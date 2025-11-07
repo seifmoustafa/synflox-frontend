@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import { useGenericCrudViewModel } from "@/hooks/use-generic-crud-viewmodel";
@@ -14,6 +15,7 @@ import type { CrudConfig } from "@/components/ui/generic-crud-view";
 import { Badge } from "@/components/ui/badge";
 
 export function useCompanyViewModel() {
+  const router = useRouter();
   const { companyService } = useServices();
   const { t } = useI18n();
   const licensingVm = useLicensingViewModel();
@@ -206,7 +208,7 @@ export function useCompanyViewModel() {
         const actions: any[] = [
           {
             label: t("common.view"),
-            onClick: (item: Company) => vm.openViewModal(item),
+            onClick: (item: Company) => router.push(`/companies/${item.id}`),
             variant: "ghost" as const,
           },
           {
