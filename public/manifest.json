@@ -1,7 +1,7 @@
 {
-  "name": "App Name",
+  "name": "SYNFLOX",
   "short_name": "CMS",
-  "description": "Professional App Name with multi-language support",
+  "description": "Professional SYNFLOX with multi-language support",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

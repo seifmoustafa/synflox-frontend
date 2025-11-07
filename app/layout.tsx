@@ -5,12 +5,12 @@ import { AppProvider } from "@/providers/app-provider"
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
-  title: "App Name",
-  description: "Professional App Name with multi-language support",
-  keywords: ["app name", "next template", "administration", "system"],
-  authors: [{ name: "App Name Team" }],
-  creator: "App Name",
-  publisher: "App Name",
+  title: "SYNFLOX",
+  description: "Professional SYNFLOX with multi-language support",
+  keywords: ["SYNFLOX", "next template", "administration", "system"],
+  authors: [{ name: "SYNFLOX Team" }],
+  creator: "SYNFLOX",
+  publisher: "SYNFLOX",
   icons: {
     icon: [
       { url: "/app-logo.png", sizes: "32x32", type: "image/png" },
@@ -21,16 +21,16 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   openGraph: {
-    title: "App Name",
-    description: "Professional App Name with multi-language support",
+    title: "SYNFLOX",
+    description: "Professional SYNFLOX with multi-language support",
     url: "https://app-name.com",
-    siteName: "App Name",
+    siteName: "SYNFLOX",
     images: [
       {
         url: "/app-logo.png",
         width: 512,
         height: 512,
-        alt: "App Name Logo",
+        alt: "SYNFLOX Logo",
       },
     ],
     locale: "ar_SA",
@@ -38,8 +38,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "App Name",
-    description: "Professional App Name with multi-language support",
+    title: "SYNFLOX",
+    description: "Professional SYNFLOX with multi-language support",
     images: ["/app-logo.png"],
   },
 }

@@ -6,7 +6,7 @@ export const en = {
     password: "Password",
     loginButton: "Sign In",
     loginError: "Invalid username or password",
-    welcome: "App Name",
+    welcome: "SYNFLOX",
     pleaseLogin: "Please sign in to continue",
     usernamePlaceholder: "superadmin",
     connectionError: "Server connection error. Please try again.",
@@ -211,7 +211,7 @@ export const en = {
   app: {
     title: "Admin Dashboard",
     subtitle: "Administrative",
-    tagline: "App Name",
+    tagline: "SYNFLOX",
     modern: "Modern",
     classic: "Classic",
     elegant: "Elegant",
