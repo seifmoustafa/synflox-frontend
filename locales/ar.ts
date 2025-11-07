@@ -34,10 +34,14 @@ export const ar = {
     dashboard: "لوحة التحكم",
     companies: "الشركات",
     admins: "المسؤولون",
-    adminTypes: "أنواع المسؤولين",
+    AdminTypes: "أنواع المسؤولين",
     profile: "الملف الشخصي",
     settings: "الإعدادات",
     logout: "تسجيل خروج",
+    System: "النظام",
+    Admins:"المسؤولون",
+    Subscribers: "المشتركون",
+    Companies: "الشركات",
   },
 
   // Company

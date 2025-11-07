@@ -109,15 +109,10 @@ export const iconMap: Record<string, any> = {
  * - false = Static navigation (hardcoded, no backend calls, no route protection)
  * - true = Dynamic navigation (from backend, with route protection)
  */
-export const USE_DYNAMIC_NAVIGATION = false;
+export const USE_DYNAMIC_NAVIGATION = true;
 
 // STATIC NAVIGATION - Used when USE_DYNAMIC_NAVIGATION is false
 export const navigation: NavigationItem[] = [
-  {
-    name: "nav.dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
   {
     name: "nav.companies",
     href: "/companies",

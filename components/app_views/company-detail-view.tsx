@@ -4,19 +4,25 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PageBreadcrumbs } from "@/components/ui/page-breadcrumbs";
-import { 
-  Building2, 
-  Calendar, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Key, 
-  Copy, 
+import {
+  Building2,
+  Calendar,
+  Mail,
+  Phone,
+  MapPin,
+  Key,
+  Copy,
   Check,
   AlertCircle,
   CheckCircle2,
@@ -47,7 +53,8 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
       const data = await companyService.getCompanyById(companyId);
       setCompany(data);
     } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : t("company.error.loadFailed");
+      const errorMessage =
+        e instanceof Error ? e.message : t("company.error.loadFailed");
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -86,8 +93,12 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
       <div className="flex items-center justify-center min-h-[400px]">
         <Card className="max-w-md">
           <CardHeader>
-            <CardTitle className="text-destructive">{t("company.error.title")}</CardTitle>
-            <CardDescription>{error || t("company.error.notFound")}</CardDescription>
+            <CardTitle className="text-destructive">
+              {t("company.error.title")}
+            </CardTitle>
+            <CardDescription>
+              {error || t("company.error.notFound")}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex gap-2">
@@ -130,6 +141,7 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
     <div className="space-y-6">
       {/* Breadcrumbs */}
       <PageBreadcrumbs
+        showHome={false}
         segments={[
           { label: t("nav.companies"), href: "/companies" },
           { label: company.name },
@@ -143,17 +155,19 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
             <Building2 className="h-8 w-8" />
             {company.name}
           </h1>
-          <p className="text-muted-foreground mt-1">{t("company.detail.description")}</p>
+          <p className="text-muted-foreground mt-1">
+            {t("company.detail.description")}
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={statusConfig[status].variant} className="text-sm px-3 py-1">
+          <Badge
+            variant={statusConfig[status].variant}
+            className="text-sm px-3 py-1"
+          >
             <StatusIcon className="h-4 w-4 mr-1" />
             {t(`company.status.${status.toLowerCase()}`)}
           </Badge>
-          <Button
-            variant="outline"
-            onClick={() => router.push(`/companies`)}
-          >
+          <Button variant="outline" onClick={() => router.push(`/companies`)}>
             <Edit className="h-4 w-4 mr-2" />
             {t("common.edit")}
           </Button>
@@ -168,7 +182,9 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
               <Building2 className="h-5 w-5" />
               {t("company.detail.basicInfo")}
             </CardTitle>
-            <CardDescription>{t("company.detail.basicInfoDescription")}</CardDescription>
+            <CardDescription>
+              {t("company.detail.basicInfoDescription")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -188,7 +204,9 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
                   {t(`company.status.${status.toLowerCase()}`)}
                 </Badge>
                 <Badge variant={company.isActive ? "active" : "inactive"}>
-                  {company.isActive ? t("company.active") : t("company.inactive")}
+                  {company.isActive
+                    ? t("company.active")
+                    : t("company.inactive")}
                 </Badge>
               </div>
             </div>
@@ -201,17 +219,22 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <p className="text-base">
                   {company.expiryDate
-                    ? new Date(company.expiryDate).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })
+                    ? new Date(company.expiryDate).toLocaleDateString(
+                        undefined,
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        }
+                      )
                     : t("company.detail.noExpiryDate")}
                 </p>
                 {company.expiryDate && (
                   <Badge
                     variant={
-                      new Date(company.expiryDate) < new Date() ? "destructive" : "default"
+                      new Date(company.expiryDate) < new Date()
+                        ? "destructive"
+                        : "default"
                     }
                     className="ml-2"
                   >
@@ -232,7 +255,9 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
               <Mail className="h-5 w-5" />
               {t("company.detail.contactInfo")}
             </CardTitle>
-            <CardDescription>{t("company.detail.contactInfoDescription")}</CardDescription>
+            <CardDescription>
+              {t("company.detail.contactInfoDescription")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -287,7 +312,9 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
                 <Key className="h-5 w-5" />
                 {t("company.licenseKey")}
               </CardTitle>
-              <CardDescription>{t("company.detail.licenseKeyDescription")}</CardDescription>
+              <CardDescription>
+                {t("company.detail.licenseKeyDescription")}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -296,7 +323,9 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
                       {t("company.licenseKey")}
                     </label>
-                    <code className="text-sm font-mono break-all">{company.licenseKey}</code>
+                    <code className="text-sm font-mono break-all">
+                      {company.licenseKey}
+                    </code>
                   </div>
                   <Button
                     variant="outline"
@@ -329,7 +358,9 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
               <Clock className="h-5 w-5" />
               {t("company.detail.timestamps")}
             </CardTitle>
-            <CardDescription>{t("company.detail.timestampsDescription")}</CardDescription>
+            <CardDescription>
+              {t("company.detail.timestampsDescription")}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
@@ -338,13 +369,16 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
                   {t("company.detail.createdAt")}
                 </label>
                 <p className="text-base">
-                  {new Date(company.createdTimestamp).toLocaleString(undefined, {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {new Date(company.createdTimestamp).toLocaleString(
+                    undefined,
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}
                 </p>
               </div>
               {company.updatedTimestamp && (
@@ -353,13 +387,16 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
                     {t("company.detail.updatedAt")}
                   </label>
                   <p className="text-base">
-                    {new Date(company.updatedTimestamp).toLocaleString(undefined, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {new Date(company.updatedTimestamp).toLocaleString(
+                      undefined,
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}
                   </p>
                 </div>
               )}
@@ -370,4 +407,3 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
     </div>
   );
 }
-

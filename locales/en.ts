@@ -35,11 +35,15 @@ export const en = {
   nav: {
     dashboard: "Dashboard",
     companies: "Companies",
-    admins: "Admins",
-    adminTypes: "Admin Types",
+
     profile: "Profile",
     settings: "Settings",
     logout: "Logout",
+    System: "System",
+    Subscribers: "Subscribers",
+    Companies: "Companies",
+    Admins: "Admins",
+    AdminTypes: "Admin Types",
   },
 
   // Company
@@ -88,7 +92,8 @@ export const en = {
       valid: "Valid",
       notProvided: "Not provided",
       noLicenseKey: "No License Key",
-      noLicenseKeyDescription: "This company does not have a license key generated yet. Use the 'Generate License Key' action to create one.",
+      noLicenseKeyDescription:
+        "This company does not have a license key generated yet. Use the 'Generate License Key' action to create one.",
       timestamps: "Timestamps",
       timestampsDescription: "Creation and update timestamps",
       createdAt: "Created At",
@@ -108,8 +113,10 @@ export const en = {
     regenerateKey: "Regenerate License Key",
     viewKey: "View License Key",
     status: "Status",
-    confirmSuspend: "Are you sure you want to suspend {name}? This will prevent the company from using the license.",
-    confirmResume: "Are you sure you want to resume {name}? This will restore the company's license access.",
+    confirmSuspend:
+      "Are you sure you want to suspend {name}? This will prevent the company from using the license.",
+    confirmResume:
+      "Are you sure you want to resume {name}? This will restore the company's license access.",
   },
 
   // Admin
@@ -187,7 +194,8 @@ export const en = {
     },
     endpoints: {
       title: "API Endpoints Explorer",
-      description: "All available API endpoints grouped by controller ({count} total)",
+      description:
+        "All available API endpoints grouped by controller ({count} total)",
       endpoints: "endpoints",
       searchPlaceholder: "Search by route, method, or controller...",
       allMethods: "All Methods",
