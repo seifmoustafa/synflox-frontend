@@ -56,6 +56,10 @@ export class AuthService {
       // Even if logout fails on server, clear local tokens
     } finally {
       secureTokenService.clearTokens();
+      // Clear navigation data from localStorage
+      localStorage.removeItem("navigation_data");
+      localStorage.removeItem("navigation_data_expiry");
+      appLogger.debug("Navigation data cleared from localStorage on logout");
     }
   }
 
