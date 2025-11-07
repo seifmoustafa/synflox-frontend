@@ -1,0 +1,119 @@
+---
+description: Enforce strict adherence to Clean Architecture patterns as defined in ARCHITECTURE_GUIDE.md
+alwaysApply: true
+---
+
+# Architecture Enforcement Rules
+
+You MUST follow the architecture structure defined in `ARCHITECTURE_GUIDE.md`. This is a strict requirement for all code generation and modifications.
+
+## Layer Structure (MANDATORY ORDER)
+
+When building features, create files in this exact order:
+
+1. **Domain Model** → `domain/models/[feature].model.ts`
+2. **Mapper** → `domain/mappers/[feature].mapper.ts`
+3. **Service** → `services/[feature].service.ts`
+4. **ViewModel** → `viewmodels/[feature]-viewmodel.ts`
+5. **View** → `views/[feature]-view.tsx` or `components/app_views/[feature]-view.tsx`
+6. **Page** → `app/[feature]/page.tsx`
+
+## Domain Model Requirements
+
+- MUST have `[Feature]Data` interface
+- MUST have `[Feature]` class with readonly properties
+- MUST have `Create[Feature]Request` and `Update[Feature]Request` classes
+- MUST include business logic in getters (e.g., `displayName`, `isActive`)
+- MUST have `update()` method for immutability
+- MUST have `isValid` getter for validation
+
+## Mapper Requirements
+
+- MUST be static class `[Feature]Mapper`
+- MUST have `fromJson()` to convert API → Domain
+- MUST have `toJson()` to convert Domain → API
+- MUST have `createRequestToJson()` and `updateRequestToJson()`
+- MUST have `handleApiResponse()` for various API formats
+- MUST define `[Features]Response` interface
+
+## Service Requirements
+
+- MUST implement `I[Feature]Service` interface
+- MUST accept `IApiService` and `INotificationService` in constructor
+- MUST use mappers for all conversions
+- MUST use NotificationService for user feedback
+- MUST handle errors properly
+
+## ViewModel Requirements
+
+- MUST be hook: `use[Feature]ViewModel()`
+- MUST use `useServices()` and `useI18n()`
+- MUST use `useGenericCrudViewModel` for CRUD features
+- MUST return `{ vm, config, handleDelete }`
+- MUST use domain models, never raw JSON
+
+## View Requirements
+
+- MUST be client component (`"use client"`)
+- MUST use ViewModel hook
+- MUST use `GenericCrudView` for CRUD
+- Minimal logic, mainly composition
+
+## Page Requirements
+
+- MUST be server component (default)
+- MUST wrap in `DashboardLayout`
+- Minimal logic, composition only
+
+## Naming Conventions (STRICT)
+
+- Pages: `[feature]/page.tsx`
+- Views: `[feature]-view.tsx` or `[Feature]View`
+- ViewModels: `use[Feature]ViewModel`
+- Services: `[Feature]Service`, `I[Feature]Service`
+- Models: `[Feature]`, `[Feature]Data`
+- Mappers: `[Feature]Mapper`
+
+## Required Updates
+
+When creating features, MUST update:
+- `domain/index.ts` - Export models and mappers
+- `domain/mappers/index.ts` - Export mapper
+- `config/api-endpoints.ts` - Add endpoints
+- `providers/service-provider.tsx` - Add service
+- `locales/en.ts` and `locales/ar.ts` - Add translations
+
+## Forbidden Patterns
+
+❌ NEVER:
+- Use raw JSON in components
+- Skip mapper layer
+- Put business logic in views
+- API calls in components
+- Use `any` without justification
+- Skip error handling
+- Skip notifications
+
+✅ ALWAYS:
+- Use domain models
+- Use mappers for conversion
+- Use services for API
+- Use ViewModels for logic
+- Handle errors properly
+- Show user notifications
+- Follow layer structure
+- Use TypeScript types
+
+## Import Order
+
+1. React/Next.js
+2. Third-party libraries
+3. Internal providers
+4. Internal hooks
+5. Internal components
+6. Domain models
+7. Utilities
+
+## Reference
+
+See `ARCHITECTURE_GUIDE.md` for complete details and examples.
