@@ -244,6 +244,7 @@ export function useCompanyViewModel() {
             className: "text-orange-600 hover:text-orange-700",
             confirmTitle: t("licensing.suspend"),
             confirmDescription: t("licensing.confirmSuspend", { name: "{name}" }),
+            confirmationVariant: "warning", // Use warning variant for suspend
           },
           {
             label: t("licensing.resume"),
@@ -258,6 +259,7 @@ export function useCompanyViewModel() {
             className: "text-blue-600 hover:text-blue-700",
             confirmTitle: t("licensing.resume"),
             confirmDescription: t("licensing.confirmResume", { name: "{name}" }),
+            confirmationVariant: "info", // Use info variant for resume
           },
           {
             label: t("licensing.extend"),
@@ -293,6 +295,7 @@ export function useCompanyViewModel() {
             show: (item: Company) => item.isActive === true,
             confirmTitle: t("common.makeInactive"),
             confirmDescription: t("common.confirmMakeInactive", { name: "{name}" }),
+            confirmationVariant: "warning", // Use warning variant for make inactive
           },
           {
             label: t("common.makeActive"),
@@ -305,6 +308,7 @@ export function useCompanyViewModel() {
             show: (item: Company) => item.isActive !== true,
             confirmTitle: t("common.makeActive"),
             confirmDescription: t("common.confirmMakeActive", { name: "{name}" }),
+            confirmationVariant: "info", // Use info variant for make active
           },
           {
             label: t("common.delete"),
@@ -313,6 +317,7 @@ export function useCompanyViewModel() {
             className: "text-red-600 hover:text-red-700",
             confirmTitle: t("common.confirmDelete"),
             confirmDescription: t("common.deleteConfirmation", { name: "{name}" }),
+            isDeleteAction: true, // Use delete confirmation dialog
           }
         );
 

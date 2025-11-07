@@ -29,7 +29,7 @@ import {
 import { GenericForm, FieldConfig } from "@/components/forms/generic-form";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ErrorMessage } from "@/components/ui/error-message";
-import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { ConfirmationDialog, useConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { useEnhancedDelete } from "@/hooks/use-enhanced-delete";
 import { useEnhancedToast } from "@/hooks/use-enhanced-toast";
 import { useSettings } from "@/providers/settings-provider";
@@ -83,6 +83,10 @@ export interface CrudAction<TItem = any> {
   confirmTitle?: string;
   /** Confirmation dialog description (supports {name} placeholder) */
   confirmDescription?: string;
+  /** Whether this is a delete action (uses delete confirmation dialog) */
+  isDeleteAction?: boolean;
+  /** Confirmation variant (default, warning, destructive, info) */
+  confirmationVariant?: "default" | "warning" | "destructive" | "info";
   /** Whether the action is disabled */
   disabled?: (item: TItem) => boolean;
   /** Tooltip text for the action */
@@ -291,6 +295,9 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
   // Enhanced delete system for professional confirmation dialogs
   const deleteSystem = useEnhancedDelete();
   const { operationSuccess, operationError } = useEnhancedToast();
+  
+  // Generic confirmation dialog for non-delete actions
+  const confirmationDialog = useConfirmationDialog();
 
   // Enhanced delete handler with professional confirmation dialog
   const handleDelete = useCallback(
@@ -379,27 +386,50 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
         const itemDisplayName = config?.getItemDisplayName
           ? config.getItemDisplayName(item)
           : item.name || item.id;
-        await deleteSystem.confirmDelete(
-          async () => {
-            await action.onClick(item);
-            await viewModel.refreshItems();
-          },
-          {
-            itemName: itemDisplayName,
-            itemType: config?.itemTypeKey ? t(config.itemTypeKey) : "Item",
-            confirmTitle: action.confirmTitle || action.label,
-            confirmDescription:
+        
+        // Use delete confirmation dialog only for delete actions
+        if (action.isDeleteAction) {
+          await deleteSystem.confirmDelete(
+            async () => {
+              await action.onClick(item);
+              await viewModel.refreshItems();
+            },
+            {
+              itemName: itemDisplayName,
+              itemType: config?.itemTypeKey ? t(config.itemTypeKey) : "Item",
+              confirmTitle: action.confirmTitle || action.label,
+              confirmDescription:
+                action.confirmDescription?.replace("{name}", itemDisplayName) ||
+                `Are you sure you want to ${action.label.toLowerCase()} ${itemDisplayName}?`,
+            }
+          );
+        } else {
+          // Use generic confirmation dialog for non-delete actions
+          confirmationDialog.showConfirmation({
+            title: action.confirmTitle || action.label,
+            description:
               action.confirmDescription?.replace("{name}", itemDisplayName) ||
               `Are you sure you want to ${action.label.toLowerCase()} ${itemDisplayName}?`,
-          }
-        );
+            confirmText: action.label,
+            cancelText: t("common.cancel"),
+            onConfirm: async () => {
+              await action.onClick(item);
+              await viewModel.refreshItems();
+              confirmationDialog.hideConfirmation();
+            },
+            onCancel: () => {
+              confirmationDialog.hideConfirmation();
+            },
+            variant: action.confirmationVariant || "default",
+          });
+        }
       } else {
         // No confirmation needed, just execute and refresh
         await action.onClick(item);
         await viewModel.refreshItems();
       }
     },
-    [deleteSystem, viewModel, config, t]
+    [deleteSystem, confirmationDialog, viewModel, config, t]
   );
 
   // Handle create button click
@@ -753,6 +783,9 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
         variant="destructive"
         isLoading={deleteSystem.isDeleting}
       />
+
+      {/* Generic confirmation dialog for non-delete actions */}
+      {confirmationDialog.ConfirmationDialog && <confirmationDialog.ConfirmationDialog />}
     </div>
   );
 }

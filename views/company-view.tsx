@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
 import { useCompanyViewModel } from "@/viewmodels/company-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
 import { Copy, Check, Loader2, Calendar, Key } from "lucide-react";
@@ -73,13 +74,13 @@ export function CompanyView() {
         <form onSubmit={handleActivateSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="activateExpiryDate">{t("company.expiryDate")}</Label>
-            <Input
+            <DatePicker
               id="activateExpiryDate"
-              type="date"
               value={activateExpiryDate}
-              onChange={(e) => setActivateExpiryDate(e.target.value)}
+              onChange={(value) => setActivateExpiryDate(value)}
+              placeholder={t("company.expiryDatePlaceholder")}
               required
-              min={new Date().toISOString().split('T')[0]}
+              type="date"
             />
           </div>
           <div className="flex justify-end gap-2">
@@ -124,13 +125,13 @@ export function CompanyView() {
         <form onSubmit={handleExtendSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="extendExpiryDate">{t("company.newExpiryDate")}</Label>
-            <Input
+            <DatePicker
               id="extendExpiryDate"
-              type="date"
               value={extendExpiryDate}
-              onChange={(e) => setExtendExpiryDate(e.target.value)}
+              onChange={(value) => setExtendExpiryDate(value)}
+              placeholder={t("company.expiryDatePlaceholder")}
               required
-              min={new Date().toISOString().split('T')[0]}
+              type="date"
             />
           </div>
           <div className="flex justify-end gap-2">
