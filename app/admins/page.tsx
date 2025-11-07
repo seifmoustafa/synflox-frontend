@@ -1,10 +1,11 @@
-import { TreeNodeView } from "@/views/tree-node-view";
+import { AdminView } from "@/views/admin-view";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
-export default async function TreeNodePage() {
+export default async function AdminsPage() {
   return (
     <DashboardLayout>
-      <TreeNodeView />
+      <AdminView />
     </DashboardLayout>
   );
 }
+

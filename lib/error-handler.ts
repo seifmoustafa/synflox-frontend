@@ -110,11 +110,13 @@ export class ErrorHandler {
       return error as AppError;
     }
 
+    // Preserve the original error message (from backend) - don't override it
+    const originalMessage = error.message || "An unknown error occurred";
     const errorCode = this.determineErrorCode(error);
 
     return {
       code: errorCode,
-      message: error.message || "An unknown error occurred",
+      message: originalMessage, // Always preserve the original message
       details: error.stack || error,
       timestamp: new Date(),
       context,
@@ -197,8 +199,23 @@ export class ErrorHandler {
 
   /**
    * Get user-friendly error message
+   * Always prefer the original error message (from backend) over generic messages
    */
   getUserFriendlyMessage(error: AppError): string {
+    // Always prefer the original error message (from backend) over generic messages
+    // Only use generic messages if the error message is clearly a generic HTTP error
+    const isGenericHttpError = error.message.includes("HTTP error!") || 
+                                error.message.includes("status:") ||
+                                error.message === "Unauthorized - please login again" ||
+                                error.message === "Network error" ||
+                                error.message === "Request was aborted";
+    
+    // If we have a specific message from backend, use it
+    if (!isGenericHttpError && error.message && error.message.trim().length > 0) {
+      return error.message;
+    }
+
+    // Fallback to generic messages only if no specific message is available
     const messages: Record<string, string> = {
       [ERROR_CODES.AUTH_TOKEN_EXPIRED]:
         "Your session has expired. Please log in again.",

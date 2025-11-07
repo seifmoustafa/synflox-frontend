@@ -41,29 +41,55 @@ export {
   type NotificationConfigData
 } from './models/notification.model';
 
-// Product domain
+// Company domain
 export {
-  Product,
-  CreateProductRequest,
-  UpdateProductRequest,
-  type ProductData,
-  type CreateProductRequestData,
-  type UpdateProductRequestData
-} from './models/product.model';
+  Company,
+  CreateCompanyRequest,
+  UpdateCompanyRequest,
+  type CompanyData,
+  type CreateCompanyRequestData,
+  type UpdateCompanyRequestData
+} from './models/company.model';
+export type { CompaniesResponse } from './mappers/company.mapper';
 
-// TreeNode domain
+// Licensing domain
 export {
-  TreeNode,
-  CreateTreeNodeRequest,
-  UpdateTreeNodeRequest,
-  type TreeNodeData,
-  type CreateTreeNodeRequestData,
-  type UpdateTreeNodeRequestData
-} from './models/tree-node.model';
+  ActivateCompanyRequest,
+  ExtendCompanyRequest,
+  CompanyStatusResponse,
+  GenerateLicenseKeyResponse,
+  ValidateLicenseKeyRequest,
+  LicenseKeyValidationResponse,
+  LicenseStatus,
+  type ActivateCompanyRequestData,
+  type ExtendCompanyRequestData,
+  type CompanyStatusResponseData,
+  type GenerateLicenseKeyResponseData,
+  type ValidateLicenseKeyRequestData,
+  type LicenseKeyValidationResponseData,
+} from './models/licensing.model';
+
+// Admin domain
+export {
+  Admin,
+  CreateAdminRequest,
+  UpdateAdminRequest,
+  type AdminData,
+  type CreateAdminRequestData,
+  type UpdateAdminRequestData
+} from './models/admin.model';
+export type { AdminsResponse } from './mappers/admin.mapper';
+
+// Admin Type domain
+export {
+  AdminType,
+  CreateAdminTypeRequest,
+  UpdateAdminTypeRequest,
+  type AdminTypeData,
+  type CreateAdminTypeRequestData,
+  type UpdateAdminTypeRequestData
+} from './models/admin-type.model';
+export type { AdminTypesResponse } from './mappers/admin-type.mapper';
 
 // Mappers
-export { UserMapper, AuthMapper, NavigationMapper, NotificationMapper, ProductMapper, TreeNodeMapper } from './mappers';
-
-// Response Types
-export type { ProductsResponse } from './mappers/product.mapper';
-export type { TreeNodesResponse } from './mappers/tree-node.mapper';
+export { UserMapper, AuthMapper, NavigationMapper, NotificationMapper, CompanyMapper, LicensingMapper, AdminMapper, AdminTypeMapper } from './mappers';

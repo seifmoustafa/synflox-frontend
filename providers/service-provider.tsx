@@ -7,8 +7,10 @@ import { NotificationService } from "@/services/notification.service";
 import { NavigationService } from "@/services/navigation.service";
 import { AuthService } from "@/services/auth.service";
 import { UserService } from "@/services/user.service";
-import { ProductService } from "@/services/product.service";
-import { TreeNodeService } from "@/services/tree-node.service";
+import { CompanyService } from "@/services/company.service";
+import { LicensingService } from "@/services/licensing.service";
+import { AdminService } from "@/services/admin.service";
+import { AdminTypeService } from "@/services/admin-type.service";
 
 interface Services {
   apiService: ApiService;
@@ -16,8 +18,10 @@ interface Services {
   navigationService: NavigationService;
   authService: AuthService;
   userService: UserService;
-  productService: ProductService;
-  treeNodeService: TreeNodeService;
+  companyService: CompanyService;
+  licensingService: LicensingService;
+  adminService: AdminService;
+  adminTypeService: AdminTypeService;
 }
 
 const ServiceContext = createContext<Services | null>(null);
@@ -29,8 +33,10 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
     const authService = new AuthService(apiService);
     const userService = new UserService(apiService);
     const navigationService = new NavigationService(apiService);
-    const productService = new ProductService(notificationService);
-    const treeNodeService = new TreeNodeService(notificationService);
+    const companyService = new CompanyService(apiService, notificationService);
+    const licensingService = new LicensingService(apiService, notificationService);
+    const adminService = new AdminService(apiService, notificationService);
+    const adminTypeService = new AdminTypeService(apiService, notificationService);
 
     return {
       apiService,
@@ -38,8 +44,10 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
       navigationService,
       authService,
       userService,
-      productService,
-      treeNodeService
+      companyService,
+      licensingService,
+      adminService,
+      adminTypeService
     };
   }, []);
 

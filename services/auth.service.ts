@@ -15,96 +15,61 @@ export class AuthService {
   constructor(private readonly apiService: IApiService) {}
 
   async login(credentials: LoginRequest): Promise<User> {
-    // ========================================
-    // REAL API ENDPOINT
-    // ========================================
-    // const response = await this.apiService.post<LoginResponse>(
-    //   API_ENDPOINTS.LOGIN,
-    //   AuthMapper.loginRequestToJson(credentials)
-    // );
-    // if (response && response.accessToken) {
-    //   secureTokenService.setAccessToken(response.accessToken);
-    //   secureTokenService.setRefreshToken(response.refreshToken);
-    //   return this.getMe();
-    // }
-    // throw new Error("Login failed: No access token received.");
-
-    // ========================================
-    // MOCK DATA FOR TESTING (COMMENT OUT FOR REAL API)
-    // ========================================
-    
-    // Debug logging
-    appLogger.debug("🔍 Mock Login Debug:", {
-      username: credentials.username,
-      password: credentials.password ? "***" : "MISSING",
-      isValid: credentials.isValid
-    });
-
-    // MOCK LOGIN: Accept ANY username/password (bypass validation for testing)
-    if (credentials.username && credentials.password) {
-      appLogger.debug("✅ Mock login successful!");
-      // Store mock tokens securely
-      secureTokenService.setAccessToken("mock-access-token");
-      secureTokenService.setRefreshToken("mock-refresh-token");
-
-      // Return mock user data using mapper
-      return UserMapper.fromJson({
-        id: "mock-user-id",
-        username: credentials.username,
-        firstName: "Demo",
-        lastName: "User",
-        phoneNumber: "+1234567890",
-        adminTypeName: "Administrator",
-      });
-    }
-    
-    appLogger.debug("❌ Mock login failed - missing username or password");
-    throw new Error("Username and password are required.");
-  }
-
-  async logout(): Promise<void> {
     try {
-      // ========================================
-      // REAL API ENDPOINT
-      // ========================================
-      // await this.apiService.post(API_ENDPOINTS.LOGOUT);
+      // SYNFLOX API: POST /api/admin/auth/login
+      // Backend returns: { statusCode, message, data: { success, accessToken, refreshToken, expiresIn, admin, errorMessage? } }
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.AUTH_LOGIN,
+        AuthMapper.loginRequestToJson(credentials)
+      );
 
-      // Remove tokens locally
-      secureTokenService.clearTokens();
+      // Handle SYNFLOX response format
+      const loginData = response?.data || response;
+      const loginResponse = AuthMapper.loginResponseFromJson(loginData);
+
+      if (loginResponse.isSuccessful && loginResponse.accessToken) {
+        secureTokenService.setAccessToken(loginResponse.accessToken);
+        secureTokenService.setRefreshToken(loginResponse.refreshToken);
+        
+        // If admin data is in response, use it; otherwise fetch user
+        if (loginData?.admin) {
+          return UserMapper.fromJson(loginData.admin);
+        }
+        return this.getMe();
+      }
+
+      // Handle error message from backend
+      const errorMessage = loginResponse.errorMessage || response?.message || "Login failed: No access token received.";
+      throw new Error(errorMessage);
     } catch (error) {
-      // Even if logout fails on server, clear local tokens
-      secureTokenService.clearTokens();
+      appLogger.error("Login failed:", error);
       throw error;
     }
   }
 
-  async getMe(): Promise<User> {
-    // ========================================
-    // REAL API ENDPOINT
-    // ========================================
-    // try {
-    //   const response = await this.apiService.get<User>(API_ENDPOINTS.GET_ADMIN_ME);
-    //   return UserMapper.fromJson(response);
-    // } catch (error) {
-    //   throw error;
-    // }
-
-    // ========================================
-    // MOCK DATA FOR TESTING (COMMENT OUT FOR REAL API)
-    // ========================================
-
-    // MOCK: Return mock user data if token exists
-    if (this.hasToken()) {
-      return UserMapper.fromJson({
-        id: "mock-user-id",
-        username: "demo-user",
-        firstName: "Demo",
-        lastName: "User",
-        phoneNumber: "+1234567890",
-        adminTypeName: "Administrator",
-      });
+  async logout(): Promise<void> {
+    try {
+      // SYNFLOX API: POST /api/admin/auth/logout
+      await this.apiService.post(API_ENDPOINTS.AUTH_LOGOUT);
+    } catch (error) {
+      appLogger.error("Logout API call failed:", error);
+      // Even if logout fails on server, clear local tokens
+    } finally {
+      secureTokenService.clearTokens();
     }
-    throw new Error("No authentication token found.");
+  }
+
+  async getMe(): Promise<User> {
+    try {
+      // SYNFLOX API: GET /api/admins/me
+      // Backend returns: { statusCode, message, data: AdminDto }
+      const response = await this.apiService.get<any>(API_ENDPOINTS.GET_ADMIN_ME);
+      const adminData = response?.data || response;
+      return UserMapper.fromJson(adminData);
+    } catch (error) {
+      appLogger.error("Failed to fetch current user:", error);
+      throw error;
+    }
   }
 
   hasToken(): boolean {
@@ -117,17 +82,24 @@ export class AuthService {
 
     try {
       const refreshRequest = new RefreshTokenRequest({ refreshToken });
-      const response = await this.apiService.post<LoginResponse>(
-        API_ENDPOINTS.REFRESH,
+      // SYNFLOX API: POST /api/admin/auth/refresh-token
+      // Backend returns: { statusCode, message, data: { success, accessToken, refreshToken, expiresIn, errorMessage? } }
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.AUTH_REFRESH_TOKEN,
         AuthMapper.refreshTokenRequestToJson(refreshRequest)
       );
 
-      const loginResponse = AuthMapper.loginResponseFromJson(response);
+      const loginData = response?.data || response;
+      const loginResponse = AuthMapper.loginResponseFromJson(loginData);
       if (loginResponse.isSuccessful) {
         secureTokenService.setAccessToken(loginResponse.accessToken);
+        if (loginResponse.refreshToken) {
+          secureTokenService.setRefreshToken(loginResponse.refreshToken);
+        }
       }
       return loginResponse;
-    } catch {
+    } catch (error) {
+      appLogger.error("Token refresh failed:", error);
       secureTokenService.clearTokens();
       return null;
     }

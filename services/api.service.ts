@@ -38,6 +38,15 @@ export class ApiService implements IApiService {
     return json as T;
   }
 
+  private getLanguage(): string {
+    // Get language from localStorage, default to 'ar' if not available
+    if (typeof window !== 'undefined') {
+      const lang = localStorage.getItem("language");
+      return lang === "en" ? "en" : "ar";
+    }
+    return "ar"; // Default for SSR
+  }
+
   private async request<T>(endpoint: string, options: RequestInit = {}, signal?: AbortSignal): Promise<T> {
     const url = this.buildUrl(endpoint);
     
@@ -53,8 +62,10 @@ export class ApiService implements IApiService {
     }
 
     const token = secureTokenService.getAccessToken();
+    const language = this.getLanguage();
     const headers: Record<string, string> = {
       ...this.defaultHeaders,
+      "Accept-Language": language,
       ...(options.headers as Record<string, string>),
     };
     if (token) {
@@ -90,11 +101,33 @@ export class ApiService implements IApiService {
       appLogger.api("Response:", { status: response.status, statusText: response.statusText });
 
       if (!response.ok) {
+        // Try to parse error response to get backend message
+        let errorMessage = response.statusText;
+        let errorData: any = null;
+        
+        try {
+          const errorText = await response.text();
+          if (errorText) {
+            try {
+              errorData = JSON.parse(errorText);
+              // Extract message from SYNFLOX response format: { statusCode, message, data, errors }
+              if (errorData?.message) {
+                errorMessage = errorData.message;
+              }
+            } catch {
+              // If not JSON, use the text as message
+              errorMessage = errorText;
+            }
+          }
+        } catch {
+          // If parsing fails, use status text
+        }
+
         if (response.status === 401) {
           if(window.location.pathname != "/login"){
-            const error = new Error("Unauthorized - please login again");
+            const error = new Error(errorMessage || "Unauthorized - please login again");
             const appError = handleError(error, `API Request: ${url}`);
-            toast.error(getUserFriendlyErrorMessage(appError));
+            toast.error(errorMessage || getUserFriendlyErrorMessage(appError));
             secureTokenService.clearTokens();
             // Use Next.js router instead of direct window manipulation
             if (typeof window !== 'undefined') {
@@ -102,16 +135,16 @@ export class ApiService implements IApiService {
             }
             throw error;
           } else {
-            const error = new Error(response.statusText);
-            const appError = handleError(error, `API Request: ${url}`);
-            toast.error(getUserFriendlyErrorMessage(appError));
+            // For login page, don't show toast - let the form handle the error display
+            const error = new Error(errorMessage);
             throw error;
           }
         }
-        const errorText = await response.text();
-        const error = new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        
+        const error = new Error(errorMessage);
         const appError = handleError(error, `API Request: ${url}`);
-        toast.error(getUserFriendlyErrorMessage(appError));
+        // Prefer backend message over generic error handler message
+        toast.error(errorMessage || getUserFriendlyErrorMessage(appError));
         throw error;
       }
 

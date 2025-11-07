@@ -16,6 +16,7 @@ export interface LoginResponseData {
   success: boolean;
   accessToken: string;
   refreshToken: string;
+  errorMessage?: string;
 }
 
 export interface RefreshTokenRequestData {
@@ -48,11 +49,13 @@ export class LoginResponse {
   public readonly success: boolean;
   public readonly accessToken: string;
   public readonly refreshToken: string;
+  public readonly errorMessage?: string;
 
   constructor(data: LoginResponseData) {
     this.success = data.success;
     this.accessToken = data.accessToken;
     this.refreshToken = data.refreshToken;
+    this.errorMessage = data.errorMessage;
   }
 
   /**

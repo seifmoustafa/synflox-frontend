@@ -114,25 +114,19 @@ export const USE_DYNAMIC_NAVIGATION = false;
 // STATIC NAVIGATION - Used when USE_DYNAMIC_NAVIGATION is false
 export const navigation: NavigationItem[] = [
   {
-    name: "nav.demo",
+    name: "nav.companies",
+    href: "/companies",
+    icon: Building,
+  },
+  {
+    name: "nav.admins",
+    href: "/admins",
     icon: Users,
-    children: [
-      {
-        name: "nav.products",
-        href: "/demo/products",
-        icon: ShieldCheck,
-      },
-      {
-        name: "nav.tree",
-        href: "/demo/tree",
-        icon: Users,
-      },
-      {
-        name: "nav.richTextEditor",
-        href: "/demo/rich-text-editor",
-        icon: Type,
-      },
-    ],
+  },
+  {
+    name: "nav.adminTypes",
+    href: "/admin-types",
+    icon: Shield,
   },
 ];
 

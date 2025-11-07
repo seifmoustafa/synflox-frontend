@@ -44,6 +44,7 @@ export class AuthMapper {
       success: json.success || false,
       accessToken: json.accessToken || '',
       refreshToken: json.refreshToken || '',
+      errorMessage: json.errorMessage,
     });
   }
 
@@ -55,6 +56,7 @@ export class AuthMapper {
       success: response.success,
       accessToken: response.accessToken,
       refreshToken: response.refreshToken,
+      errorMessage: response.errorMessage,
     };
   }
 
