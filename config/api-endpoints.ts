@@ -40,4 +40,9 @@ export const API_ENDPOINTS = {
   
   // Navigation (if still needed)
   GET_MENU_ITEMS: "/MenuItems",
+  
+  // Dashboard
+  DASHBOARD_OVERVIEW: "/dashboard/overview",
+  DASHBOARD_STATISTICS: "/dashboard/statistics",
+  DASHBOARD_ENDPOINTS: "/dashboard/endpoints",
 };

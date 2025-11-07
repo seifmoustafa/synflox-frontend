@@ -114,6 +114,11 @@ export const USE_DYNAMIC_NAVIGATION = false;
 // STATIC NAVIGATION - Used when USE_DYNAMIC_NAVIGATION is false
 export const navigation: NavigationItem[] = [
   {
+    name: "nav.dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
     name: "nav.companies",
     href: "/companies",
     icon: Building,

@@ -124,6 +124,53 @@ export const ar = {
     inactive: "غير نشط",
     isActive: "نشط",
   },
+
+  // Dashboard
+  dashboard: {
+    title: "لوحة التحكم",
+    description: "نظرة عامة على النظام والإحصائيات",
+    loading: "جاري تحميل بيانات لوحة التحكم...",
+    error: {
+      title: "خطأ في تحميل لوحة التحكم",
+      loadFailed: "فشل تحميل بيانات لوحة التحكم",
+      retry: "إعادة المحاولة",
+    },
+    tabs: {
+      statistics: "الإحصائيات",
+      endpoints: "نقاط نهاية API",
+    },
+    statistics: {
+      totalCompanies: "إجمالي الشركات",
+      totalAdmins: "إجمالي المسؤولين",
+      totalAdminTypes: "إجمالي أنواع المسؤولين",
+      activeAdmins: "المسؤولون النشطون",
+      inactiveAdmins: "المسؤولون غير النشطين",
+      companiesExpiringSoon: "الشركات التي تنتهي قريباً",
+      recentlyCreatedCompanies: "الشركات المُنشأة مؤخراً",
+      recentlyCreatedAdmins: "المسؤولون المُنشأون مؤخراً",
+      expiringWarning: "الشركات التي تنتهي خلال 30 يوماً",
+    },
+    licenseStatus: {
+      title: "نظرة عامة على حالة الترخيص",
+      description: "توزيع حالات الترخيص عبر جميع الشركات",
+      active: "نشط",
+      expired: "منتهي",
+      suspended: "معلق",
+      total: "الإجمالي",
+    },
+    endpoints: {
+      title: "مستكشف نقاط نهاية API",
+      description: "جميع نقاط نهاية API المتاحة مجمعة حسب المتحكم ({count} إجمالي)",
+      endpoints: "نقاط نهاية",
+      searchPlaceholder: "البحث حسب المسار أو الطريقة أو المتحكم...",
+      allMethods: "جميع الطرق",
+      expandAll: "توسيع الكل",
+      collapseAll: "طي الكل",
+      policy: "السياسة",
+      parameters: "المعاملات",
+      optional: "اختياري",
+    },
+  },
   imageUploader: {
     placeholder: "انقر للتحميل أو اسحب وأفلت",
     selectFile: "اختر ملف",
@@ -161,16 +208,7 @@ export const ar = {
     text: "SA", // Text for shield/avatar fallback
   },
 
-  // Dashboard
-  dashboard: {
-    title: "نظرة عامة على لوحة التحكم",
-    welcome: "مرحباً بعودتك!",
-    totalUsers: "إجمالي المستخدمين",
-    revenue: "الإيرادات",
-    orders: "الطلبات",
-    growth: "النمو",
-    revenueOverview: "نظرة عامة على الإيرادات",
-  },
+  
 
   // Analytics
   analytics: {

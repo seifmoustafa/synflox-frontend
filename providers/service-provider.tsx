@@ -11,6 +11,7 @@ import { CompanyService } from "@/services/company.service";
 import { LicensingService } from "@/services/licensing.service";
 import { AdminService } from "@/services/admin.service";
 import { AdminTypeService } from "@/services/admin-type.service";
+import { DashboardService } from "@/services/dashboard.service";
 
 interface Services {
   apiService: ApiService;
@@ -22,6 +23,7 @@ interface Services {
   licensingService: LicensingService;
   adminService: AdminService;
   adminTypeService: AdminTypeService;
+  dashboardService: DashboardService;
 }
 
 const ServiceContext = createContext<Services | null>(null);
@@ -37,6 +39,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
     const licensingService = new LicensingService(apiService, notificationService);
     const adminService = new AdminService(apiService, notificationService);
     const adminTypeService = new AdminTypeService(apiService, notificationService);
+    const dashboardService = new DashboardService(apiService, notificationService);
 
     return {
       apiService,
@@ -47,7 +50,8 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
       companyService,
       licensingService,
       adminService,
-      adminTypeService
+      adminTypeService,
+      dashboardService
     };
   }, []);
 

@@ -13,3 +13,4 @@ export { CompanyMapper } from './company.mapper';
 export { LicensingMapper } from './licensing.mapper';
 export { AdminMapper } from './admin.mapper';
 export { AdminTypeMapper } from './admin-type.mapper';
+export { DashboardMapper } from './dashboard.mapper';

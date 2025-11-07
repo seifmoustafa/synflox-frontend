@@ -126,6 +126,53 @@ export const en = {
     isActive: "Is Active",
   },
 
+  // Dashboard
+  dashboard: {
+    title: "Dashboard",
+    description: "System overview and statistics",
+    loading: "Loading dashboard data...",
+    error: {
+      title: "Error Loading Dashboard",
+      loadFailed: "Failed to load dashboard data",
+      retry: "Retry",
+    },
+    tabs: {
+      statistics: "Statistics",
+      endpoints: "API Endpoints",
+    },
+    statistics: {
+      totalCompanies: "Total Companies",
+      totalAdmins: "Total Admins",
+      totalAdminTypes: "Total Admin Types",
+      activeAdmins: "Active Admins",
+      inactiveAdmins: "Inactive Admins",
+      companiesExpiringSoon: "Companies Expiring Soon",
+      recentlyCreatedCompanies: "Recently Created Companies",
+      recentlyCreatedAdmins: "Recently Created Admins",
+      expiringWarning: "Companies expiring within 30 days",
+    },
+    licenseStatus: {
+      title: "License Status Overview",
+      description: "Distribution of license statuses across all companies",
+      active: "Active",
+      expired: "Expired",
+      suspended: "Suspended",
+      total: "Total",
+    },
+    endpoints: {
+      title: "API Endpoints Explorer",
+      description: "All available API endpoints grouped by controller ({count} total)",
+      endpoints: "endpoints",
+      searchPlaceholder: "Search by route, method, or controller...",
+      allMethods: "All Methods",
+      expandAll: "Expand All",
+      collapseAll: "Collapse All",
+      policy: "Policy",
+      parameters: "Parameters",
+      optional: "Optional",
+    },
+  },
+
   // Layout & App
   app: {
     title: "Admin Dashboard",
