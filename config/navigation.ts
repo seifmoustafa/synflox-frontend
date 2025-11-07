@@ -33,6 +33,8 @@ import {
   Palette,
   Map,
   Ticket,
+  ShieldUser,
+  Tag,
 } from "lucide-react";
 
 export interface NavigationItem {
@@ -47,6 +49,18 @@ export interface NavigationItem {
 /**
  * Icon mapping from string names to actual icon components
  * Used to convert backend icon names to React components
+ * 
+ * 📋 BACKEND ICON NAMES REFERENCE:
+ * 
+ * For menu items, use these icon names in your backend response:
+ * 
+ * - Admins: "Users2" (recommended) or "Users" or "UserShield"
+ * - Admin Types: "ShieldCheck" (recommended) or "Shield" or "UserShield"
+ * - Companies: "Building"
+ * - Settings: "Settings" or "Cog"
+ * - Dashboard: "LayoutDashboard"
+ * 
+ * The system supports case-insensitive matching, so "users2", "Users2", or "USERS2" all work.
  */
 export const iconMap: Record<string, any> = {
   MapPin: MapPin,
@@ -75,6 +89,8 @@ export const iconMap: Record<string, any> = {
   PieChart: PieChart,
   BarChart: BarChart,
   Type: Type,
+  UserShield: ShieldUser,
+  UserTag: Tag,
 };
 
 /**
@@ -121,12 +137,12 @@ export const navigation: NavigationItem[] = [
   {
     name: "nav.admins",
     href: "/admins",
-    icon: Users,
+    icon: Users2, // Better icon for admins (multiple users)
   },
   {
     name: "nav.adminTypes",
     href: "/admin-types",
-    icon: Shield,
+    icon: ShieldCheck, // Better icon for admin types (shield with checkmark)
   },
 ];
 
@@ -238,6 +254,36 @@ export const getFlatNavigationItems = (
 };
 
 /**
+ * Helper function to find icon in iconMap with case-insensitive lookup
+ */
+const getIconFromMap = (iconName: string | null | undefined): any => {
+  if (!iconName) {
+    return iconMap["Package"]; // Default fallback
+  }
+
+  // Try exact match first
+  if (iconMap[iconName]) {
+    return iconMap[iconName];
+  }
+
+  // Try case-insensitive lookup
+  const iconKey = Object.keys(iconMap).find(
+    (key) => key.toLowerCase() === iconName.toLowerCase()
+  );
+
+  if (iconKey) {
+    return iconMap[iconKey];
+  }
+
+  // Log warning for missing icons (helpful for debugging)
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    console.warn(`[Navigation] Icon "${iconName}" not found in iconMap. Available icons:`, Object.keys(iconMap));
+  }
+
+  return iconMap["Package"]; // Default fallback
+};
+
+/**
  * 🔄 Converts backend menu items to frontend navigation format
  * Used internally by the dynamic navigation system
  */
@@ -267,10 +313,14 @@ export const convertMenuItemsToNavigation = (
   }
 
   const convertMenuItem = (item: any): NavigationItem => {
+    // Handle both domain model objects and plain objects
+    const iconName = item.icon || item.iconName || null;
+    const icon = getIconFromMap(iconName);
+
     return {
       name: item.name,
       href: item.href,
-      icon: iconMap[item.icon] || iconMap["Package"], // Default fallback icon
+      icon: icon, // Use the mapped icon component
       children: item.children?.map(convertMenuItem) || [],
       disabled: !item.isActive, // Now using isActive since we mapped active to isActive
     };
