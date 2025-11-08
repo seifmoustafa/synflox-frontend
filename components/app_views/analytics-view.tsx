@@ -79,13 +79,16 @@ export function AnalyticsView({ companyId }: AnalyticsViewProps) {
     const entries = Object.entries(apiUsageByCompany.requestsByCompany);
     const sorted = entries.sort((a, b) => b[1].count - a[1].count).slice(0, 10);
 
+    // Use primary colors but start from index 1 to differentiate from other charts
+    const colors = GENERIC_COLORS.primary.slice(1);
+
     return {
       labels: sorted.map(([, data]) => data.companyName || data.companyId.substring(0, 8)),
       datasets: [{
         label: t("analytics.requests"),
         data: sorted.map(([, data]) => data.count),
-        backgroundColor: GENERIC_COLORS.secondary.map(c => c + "80"),
-        borderColor: GENERIC_COLORS.secondary,
+        backgroundColor: colors.map(c => c + "80"),
+        borderColor: colors,
         borderWidth: 1,
       }],
     };
