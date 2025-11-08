@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { GenericSelect, type GenericSelectOption } from "@/components/ui/generic-select";
 import type { SubscriptionHistory } from "@/domain";
 import { SubscriptionHistoryActionType } from "@/domain";
 import { Calendar, Filter, X } from "lucide-react";
@@ -29,7 +29,7 @@ export function SubscriptionHistoryView({ companyId }: SubscriptionHistoryViewPr
     actionType: "",
   });
 
-  const actionTypes = [
+  const actionTypes: GenericSelectOption[] = [
     { value: "", label: t("subscriptionHistory.filter.all") },
     { value: SubscriptionHistoryActionType.Created.toString(), label: t("subscriptionHistory.actionType.created") },
     { value: SubscriptionHistoryActionType.Activated.toString(), label: t("subscriptionHistory.actionType.activated") },
@@ -104,21 +104,13 @@ export function SubscriptionHistoryView({ companyId }: SubscriptionHistoryViewPr
             </div>
             <div className="space-y-2">
               <Label>{t("subscriptionHistory.actionType")}</Label>
-              <Select
+              <GenericSelect
+                options={actionTypes}
                 value={filters.actionType}
-                onValueChange={(value) => setFilters({ ...filters, actionType: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("subscriptionHistory.filter.all")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {actionTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onValueChange={(value) => setFilters({ ...filters, actionType: value as string })}
+                placeholder={t("subscriptionHistory.filter.all")}
+                type="single"
+              />
             </div>
             <div className="flex items-end gap-2">
               <Button onClick={handleApplyFilters} variant="default">
