@@ -228,42 +228,39 @@ export function useAdminViewModel() {
       enableBulkActions: true,
       bulkActions: [
         {
-          label: t("admin.bulkActivate") || "Activate Selected",
+          label: t("admin.bulkActivate"),
           onClick: async (selectedIds: string[]) => {
             for (const id of selectedIds) {
               await adminService.toggleActive(id, true);
             }
             await vm.refreshItems();
           },
-          confirmTitle: t("admin.bulkActivate") || "Activate Selected Admins",
-          confirmDescription: t("admin.confirmBulkActivate", { count: "{count}" }) || 
-            "Are you sure you want to activate {count} selected admins?",
+          confirmTitle: t("admin.bulkActivate"),
+          confirmDescription: t("admin.confirmBulkActivate", { count: "{count}" }),
           variant: "default" as const,
         },
         {
-          label: t("admin.bulkDeactivate") || "Deactivate Selected",
+          label: t("admin.bulkDeactivate"),
           onClick: async (selectedIds: string[]) => {
             for (const id of selectedIds) {
               await adminService.toggleActive(id, false);
             }
             await vm.refreshItems();
           },
-          confirmTitle: t("admin.bulkDeactivate") || "Deactivate Selected Admins",
-          confirmDescription: t("admin.confirmBulkDeactivate", { count: "{count}" }) || 
-            "Are you sure you want to deactivate {count} selected admins?",
+          confirmTitle: t("admin.bulkDeactivate"),
+          confirmDescription: t("admin.confirmBulkDeactivate", { count: "{count}" }),
           variant: "default" as const,
         },
         {
-          label: t("admin.bulkDelete") || "Delete Selected",
+          label: t("admin.bulkDelete"),
           onClick: async (selectedIds: string[]) => {
             for (const id of selectedIds) {
               await adminService.deleteAdmin(id);
             }
             await vm.refreshItems();
           },
-          confirmTitle: t("admin.bulkDelete") || "Delete Selected Admins",
-          confirmDescription: t("admin.confirmBulkDelete", { count: "{count}" }) || 
-            "Are you sure you want to delete {count} selected admins? This action cannot be undone.",
+          confirmTitle: t("admin.bulkDelete"),
+          confirmDescription: t("admin.confirmBulkDelete", { count: "{count}" }),
           variant: "destructive" as const,
         },
       ],

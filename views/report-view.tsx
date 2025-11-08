@@ -80,7 +80,7 @@ export function ReportView() {
               <GenericSelect
                 options={selectedReport.availableFormats.map(f => ({
                   value: f,
-                  label: f.toUpperCase(),
+                  label: t(`report.formats.${f}`),
                 }))}
                 value={selectedFormat}
                 onValueChange={(value: string | string[]) => setSelectedFormat((Array.isArray(value) ? value[0] : value) as 'csv' | 'excel' | 'pdf')}

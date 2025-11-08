@@ -150,7 +150,7 @@ interface RichTextEditorProps {
 export function RichTextEditor({
   value = "",
   onChange,
-  placeholder = "Start typing...",
+  placeholder,
   className,
   disabled = false,
   minHeight = 200
@@ -158,6 +158,7 @@ export function RichTextEditor({
   const { t } = useI18n();
   const editorRef = useRef<HTMLDivElement>(null);
   const [isActive, setIsActive] = useState(false);
+  const defaultPlaceholder = placeholder || t("richTextEditor.placeholder");
 
   useEffect(() => {
     if (editorRef.current && value !== editorRef.current.innerHTML) {
@@ -207,51 +208,51 @@ export function RichTextEditor({
     {
       group: "headings",
       buttons: [
-        { icon: Heading1, command: "formatBlock", value: "h1", title: "Heading 1" },
-        { icon: Heading2, command: "formatBlock", value: "h2", title: "Heading 2" },
-        { icon: Heading3, command: "formatBlock", value: "h3", title: "Heading 3" },
+        { icon: Heading1, command: "formatBlock", value: "h1", title: t("richTextEditor.heading1") },
+        { icon: Heading2, command: "formatBlock", value: "h2", title: t("richTextEditor.heading2") },
+        { icon: Heading3, command: "formatBlock", value: "h3", title: t("richTextEditor.heading3") },
       ]
     },
     {
       group: "format",
       buttons: [
-        { icon: Bold, command: "bold", title: "Bold (Ctrl+B)" },
-        { icon: Italic, command: "italic", title: "Italic (Ctrl+I)" },
-        { icon: Underline, command: "underline", title: "Underline (Ctrl+U)" },
-        { icon: Strikethrough, command: "strikeThrough", title: "Strikethrough" },
+        { icon: Bold, command: "bold", title: t("richTextEditor.bold") },
+        { icon: Italic, command: "italic", title: t("richTextEditor.italic") },
+        { icon: Underline, command: "underline", title: t("richTextEditor.underline") },
+        { icon: Strikethrough, command: "strikeThrough", title: t("richTextEditor.strikethrough") },
       ]
     },
     {
       group: "align",
       buttons: [
-        { icon: AlignLeft, command: "justifyLeft", title: "Align Left" },
-        { icon: AlignCenter, command: "justifyCenter", title: "Align Center" },
-        { icon: AlignRight, command: "justifyRight", title: "Align Right" },
-        { icon: AlignJustify, command: "justifyFull", title: "Justify" },
+        { icon: AlignLeft, command: "justifyLeft", title: t("richTextEditor.alignLeft") },
+        { icon: AlignCenter, command: "justifyCenter", title: t("richTextEditor.alignCenter") },
+        { icon: AlignRight, command: "justifyRight", title: t("richTextEditor.alignRight") },
+        { icon: AlignJustify, command: "justifyFull", title: t("richTextEditor.justify") },
       ]
     },
     {
       group: "lists",
       buttons: [
-        { icon: List, command: "insertUnorderedList", title: "Bullet List" },
-        { icon: ListOrdered, command: "insertOrderedList", title: "Numbered List" },
-        { icon: Quote, command: "formatBlock", value: "blockquote", title: "Quote" },
+        { icon: List, command: "insertUnorderedList", title: t("richTextEditor.bulletList") },
+        { icon: ListOrdered, command: "insertOrderedList", title: t("richTextEditor.numberedList") },
+        { icon: Quote, command: "formatBlock", value: "blockquote", title: t("richTextEditor.quote") },
       ]
     },
     {
       group: "insert",
       buttons: [
-        { icon: Link, action: insertLink, title: "Insert Link" },
-        { icon: Image, action: insertImage, title: "Insert Image" },
-        { icon: Code, command: "formatBlock", value: "pre", title: "Code Block" },
-        { icon: Minus, command: "insertHorizontalRule", title: "Horizontal Rule" },
+        { icon: Link, action: insertLink, title: t("richTextEditor.insertLink") },
+        { icon: Image, action: insertImage, title: t("richTextEditor.insertImage") },
+        { icon: Code, command: "formatBlock", value: "pre", title: t("richTextEditor.codeBlock") },
+        { icon: Minus, command: "insertHorizontalRule", title: t("richTextEditor.horizontalRule") },
       ]
     },
     {
       group: "history",
       buttons: [
-        { icon: Undo, command: "undo", title: "Undo (Ctrl+Z)" },
-        { icon: Redo, command: "redo", title: "Redo (Ctrl+Y)" },
+        { icon: Undo, command: "undo", title: t("richTextEditor.undo") },
+        { icon: Redo, command: "redo", title: t("richTextEditor.redo") },
       ]
     }
   ] as const;
@@ -285,7 +286,7 @@ export function RichTextEditor({
             className="w-8 h-6 border rounded cursor-pointer"
             onChange={(e) => changeTextColor(e.target.value)}
             disabled={disabled}
-            title="Text Color"
+            title={t("richTextEditor.textColor")}
           />
         </div>
 
@@ -375,7 +376,7 @@ export function RichTextEditor({
             }
           }
         }}
-        data-placeholder={placeholder}
+        data-placeholder={defaultPlaceholder}
         suppressContentEditableWarning={true}
       />
 

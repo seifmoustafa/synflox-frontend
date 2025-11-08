@@ -32,23 +32,24 @@ import { ProfessionalTimelineCharts } from "@/components/charts/timeline-charts"
 import { ProfessionalFunnelCharts } from "@/components/charts/funnel-charts";
 import { ProfessionalGaugeCharts } from "@/components/charts/gauge-charts";
 
-const chartTypes = [
-  { id: "line", label: "Line Charts", icon: <TrendingUp className="h-4 w-4" /> },
-  { id: "area", label: "Area Charts", icon: <BarChart3 className="h-4 w-4" /> },
-  { id: "bar", label: "Bar Charts", icon: <BarChart className="h-4 w-4" /> },
-  { id: "pie", label: "Pie Charts", icon: <PieChart className="h-4 w-4" /> },
-  { id: "scatter", label: "Scatter Charts", icon: <Dot className="h-4 w-4" /> },
-  { id: "radar", label: "Radar Charts", icon: <Radar className="h-4 w-4" /> },
-  { id: "mixed", label: "Mixed Charts", icon: <Layers className="h-4 w-4" /> },
-  { id: "heatmap", label: "Heatmap Charts", icon: <Activity className="h-4 w-4" /> },
-  { id: "treemap", label: "Treemap Charts", icon: <Target className="h-4 w-4" /> },
-  { id: "timeline", label: "Timeline Charts", icon: <Clock className="h-4 w-4" /> },
-  { id: "funnel", label: "Funnel Charts", icon: <Zap className="h-4 w-4" /> },
-  { id: "gauge", label: "Gauge Charts", icon: <Sparkles className="h-4 w-4" /> },
-];
-
 export function ProfessionalChartsTab() {
   const { t } = useI18n();
+  
+  const chartTypes = [
+    { id: "line", label: t("settings.charts.tabs.line"), icon: <TrendingUp className="h-4 w-4" /> },
+    { id: "area", label: t("settings.charts.tabs.area"), icon: <BarChart3 className="h-4 w-4" /> },
+    { id: "bar", label: t("settings.charts.tabs.bar"), icon: <BarChart className="h-4 w-4" /> },
+    { id: "pie", label: t("settings.charts.tabs.pie"), icon: <PieChart className="h-4 w-4" /> },
+    { id: "scatter", label: t("settings.charts.tabs.scatter"), icon: <Dot className="h-4 w-4" /> },
+    { id: "radar", label: t("settings.charts.tabs.radar"), icon: <Radar className="h-4 w-4" /> },
+    { id: "mixed", label: t("settings.charts.tabs.mixed"), icon: <Layers className="h-4 w-4" /> },
+    { id: "heatmap", label: t("settings.charts.tabs.heatmap"), icon: <Activity className="h-4 w-4" /> },
+    { id: "treemap", label: t("settings.charts.tabs.treemap"), icon: <Target className="h-4 w-4" /> },
+    { id: "timeline", label: t("settings.charts.tabs.timeline"), icon: <Clock className="h-4 w-4" /> },
+    { id: "funnel", label: t("settings.charts.tabs.funnel"), icon: <Zap className="h-4 w-4" /> },
+    { id: "gauge", label: t("settings.charts.tabs.gauge"), icon: <Sparkles className="h-4 w-4" /> },
+  ];
+  
   const [activeChartType, setActiveChartType] = useState("line");
 
   const renderChartComponent = () => {

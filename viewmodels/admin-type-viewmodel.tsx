@@ -159,42 +159,39 @@ export function useAdminTypeViewModel() {
       enableBulkActions: true,
       bulkActions: [
         {
-          label: t("adminType.bulkActivate") || "Activate Selected",
+          label: t("adminType.bulkActivate"),
           onClick: async (selectedIds: string[]) => {
             for (const id of selectedIds) {
               await adminTypeService.toggleActive(id, true);
             }
             await vm.refreshItems();
           },
-          confirmTitle: t("adminType.bulkActivate") || "Activate Selected Admin Types",
-          confirmDescription: t("adminType.confirmBulkActivate", { count: "{count}" }) || 
-            "Are you sure you want to activate {count} selected admin types?",
+          confirmTitle: t("adminType.bulkActivate"),
+          confirmDescription: t("adminType.confirmBulkActivate", { count: "{count}" }),
           variant: "default" as const,
         },
         {
-          label: t("adminType.bulkDeactivate") || "Deactivate Selected",
+          label: t("adminType.bulkDeactivate"),
           onClick: async (selectedIds: string[]) => {
             for (const id of selectedIds) {
               await adminTypeService.toggleActive(id, false);
             }
             await vm.refreshItems();
           },
-          confirmTitle: t("adminType.bulkDeactivate") || "Deactivate Selected Admin Types",
-          confirmDescription: t("adminType.confirmBulkDeactivate", { count: "{count}" }) || 
-            "Are you sure you want to deactivate {count} selected admin types?",
+          confirmTitle: t("adminType.bulkDeactivate"),
+          confirmDescription: t("adminType.confirmBulkDeactivate", { count: "{count}" }),
           variant: "default" as const,
         },
         {
-          label: t("adminType.bulkDelete") || "Delete Selected",
+          label: t("adminType.bulkDelete"),
           onClick: async (selectedIds: string[]) => {
             for (const id of selectedIds) {
               await adminTypeService.deleteAdminType(id);
             }
             await vm.refreshItems();
           },
-          confirmTitle: t("adminType.bulkDelete") || "Delete Selected Admin Types",
-          confirmDescription: t("adminType.confirmBulkDelete", { count: "{count}" }) || 
-            "Are you sure you want to delete {count} selected admin types? This action cannot be undone.",
+          confirmTitle: t("adminType.bulkDelete"),
+          confirmDescription: t("adminType.confirmBulkDelete", { count: "{count}" }),
           variant: "destructive" as const,
         },
       ],

@@ -121,10 +121,12 @@ export function useCompanyViewModel() {
           label: t("company.status.title"),
           render: (_val: unknown, company: Company) => {
             const status = company.status;
-            const variant = status === "Active" ? "active" : status === "Expired" ? "destructive" : "secondary";
+            // Normalize status for comparison (case-insensitive)
+            const statusLower = status?.toLowerCase() || "";
+            const variant = statusLower === "active" ? "active" : statusLower === "expired" ? "destructive" : "secondary";
             return (
               <Badge variant={variant}>
-                {t(`company.status.${status.toLowerCase().replace(" ", "")}`)}
+                {t(`company.status.${statusLower.replace(/\s+/g, "")}`)}
               </Badge>
             );
           },
@@ -269,7 +271,7 @@ export function useCompanyViewModel() {
               setActivateModalOpen(true);
             },
             variant: "ghost" as const,
-            show: (item: Company) => status(item) !== "Active",
+            show: (item: Company) => status(item)?.toLowerCase() !== "active",
             className: "text-green-600 hover:text-green-700",
           },
           {
@@ -281,7 +283,7 @@ export function useCompanyViewModel() {
               }
             },
             variant: "ghost" as const,
-            show: (item: Company) => status(item) === "Active",
+            show: (item: Company) => status(item)?.toLowerCase() === "active",
             className: "text-orange-600 hover:text-orange-700",
             confirmTitle: t("licensing.suspend"),
             confirmDescription: t("licensing.confirmSuspend", { name: "{name}" }),
@@ -296,7 +298,7 @@ export function useCompanyViewModel() {
               }
             },
             variant: "ghost" as const,
-            show: (item: Company) => status(item) === "Suspended",
+            show: (item: Company) => status(item)?.toLowerCase() === "suspended",
             className: "text-blue-600 hover:text-blue-700",
             confirmTitle: t("licensing.resume"),
             confirmDescription: t("licensing.confirmResume", { name: "{name}" }),
@@ -309,7 +311,10 @@ export function useCompanyViewModel() {
               setExtendModalOpen(true);
             },
             variant: "ghost" as const,
-            show: (item: Company) => status(item) === "Active" || status(item) === "Expired",
+            show: (item: Company) => {
+              const itemStatus = status(item)?.toLowerCase();
+              return itemStatus === "active" || itemStatus === "expired";
+            },
           },
           {
             label: t("licensing.generateKey"),

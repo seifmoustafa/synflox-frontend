@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Trash2, AlertTriangle, Info, CheckCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { appLogger } from "@/lib/logger"
+import { useI18n } from "@/providers/i18n-provider"
 
 export interface ConfirmationDialogProps {
   open: boolean
@@ -30,52 +31,56 @@ export interface ConfirmationDialogProps {
   isLoading?: boolean
 }
 
-const variantConfig = {
-  destructive: {
-    icon: Trash2,
-    iconColor: "text-red-500",
-    confirmVariant: "destructive" as const,
-    title: "Delete Item",
-    description: "Are you sure you want to delete this item? This action cannot be undone.",
-  },
-  warning: {
-    icon: AlertTriangle,
-    iconColor: "text-yellow-500",
-    confirmVariant: "default" as const,
-    title: "Warning",
-    description: "Please confirm this action.",
-  },
-  info: {
-    icon: Info,
-    iconColor: "text-blue-500",
-    confirmVariant: "default" as const,
-    title: "Information",
-    description: "Please confirm this action.",
-  },
-  default: {
-    icon: CheckCircle,
-    iconColor: "text-green-500",
-    confirmVariant: "default" as const,
-    title: "Confirm Action",
-    description: "Are you sure you want to proceed?",
-  },
-}
-
 export function ConfirmationDialog({
   open,
   onOpenChange,
   title,
   description,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
+  confirmText,
+  cancelText,
   onConfirm,
   onCancel,
   variant = "default",
   icon,
   isLoading = false,
 }: ConfirmationDialogProps) {
+  const { t } = useI18n();
+  
+  const variantConfig = {
+    destructive: {
+      icon: Trash2,
+      iconColor: "text-red-500",
+      confirmVariant: "destructive" as const,
+      title: t("confirmationDialog.deleteItem"),
+      description: t("confirmationDialog.deleteDescription"),
+    },
+    warning: {
+      icon: AlertTriangle,
+      iconColor: "text-yellow-500",
+      confirmVariant: "default" as const,
+      title: t("confirmationDialog.warning"),
+      description: t("confirmationDialog.warningDescription"),
+    },
+    info: {
+      icon: Info,
+      iconColor: "text-blue-500",
+      confirmVariant: "default" as const,
+      title: t("confirmationDialog.information"),
+      description: t("confirmationDialog.infoDescription"),
+    },
+    default: {
+      icon: CheckCircle,
+      iconColor: "text-green-500",
+      confirmVariant: "default" as const,
+      title: t("confirmationDialog.confirmAction"),
+      description: t("confirmationDialog.defaultDescription"),
+    },
+  };
+  
   const config = variantConfig[variant]
   const IconComponent = config.icon
+  const defaultConfirmText = confirmText || t("common.confirm");
+  const defaultCancelText = cancelText || t("common.cancel");
   
   const handleConfirm = async () => {
     try {
@@ -101,11 +106,11 @@ export function ConfirmationDialog({
               </div>
             )}
             <AlertDialogTitle className="text-left">
-              {title || config.title}
+              {title ?? config.title}
             </AlertDialogTitle>
           </div>
           <AlertDialogDescription className="text-left mt-2">
-            {description || config.description}
+            {description ?? config.description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-2">
@@ -115,7 +120,7 @@ export function ConfirmationDialog({
               onClick={handleCancel}
               disabled={isLoading}
             >
-              {cancelText}
+              {defaultCancelText}
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
@@ -131,7 +136,7 @@ export function ConfirmationDialog({
                   Loading...
                 </div>
               ) : (
-                confirmText
+                defaultConfirmText
               )}
             </Button>
           </AlertDialogAction>

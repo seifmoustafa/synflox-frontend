@@ -136,7 +136,7 @@ export function useReportViewModel() {
           label: t("report.format"),
           render: (_val: unknown, report: Report) => (
             <Badge variant="outline">
-              {report.format?.toUpperCase() || '-'}
+              {report.format ? t(`report.formats.${report.format}`) : '-'}
             </Badge>
           ),
         },
