@@ -226,7 +226,7 @@ export function DashboardView() {
             {statisticsCards.map((card, index) => {
               const Icon = card.icon;
               return (
-                <Card key={index} className={cn(card.warning && "border-orange-500")}>
+                <Card key={index}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
                     <div className={cn("p-2 rounded-lg", card.bgColor)}>
@@ -235,11 +235,6 @@ export function DashboardView() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{card.value}</div>
-                    {card.warning && (
-                      <p className="text-xs text-orange-600 mt-1">
-                        {t("dashboard.statistics.expiringWarning")}
-                      </p>
-                    )}
                   </CardContent>
                 </Card>
               );
@@ -258,17 +253,14 @@ export function DashboardView() {
                   <GenericChart
                     title=""
                     description=""
-                    data={{
-                      labels: chartData.labels,
-                      datasets: [{
-                        ...chartData.datasets[0],
-                        cutout: "60%", // Make it a doughnut chart
-                      }],
-                    }}
+                    data={chartData}
                     type="doughnut"
                     height={300}
                     filterable={false}
                     options={{
+                      ...({
+                        cutout: "60%", // Make it a doughnut chart
+                      } as any),
                       plugins: {
                         legend: {
                           position: "bottom",
