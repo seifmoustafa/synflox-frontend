@@ -35,8 +35,11 @@ export class CompanyMapper {
       contactPhone: json.contactPhone,
       address: json.address,
       licenseKey: json.licenseKey,
-      createdTimestamp: json.createdTimestamp || new Date().toISOString(),
-      updatedTimestamp: json.updatedTimestamp,
+      isTrial: json.isTrial ?? false,
+      trialEndDate: json.trialEndDate,
+      subscriptionPlanId: json.subscriptionPlanId,
+      createdTimestamp: json.createdTimestamp || json.createdAt || new Date().toISOString(),
+      updatedTimestamp: json.updatedTimestamp || json.updatedAt,
     });
   }
 
@@ -53,6 +56,9 @@ export class CompanyMapper {
       contactPhone: company.contactPhone,
       address: company.address,
       licenseKey: company.licenseKey,
+      isTrial: company.isTrial,
+      trialEndDate: company.trialEndDate,
+      subscriptionPlanId: company.subscriptionPlanId,
       createdTimestamp: company.createdTimestamp,
       updatedTimestamp: company.updatedTimestamp,
     };
@@ -62,13 +68,17 @@ export class CompanyMapper {
    * Convert CreateCompanyRequest domain model to JSON for API requests
    */
   static createRequestToJson(request: CreateCompanyRequest): any {
-    return {
+    const json: any = {
       name: request.name,
       expiryDate: request.expiryDate,
       contactEmail: request.contactEmail,
       contactPhone: request.contactPhone,
       address: request.address,
     };
+    if (request.subscriptionPlanId !== undefined) {
+      json.subscriptionPlanId = request.subscriptionPlanId;
+    }
+    return json;
   }
 
   /**
@@ -82,6 +92,7 @@ export class CompanyMapper {
     if (request.contactEmail !== undefined) json.contactEmail = request.contactEmail;
     if (request.contactPhone !== undefined) json.contactPhone = request.contactPhone;
     if (request.address !== undefined) json.address = request.address;
+    if (request.subscriptionPlanId !== undefined) json.subscriptionPlanId = request.subscriptionPlanId;
     return json;
   }
 

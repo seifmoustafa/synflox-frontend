@@ -7,16 +7,21 @@ import type {
   DashboardOverview,
   SystemStatistics,
   DashboardEndpoints,
+  MetricsSummary,
+  ApiUsageAnalytics,
 } from "@/domain";
 
 export function useDashboardViewModel() {
-  const { dashboardService } = useServices();
+  const { dashboardService, metricService, analyticsService, companyService } = useServices();
   const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [statistics, setStatistics] = useState<SystemStatistics | null>(null);
   const [endpoints, setEndpoints] = useState<DashboardEndpoints | null>(null);
+  const [metricsSummary, setMetricsSummary] = useState<MetricsSummary | null>(null);
+  const [apiUsage, setApiUsage] = useState<ApiUsageAnalytics | null>(null);
+  const [trialCompaniesCount, setTrialCompaniesCount] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<"statistics" | "endpoints">("statistics");
 
   const loadDashboardOverview = useCallback(async () => {
@@ -63,9 +68,44 @@ export function useDashboardViewModel() {
     }
   }, [dashboardService, t]);
 
+  const loadMetricsSummary = useCallback(async () => {
+    try {
+      const data = await metricService.getSummary();
+      setMetricsSummary(data);
+    } catch (e) {
+      // Error already shown by service
+    }
+  }, [metricService]);
+
+  const loadApiUsage = useCallback(async () => {
+    try {
+      const endDate = new Date().toISOString();
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(); // Last 30 days
+      const data = await analyticsService.getApiUsage({ startDate, endDate });
+      setApiUsage(data);
+    } catch (e) {
+      // Error already shown by service
+    }
+  }, [analyticsService]);
+
+  const loadTrialCompaniesCount = useCallback(async () => {
+    try {
+      // Get companies and filter for trials
+      const response = await companyService.getCompanies({ page: 1, pageSize: 1000 });
+      const companies = response.data || [];
+      const trialCount = companies.filter((c: any) => c.isTrial).length;
+      setTrialCompaniesCount(trialCount);
+    } catch (e) {
+      // Error already shown by service
+    }
+  }, [companyService]);
+
   useEffect(() => {
     loadDashboardOverview();
-  }, [loadDashboardOverview]);
+    loadMetricsSummary();
+    loadApiUsage();
+    loadTrialCompaniesCount();
+  }, [loadDashboardOverview, loadMetricsSummary, loadApiUsage, loadTrialCompaniesCount]);
 
   return {
     loading,
@@ -73,11 +113,16 @@ export function useDashboardViewModel() {
     overview,
     statistics,
     endpoints,
+    metricsSummary,
+    apiUsage,
+    trialCompaniesCount,
     activeTab,
     setActiveTab,
     refresh: loadDashboardOverview,
     refreshStatistics: loadStatistics,
     refreshEndpoints: loadEndpoints,
+    refreshMetrics: loadMetricsSummary,
+    refreshApiUsage: loadApiUsage,
   };
 }
 

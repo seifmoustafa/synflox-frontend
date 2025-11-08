@@ -225,6 +225,48 @@ export function useAdminViewModel() {
           confirmDescription: t("common.deleteConfirmation", { name: "{name}" }),
         },
       ],
+      enableBulkActions: true,
+      bulkActions: [
+        {
+          label: t("admin.bulkActivate") || "Activate Selected",
+          onClick: async (selectedIds: string[]) => {
+            for (const id of selectedIds) {
+              await adminService.toggleActive(id, true);
+            }
+            await vm.refreshItems();
+          },
+          confirmTitle: t("admin.bulkActivate") || "Activate Selected Admins",
+          confirmDescription: t("admin.confirmBulkActivate", { count: "{count}" }) || 
+            "Are you sure you want to activate {count} selected admins?",
+          variant: "default" as const,
+        },
+        {
+          label: t("admin.bulkDeactivate") || "Deactivate Selected",
+          onClick: async (selectedIds: string[]) => {
+            for (const id of selectedIds) {
+              await adminService.toggleActive(id, false);
+            }
+            await vm.refreshItems();
+          },
+          confirmTitle: t("admin.bulkDeactivate") || "Deactivate Selected Admins",
+          confirmDescription: t("admin.confirmBulkDeactivate", { count: "{count}" }) || 
+            "Are you sure you want to deactivate {count} selected admins?",
+          variant: "default" as const,
+        },
+        {
+          label: t("admin.bulkDelete") || "Delete Selected",
+          onClick: async (selectedIds: string[]) => {
+            for (const id of selectedIds) {
+              await adminService.deleteAdmin(id);
+            }
+            await vm.refreshItems();
+          },
+          confirmTitle: t("admin.bulkDelete") || "Delete Selected Admins",
+          confirmDescription: t("admin.confirmBulkDelete", { count: "{count}" }) || 
+            "Are you sure you want to delete {count} selected admins? This action cannot be undone.",
+          variant: "destructive" as const,
+        },
+      ],
     }),
     [t, adminTypeService, adminService, vm]
   );

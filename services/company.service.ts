@@ -16,6 +16,7 @@ import {
   type CompaniesResponse,
 } from "@/domain";
 import { API_ENDPOINTS } from "@/config/api-endpoints";
+import { secureTokenService } from "@/lib/secure-token-service";
 
 export interface ICompanyService {
   getCompanies(params?: {
@@ -27,6 +28,8 @@ export interface ICompanyService {
   createCompany(data: CreateCompanyRequest): Promise<Company>;
   updateCompany(id: string, data: UpdateCompanyRequest): Promise<Company>;
   deleteCompany(id: string): Promise<void>;
+  exportCompanies(format: 'csv' | 'excel'): Promise<Blob>;
+  importCompanies(file: File, format: 'csv' | 'excel'): Promise<{ totalRows: number; imported: number; errors: Array<{ row: number; field: string; message: string }>; errorCount: number }>;
 }
 
 export class CompanyService implements ICompanyService {
@@ -128,6 +131,92 @@ export class CompanyService implements ICompanyService {
       return await this.updateCompany(id, updateRequest);
     } catch (e) {
       // Error message already shown by API service with backend message
+      throw e;
+    }
+  }
+
+  async exportCompanies(format: 'csv' | 'excel'): Promise<Blob> {
+    try {
+      // SYNFLOX API: GET /api/companies/export?format=csv|excel
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const url = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+      const token = secureTokenService.getAccessToken();
+      const language = typeof window !== 'undefined' ? localStorage.getItem('language') || 'ar' : 'ar';
+
+      const response = await fetch(
+        `${url}${API_ENDPOINTS.COMPANIES_EXPORT}?format=${format}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Accept-Language': language,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to export companies as ${format}`);
+      }
+
+      const blob = await response.blob();
+      this.notificationService.success(`Companies exported successfully as ${format.toUpperCase()}`);
+      return blob;
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : `Failed to export companies as ${format}`;
+      this.notificationService.error(errorMessage);
+      throw e;
+    }
+  }
+
+  async importCompanies(file: File, format: 'csv' | 'excel'): Promise<{ totalRows: number; imported: number; errors: Array<{ row: number; field: string; message: string }>; errorCount: number }> {
+    try {
+      // SYNFLOX API: POST /api/companies/import (multipart/form-data)
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('format', format);
+
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+      const url = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
+      const token = secureTokenService.getAccessToken();
+      const language = typeof window !== 'undefined' ? localStorage.getItem('language') || 'ar' : 'ar';
+
+      const response = await fetch(
+        `${url}${API_ENDPOINTS.COMPANIES_IMPORT}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': token ? `Bearer ${token}` : '',
+            'Accept-Language': language,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to import companies');
+      }
+
+      const result = await response.json();
+      const data = result.data || result;
+      
+      const message = result.message || `Import completed: ${data.imported || 0} imported, ${data.errorCount || 0} errors`;
+      if (data.errorCount > 0) {
+        this.notificationService.warning(message);
+      } else {
+        this.notificationService.success(message);
+      }
+
+      return {
+        totalRows: data.totalRows || 0,
+        imported: data.imported || 0,
+        errors: data.errors || [],
+        errorCount: data.errorCount || 0,
+      };
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : 'Failed to import companies';
+      this.notificationService.error(errorMessage);
       throw e;
     }
   }

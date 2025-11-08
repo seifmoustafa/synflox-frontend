@@ -23,6 +23,15 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  AlertCircle,
+  BarChart3,
+  FileText,
+  Key,
+  Webhook,
+  Settings,
+  Search,
+  Menu,
+  Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -332,6 +341,197 @@ export function DashboardView() {
               </CardContent>
             </Card>
           )}
+
+          {/* API Usage Chart */}
+          {vm.apiUsage && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("dashboard.apiUsage.title")}</CardTitle>
+                <CardDescription>{t("dashboard.apiUsage.description")}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">{t("dashboard.apiUsage.totalRequests")}</div>
+                      <div className="text-2xl font-bold">{vm.apiUsage.totalRequests.toLocaleString()}</div>
+                    </div>
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">{t("dashboard.apiUsage.successfulRequests")}</div>
+                      <div className="text-2xl font-bold text-green-600">{vm.apiUsage.successfulRequests.toLocaleString()}</div>
+                    </div>
+                    <div className="p-4 border rounded-lg">
+                      <div className="text-sm text-muted-foreground">{t("dashboard.apiUsage.failedRequests")}</div>
+                      <div className="text-2xl font-bold text-red-600">{vm.apiUsage.failedRequests.toLocaleString()}</div>
+                    </div>
+                  </div>
+                  {vm.apiUsage.requestsByDay && Object.keys(vm.apiUsage.requestsByDay).length > 0 && (
+                    <GenericChart
+                      title={t("dashboard.apiUsage.dailyChart")}
+                      description=""
+                      data={{
+                        labels: Object.keys(vm.apiUsage.requestsByDay),
+                        datasets: [{
+                          label: t("dashboard.apiUsage.requests"),
+                          data: Object.values(vm.apiUsage.requestsByDay),
+                          backgroundColor: "rgba(59, 130, 246, 0.5)",
+                          borderColor: "#3b82f6",
+                          borderWidth: 2,
+                        }],
+                      }}
+                      type="line"
+                      height={300}
+                      filterable={false}
+                    />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Error Rate & Metrics Summary */}
+          {vm.metricsSummary && (
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className={cn(vm.metricsSummary.errorRate > 5 && "border-red-500")}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertCircle className={cn("h-5 w-5", vm.metricsSummary.errorRate > 5 ? "text-red-600" : "text-green-600")} />
+                    {t("dashboard.metrics.errorRate")}
+                  </CardTitle>
+                  <CardDescription>{t("dashboard.metrics.errorRateDescription")}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold mb-2">
+                    <span className={cn(vm.metricsSummary.errorRate > 5 ? "text-red-600" : "text-green-600")}>
+                      {vm.metricsSummary.errorRate.toFixed(2)}%
+                    </span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("dashboard.metrics.totalRequests")}: {vm.metricsSummary.totalRequests.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {t("dashboard.metrics.failedRequests")}: {vm.metricsSummary.failedRequests.toLocaleString()}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t("dashboard.metrics.moduleUsage")}</CardTitle>
+                  <CardDescription>{t("dashboard.metrics.moduleUsageDescription")}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">{t("dashboard.metrics.activeApiKeys")}</span>
+                      <div className="text-right">
+                        <div className="font-bold">{vm.metricsSummary.activeApiKeys}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {vm.metricsSummary.totalApiKeys > 0 
+                            ? `${Math.round((vm.metricsSummary.activeApiKeys / vm.metricsSummary.totalApiKeys) * 100)}%`
+                            : "0%"}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">{t("dashboard.metrics.activeWebhooks")}</span>
+                      <div className="text-right">
+                        <div className="font-bold">{vm.metricsSummary.activeWebhooks}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {vm.metricsSummary.totalWebhooks > 0 
+                            ? `${Math.round((vm.metricsSummary.activeWebhooks / vm.metricsSummary.totalWebhooks) * 100)}%`
+                            : "0%"}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">{t("dashboard.metrics.averageResponseTime")}</span>
+                      <div className="font-bold">{vm.metricsSummary.averageResponseTime.toFixed(0)}ms</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("dashboard.quickActions.title")}</CardTitle>
+              <CardDescription>{t("dashboard.quickActions.description")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => window.location.href = "/analytics"}
+                >
+                  <BarChart3 className="h-5 w-5 mb-2" />
+                  <span className="font-medium">{t("dashboard.quickActions.analytics")}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => window.location.href = "/reports"}
+                >
+                  <FileText className="h-5 w-5 mb-2" />
+                  <span className="font-medium">{t("dashboard.quickActions.reports")}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => window.location.href = "/api-keys"}
+                >
+                  <Key className="h-5 w-5 mb-2" />
+                  <span className="font-medium">{t("dashboard.quickActions.apiKeys")}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => window.location.href = "/webhooks"}
+                >
+                  <Webhook className="h-5 w-5 mb-2" />
+                  <span className="font-medium">{t("dashboard.quickActions.webhooks")}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => window.location.href = "/metrics"}
+                >
+                  <Activity className="h-5 w-5 mb-2" />
+                  <span className="font-medium">{t("dashboard.quickActions.metrics")}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => window.location.href = "/settings"}
+                >
+                  <Settings className="h-5 w-5 mb-2" />
+                  <span className="font-medium">{t("dashboard.quickActions.settings")}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => {
+                    const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
+                    if (searchInput) searchInput.focus();
+                  }}
+                >
+                  <Search className="h-5 w-5 mb-2" />
+                  <span className="font-medium">{t("dashboard.quickActions.search")}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-auto flex-col items-start p-4"
+                  onClick={() => window.location.href = "/menu-items"}
+                >
+                  <Menu className="h-5 w-5 mb-2" />
+                  <span className="font-medium">{t("dashboard.quickActions.menuItems")}</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="endpoints" className="space-y-6">

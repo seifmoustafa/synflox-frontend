@@ -42,6 +42,9 @@ const PreviewPanel = dynamic(() => import("./settings").then(mod => ({ default: 
 const ProfessionalChartsTab = dynamic(() => import("./settings/charts-tab").then(mod => ({ default: mod.ProfessionalChartsTab })), {
   loading: () => <LoadingSpinner size="sm" />,
 });
+const PasswordPolicyTab = dynamic(() => import("./settings/password-policy-tab").then(mod => ({ default: mod.PasswordPolicyTab })), {
+  loading: () => <LoadingSpinner size="sm" />,
+});
 
 export function SettingsView() {
   const { t } = useI18n();
@@ -168,7 +171,7 @@ export function SettingsView() {
               onValueChange={setActiveTab}
               className="space-y-6"
             >
-              <TabsList className="grid w-full grid-cols-7">
+              <TabsList className="grid w-full grid-cols-8">
                 <TabsTrigger value="appearance">
                   {t("settings.tabs.appearance")}
                 </TabsTrigger>
@@ -189,6 +192,9 @@ export function SettingsView() {
                 </TabsTrigger>
                 <TabsTrigger value="behavior">
                   {t("settings.tabs.behavior")}
+                </TabsTrigger>
+                <TabsTrigger value="passwordPolicy">
+                  {t("settings.tabs.passwordPolicy")}
                 </TabsTrigger>
               </TabsList>
 
@@ -225,6 +231,11 @@ export function SettingsView() {
               <TabsContent value="behavior">
                 <Suspense fallback={<LoadingSpinner size="sm" />}>
                   <BehaviorTab />
+                </Suspense>
+              </TabsContent>
+              <TabsContent value="passwordPolicy">
+                <Suspense fallback={<LoadingSpinner size="sm" />}>
+                  <PasswordPolicyTab />
                 </Suspense>
               </TabsContent>
             </Tabs>

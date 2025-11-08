@@ -138,6 +138,12 @@ export const ar = {
     active: "نشط",
     inactive: "غير نشط",
     isActive: "نشط",
+    bulkActivate: "تفعيل المحدد",
+    bulkDeactivate: "إلغاء تفعيل المحدد",
+    bulkDelete: "حذف المحدد",
+    confirmBulkActivate: "هل أنت متأكد من تفعيل {count} من المسؤولين المحددين؟",
+    confirmBulkDeactivate: "هل أنت متأكد من إلغاء تفعيل {count} من المسؤولين المحددين؟",
+    confirmBulkDelete: "هل أنت متأكد من حذف {count} من المسؤولين المحددين؟ لا يمكن التراجع عن هذا الإجراء.",
   },
 
   // Admin Type
@@ -153,6 +159,12 @@ export const ar = {
     active: "نشط",
     inactive: "غير نشط",
     isActive: "نشط",
+    bulkActivate: "تفعيل المحدد",
+    bulkDeactivate: "إلغاء تفعيل المحدد",
+    bulkDelete: "حذف المحدد",
+    confirmBulkActivate: "هل أنت متأكد من تفعيل {count} من أنواع المسؤولين المحددة؟",
+    confirmBulkDeactivate: "هل أنت متأكد من إلغاء تفعيل {count} من أنواع المسؤولين المحددة؟",
+    confirmBulkDelete: "هل أنت متأكد من حذف {count} من أنواع المسؤولين المحددة؟ لا يمكن التراجع عن هذا الإجراء.",
   },
 
   // Dashboard
@@ -175,10 +187,43 @@ export const ar = {
       totalAdminTypes: "إجمالي أنواع المسؤولين",
       activeAdmins: "المسؤولون النشطون",
       inactiveAdmins: "المسؤولون غير النشطين",
+      trialCompanies: "الشركات التجريبية",
       companiesExpiringSoon: "الشركات التي تنتهي قريباً",
       recentlyCreatedCompanies: "الشركات المُنشأة مؤخراً",
       recentlyCreatedAdmins: "المسؤولون المُنشأون مؤخراً",
       expiringWarning: "الشركات التي تنتهي خلال 30 يوماً",
+    },
+    apiUsage: {
+      title: "تحليلات استخدام API",
+      description: "إحصائيات طلبات API للـ 30 يوماً الماضية",
+      totalRequests: "إجمالي الطلبات",
+      successfulRequests: "نجحت",
+      failedRequests: "فشلت",
+      dailyChart: "طلبات API اليومية",
+      requests: "الطلبات",
+    },
+    metrics: {
+      errorRate: "معدل الخطأ",
+      errorRateDescription: "نسبة طلبات API الفاشلة",
+      totalRequests: "إجمالي الطلبات",
+      failedRequests: "الطلبات الفاشلة",
+      moduleUsage: "استخدام الوحدات",
+      moduleUsageDescription: "الوحدات والتكاملات النشطة",
+      activeApiKeys: "مفاتيح API النشطة",
+      activeWebhooks: "Webhooks النشطة",
+      averageResponseTime: "متوسط وقت الاستجابة",
+    },
+    quickActions: {
+      title: "إجراءات سريعة",
+      description: "وصول سريع للميزات المستخدمة بشكل متكرر",
+      analytics: "التحليلات",
+      reports: "التقارير",
+      apiKeys: "مفاتيح API",
+      webhooks: "Webhooks",
+      metrics: "المقاييس",
+      settings: "الإعدادات",
+      search: "البحث الشامل",
+      menuItems: "عناصر القائمة",
     },
     licenseStatus: {
       title: "نظرة عامة على حالة الترخيص",
@@ -2717,6 +2762,40 @@ export const ar = {
       unauthorized: "ليس لديك صلاحية للوصول إلى هذا المورد.",
       sessionExpired: "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
       loginRequired: "يرجى تسجيل الدخول للمتابعة.",
+    },
+  },
+
+  // File Upload
+  fileUpload: {
+    title: "رفع الملفات",
+    description: "رفع الملفات باستخدام النقل المجزأ للملفات الكبيرة",
+    selectFile: "اختر ملف",
+    upload: "رفع",
+    uploading: "جاري الرفع...",
+    cancel: "إلغاء",
+    uploadAnother: "رفع ملف آخر",
+    success: {
+      uploadComplete: "تم الرفع بنجاح!",
+      fileName: "الملف",
+      fileSize: "الحجم",
+    },
+    error: {
+      fileTooLarge: "حجم الملف يتجاوز الحد الأقصى المسموح به وهو {{maxSize}}",
+      invalidFileType: "نوع الملف غير مسموح. الأنواع المقبولة: {{types}}",
+      uploadFailed: "فشل الرفع. يرجى المحاولة مرة أخرى.",
+    },
+  },
+
+  // File Download
+  fileDownload: {
+    title: "تنزيل الملفات",
+    description: "تنزيل الملفات باستخدام النقل المجزأ للملفات الكبيرة",
+    download: "تنزيل",
+    downloading: "جاري التنزيل...",
+    fileSize: "الحجم",
+    contentType: "النوع",
+    error: {
+      downloadFailed: "فشل التنزيل. يرجى المحاولة مرة أخرى.",
     },
   },
 };

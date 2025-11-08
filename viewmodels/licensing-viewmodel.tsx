@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import type { Company } from "@/domain";
-import { ActivateCompanyRequest, ExtendCompanyRequest } from "@/domain";
+import { ActivateCompanyRequest, ExtendCompanyRequest, StartTrialRequest, ConvertTrialRequest, BulkOperationResponse } from "@/domain";
 
 export function useLicensingViewModel() {
   const { licensingService } = useServices();
@@ -85,6 +85,76 @@ export function useLicensingViewModel() {
     }
   }, [licensingService]);
 
+  const startTrial = useCallback(async (companyId: string, trialDays: number) => {
+    setLoading(true);
+    try {
+      const request = new StartTrialRequest({ trialDays });
+      await licensingService.startTrial(companyId, request);
+      return true;
+    } catch (e) {
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [licensingService]);
+
+  const convertTrial = useCallback(async (companyId: string, expiryDate: string) => {
+    setLoading(true);
+    try {
+      const request = new ConvertTrialRequest({ expiryDate });
+      await licensingService.convertTrial(companyId, request);
+      return true;
+    } catch (e) {
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [licensingService]);
+
+  const bulkActivate = useCallback(async (companyIds: string[], expiryDate?: string): Promise<BulkOperationResponse | null> => {
+    setLoading(true);
+    try {
+      return await licensingService.bulkActivate(companyIds, expiryDate);
+    } catch (e) {
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [licensingService]);
+
+  const bulkSuspend = useCallback(async (companyIds: string[]): Promise<BulkOperationResponse | null> => {
+    setLoading(true);
+    try {
+      return await licensingService.bulkSuspend(companyIds);
+    } catch (e) {
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [licensingService]);
+
+  const bulkResume = useCallback(async (companyIds: string[]): Promise<BulkOperationResponse | null> => {
+    setLoading(true);
+    try {
+      return await licensingService.bulkResume(companyIds);
+    } catch (e) {
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [licensingService]);
+
+  const bulkExtend = useCallback(async (companyIds: string[], expiryDate: string): Promise<BulkOperationResponse | null> => {
+    setLoading(true);
+    try {
+      return await licensingService.bulkExtend(companyIds, expiryDate);
+    } catch (e) {
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [licensingService]);
+
   return {
     loading,
     activateCompany,
@@ -93,6 +163,12 @@ export function useLicensingViewModel() {
     extendCompany,
     generateLicenseKey,
     regenerateLicenseKey,
+    startTrial,
+    convertTrial,
+    bulkActivate,
+    bulkSuspend,
+    bulkResume,
+    bulkExtend,
   };
 }
 

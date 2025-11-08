@@ -136,3 +136,105 @@ export class LicenseKeyValidationResponse {
   }
 }
 
+// Bulk Operations
+export interface BulkOperationRequestData {
+  companyIds: string[]; // Array of encrypted GUIDs
+  action: number; // 1=Activate, 2=Suspend, 3=Resume, 4=Extend, 5=Delete
+  expiryDate?: string; // Required for Extend action (ISO 8601)
+}
+
+export class BulkOperationRequest {
+  public readonly companyIds: string[];
+  public readonly action: number;
+  public readonly expiryDate?: string;
+
+  constructor(data: BulkOperationRequestData) {
+    this.companyIds = data.companyIds;
+    this.action = data.action;
+    this.expiryDate = data.expiryDate;
+  }
+
+  get isValid(): boolean {
+    return this.companyIds.length > 0 && (this.action !== 4 || !!this.expiryDate);
+  }
+}
+
+export interface BulkOperationResultData {
+  companyId: string;
+  companyName?: string;
+  success: boolean;
+  message: string;
+  errorMessage?: string;
+}
+
+export class BulkOperationResult {
+  public readonly companyId: string;
+  public readonly companyName?: string;
+  public readonly success: boolean;
+  public readonly message: string;
+  public readonly errorMessage?: string;
+
+  constructor(data: BulkOperationResultData) {
+    this.companyId = data.companyId;
+    this.companyName = data.companyName;
+    this.success = data.success;
+    this.message = data.message;
+    this.errorMessage = data.errorMessage;
+  }
+}
+
+export interface BulkOperationResponseData {
+  totalCount: number;
+  successCount: number;
+  failedCount: number;
+  results: BulkOperationResultData[];
+}
+
+export class BulkOperationResponse {
+  public readonly totalCount: number;
+  public readonly successCount: number;
+  public readonly failedCount: number;
+  public readonly results: BulkOperationResult[];
+
+  constructor(data: BulkOperationResponseData) {
+    this.totalCount = data.totalCount;
+    this.successCount = data.successCount;
+    this.failedCount = data.failedCount;
+    this.results = data.results.map(r => new BulkOperationResult(r));
+  }
+}
+
+// Trial Operations
+export interface StartTrialRequestData {
+  trialDays: number; // 1-365
+}
+
+export class StartTrialRequest {
+  public readonly trialDays: number;
+
+  constructor(data: StartTrialRequestData) {
+    this.trialDays = data.trialDays;
+  }
+
+  get isValid(): boolean {
+    return this.trialDays >= 1 && this.trialDays <= 365;
+  }
+}
+
+export interface ConvertTrialRequestData {
+  expiryDate: string; // ISO 8601 date
+}
+
+export class ConvertTrialRequest {
+  public readonly expiryDate: string;
+
+  constructor(data: ConvertTrialRequestData) {
+    this.expiryDate = data.expiryDate;
+  }
+
+  get isValid(): boolean {
+    const date = new Date(this.expiryDate);
+    return date > new Date();
+  }
+}
+

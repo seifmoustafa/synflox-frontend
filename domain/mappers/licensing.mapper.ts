@@ -12,12 +12,20 @@ import {
   ValidateLicenseKeyRequest,
   LicenseKeyValidationResponse,
   LicenseStatus,
+  BulkOperationRequest,
+  BulkOperationResponse,
+  StartTrialRequest,
+  ConvertTrialRequest,
   type ActivateCompanyRequestData,
   type ExtendCompanyRequestData,
   type CompanyStatusResponseData,
   type GenerateLicenseKeyResponseData,
   type ValidateLicenseKeyRequestData,
   type LicenseKeyValidationResponseData,
+  type BulkOperationRequestData,
+  type BulkOperationResponseData,
+  type StartTrialRequestData,
+  type ConvertTrialRequestData,
 } from '../models/licensing.model';
 import { Company } from '../models/company.model';
 import { CompanyMapper } from './company.mapper';
@@ -100,6 +108,52 @@ export class LicensingMapper {
   static companyFromResponse(json: any): Company {
     const companyData = json?.data || json;
     return CompanyMapper.fromJson(companyData);
+  }
+
+  /**
+   * Convert BulkOperationRequest to JSON for API
+   */
+  static bulkOperationRequestToJson(request: BulkOperationRequest): any {
+    const json: any = {
+      companyIds: request.companyIds,
+      action: request.action,
+    };
+    if (request.expiryDate) {
+      json.expiryDate = request.expiryDate;
+    }
+    return json;
+  }
+
+  /**
+   * Convert API response to BulkOperationResponse
+   * Backend format: { statusCode, message, data: { totalCount, successCount, failedCount, results } }
+   */
+  static bulkOperationResponseFromJson(json: any): BulkOperationResponse {
+    const data = json?.data || json;
+    return new BulkOperationResponse({
+      totalCount: data.totalCount || data.totalRequested || 0,
+      successCount: data.successCount || data.successful || 0,
+      failedCount: data.failedCount || data.failed || 0,
+      results: data.results || [],
+    });
+  }
+
+  /**
+   * Convert StartTrialRequest to JSON for API
+   */
+  static startTrialRequestToJson(request: StartTrialRequest): any {
+    return {
+      trialDays: request.trialDays,
+    };
+  }
+
+  /**
+   * Convert ConvertTrialRequest to JSON for API
+   */
+  static convertTrialRequestToJson(request: ConvertTrialRequest): any {
+    return {
+      expiryDate: request.expiryDate,
+    };
   }
 }
 

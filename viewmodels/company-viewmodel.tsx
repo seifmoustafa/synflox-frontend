@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
@@ -16,9 +16,10 @@ import { Badge } from "@/components/ui/badge";
 
 export function useCompanyViewModel() {
   const router = useRouter();
-  const { companyService } = useServices();
+  const { companyService, subscriptionPlanService } = useServices();
   const { t } = useI18n();
   const licensingVm = useLicensingViewModel();
+  const [subscriptionPlanOptions, setSubscriptionPlanOptions] = useState<Array<{value: string, label: string}>>([]);
   
   // Licensing modal states
   const [activateModalOpen, setActivateModalOpen] = useState(false);
@@ -27,6 +28,24 @@ export function useCompanyViewModel() {
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [licenseKey, setLicenseKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // Load subscription plans for dropdown
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        const response = await subscriptionPlanService.getPlans({ pageSize: 100, isActive: true });
+        setSubscriptionPlanOptions(
+          response.data.map(plan => ({
+            value: plan.id,
+            label: plan.name,
+          }))
+        );
+      } catch (e) {
+        // Error already shown by service
+      }
+    };
+    loadPlans();
+  }, [subscriptionPlanService]);
 
   const vm = useGenericCrudViewModel<
     Company,
@@ -87,7 +106,14 @@ export function useCompanyViewModel() {
           key: "name",
           label: t("company.name"),
           render: (_val: unknown, company: Company) => (
-            <div className="font-medium">{company.name}</div>
+            <div className="flex items-center gap-2">
+              <div className="font-medium">{company.name}</div>
+              {company.isTrial && (
+                <Badge variant="secondary" className="text-xs">
+                  {t("company.trialBadge")}
+                </Badge>
+              )}
+            </div>
           ),
         },
         {
@@ -154,6 +180,13 @@ export function useCompanyViewModel() {
           type: "textarea" as const,
           placeholder: t("company.addressPlaceholder"),
         },
+        {
+          name: "subscriptionPlanId",
+          label: t("company.subscriptionPlan"),
+          type: "select" as const,
+          placeholder: t("company.subscriptionPlanPlaceholder"),
+          options: subscriptionPlanOptions,
+        },
       ],
       editFields: [
         {
@@ -193,6 +226,13 @@ export function useCompanyViewModel() {
           placeholder: t("company.addressPlaceholder"),
         },
         { name: "id", type: "hidden" as const, required: true },
+        {
+          name: "subscriptionPlanId",
+          label: t("company.subscriptionPlan"),
+          type: "select" as const,
+          placeholder: t("company.subscriptionPlanPlaceholder"),
+          options: subscriptionPlanOptions,
+        },
       ],
       createInitialValues: {},
       editInitialValues: (company: Company) => ({
@@ -202,6 +242,7 @@ export function useCompanyViewModel() {
         contactEmail: company.contactEmail || "",
         contactPhone: company.contactPhone || "",
         address: company.address || "",
+        subscriptionPlanId: company.subscriptionPlanId || "",
         id: company.id,
       }),
       getActions: (vm: any, t: any, handleDelete) => {
@@ -323,8 +364,114 @@ export function useCompanyViewModel() {
 
         return actions;
       },
+      enableBulkActions: true,
+      bulkActions: [
+        {
+          label: t("licensing.bulkActivate"),
+          onClick: async (selectedIds: string[]) => {
+            // Show date picker modal for expiry date, then call bulkActivate
+            const expiryDate = prompt(t("company.expiryDate") + " (YYYY-MM-DD):");
+            if (expiryDate) {
+              const result = await licensingVm.bulkActivate(selectedIds, new Date(expiryDate).toISOString());
+              if (result) {
+                await vm.refreshItems();
+              }
+            }
+          },
+          confirmTitle: t("licensing.bulkActivate"),
+          confirmDescription: t("licensing.confirmBulkActivate", { count: "{count}" }),
+          variant: "default" as const,
+        },
+        {
+          label: t("licensing.bulkSuspend"),
+          onClick: async (selectedIds: string[]) => {
+            const result = await licensingVm.bulkSuspend(selectedIds);
+            if (result) {
+              await vm.refreshItems();
+            }
+          },
+          confirmTitle: t("licensing.bulkSuspend"),
+          confirmDescription: t("licensing.confirmBulkSuspend", { count: "{count}" }),
+          variant: "default" as const,
+        },
+        {
+          label: t("licensing.bulkResume"),
+          onClick: async (selectedIds: string[]) => {
+            const result = await licensingVm.bulkResume(selectedIds);
+            if (result) {
+              await vm.refreshItems();
+            }
+          },
+          confirmTitle: t("licensing.bulkResume"),
+          confirmDescription: t("licensing.confirmBulkResume", { count: "{count}" }),
+          variant: "default" as const,
+        },
+        {
+          label: t("licensing.bulkExtend"),
+          onClick: async (selectedIds: string[]) => {
+            // Show date picker modal for expiry date
+            const expiryDate = prompt(t("company.newExpiryDate") + " (YYYY-MM-DD):");
+            if (expiryDate) {
+              const result = await licensingVm.bulkExtend(selectedIds, new Date(expiryDate).toISOString());
+              if (result) {
+                await vm.refreshItems();
+              }
+            }
+          },
+          confirmTitle: t("licensing.bulkExtend"),
+          confirmDescription: t("licensing.confirmBulkExtend", { count: "{count}" }),
+          variant: "default" as const,
+        },
+      ],
+      customActions: [
+        {
+          label: t("company.export"),
+          onClick: async () => {
+            // Show dropdown to select format
+            const format = confirm("Export as Excel? (OK for Excel, Cancel for CSV)") ? 'excel' : 'csv';
+            try {
+              const blob = await companyService.exportCompanies(format);
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `companies.${format === 'excel' ? 'xlsx' : 'csv'}`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);
+            } catch (e) {
+              // Error already shown by service
+            }
+          },
+          variant: "outline" as const,
+        },
+        {
+          label: t("company.import"),
+          onClick: async () => {
+            // Import dialog will be handled in the view component
+            // For now, just show a file input
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv,.xlsx,.xls';
+            input.onchange = async (e) => {
+              const file = (e.target as HTMLInputElement).files?.[0];
+              if (file) {
+                const format = file.name.endsWith('.xlsx') || file.name.endsWith('.xls') ? 'excel' : 'csv';
+                try {
+                  await companyService.importCompanies(file, format);
+                  await vm.refreshItems();
+                } catch (error) {
+                  // Error already shown by service
+                }
+              }
+            };
+            input.click();
+          },
+          variant: "outline" as const,
+        },
+      ],
     }),
-    [t, setActivateModalOpen, setExtendModalOpen, setLicenseKeyModalOpen, setSelectedCompany, setLicenseKey, licensingVm, vm, handleDelete, companyService]
+    [t, setActivateModalOpen, setExtendModalOpen, setLicenseKeyModalOpen, setSelectedCompany, setLicenseKey, licensingVm, vm, handleDelete, companyService, subscriptionPlanOptions]
   );
 
   const handleCopyLicenseKey = useCallback(async () => {

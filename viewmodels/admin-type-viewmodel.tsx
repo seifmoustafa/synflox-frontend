@@ -156,6 +156,48 @@ export function useAdminTypeViewModel() {
           confirmDescription: t("common.deleteConfirmation", { name: "{name}" }),
         },
       ],
+      enableBulkActions: true,
+      bulkActions: [
+        {
+          label: t("adminType.bulkActivate") || "Activate Selected",
+          onClick: async (selectedIds: string[]) => {
+            for (const id of selectedIds) {
+              await adminTypeService.toggleActive(id, true);
+            }
+            await vm.refreshItems();
+          },
+          confirmTitle: t("adminType.bulkActivate") || "Activate Selected Admin Types",
+          confirmDescription: t("adminType.confirmBulkActivate", { count: "{count}" }) || 
+            "Are you sure you want to activate {count} selected admin types?",
+          variant: "default" as const,
+        },
+        {
+          label: t("adminType.bulkDeactivate") || "Deactivate Selected",
+          onClick: async (selectedIds: string[]) => {
+            for (const id of selectedIds) {
+              await adminTypeService.toggleActive(id, false);
+            }
+            await vm.refreshItems();
+          },
+          confirmTitle: t("adminType.bulkDeactivate") || "Deactivate Selected Admin Types",
+          confirmDescription: t("adminType.confirmBulkDeactivate", { count: "{count}" }) || 
+            "Are you sure you want to deactivate {count} selected admin types?",
+          variant: "default" as const,
+        },
+        {
+          label: t("adminType.bulkDelete") || "Delete Selected",
+          onClick: async (selectedIds: string[]) => {
+            for (const id of selectedIds) {
+              await adminTypeService.deleteAdminType(id);
+            }
+            await vm.refreshItems();
+          },
+          confirmTitle: t("adminType.bulkDelete") || "Delete Selected Admin Types",
+          confirmDescription: t("adminType.confirmBulkDelete", { count: "{count}" }) || 
+            "Are you sure you want to delete {count} selected admin types? This action cannot be undone.",
+          variant: "destructive" as const,
+        },
+      ],
     }),
     [t, adminTypeService, vm]
   );

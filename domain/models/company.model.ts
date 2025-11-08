@@ -15,6 +15,9 @@ export interface CompanyData {
   contactPhone?: string;
   address?: string;
   licenseKey?: string; // Only shown when generated
+  isTrial?: boolean; // NEW: Whether company is on trial
+  trialEndDate?: string; // NEW: ISO date string for trial end
+  subscriptionPlanId?: string; // NEW: Encrypted GUID of subscription plan
   createdTimestamp: string;
   updatedTimestamp?: string;
 }
@@ -28,6 +31,9 @@ export class Company {
   public readonly contactPhone?: string;
   public readonly address?: string;
   public readonly licenseKey?: string;
+  public readonly isTrial?: boolean;
+  public readonly trialEndDate?: string;
+  public readonly subscriptionPlanId?: string;
   public readonly createdTimestamp: string;
   public readonly updatedTimestamp?: string;
 
@@ -40,6 +46,9 @@ export class Company {
     this.contactPhone = data.contactPhone;
     this.address = data.address;
     this.licenseKey = data.licenseKey;
+    this.isTrial = data.isTrial ?? false;
+    this.trialEndDate = data.trialEndDate;
+    this.subscriptionPlanId = data.subscriptionPlanId;
     this.createdTimestamp = data.createdTimestamp;
     this.updatedTimestamp = data.updatedTimestamp;
   }
@@ -71,6 +80,21 @@ export class Company {
   }
 
   /**
+   * Check if company is on trial
+   */
+  get isOnTrial(): boolean {
+    return this.isTrial === true;
+  }
+
+  /**
+   * Check if trial has expired
+   */
+  get isTrialExpired(): boolean {
+    if (!this.isTrial || !this.trialEndDate) return false;
+    return new Date(this.trialEndDate) < new Date();
+  }
+
+  /**
    * Create a copy of the company with updated data
    */
   update(updates: Partial<CompanyData>): Company {
@@ -90,6 +114,7 @@ export interface CreateCompanyRequestData {
   contactEmail?: string;
   contactPhone?: string;
   address?: string;
+  subscriptionPlanId?: string;
 }
 
 export class CreateCompanyRequest {
@@ -98,6 +123,7 @@ export class CreateCompanyRequest {
   public readonly contactEmail?: string;
   public readonly contactPhone?: string;
   public readonly address?: string;
+  public readonly subscriptionPlanId?: string;
 
   constructor(data: CreateCompanyRequestData) {
     this.name = data.name;
@@ -105,6 +131,7 @@ export class CreateCompanyRequest {
     this.contactEmail = data.contactEmail;
     this.contactPhone = data.contactPhone;
     this.address = data.address;
+    this.subscriptionPlanId = data.subscriptionPlanId;
   }
 
   /**
@@ -126,6 +153,7 @@ export interface UpdateCompanyRequestData {
   contactEmail?: string;
   contactPhone?: string;
   address?: string;
+  subscriptionPlanId?: string;
 }
 
 export class UpdateCompanyRequest {
@@ -136,6 +164,7 @@ export class UpdateCompanyRequest {
   public readonly contactEmail?: string;
   public readonly contactPhone?: string;
   public readonly address?: string;
+  public readonly subscriptionPlanId?: string;
 
   constructor(data: UpdateCompanyRequestData) {
     this.id = data.id;
@@ -145,6 +174,7 @@ export class UpdateCompanyRequest {
     this.contactEmail = data.contactEmail;
     this.contactPhone = data.contactPhone;
     this.address = data.address;
+    this.subscriptionPlanId = data.subscriptionPlanId;
   }
 
   /**

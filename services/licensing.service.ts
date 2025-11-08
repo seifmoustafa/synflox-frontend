@@ -15,6 +15,10 @@ import {
   GenerateLicenseKeyResponse,
   ValidateLicenseKeyRequest,
   LicenseKeyValidationResponse,
+  BulkOperationRequest,
+  BulkOperationResponse,
+  StartTrialRequest,
+  ConvertTrialRequest,
   LicensingMapper,
 } from "@/domain";
 import { API_ENDPOINTS } from "@/config/api-endpoints";
@@ -28,6 +32,12 @@ export interface ILicensingService {
   generateLicenseKey(id: string): Promise<GenerateLicenseKeyResponse>;
   regenerateLicenseKey(id: string): Promise<GenerateLicenseKeyResponse>;
   validateLicenseKey(request: ValidateLicenseKeyRequest): Promise<LicenseKeyValidationResponse>;
+  bulkActivate(companyIds: string[], expiryDate?: string): Promise<BulkOperationResponse>;
+  bulkSuspend(companyIds: string[]): Promise<BulkOperationResponse>;
+  bulkResume(companyIds: string[]): Promise<BulkOperationResponse>;
+  bulkExtend(companyIds: string[], expiryDate: string): Promise<BulkOperationResponse>;
+  startTrial(companyId: string, request: StartTrialRequest): Promise<Company>;
+  convertTrial(companyId: string, request: ConvertTrialRequest): Promise<Company>;
 }
 
 export class LicensingService implements ILicensingService {
@@ -164,6 +174,116 @@ export class LicensingService implements ILicensingService {
         json
       );
       return LicensingMapper.validateKeyResponseFromJson(response);
+    } catch (e) {
+      // Error message already shown by API service with backend message
+      throw e;
+    }
+  }
+
+  async bulkActivate(companyIds: string[], expiryDate?: string): Promise<BulkOperationResponse> {
+    try {
+      // SYNFLOX API: POST /api/licensing/bulk-activate
+      const request = new BulkOperationRequest({ companyIds, action: 1, expiryDate });
+      const json = LicensingMapper.bulkOperationRequestToJson(request);
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.LICENSING_BULK_ACTIVATE,
+        json
+      );
+      const result = LicensingMapper.bulkOperationResponseFromJson(response);
+      const message = response?.message || `Bulk activation completed: ${result.successCount} succeeded, ${result.failedCount} failed`;
+      this.notificationService.success(message);
+      return result;
+    } catch (e) {
+      // Error message already shown by API service with backend message
+      throw e;
+    }
+  }
+
+  async bulkSuspend(companyIds: string[]): Promise<BulkOperationResponse> {
+    try {
+      // SYNFLOX API: POST /api/licensing/bulk-suspend
+      const request = new BulkOperationRequest({ companyIds, action: 2 });
+      const json = LicensingMapper.bulkOperationRequestToJson(request);
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.LICENSING_BULK_SUSPEND,
+        json
+      );
+      const result = LicensingMapper.bulkOperationResponseFromJson(response);
+      const message = response?.message || `Bulk suspension completed: ${result.successCount} succeeded, ${result.failedCount} failed`;
+      this.notificationService.success(message);
+      return result;
+    } catch (e) {
+      // Error message already shown by API service with backend message
+      throw e;
+    }
+  }
+
+  async bulkResume(companyIds: string[]): Promise<BulkOperationResponse> {
+    try {
+      // SYNFLOX API: POST /api/licensing/bulk-resume
+      const request = new BulkOperationRequest({ companyIds, action: 3 });
+      const json = LicensingMapper.bulkOperationRequestToJson(request);
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.LICENSING_BULK_RESUME,
+        json
+      );
+      const result = LicensingMapper.bulkOperationResponseFromJson(response);
+      const message = response?.message || `Bulk resume completed: ${result.successCount} succeeded, ${result.failedCount} failed`;
+      this.notificationService.success(message);
+      return result;
+    } catch (e) {
+      // Error message already shown by API service with backend message
+      throw e;
+    }
+  }
+
+  async bulkExtend(companyIds: string[], expiryDate: string): Promise<BulkOperationResponse> {
+    try {
+      // SYNFLOX API: POST /api/licensing/bulk-extend
+      const request = new BulkOperationRequest({ companyIds, action: 4, expiryDate });
+      const json = LicensingMapper.bulkOperationRequestToJson(request);
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.LICENSING_BULK_EXTEND,
+        json
+      );
+      const result = LicensingMapper.bulkOperationResponseFromJson(response);
+      const message = response?.message || `Bulk extension completed: ${result.successCount} succeeded, ${result.failedCount} failed`;
+      this.notificationService.success(message);
+      return result;
+    } catch (e) {
+      // Error message already shown by API service with backend message
+      throw e;
+    }
+  }
+
+  async startTrial(companyId: string, request: StartTrialRequest): Promise<Company> {
+    try {
+      // SYNFLOX API: POST /api/licensing/{id}/trial/start
+      const json = LicensingMapper.startTrialRequestToJson(request);
+      const response = await this.apiService.post<any>(
+        `${API_ENDPOINTS.LICENSING_TRIAL_START}/${companyId}/trial/start`,
+        json
+      );
+      const message = response?.message || "Trial started successfully";
+      this.notificationService.success(message);
+      return LicensingMapper.companyFromResponse(response);
+    } catch (e) {
+      // Error message already shown by API service with backend message
+      throw e;
+    }
+  }
+
+  async convertTrial(companyId: string, request: ConvertTrialRequest): Promise<Company> {
+    try {
+      // SYNFLOX API: POST /api/licensing/{id}/trial/convert
+      const json = LicensingMapper.convertTrialRequestToJson(request);
+      const response = await this.apiService.post<any>(
+        `${API_ENDPOINTS.LICENSING_TRIAL_CONVERT}/${companyId}/trial/convert`,
+        json
+      );
+      const message = response?.message || "Trial converted successfully";
+      this.notificationService.success(message);
+      return LicensingMapper.companyFromResponse(response);
     } catch (e) {
       // Error message already shown by API service with backend message
       throw e;
