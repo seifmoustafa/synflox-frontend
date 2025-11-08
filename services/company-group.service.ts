@@ -135,8 +135,8 @@ export class CompanyGroupService implements ICompanyGroupService {
 
   async removeCompanies(groupId: string, companyIds: string[]): Promise<void> {
     try {
-      const response = await this.apiService.delete<any>(
-        `${API_ENDPOINTS.COMPANY_GROUPS_REMOVE_COMPANIES}/${groupId}/companies`,
+      const response = await this.apiService.post<any>(
+        `${API_ENDPOINTS.COMPANY_GROUPS_REMOVE_COMPANIES}/${groupId}/companies/remove`,
         { companyIds }
       );
       const message = response?.message || "Companies removed from group successfully";

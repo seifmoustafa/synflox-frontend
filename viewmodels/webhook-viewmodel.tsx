@@ -7,11 +7,10 @@ import { useI18n } from "@/providers/i18n-provider";
 import { useGenericCrudViewModel } from "@/hooks/use-generic-crud-viewmodel";
 import type {
   Webhook,
-  CreateWebhookRequest,
-  UpdateWebhookRequest,
   WebhookDelivery,
   WebhookEventType,
 } from "@/domain";
+import { CreateWebhookRequest, UpdateWebhookRequest } from "@/domain";
 import { WebhookEventType as WebhookEventTypeEnum, WebhookDeliveryStatus } from "@/domain";
 import type { CrudConfig } from "@/components/ui/generic-crud-view";
 import { Badge } from "@/components/ui/badge";

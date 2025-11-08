@@ -107,7 +107,7 @@ export function SubscriptionHistoryView({ companyId }: SubscriptionHistoryViewPr
               <GenericSelect
                 options={actionTypes}
                 value={filters.actionType}
-                onValueChange={(value) => setFilters({ ...filters, actionType: value as string })}
+                onValueChange={(value: string | string[]) => setFilters({ ...filters, actionType: value as string })}
                 placeholder={t("subscriptionHistory.filter.all")}
                 type="single"
               />

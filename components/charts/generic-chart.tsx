@@ -374,6 +374,56 @@ export const GENERIC_COLORS = {
     "#84CC16", // Lime
     "#F97316", // Orange
   ],
+  secondary: [
+    "#6366F1", // Indigo
+    "#8B5CF6", // Violet
+    "#A855F7", // Purple
+    "#C084FC", // Fuchsia
+    "#D946EF", // Pink
+    "#EC4899", // Rose
+    "#F43F5E", // Red
+    "#FB7185", // Pink
+  ],
+  success: [
+    "#10B981", // Emerald
+    "#059669", // Emerald 700
+    "#047857", // Emerald 800
+    "#34D399", // Emerald 400
+    "#6EE7B7", // Emerald 300
+    "#A7F3D0", // Emerald 200
+    "#D1FAE5", // Emerald 100
+    "#ECFDF5", // Emerald 50
+  ],
+  destructive: [
+    "#EF4444", // Red
+    "#DC2626", // Red 600
+    "#B91C1C", // Red 700
+    "#F87171", // Red 400
+    "#FCA5A5", // Red 300
+    "#FEE2E2", // Red 200
+    "#FEE2E2", // Red 100
+    "#FEF2F2", // Red 50
+  ],
+  warning: [
+    "#F59E0B", // Amber
+    "#D97706", // Amber 600
+    "#B45309", // Amber 700
+    "#FBBF24", // Amber 400
+    "#FCD34D", // Amber 300
+    "#FDE68A", // Amber 200
+    "#FEF3C7", // Amber 100
+    "#FFFBEB", // Amber 50
+  ],
+  info: [
+    "#3B82F6", // Blue
+    "#2563EB", // Blue 600
+    "#1D4ED8", // Blue 700
+    "#60A5FA", // Blue 400
+    "#93C5FD", // Blue 300
+    "#BFDBFE", // Blue 200
+    "#DBEAFE", // Blue 100
+    "#EFF6FF", // Blue 50
+  ],
   gradient: [
     "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",

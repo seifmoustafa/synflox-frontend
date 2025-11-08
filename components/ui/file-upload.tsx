@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Upload, X, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { InitiateUploadRequest, UploadSession, FileInfo } from "@/domain";
+import { InitiateUploadRequest } from "@/domain";
+import type { UploadSession, FileInfo } from "@/domain";
 
 export interface FileUploadProps {
   onUploadComplete?: (fileInfo: FileInfo) => void;

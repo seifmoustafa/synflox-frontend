@@ -62,6 +62,8 @@ export function useLoginAttemptViewModel() {
     () => ({
       titleKey: "loginAttempt.title",
       subtitleKey: "loginAttempt.description",
+      createFields: [], // Login attempts are read-only
+      editFields: [], // Login attempts are read-only
       columns: [
         {
           key: "username",

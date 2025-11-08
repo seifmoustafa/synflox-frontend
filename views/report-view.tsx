@@ -62,7 +62,7 @@ export function ReportView() {
                 label: r.name,
               }))}
               value={selectedReportTypeValue}
-              onValueChange={(value) => {
+              onValueChange={(value: string | string[]) => {
                 setSelectedReportTypeValue(Array.isArray(value) ? value[0] : value);
                 const report = availableReports.find(r => r.reportType.toString() === (Array.isArray(value) ? value[0] : value));
                 setSelectedReportType(report || null);
@@ -83,7 +83,7 @@ export function ReportView() {
                   label: f.toUpperCase(),
                 }))}
                 value={selectedFormat}
-                onValueChange={(value) => setSelectedFormat((Array.isArray(value) ? value[0] : value) as 'csv' | 'excel' | 'pdf')}
+                onValueChange={(value: string | string[]) => setSelectedFormat((Array.isArray(value) ? value[0] : value) as 'csv' | 'excel' | 'pdf')}
                 placeholder={t("report.formatPlaceholder")}
               />
             </div>

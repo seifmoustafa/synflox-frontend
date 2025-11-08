@@ -8,9 +8,9 @@ import { useGenericCrudViewModel } from "@/hooks/use-generic-crud-viewmodel";
 import type {
   Report,
   AvailableReport,
-  GenerateReportRequest,
   ReportType,
 } from "@/domain";
+import { GenerateReportRequest } from "@/domain";
 import { ReportType as ReportTypeEnum, ReportStatus } from "@/domain";
 import type { CrudConfig } from "@/components/ui/generic-crud-view";
 import { Badge } from "@/components/ui/badge";
@@ -110,6 +110,10 @@ export function useReportViewModel() {
     () => ({
       titleKey: "report.title",
       subtitleKey: "report.description",
+      createFields: [], // Reports are generated, not created via form
+      editFields: [], // Reports are read-only
+      createInitialValues: {},
+      editInitialValues: () => ({}),
       columns: [
         {
           key: "name",
@@ -196,7 +200,7 @@ export function useReportViewModel() {
       customActions: [
         {
           label: t("report.generate"),
-          onClick: () => setGenerateModalOpen(true),
+          onClick: async () => { setGenerateModalOpen(true); },
           variant: "default" as const,
         },
       ],

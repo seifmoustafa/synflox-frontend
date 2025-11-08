@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Download, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { InitiateDownloadRequest, DownloadSession, FileInfo } from "@/domain";
+import { InitiateDownloadRequest } from "@/domain";
+import type { DownloadSession, FileInfo } from "@/domain";
 
 export interface FileDownloadProps {
   fileId: string;

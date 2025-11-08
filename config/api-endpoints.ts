@@ -159,6 +159,16 @@ export const API_ENDPOINTS = {
   ERROR_LOGS_GET_BY_ID: "/errors",
   ERROR_LOGS_CLEANUP: "/errors/cleanup",
   
+  // Login Attempts
+  LOGIN_ATTEMPTS_GET_ALL: "/login-attempts",
+  LOGIN_ATTEMPTS_GET_FAILED: "/login-attempts",
+  
+  // Search
+  SEARCH_POST: "/search",
+  SEARCH_SUGGESTIONS: "/search/suggestions",
+  SEARCH_ENTITY_TYPES: "/search/entity-types",
+  SEARCH_STATS: "/search/stats",
+  
   // Password Policy
   PASSWORD_POLICY_GET: "/password-policy",
   PASSWORD_POLICY_UPDATE: "/password-policy",

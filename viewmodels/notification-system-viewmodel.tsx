@@ -143,7 +143,7 @@ export function useNotificationSystemViewModel(companyId?: string) {
       editInitialValues: () => ({}),
       getActions: (vm: any, t: any) => [
         {
-          label: notification => notification.isRead ? t("notifications.markUnread") : t("notifications.markRead"),
+          label: t("notifications.markRead"),
           onClick: async (item: SystemNotification) => {
             await markAsRead(item.id);
           },

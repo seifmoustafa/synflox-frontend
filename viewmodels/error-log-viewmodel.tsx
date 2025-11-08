@@ -67,6 +67,8 @@ export function useErrorLogViewModel() {
     () => ({
       titleKey: "errorLog.title",
       subtitleKey: "errorLog.description",
+      createFields: [], // Error logs are read-only
+      editFields: [], // Error logs are read-only
       columns: [
         {
           key: "level",

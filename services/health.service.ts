@@ -25,9 +25,7 @@ export class HealthService implements IHealthService {
   async getHealth(): Promise<Health> {
     try {
       const response = await this.apiService.get<any>(
-        API_ENDPOINTS.HEALTH_CHECK,
-        {},
-        { skipAuth: true } // Health check endpoint is AllowAnonymous
+        "/health"
       );
       const healthData = response?.data || response;
       return HealthMapper.fromJson(healthData);
