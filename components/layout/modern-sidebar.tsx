@@ -139,7 +139,7 @@ export function ModernSidebar({
                 {/* Text content - only visible when hovered */}
                 {isHovered && (
                   <div className="flex-1 min-w-0">
-                    <span className="block truncate">{item.name}</span>
+                    <span className="block truncate">{item.name.startsWith("nav.") ? t(item.name) : item.name}</span>
                   </div>
                 )}
 
@@ -227,7 +227,7 @@ export function ModernSidebar({
         {/* Text content - only visible when hovered */}
         {isHovered && (
           <div className="flex-1 min-w-0">
-            <span className="block truncate">{item.name}</span>
+            <span className="block truncate">{item.name.startsWith("nav.") ? t(item.name) : item.name}</span>
           </div>
         )}
 
