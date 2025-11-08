@@ -428,7 +428,7 @@ export function useCompanyViewModel() {
           label: t("company.export"),
           onClick: async () => {
             // Show dropdown to select format
-            const format = confirm("Export as Excel? (OK for Excel, Cancel for CSV)") ? 'excel' : 'csv';
+            const format = confirm(t("company.exportFormatPrompt")) ? 'excel' : 'csv';
             try {
               const blob = await companyService.exportCompanies(format);
               const url = window.URL.createObjectURL(blob);

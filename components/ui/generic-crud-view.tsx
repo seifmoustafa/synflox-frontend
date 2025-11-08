@@ -366,12 +366,12 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
           await viewModel.refreshItems();
         },
         {
-          itemName: "all items",
-          itemType: config?.itemTypeKey ? t(config.itemTypeKey) : "Items",
+          itemName: t("common.allItems"),
+          itemType: config?.itemTypeKey ? t(config.itemTypeKey) : t("common.item"),
           confirmTitle: action.confirmTitle || action.label,
           confirmDescription:
             action.confirmDescription ||
-            `Are you sure you want to ${action.label.toLowerCase()}?`,
+            t("common.confirmAction", { action: action.label.toLowerCase() }),
         }
       );
     },

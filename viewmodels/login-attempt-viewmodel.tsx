@@ -24,9 +24,9 @@ export function useLoginAttemptViewModel() {
   >(
     {
       getData: loginAttemptService.getLoginAttempts.bind(loginAttemptService),
-      create: async () => { throw new Error("Not supported"); },
-      update: async () => { throw new Error("Not supported"); },
-      delete: async () => { throw new Error("Not supported"); },
+      create: async () => { throw new Error(t("common.notSupported")); },
+      update: async () => { throw new Error(t("common.notSupported")); },
+      delete: async () => { throw new Error(t("common.notSupported")); },
     },
     {
       itemTypeName: t("loginAttempt.item"),

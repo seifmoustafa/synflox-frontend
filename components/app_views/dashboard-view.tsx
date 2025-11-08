@@ -202,9 +202,9 @@ export function DashboardView() {
 
     const total = statusBreakdown.total;
     const data = [
-      { name: "Active", value: statusBreakdown.active, fill: "#10B981" },
-      { name: "Expired", value: statusBreakdown.expired, fill: "#EF4444" },
-      { name: "Suspended", value: statusBreakdown.suspended, fill: "#F59E0B" },
+      { name: t("company.status.active"), value: statusBreakdown.active, fill: "#10B981" },
+      { name: t("company.status.expired"), value: statusBreakdown.expired, fill: "#EF4444" },
+      { name: t("company.status.suspended"), value: statusBreakdown.suspended, fill: "#F59E0B" },
     ].filter(item => item.value > 0);
 
     return {

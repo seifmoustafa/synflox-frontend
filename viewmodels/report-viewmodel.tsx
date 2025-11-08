@@ -46,9 +46,9 @@ export function useReportViewModel() {
   >(
     {
       getData: reportService.getReports.bind(reportService),
-      create: async () => { throw new Error("Use generateReport instead"); },
-      update: async () => { throw new Error("Not supported"); },
-      delete: async () => { throw new Error("Not supported"); },
+      create: async () => { throw new Error(t("report.useGenerateReport")); },
+      update: async () => { throw new Error(t("common.notSupported")); },
+      delete: async () => { throw new Error(t("common.notSupported")); },
     },
     {
       itemTypeName: t("report.item"),

@@ -118,7 +118,7 @@ export function ProfessionalLineCharts() {
               tension: 0.4,
             },
             {
-              label: "Active Sessions",
+              label: t("settings.charts.activeSessions"),
               data: [50, 30, 100, 150, 120, 80],
               borderColor: GENERIC_COLORS.primary[6],
               backgroundColor: GENERIC_COLORS.primary[6] + "20",

@@ -1002,18 +1002,18 @@ export function ComponentsTab() {
         )}
       >
         <div className={getFieldClasses()}>
-          <label className={getLabelClasses()}>Name</label>
+          <label className={getLabelClasses()}>{t("settings.components.name")}</label>
           <input
             className={getInputClasses()}
-            placeholder="John Doe"
+            placeholder={t("settings.components.placeholder.name")}
             readOnly
           />
         </div>
         <div className={getFieldClasses()}>
-          <label className={getLabelClasses()}>Email</label>
+          <label className={getLabelClasses()}>{t("settings.components.email")}</label>
           <input
             className={getInputClasses()}
-            placeholder="john@example.com"
+            placeholder={t("settings.components.placeholder.email")}
             readOnly
           />
         </div>
@@ -1839,19 +1839,19 @@ export function ComponentsTab() {
               {[
                 {
                   value: "none",
-                  name: "None",
+                  name: t("settings.components.plan.none"),
                   description: "No hover effect",
                   icon: Move,
                 },
                 {
                   value: "elevate",
-                  name: "Elevate",
+                  name: t("settings.components.plan.elevate"),
                   description: "Lift and shadow",
                   icon: MoveUp,
                 },
                 {
                   value: "scale",
-                  name: "Scale",
+                  name: t("settings.components.plan.scale"),
                   description: "Grow on hover",
                   icon: ZoomIn,
                 },
@@ -1923,7 +1923,7 @@ export function ComponentsTab() {
               {[
                 {
                   value: "none",
-                  name: "None",
+                  name: t("settings.components.plan.none"),
                   description: "No effect",
                   intensity: 0,
                 },

@@ -26,9 +26,9 @@ export function useNotificationSystemViewModel(companyId?: string) {
       getData: companyId 
         ? notificationSystemService.getCompanyNotifications.bind(notificationSystemService, companyId)
         : notificationSystemService.getNotifications.bind(notificationSystemService),
-      create: async () => { throw new Error("Not supported"); },
-      update: async () => { throw new Error("Not supported"); },
-      delete: async () => { throw new Error("Not supported"); },
+      create: async () => { throw new Error(t("common.notSupported")); },
+      update: async () => { throw new Error(t("common.notSupported")); },
+      delete: async () => { throw new Error(t("common.notSupported")); },
     },
     {
       itemTypeName: t("notifications.item"),

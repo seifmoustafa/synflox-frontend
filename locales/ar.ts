@@ -11,6 +11,8 @@ export const ar = {
     usernamePlaceholder: "المشرف العام",
     connectionError: "خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى.",
     redirecting: "جاري التحويل...",
+    validationError: "يرجى ملء جميع الحقول المطلوبة",
+    passwordMinLength: "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
   },
 
   // Not Authorized Page
@@ -319,6 +321,46 @@ export const ar = {
     combined: "التحليلات المجمعة",
     users: "المستخدمون",
     revenue: "الإيرادات",
+  },
+
+  // Reports
+  report: {
+    title: "التقارير",
+    description: "إنشاء وتنزيل تقارير النظام",
+    item: "تقرير",
+    items: "التقارير",
+    name: "الاسم",
+    type: "النوع",
+    format: "التنسيق",
+    statusLabel: "الحالة",
+    fileSize: "حجم الملف",
+    generatedAt: "تم الإنشاء في",
+    notGenerated: "لم يتم الإنشاء بعد",
+    generate: "إنشاء تقرير",
+    generateDescription: "اختر نوع التقرير والتنسيق للإنشاء",
+    selectReport: "اختر التقرير",
+    selectReportPlaceholder: "اختر نوع التقرير",
+    formatPlaceholder: "اختر التنسيق",
+    download: "تنزيل",
+    generating: "جاري الإنشاء...",
+    useGenerateReport: "استخدم generateReport بدلاً من ذلك",
+    types: {
+      companyList: "قائمة الشركات",
+      subscriptionSummary: "ملخص الاشتراكات",
+      usageStatistics: "إحصائيات الاستخدام",
+      financialReport: "التقرير المالي",
+      auditLog: "سجل التدقيق",
+      apiUsage: "استخدام API",
+      errorLogs: "سجلات الأخطاء",
+      unknown: "غير معروف",
+    },
+    status: {
+      pending: "قيد الانتظار",
+      generating: "جاري الإنشاء",
+      completed: "مكتمل",
+      failed: "فشل",
+      expired: "منتهي الصلاحية",
+    },
   },
 
   // Charts
@@ -1268,6 +1310,32 @@ export const ar = {
 
   // Settings
   settings: {
+    components: {
+      name: "الاسم",
+      email: "البريد الإلكتروني",
+      phone: "الهاتف",
+      address: "العنوان",
+      city: "المدينة",
+      state: "الولاية",
+      zip: "الرمز البريدي",
+      country: "الدولة",
+      placeholder: {
+        name: "أحمد محمد",
+        email: "ahmed@example.com",
+        phone: "+966 50 123 4567",
+        address: "شارع الملك فهد",
+        city: "الرياض",
+        state: "الرياض",
+        zip: "12345",
+        country: "المملكة العربية السعودية",
+      },
+      plan: {
+        none: "لا شيء",
+        elevate: "ارتقاء",
+        scale: "نطاق",
+        enterprise: "مؤسسي",
+      },
+    },
     devices: {
       desktop: "Desktop",
       mobile: "Mobile",
@@ -1690,6 +1758,23 @@ export const ar = {
       typography: "الخطوط",
       behavior: "السلوك",
       checkboxRadio: "كشوفات & راديو",
+    },
+    charts: {
+      tabs: {
+        line: "خطي",
+        area: "مساحي",
+        bar: "عمودي",
+        pie: "دائري",
+        scatter: "انتشاري",
+        radar: "رادار",
+        mixed: "مختلط",
+        heatmap: "خريطة حرارية",
+        treemap: "خريطة شجرية",
+        timeline: "زمني",
+        funnel: "قمع",
+        gauge: "مقياس",
+      },
+      activeSessions: "الجلسات النشطة",
     },
     lightBackground: {
       title: "سمة الخلفية الفاتحة",
@@ -2468,6 +2553,7 @@ export const ar = {
     filter: "تصفية",
     create: "إنشاء",
     export: "تصدير",
+    exportFormatPrompt: "تصدير كملف Excel؟ (موافق لـ Excel، إلغاء لـ CSV)",
     import: "استيراد",
     save: "حفظ",
     cancel: "إلغاء",
@@ -2501,6 +2587,14 @@ export const ar = {
     pageNotFoundDescription: "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
     goBack: "العودة",
     goHome: "الذهاب للرئيسية",
+    apply: "تطبيق",
+    clear: "مسح",
+    actions: "الإجراءات",
+    notSupported: "العملية غير مدعومة",
+    inactive: "غير نشط",
+    allItems: "جميع العناصر",
+    items: "العناصر",
+    confirmAction: "هل أنت متأكد من {action}؟",
     unexpectedError:
       "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى أو الاتصال بالدعم إذا استمرت المشكلة.",
     errorId: "معرف الخطأ",
@@ -2810,6 +2904,13 @@ export const ar = {
       invalidFileType: "نوع الملف غير مسموح. الأنواع المقبولة: {{types}}",
       uploadFailed: "فشل الرفع. يرجى المحاولة مرة أخرى.",
     },
+  },
+
+  // Rich Text Editor
+  richTextEditor: {
+    enterUrl: "أدخل الرابط:",
+    enterImageUrl: "أدخل رابط الصورة:",
+    invalidUrl: "يرجى إدخال رابط صحيح (http:// أو https://)",
   },
 
   // File Download

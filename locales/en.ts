@@ -13,6 +13,7 @@ export const en = {
     redirecting: "Redirecting...",
     welcomeBack: "Welcome back!",
     validationError: "Please fill in all required fields",
+    passwordMinLength: "Password must be at least 6 characters long",
   },
 
   // Not Authorized Page
@@ -142,6 +143,7 @@ export const en = {
     export: "Export",
     exportCsv: "Export as CSV",
     exportExcel: "Export as Excel",
+    exportFormatPrompt: "Export as Excel? (OK for Excel, Cancel for CSV)",
     import: "Import",
     importCompanies: "Import Companies",
     exportCompanies: "Export Companies",
@@ -348,6 +350,7 @@ export const en = {
     formatPlaceholder: "Select format",
     download: "Download",
     generating: "Generating...",
+    useGenerateReport: "Use generateReport instead",
     types: {
       companyList: "Company List",
       subscriptionSummary: "Subscription Summary",
@@ -1694,6 +1697,32 @@ export const en = {
       checkboxRadio: "Checkbox & Radio",
       passwordPolicy: "Password Policy",
     },
+    components: {
+      name: "Name",
+      email: "Email",
+      phone: "Phone",
+      address: "Address",
+      city: "City",
+      state: "State",
+      zip: "Zip Code",
+      country: "Country",
+      placeholder: {
+        name: "John Doe",
+        email: "john@example.com",
+        phone: "+1 (555) 123-4567",
+        address: "123 Main St",
+        city: "New York",
+        state: "NY",
+        zip: "10001",
+        country: "United States",
+      },
+      plan: {
+        none: "None",
+        elevate: "Elevate",
+        scale: "Scale",
+        enterprise: "Enterprise",
+      },
+    },
     devices: {
       desktop: "Desktop",
       mobile: "Mobile",
@@ -1716,6 +1745,7 @@ export const en = {
         funnel: "Funnel",
         gauge: "Gauge",
       },
+      activeSessions: "Active Sessions",
       line: {
         title: "Line Charts",
         description:
@@ -3007,6 +3037,14 @@ export const en = {
     shipping: "Shipping",
     grand_total: "Grand Total",
     ok: "OK",
+    apply: "Apply",
+    clear: "Clear",
+    actions: "Actions",
+    notSupported: "Operation not supported",
+    active: "Active",
+    inactive: "Inactive",
+    allItems: "all items",
+    confirmAction: "Are you sure you want to {action}?",
     confirm: "Confirm",
     warning: "Warning",
     info: "Info",
@@ -3489,6 +3527,13 @@ export const en = {
       invalidFileType: "File type not allowed. Accepted types: {{types}}",
       uploadFailed: "Upload failed. Please try again.",
     },
+  },
+
+  // Rich Text Editor
+  richTextEditor: {
+    enterUrl: "Enter URL:",
+    enterImageUrl: "Enter image URL:",
+    invalidUrl: "Please enter a valid URL (http:// or https://)",
   },
 
   // File Download

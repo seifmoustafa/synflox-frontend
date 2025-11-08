@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/providers/i18n-provider";
 import {
   Bold,
   Italic,
@@ -154,6 +155,7 @@ export function RichTextEditor({
   disabled = false,
   minHeight = 200
 }: RichTextEditorProps) {
+  const { t } = useI18n();
   const editorRef = useRef<HTMLDivElement>(null);
   const [isActive, setIsActive] = useState(false);
 
@@ -176,20 +178,20 @@ export function RichTextEditor({
   };
 
   const insertLink = () => {
-    const url = prompt("Enter URL:");
+    const url = prompt(t("richTextEditor.enterUrl"));
     if (url && isValidURL(url)) {
       executeCommand("createLink", url);
     } else if (url) {
-      alert("Please enter a valid URL (http:// or https://)");
+      alert(t("richTextEditor.invalidUrl"));
     }
   };
 
   const insertImage = () => {
-    const url = prompt("Enter image URL:");
+    const url = prompt(t("richTextEditor.enterImageUrl"));
     if (url && isValidURL(url)) {
       executeCommand("insertImage", url);
     } else if (url) {
-      alert("Please enter a valid URL (http:// or https://)");
+      alert(t("richTextEditor.invalidUrl"));
     }
   };
 
