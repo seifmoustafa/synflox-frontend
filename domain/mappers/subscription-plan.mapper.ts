@@ -29,12 +29,12 @@ export class SubscriptionPlanMapper {
       id: json.id || '',
       name: json.name || '',
       description: json.description,
-      price: json.price || 0,
+      price: typeof json.price === 'string' ? parseFloat(json.price) : (json.price || 0),
       currency: json.currency || 'USD',
-      billingCycle: json.billingCycle || BillingCycle.Monthly,
+      billingCycle: typeof json.billingCycle === 'string' ? parseInt(json.billingCycle) as BillingCycle : (json.billingCycle || BillingCycle.Monthly),
       isActive: json.isActive ?? true,
       features: json.features,
-      maxCompanies: json.maxCompanies,
+      maxCompanies: json.maxCompanies !== undefined && json.maxCompanies !== null ? (typeof json.maxCompanies === 'string' ? parseInt(json.maxCompanies) : json.maxCompanies) : null,
       createdAt: json.createdAt || json.createdTimestamp || new Date().toISOString(),
       updatedAt: json.updatedAt || json.updatedTimestamp,
     });
@@ -60,6 +60,47 @@ export class SubscriptionPlanMapper {
   }
 
   /**
+   * Convert form data (which may contain strings) to CreateSubscriptionPlanRequest
+   * Handles type conversion from form values (strings) to proper types
+   */
+  static formDataToCreateRequest(formData: any): CreateSubscriptionPlanRequest {
+    return new CreateSubscriptionPlanRequest({
+      name: formData.name,
+      description: formData.description,
+      price: typeof formData.price === 'string' ? parseFloat(formData.price) : formData.price,
+      currency: formData.currency,
+      billingCycle: typeof formData.billingCycle === 'string' ? parseInt(formData.billingCycle) as BillingCycle : formData.billingCycle,
+      maxCompanies: formData.maxCompanies && formData.maxCompanies !== '' 
+        ? (typeof formData.maxCompanies === 'string' ? parseInt(formData.maxCompanies) : formData.maxCompanies)
+        : undefined,
+      isActive: formData.isActive,
+    });
+  }
+
+  /**
+   * Convert form data (which may contain strings) to UpdateSubscriptionPlanRequest
+   * Handles type conversion from form values (strings) to proper types
+   */
+  static formDataToUpdateRequest(id: string, formData: any): UpdateSubscriptionPlanRequest {
+    return new UpdateSubscriptionPlanRequest({
+      id,
+      name: formData.name,
+      description: formData.description,
+      price: formData.price !== undefined 
+        ? (typeof formData.price === 'string' ? parseFloat(formData.price) : formData.price)
+        : undefined,
+      currency: formData.currency,
+      billingCycle: formData.billingCycle !== undefined
+        ? (typeof formData.billingCycle === 'string' ? parseInt(formData.billingCycle) as BillingCycle : formData.billingCycle)
+        : undefined,
+      maxCompanies: formData.maxCompanies !== undefined && formData.maxCompanies !== ''
+        ? (typeof formData.maxCompanies === 'string' ? parseInt(formData.maxCompanies) : formData.maxCompanies)
+        : undefined,
+      isActive: formData.isActive,
+    });
+  }
+
+  /**
    * Convert CreateSubscriptionPlanRequest domain model to JSON for API requests
    */
   static createRequestToJson(request: CreateSubscriptionPlanRequest): any {
@@ -74,7 +115,7 @@ export class SubscriptionPlanMapper {
     if (request.features !== undefined) {
       json.features = JSON.stringify(request.features);
     }
-    if (request.maxCompanies !== undefined) {
+    if (request.maxCompanies !== undefined && request.maxCompanies !== null) {
       json.maxCompanies = request.maxCompanies;
     }
     return json;
@@ -92,7 +133,9 @@ export class SubscriptionPlanMapper {
     if (request.billingCycle !== undefined) json.billingCycle = request.billingCycle;
     if (request.isActive !== undefined) json.isActive = request.isActive;
     if (request.features !== undefined) json.features = JSON.stringify(request.features);
-    if (request.maxCompanies !== undefined) json.maxCompanies = request.maxCompanies;
+    if (request.maxCompanies !== undefined && request.maxCompanies !== null) {
+      json.maxCompanies = request.maxCompanies;
+    }
     return json;
   }
 

@@ -4,14 +4,10 @@ import { useCallback, useMemo, useState } from "react";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import { useGenericCrudViewModel } from "@/hooks/use-generic-crud-viewmodel";
-import type {
-  SubscriptionPlan,
-  CreateSubscriptionPlanRequest,
-  UpdateSubscriptionPlanRequest,
-} from "@/domain";
+import type { SubscriptionPlan, CreateSubscriptionPlanRequest, UpdateSubscriptionPlanRequest } from "@/domain";
+import { SubscriptionPlanMapper, BillingCycle } from "@/domain";
 import type { CrudConfig } from "@/components/ui/generic-crud-view";
 import { Badge } from "@/components/ui/badge";
-import { BillingCycle } from "@/domain";
 
 export function useSubscriptionPlanViewModel() {
   const { subscriptionPlanService } = useServices();
@@ -27,8 +23,16 @@ export function useSubscriptionPlanViewModel() {
   >(
     {
       getData: subscriptionPlanService.getPlans.bind(subscriptionPlanService),
-      create: subscriptionPlanService.createPlan.bind(subscriptionPlanService),
-      update: subscriptionPlanService.updatePlan.bind(subscriptionPlanService),
+      create: async (data: any) => {
+        // Use mapper to convert form data to request object with proper types
+        const request = SubscriptionPlanMapper.formDataToCreateRequest(data);
+        return await subscriptionPlanService.createPlan(request);
+      },
+      update: async (id: string, data: any) => {
+        // Use mapper to convert form data to request object with proper types
+        const request = SubscriptionPlanMapper.formDataToUpdateRequest(id, data);
+        return await subscriptionPlanService.updatePlan(id, request);
+      },
       delete: subscriptionPlanService.deletePlan.bind(subscriptionPlanService),
     },
     {
@@ -219,7 +223,7 @@ export function useSubscriptionPlanViewModel() {
         price: plan.price,
         currency: plan.currency,
         billingCycle: plan.billingCycle.toString(),
-        maxCompanies: plan.maxCompanies?.toString() || "",
+        maxCompanies: plan.maxCompanies ?? "",
         isActive: plan.isActive,
         id: plan.id,
       }),
