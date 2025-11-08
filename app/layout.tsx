@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SYNFLOX",
     description: "Professional SYNFLOX with multi-language support",
-    url: "https://app-name.com",
+    url: "https://synflox-frontend.vercel.app/",
     siteName: "SYNFLOX",
     images: [
       {
