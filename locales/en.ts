@@ -205,6 +205,22 @@ export const en = {
     descriptionPlaceholder: "Enter project description",
     isActive: "Is Active",
     status: "Status",
+    detail: {
+      description: "View and manage project details",
+      overview: "Overview",
+      overviewDescription: "Project information and details",
+      metadata: "Metadata",
+      metadataDescription: "Project creation and update information",
+      createdAt: "Created At",
+      updatedAt: "Updated At",
+      projectId: "Project ID",
+      noDescription: "No description",
+    },
+    error: {
+      title: "Error Loading Project",
+      loadFailed: "Failed to load project details",
+      notFound: "Project not found",
+    },
   },
 
   // Modules

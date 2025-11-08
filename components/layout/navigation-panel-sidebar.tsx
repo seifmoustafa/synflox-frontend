@@ -44,7 +44,29 @@ export function NavigationPanelSidebar({
     iconStyle,
   } = useSettings();
 
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  // Load expanded items from localStorage on mount
+  const [expandedItems, setExpandedItems] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('nav_expandedItems');
+        return saved ? JSON.parse(saved) : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
+  
+  // Save expanded items to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('nav_expandedItems', JSON.stringify(expandedItems));
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+    }
+  }, [expandedItems]);
 
   // Get the selected main navigation item
   const selectedNavItem = navigation.find(

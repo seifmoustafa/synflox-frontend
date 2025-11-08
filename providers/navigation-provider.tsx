@@ -60,7 +60,7 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
   });
   
   const [isLoading, setIsLoading] = useState(false);
-  const [hasFetchedForUser, setHasFetchedForUser] = useState<string | null>(null);
+  const [hasTriggeredRefresh, setHasTriggeredRefresh] = useState(false);
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
   const { navigationService } = useServices();
 
@@ -203,37 +203,27 @@ export function NavigationProvider({ children }: { children: React.ReactNode }) 
 
   // Check if we need to refresh cache (no effect hook needed - data already loaded on init)
 
-  // Fetch navigation data when user logs in (always fetch on login)
+  // Fetch navigation data when user logs in (only once per session)
   useEffect(() => {
-    // Don't fetch if auth is still loading
-    if (authLoading) {
+    // Don't fetch if auth is still loading or already triggered
+    if (authLoading || hasTriggeredRefresh) {
       return;
     }
 
     if (isAuthenticated && user) {
-      const currentUserId = user.id;
-      // Always fetch menu items on login (every time user becomes authenticated)
-      // This ensures fresh data is always loaded, regardless of cache
-      if (hasFetchedForUser !== currentUserId) {
-        appLogger.debug('User logged in, fetching menu items...', { userId: currentUserId });
-        refreshNavigation(false); // Always show loading on login
-        setHasFetchedForUser(currentUserId);
-      } else if (!navigationData) {
-        // If no navigation data but same user, fetch it
-        appLogger.debug('No navigation data found, fetching...');
-        refreshNavigation(false);
-      }
+      // If we have cached data, refresh in background without blocking
+      const hasCachedData = !!navigationData;
+      setHasTriggeredRefresh(true);
+      refreshNavigation(hasCachedData); // Skip loading state if we have cached data
     } else if (!isAuthenticated) {
-      // Clear navigation data on logout
-      appLogger.debug('User logged out, clearing navigation data...');
       setNavigationData(null);
       navigationService.clearNavigationData();
       clearCache();
       setIsLoading(false);
-      setHasFetchedForUser(null); // Reset user tracking
+      setHasTriggeredRefresh(false); // Allow refresh on next login
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user, authLoading, hasFetchedForUser]);
+  }, [isAuthenticated, user, authLoading, hasTriggeredRefresh]);
 
   const hasPageAccess = useCallback((pathname: string): boolean => {
     if (!isAuthenticated) {

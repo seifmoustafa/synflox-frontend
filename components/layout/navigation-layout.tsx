@@ -27,16 +27,86 @@ export function NavigationLayout({
   const settings = useSettings();
   const navigation = useDynamicNavigation();
   const pathname = usePathname();
-  const [activeMainItem, setActiveMainItem] = useState<string>("");
-  const [selectedMainItem, setSelectedMainItem] = useState<string | null>(null);
-  const [panelSidebarOpen, setPanelSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(() => {
+  
+  // Load navigation state from localStorage on mount
+  const [activeMainItem, setActiveMainItem] = useState<string>(() => {
     if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('nav_activeMainItem');
+        return saved || "";
+      } catch {
+        return "";
+      }
+    }
+    return "";
+  });
+  
+  const [selectedMainItem, setSelectedMainItem] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('nav_selectedMainItem');
+        return saved || null;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
+  
+  const [panelSidebarOpen, setPanelSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('nav_panelSidebarOpen');
+        return saved === 'true';
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  });
+  
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== "undefined") {
       return window.innerWidth < 1024;
     }
     return false;
   });
   const manualSelectionRef = useRef(false);
+  
+  // Save navigation state to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('nav_activeMainItem', activeMainItem);
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+    }
+  }, [activeMainItem]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        if (selectedMainItem) {
+          localStorage.setItem('nav_selectedMainItem', selectedMainItem);
+        } else {
+          localStorage.removeItem('nav_selectedMainItem');
+        }
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+    }
+  }, [selectedMainItem]);
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('nav_panelSidebarOpen', panelSidebarOpen.toString());
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+    }
+  }, [panelSidebarOpen]);
 
   // Helper function to find parent item for current path
   const findParentItemForPath = (path: string) => {
@@ -78,7 +148,11 @@ export function NavigationLayout({
           // Check nested children
           if (child.children) {
             for (const nestedChild of child.children) {
-              if (nestedChild.href && nestedChild.href !== "/" && path.startsWith(nestedChild.href)) {
+              if (
+                nestedChild.href &&
+                nestedChild.href !== "/" &&
+                path.startsWith(nestedChild.href)
+              ) {
                 const nextChar = path[nestedChild.href.length];
                 if (nextChar === undefined || nextChar === "/") {
                   return item.name;
@@ -100,9 +174,13 @@ export function NavigationLayout({
       manualSelectionRef.current = false;
       return;
     }
-    
+
     const parentItem = findParentItemForPath(pathname);
-    setActiveMainItem(parentItem);
+    
+    // Only update if the parent item actually changed
+    if (parentItem !== activeMainItem) {
+      setActiveMainItem(parentItem);
+    }
 
     // If we're on a child page, keep the panel open
     const parentNavItem = navigation.find((item) => item.name === parentItem);
@@ -119,18 +197,20 @@ export function NavigationLayout({
       onSidebarOpenChange(true);
     }
 
-    // Reset selected item when navigating via URL
-    if (selectedMainItem !== null) {
-      setSelectedMainItem(null);
+    // Preserve selected item if it matches the active item (for refresh persistence)
+    // If we have a valid parent item and no selected item, set it to maintain focus
+    if (parentItem && !selectedMainItem) {
+      setSelectedMainItem(parentItem);
+    } else if (selectedMainItem !== null && selectedMainItem !== parentItem && parentItem) {
+      // If selected item doesn't match active, update it to match
+      setSelectedMainItem(parentItem);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, isMobile]);
 
   // Get the current item to display (selected takes priority over active)
   const currentItem = selectedMainItem || activeMainItem;
-  const currentNavItem = navigation.find(
-    (item) => item.name === currentItem
-  );
+  const currentNavItem = navigation.find((item) => item.name === currentItem);
   const hasChildren =
     currentNavItem?.children && currentNavItem.children.length > 0;
   const shouldShowPanel = hasChildren && panelSidebarOpen && !isMobile;
@@ -138,19 +218,22 @@ export function NavigationLayout({
   // Handle main item selection
   const handleMainItemSelect = (itemName: string) => {
     manualSelectionRef.current = true;
-    
+
     // If empty string, clear selection
     if (!itemName || itemName === "") {
       setSelectedMainItem(null);
       // Return to active item's panel
-      const activeNavItem = navigation.find((item) => item.name === activeMainItem);
-      const activeHasChildren = activeNavItem?.children && activeNavItem.children.length > 0;
+      const activeNavItem = navigation.find(
+        (item) => item.name === activeMainItem
+      );
+      const activeHasChildren =
+        activeNavItem?.children && activeNavItem.children.length > 0;
       if (activeHasChildren && !isMobile) {
         setPanelSidebarOpen(true);
       }
       return;
     }
-    
+
     const newItem = navigation.find((item) => item.name === itemName);
     const newHasChildren = newItem?.children && newItem.children.length > 0;
 
