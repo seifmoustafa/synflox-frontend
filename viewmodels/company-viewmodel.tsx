@@ -107,7 +107,7 @@ export function useCompanyViewModel() {
           label: t("company.name"),
           render: (_val: unknown, company: Company) => (
             <div className="flex items-center gap-2">
-            <div className="font-medium">{company.name}</div>
+              <div className="font-medium">{company.name}</div>
               {company.isTrial && (
                 <Badge variant="secondary" className="text-xs">
                   {t("company.trialBadge")}

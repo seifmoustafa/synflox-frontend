@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { GenericChart } from "@/components/charts/generic-chart";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
   Building2, 
   Users, 
@@ -32,8 +33,14 @@ import {
   Search,
   Menu,
   Upload,
+  CheckCircle2,
+  XCircle,
+  PauseCircle,
+  Calendar,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SystemNotificationType } from "@/domain";
 
 export function DashboardView() {
   const vm = useDashboardViewModel();
@@ -125,6 +132,172 @@ export function DashboardView() {
     };
   }, [vm.endpoints, searchQuery, methodFilter]);
 
+  // Format date helper
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  // Format relative time helper
+  const formatRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  // Get notification icon
+  const getNotificationIcon = (type: SystemNotificationType) => {
+    switch (type) {
+      case SystemNotificationType.ExpiryWarning:
+        return <AlertTriangle className="h-4 w-4 text-orange-500" />;
+      case SystemNotificationType.Expired:
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      case SystemNotificationType.Suspended:
+        return <PauseCircle className="h-4 w-4 text-orange-500" />;
+      case SystemNotificationType.Activated:
+      case SystemNotificationType.Resumed:
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case SystemNotificationType.Extended:
+        return <Calendar className="h-4 w-4 text-blue-500" />;
+      default:
+        return <Bell className="h-4 w-4 text-blue-500" />;
+    }
+  };
+
+  // Prepare expiry timeline data
+  const expiryTimelineData = useMemo(() => {
+    if (!vm.expiryReport || vm.expiryReport.length === 0) {
+      // If no expiry report, use companies expiring soon from statistics
+      // For now, return empty array - will be populated when report is available
+      return [];
+    }
+
+    // Group by date and count
+    const grouped = vm.expiryReport.reduce((acc, company) => {
+      const date = new Date(company.expiryDate).toISOString().split('T')[0];
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Transform to chart format
+    return Object.entries(grouped)
+      .map(([date, count]) => ({
+        date: formatDate(date),
+        count: count,
+        fullDate: date
+      }))
+      .sort((a, b) => new Date(a.fullDate).getTime() - new Date(b.fullDate).getTime());
+  }, [vm.expiryReport]);
+
+  // Section 2: Enhanced Donut Chart Data
+  const statusBreakdown = vm.statistics?.licenseStatusStats;
+  const donutChartData = useMemo(() => {
+    if (!statusBreakdown) return null;
+
+    const total = statusBreakdown.total;
+    const data = [
+      { name: "Active", value: statusBreakdown.active, fill: "#10B981" },
+      { name: "Expired", value: statusBreakdown.expired, fill: "#EF4444" },
+      { name: "Suspended", value: statusBreakdown.suspended, fill: "#F59E0B" },
+    ].filter(item => item.value > 0);
+
+    return {
+      labels: data.map(d => d.name),
+      datasets: [{
+        label: t("dashboard.licenseStatus.title"),
+        data: data.map(d => d.value),
+        backgroundColor: data.map(d => d.fill),
+        borderColor: "#ffffff",
+        borderWidth: 3,
+        cutout: "60%", // Makes it a donut chart
+      }],
+      total: total,
+    };
+  }, [statusBreakdown, t]);
+
+  // Section 3: Expiry Timeline Area Chart Data
+  const expiryAreaChartData = useMemo(() => {
+    if (expiryTimelineData.length === 0) return null;
+
+    return {
+      labels: expiryTimelineData.map(d => d.date),
+      datasets: [{
+        label: t("dashboard.expiryTimeline.companies"),
+        data: expiryTimelineData.map(d => d.count),
+        borderColor: "#EF4444",
+        backgroundColor: "rgba(239, 68, 68, 0.2)",
+        fill: true,
+        tension: 0.4,
+      }],
+    };
+  }, [expiryTimelineData, t]);
+
+  // Section 4: API Usage Bar Chart Data
+  const apiUsageBarChartData = useMemo(() => {
+    if (!vm.apiUsage?.requestsByDay || Object.keys(vm.apiUsage.requestsByDay).length === 0) return null;
+
+    const sortedEntries = Object.entries(vm.apiUsage.requestsByDay)
+      .sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime())
+      .slice(-7); // Last 7 days
+
+    return {
+      labels: sortedEntries.map(([date]) => {
+        const d = new Date(date);
+        return d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+      }),
+      datasets: [{
+        label: t("dashboard.apiUsage.requests"),
+        data: sortedEntries.map(([, count]) => count),
+        backgroundColor: "rgba(59, 130, 246, 0.8)",
+        borderColor: "#3B82F6",
+        borderWidth: 2,
+        borderRadius: 8,
+      }],
+    };
+  }, [vm.apiUsage, t]);
+
+  // Section 1: Statistics Cards (4 main cards as per guide)
+  const mainStatisticsCards = useMemo(() => [
+    {
+      title: t("dashboard.statistics.totalCompanies"),
+      value: vm.statistics?.totalCompanies || 0,
+      icon: Building2,
+      color: "text-blue-600",
+      bgColor: "bg-blue-100 dark:bg-blue-900/20",
+      borderColor: "border-blue-500",
+    },
+    {
+      title: t("dashboard.statistics.activeCompanies"),
+      value: vm.statistics?.licenseStatusStats.active || 0,
+      icon: CheckCircle2,
+      color: "text-green-600",
+      bgColor: "bg-green-100 dark:bg-green-900/20",
+      borderColor: "border-green-500",
+    },
+    {
+      title: t("dashboard.statistics.expiredCompanies"),
+      value: vm.statistics?.licenseStatusStats.expired || 0,
+      icon: XCircle,
+      color: "text-red-600",
+      bgColor: "bg-red-100 dark:bg-red-900/20",
+      borderColor: "border-red-500",
+    },
+    {
+      title: t("dashboard.statistics.suspendedCompanies"),
+      value: vm.statistics?.licenseStatusStats.suspended || 0,
+      icon: PauseCircle,
+      color: "text-orange-600",
+      bgColor: "bg-orange-100 dark:bg-orange-900/20",
+      borderColor: "border-orange-500",
+    },
+  ], [vm.statistics, t]);
+
   if (vm.loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -152,53 +325,6 @@ export function DashboardView() {
     );
   }
 
-  // Prepare chart data for license status
-  const licenseChartData = vm.statistics?.licenseStatusStats.chartData || [];
-  const chartData = {
-    labels: licenseChartData.map((d) => d.name),
-    datasets: [
-      {
-        label: t("dashboard.licenseStatus.title"),
-        data: licenseChartData.map((d) => d.value),
-        backgroundColor: licenseChartData.map((d) => d.fill),
-        borderColor: licenseChartData.map((d) => d.fill),
-        borderWidth: 2,
-      },
-    ],
-  };
-
-  // Section 1: Overview Cards (4 main cards as per design guide)
-  const statisticsCards = [
-    {
-      title: t("dashboard.statistics.totalCompanies"),
-      value: vm.statistics?.totalCompanies || 0,
-      icon: Building2,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100 dark:bg-blue-900/20",
-    },
-    {
-      title: t("dashboard.statistics.activeCompanies"),
-      value: vm.statistics?.licenseStatusStats?.active || 0,
-      icon: Activity,
-      color: "text-green-600",
-      bgColor: "bg-green-100 dark:bg-green-900/20",
-    },
-    {
-      title: t("dashboard.statistics.expiredCompanies"),
-      value: vm.statistics?.licenseStatusStats?.expired || 0,
-      icon: AlertTriangle,
-      color: "text-red-600",
-      bgColor: "bg-red-100 dark:bg-red-900/20",
-    },
-    {
-      title: t("dashboard.statistics.suspendedCompanies"),
-      value: vm.statistics?.licenseStatusStats?.suspended || 0,
-      icon: Lock,
-      color: "text-orange-600",
-      bgColor: "bg-orange-100 dark:bg-orange-900/20",
-    },
-  ];
-
   const methodColors: Record<string, string> = {
     GET: "#3b82f6",
     POST: "#10b981",
@@ -221,12 +347,22 @@ export function DashboardView() {
         </TabsList>
 
         <TabsContent value="statistics" className="space-y-6">
-          {/* Statistics Cards */}
+          {/* Section 1: Statistics Cards (4 main cards) */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {statisticsCards.map((card, index) => {
+            {mainStatisticsCards.map((card, index) => {
               const Icon = card.icon;
               return (
-                <Card key={index}>
+                <Card 
+                  key={index} 
+                  className={cn(
+                    "transition-all hover:shadow-lg cursor-pointer",
+                    `border-l-4 ${card.borderColor}`
+                  )}
+                  onClick={() => {
+                    // Navigate to filtered companies list
+                    window.location.href = `/companies?status=${card.title.toLowerCase().replace(' companies', '')}`;
+                  }}
+                >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
                     <div className={cn("p-2 rounded-lg", card.bgColor)}>
@@ -234,44 +370,49 @@ export function DashboardView() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{card.value}</div>
+                    <div className="text-3xl font-bold">{card.value.toLocaleString()}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {card.title.includes("Total") 
+                        ? `${t("dashboard.statistics.allCompanies")}`
+                        : `${t("dashboard.statistics.subscriptionStatus")}`
+                      }
+                    </p>
                   </CardContent>
                 </Card>
               );
             })}
           </div>
 
-          {/* Section 2: Subscription Status Chart (Doughnut) */}
-          {vm.statistics && (
+          {/* Section 2: Enhanced Donut Chart for Subscription Status */}
+          {donutChartData && (
             <Card>
               <CardHeader>
                 <CardTitle>{t("dashboard.licenseStatus.title")}</CardTitle>
-                <CardDescription>{t("dashboard.licenseStatus.description")}</CardDescription>
+                <CardDescription>
+                  {t("dashboard.licenseStatus.description")} - {t("dashboard.licenseStatus.total")}: {donutChartData.total}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-6">
                   <GenericChart
                     title=""
                     description=""
-                    data={chartData}
+                    data={donutChartData}
                     type="doughnut"
                     height={300}
                     filterable={false}
                     options={{
-                      ...({
-                        cutout: "60%", // Make it a doughnut chart
-                      } as any),
                       plugins: {
                         legend: {
-                          position: "bottom",
+                          position: "bottom" as const,
                         },
                         tooltip: {
                           callbacks: {
-                            label: (context: any) => {
-                              const label = context.label || "";
+                            label: (context) => {
+                              const label = context.label || '';
                               const value = context.parsed || 0;
-                              const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
-                              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                              const total = donutChartData.total;
+                              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
                               return `${label}: ${value} (${percentage}%)`;
                             },
                           },
@@ -279,60 +420,49 @@ export function DashboardView() {
                       },
                     }}
                   />
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
+                  <div className="space-y-4 flex flex-col justify-center">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-green-500"></div>
                           <span className="text-sm font-medium">{t("dashboard.licenseStatus.active")}</span>
                         </div>
                         <div className="text-right">
-                          <div className="font-bold">{vm.statistics.licenseStatusStats.active}</div>
+                          <div className="font-bold text-lg">{statusBreakdown?.active || 0}</div>
                           <div className="text-xs text-muted-foreground">
-                            {vm.statistics.licenseStatusStats.activePercentage}%
+                            {statusBreakdown ? `${statusBreakdown.activePercentage}%` : "0%"}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-red-500"></div>
                           <span className="text-sm font-medium">{t("dashboard.licenseStatus.expired")}</span>
                         </div>
                         <div className="text-right">
-                          <div className="font-bold">{vm.statistics.licenseStatusStats.expired}</div>
+                          <div className="font-bold text-lg">{statusBreakdown?.expired || 0}</div>
                           <div className="text-xs text-muted-foreground">
-                            {vm.statistics.licenseStatusStats.expiredPercentage}%
+                            {statusBreakdown ? `${statusBreakdown.expiredPercentage}%` : "0%"}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                         <div className="flex items-center gap-2">
                           <div className="w-4 h-4 rounded-full bg-orange-500"></div>
                           <span className="text-sm font-medium">{t("dashboard.licenseStatus.suspended")}</span>
                         </div>
                         <div className="text-right">
-                          <div className="font-bold">{vm.statistics.licenseStatusStats.suspended}</div>
+                          <div className="font-bold text-lg">{statusBreakdown?.suspended || 0}</div>
                           <div className="text-xs text-muted-foreground">
-                            {vm.statistics.licenseStatusStats.suspendedPercentage}%
+                            {statusBreakdown ? `${statusBreakdown.suspendedPercentage}%` : "0%"}
                           </div>
                         </div>
                       </div>
-                      {vm.trialCompaniesCount > 0 && (
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-purple-500"></div>
-                            <span className="text-sm font-medium">{t("dashboard.statistics.trialCompanies")}</span>
-                          </div>
-                          <div className="text-right">
-                            <div className="font-bold">{vm.trialCompaniesCount}</div>
-                          </div>
-                        </div>
-                      )}
-                      <div className="pt-2 border-t">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">{t("dashboard.licenseStatus.total")}</span>
-                          <div className="font-bold">{vm.statistics.licenseStatusStats.total}</div>
-                        </div>
+                    </div>
+                    <div className="pt-4 border-t">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">{t("dashboard.licenseStatus.total")}</span>
+                        <div className="font-bold text-xl">{donutChartData.total}</div>
                       </div>
                     </div>
                   </div>
@@ -341,95 +471,75 @@ export function DashboardView() {
             </Card>
           )}
 
-          {/* Section 3: Expiry Timeline Chart (Area Chart) */}
-          {vm.expiryReportData && vm.expiryReportData.length > 0 && (() => {
-            // Group companies by expiry date and count
-            const grouped = vm.expiryReportData.reduce((acc: Record<string, number>, company: any) => {
-              if (company.expiryDate) {
-                const date = new Date(company.expiryDate).toISOString().split('T')[0];
-                acc[date] = (acc[date] || 0) + 1;
-              }
-              return acc;
-            }, {});
-
-            // Transform to chart format
-            const expiryChartData = Object.entries(grouped)
-              .map(([date, count]) => ({
-                date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                count: count as number,
-                fullDate: date,
-              }))
-              .sort((a, b) => new Date(a.fullDate).getTime() - new Date(b.fullDate).getTime());
-
-            const maxCount = Math.max(...expiryChartData.map(d => d.count), 0);
-            const peakDate = expiryChartData.find(d => d.count === maxCount);
-
-            return (
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t("dashboard.expiryTimeline.title")}</CardTitle>
-                  <CardDescription>
-                    {peakDate && `${t("dashboard.expiryTimeline.peak")}: ${maxCount} ${t("dashboard.expiryTimeline.companies")} ${t("dashboard.expiryTimeline.on")} ${peakDate.date}`}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <GenericChart
-                    title=""
-                    description=""
-                    data={{
-                      labels: expiryChartData.map(d => d.date),
-                      datasets: [{
-                        label: t("dashboard.expiryTimeline.expiringCompanies"),
-                        data: expiryChartData.map(d => d.count),
-                        borderColor: "#ef4444",
-                        backgroundColor: "rgba(239, 68, 68, 0.2)",
-                        fill: true,
-                        tension: 0.4,
-                      }],
-                    }}
-                    type="line"
-                    height={300}
-                    filterable={false}
-                    options={{
-                      plugins: {
-                        legend: {
-                          display: false,
+          {/* Section 3: Expiry Timeline Area Chart */}
+          {expiryAreaChartData ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("dashboard.expiryTimeline.title")}</CardTitle>
+                <CardDescription>{t("dashboard.expiryTimeline.description")}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <GenericChart
+                  title=""
+                  description=""
+                  data={expiryAreaChartData}
+                  type="line"
+                  height={300}
+                  filterable={false}
+                  options={{
+                    plugins: {
+                      legend: {
+                        display: false,
+                      },
+                      tooltip: {
+                        callbacks: {
+                        label: (context) => {
+                              const value = context.parsed.y ?? 0;
+                              return `${value} ${t("dashboard.expiryTimeline.companies")}`;
+                            },
                         },
                       },
-                      scales: {
-                        y: {
-                          beginAtZero: true,
-                          title: {
-                            display: true,
-                            text: t("dashboard.expiryTimeline.companies"),
-                          },
-                        },
-                        x: {
-                          title: {
-                            display: true,
-                            text: t("dashboard.expiryTimeline.date"),
-                          },
+                    },
+                    scales: {
+                      y: {
+                        beginAtZero: true,
+                        title: {
+                          display: true,
+                          text: t("dashboard.expiryTimeline.companies"),
                         },
                       },
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            );
-          })()}
+                      x: {
+                        title: {
+                          display: true,
+                          text: t("dashboard.expiryTimeline.date"),
+                        },
+                      },
+                    },
+                  }}
+                />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("dashboard.expiryTimeline.title")}</CardTitle>
+                <CardDescription>{t("dashboard.expiryTimeline.description")}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-muted-foreground">
+                  {t("dashboard.expiryTimeline.noData")}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Section 4: API Usage Trends (Bar Chart) */}
-          {vm.apiUsage && (
+          {/* Section 4: API Usage Bar Chart */}
+          {apiUsageBarChartData && (
             <Card>
               <CardHeader>
                 <CardTitle>{t("dashboard.apiUsage.title")}</CardTitle>
                 <CardDescription>
-                  {vm.apiUsage.requestsByDay && Object.keys(vm.apiUsage.requestsByDay).length > 0
-                    ? `${t("dashboard.apiUsage.average")}: ${Math.round(
-                        Object.values(vm.apiUsage.requestsByDay).reduce((a: number, b: number) => a + b, 0) /
-                        Object.keys(vm.apiUsage.requestsByDay).length
-                      ).toLocaleString()} ${t("dashboard.apiUsage.requestsPerDay")}`
-                    : t("dashboard.apiUsage.description")}
+                  {t("dashboard.apiUsage.description")} - {t("dashboard.apiUsage.average")}: {vm.apiUsage ? Math.round(vm.apiUsage.totalRequests / 7).toLocaleString() : 0} {t("dashboard.apiUsage.requestsPerDay")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -437,301 +547,133 @@ export function DashboardView() {
                   <div className="grid md:grid-cols-3 gap-4">
                     <div className="p-4 border rounded-lg">
                       <div className="text-sm text-muted-foreground">{t("dashboard.apiUsage.totalRequests")}</div>
-                      <div className="text-2xl font-bold">{vm.apiUsage.totalRequests.toLocaleString()}</div>
+                      <div className="text-2xl font-bold">{vm.apiUsage?.totalRequests.toLocaleString() || 0}</div>
                     </div>
                     <div className="p-4 border rounded-lg">
                       <div className="text-sm text-muted-foreground">{t("dashboard.apiUsage.successfulRequests")}</div>
-                      <div className="text-2xl font-bold text-green-600">{vm.apiUsage.successfulRequests.toLocaleString()}</div>
+                      <div className="text-2xl font-bold text-green-600">{vm.apiUsage?.successfulRequests.toLocaleString() || 0}</div>
                     </div>
                     <div className="p-4 border rounded-lg">
                       <div className="text-sm text-muted-foreground">{t("dashboard.apiUsage.failedRequests")}</div>
-                      <div className="text-2xl font-bold text-red-600">{vm.apiUsage.failedRequests.toLocaleString()}</div>
+                      <div className="text-2xl font-bold text-red-600">{vm.apiUsage?.failedRequests.toLocaleString() || 0}</div>
                     </div>
                   </div>
-                  {vm.apiUsage.requestsByDay && Object.keys(vm.apiUsage.requestsByDay).length > 0 && (
-                    <GenericChart
-                      title={t("dashboard.apiUsage.dailyChart")}
-                      description=""
-                      data={{
-                        labels: Object.keys(vm.apiUsage.requestsByDay).map(date => {
-                          const d = new Date(date);
-                          return d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
-                        }),
-                        datasets: [{
-                          label: t("dashboard.apiUsage.requests"),
-                          data: Object.values(vm.apiUsage.requestsByDay),
-                          backgroundColor: "rgba(59, 130, 246, 0.8)",
-                          borderColor: "#3b82f6",
-                          borderWidth: 2,
-                          borderRadius: 4,
-                        }],
-                      }}
-                      type="bar"
-                      height={300}
-                      filterable={false}
-                      options={{
-                        plugins: {
-                          legend: {
-                            display: false,
-                          },
+                  <GenericChart
+                    title=""
+                    description=""
+                    data={apiUsageBarChartData}
+                    type="bar"
+                    height={300}
+                    filterable={false}
+                    options={{
+                      plugins: {
+                        legend: {
+                          display: false,
                         },
-                        scales: {
-                          y: {
-                            beginAtZero: true,
-                            title: {
-                              display: true,
-                              text: t("dashboard.apiUsage.requests"),
-                            },
-                            ticks: {
-                              callback: function(value: any) {
-                                return (value / 1000).toFixed(0) + 'K';
-                              },
+                        tooltip: {
+                          callbacks: {
+                            label: (context) => {
+                              const value = context.parsed.y ?? 0;
+                              return `${value.toLocaleString()} ${t("dashboard.apiUsage.requests")}`;
                             },
                           },
                         },
-                      }}
-                    />
-                  )}
+                      },
+                      scales: {
+                        y: {
+                          beginAtZero: true,
+                          title: {
+                            display: true,
+                            text: t("dashboard.apiUsage.requests"),
+                          },
+                          ticks: {
+                            callback: (value) => {
+                              if (typeof value === 'number') {
+                                return `${(value / 1000).toFixed(0)}K`;
+                              }
+                              return value;
+                            },
+                          },
+                        },
+                      },
+                    }}
+                  />
                 </div>
               </CardContent>
             </Card>
           )}
 
           {/* Section 5: Recent Activity / Notifications Table */}
-          {vm.recentNotifications && vm.recentNotifications.length > 0 && (
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>{t("dashboard.recentActivity.title")}</CardTitle>
-                    <CardDescription>{t("dashboard.recentActivity.description")}</CardDescription>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.location.href = "/notifications"}
-                  >
-                    {t("dashboard.recentActivity.viewAll")} →
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2 text-sm font-medium">{t("dashboard.recentActivity.time")}</th>
-                        <th className="text-left p-2 text-sm font-medium">{t("dashboard.recentActivity.type")}</th>
-                        <th className="text-left p-2 text-sm font-medium">{t("dashboard.recentActivity.company")}</th>
-                        <th className="text-left p-2 text-sm font-medium">{t("dashboard.recentActivity.message")}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {vm.recentNotifications.slice(0, 10).map((notification) => {
-                        const getNotificationIcon = (type: number) => {
-                          switch (type) {
-                            case 1: return "⚠️"; // ExpiryWarning
-                            case 2: return "🔴"; // Expired
-                            case 3: return "⏸️"; // Suspended
-                            case 4: return "✅"; // Activated
-                            case 5: return "▶️"; // Resumed
-                            case 6: return "📅"; // Extended
-                            default: return "ℹ️"; // General
-                          }
-                        };
-                        const getNotificationTypeName = (type: number) => {
-                          switch (type) {
-                            case 1: return t("dashboard.recentActivity.expiryWarning");
-                            case 2: return t("dashboard.recentActivity.expired");
-                            case 3: return t("dashboard.recentActivity.suspended");
-                            case 4: return t("dashboard.recentActivity.activated");
-                            case 5: return t("dashboard.recentActivity.resumed");
-                            case 6: return t("dashboard.recentActivity.extended");
-                            default: return t("dashboard.recentActivity.general");
-                          }
-                        };
-                        const formatRelativeTime = (dateString: string) => {
-                          const date = new Date(dateString);
-                          const now = new Date();
-                          const diffMs = now.getTime() - date.getTime();
-                          const diffMins = Math.floor(diffMs / 60000);
-                          const diffHours = Math.floor(diffMs / 3600000);
-                          const diffDays = Math.floor(diffMs / 86400000);
-                          
-                          if (diffMins < 60) return `${diffMins} ${t("dashboard.recentActivity.minutesAgo")}`;
-                          if (diffHours < 24) return `${diffHours} ${t("dashboard.recentActivity.hoursAgo")}`;
-                          if (diffDays === 1) return t("dashboard.recentActivity.yesterday");
-                          if (diffDays < 7) return `${diffDays} ${t("dashboard.recentActivity.daysAgo")}`;
-                          return date.toLocaleDateString();
-                        };
-                        return (
-                          <tr
-                            key={notification.id}
-                            className={cn(
-                              "border-b hover:bg-muted/50",
-                              !notification.isRead && "bg-blue-50 dark:bg-blue-950/20"
-                            )}
-                          >
-                            <td className="p-2 text-sm">{formatRelativeTime(notification.createdAt)}</td>
-                            <td className="p-2 text-sm">
-                              <div className="flex items-center gap-2">
-                                <span>{getNotificationIcon(notification.type)}</span>
-                                <span>{getNotificationTypeName(notification.type)}</span>
-                              </div>
-                            </td>
-                            <td className="p-2 text-sm">{notification.companyId}</td>
-                            <td className="p-2 text-sm">{notification.message}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Error Rate & Metrics Summary */}
-          {vm.metricsSummary && (
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className={cn(vm.metricsSummary.errorRate > 5 && "border-red-500")}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <AlertCircle className={cn("h-5 w-5", vm.metricsSummary.errorRate > 5 ? "text-red-600" : "text-green-600")} />
-                    {t("dashboard.metrics.errorRate")}
-                  </CardTitle>
-                  <CardDescription>{t("dashboard.metrics.errorRateDescription")}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-4xl font-bold mb-2">
-                    <span className={cn(vm.metricsSummary.errorRate > 5 ? "text-red-600" : "text-green-600")}>
-                      {vm.metricsSummary.errorRate.toFixed(2)}%
-                    </span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {t("dashboard.metrics.totalRequests")}: {vm.metricsSummary.totalRequests.toLocaleString()}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {t("dashboard.metrics.failedRequests")}: {vm.metricsSummary.failedRequests.toLocaleString()}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t("dashboard.metrics.moduleUsage")}</CardTitle>
-                  <CardDescription>{t("dashboard.metrics.moduleUsageDescription")}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">{t("dashboard.metrics.activeApiKeys")}</span>
-                      <div className="text-right">
-                        <div className="font-bold">{vm.metricsSummary.activeApiKeys}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {vm.metricsSummary.totalApiKeys > 0 
-                            ? `${Math.round((vm.metricsSummary.activeApiKeys / vm.metricsSummary.totalApiKeys) * 100)}%`
-                            : "0%"}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">{t("dashboard.metrics.activeWebhooks")}</span>
-                      <div className="text-right">
-                        <div className="font-bold">{vm.metricsSummary.activeWebhooks}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {vm.metricsSummary.totalWebhooks > 0 
-                            ? `${Math.round((vm.metricsSummary.activeWebhooks / vm.metricsSummary.totalWebhooks) * 100)}%`
-                            : "0%"}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">{t("dashboard.metrics.averageResponseTime")}</span>
-                      <div className="font-bold">{vm.metricsSummary.averageResponseTime.toFixed(0)}ms</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>{t("dashboard.quickActions.title")}</CardTitle>
-              <CardDescription>{t("dashboard.quickActions.description")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>{t("dashboard.recentActivity.title")}</CardTitle>
+                  <CardDescription>{t("dashboard.recentActivity.description")}</CardDescription>
+                </div>
                 <Button
                   variant="outline"
-                  className="h-auto flex-col items-start p-4"
-                  onClick={() => window.location.href = "/analytics"}
+                  size="sm"
+                  onClick={() => window.location.href = "/notifications"}
                 >
-                  <BarChart3 className="h-5 w-5 mb-2" />
-                  <span className="font-medium">{t("dashboard.quickActions.analytics")}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto flex-col items-start p-4"
-                  onClick={() => window.location.href = "/reports"}
-                >
-                  <FileText className="h-5 w-5 mb-2" />
-                  <span className="font-medium">{t("dashboard.quickActions.reports")}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto flex-col items-start p-4"
-                  onClick={() => window.location.href = "/api-keys"}
-                >
-                  <Key className="h-5 w-5 mb-2" />
-                  <span className="font-medium">{t("dashboard.quickActions.apiKeys")}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto flex-col items-start p-4"
-                  onClick={() => window.location.href = "/webhooks"}
-                >
-                  <Webhook className="h-5 w-5 mb-2" />
-                  <span className="font-medium">{t("dashboard.quickActions.webhooks")}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto flex-col items-start p-4"
-                  onClick={() => window.location.href = "/metrics"}
-                >
-                  <Activity className="h-5 w-5 mb-2" />
-                  <span className="font-medium">{t("dashboard.quickActions.metrics")}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto flex-col items-start p-4"
-                  onClick={() => window.location.href = "/settings"}
-                >
-                  <Settings className="h-5 w-5 mb-2" />
-                  <span className="font-medium">{t("dashboard.quickActions.settings")}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto flex-col items-start p-4"
-                  onClick={() => {
-                    const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
-                    if (searchInput) searchInput.focus();
-                  }}
-                >
-                  <Search className="h-5 w-5 mb-2" />
-                  <span className="font-medium">{t("dashboard.quickActions.search")}</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="h-auto flex-col items-start p-4"
-                  onClick={() => window.location.href = "/menu-items"}
-                >
-                  <Menu className="h-5 w-5 mb-2" />
-                  <span className="font-medium">{t("dashboard.quickActions.menuItems")}</span>
+                  {t("dashboard.recentActivity.viewAll")}
                 </Button>
               </div>
+            </CardHeader>
+            <CardContent>
+              {vm.recentNotifications && vm.recentNotifications.length > 0 ? (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">{t("dashboard.recentActivity.time")}</TableHead>
+                        <TableHead className="w-[100px]">{t("dashboard.recentActivity.type")}</TableHead>
+                        <TableHead>{t("dashboard.recentActivity.message")}</TableHead>
+                        <TableHead className="w-[100px]">{t("dashboard.recentActivity.status")}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {vm.recentNotifications.slice(0, 10).map((notification) => (
+                        <TableRow 
+                          key={notification.id}
+                          className={cn(
+                            "cursor-pointer hover:bg-muted/50",
+                            !notification.isRead && "bg-blue-50 dark:bg-blue-900/10"
+                          )}
+                          onClick={() => window.location.href = `/notifications`}
+                        >
+                          <TableCell className="text-sm">
+                            {formatRelativeTime(notification.createdAt)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getNotificationIcon(notification.type)}
+                              <span className="text-xs text-muted-foreground">
+                                {SystemNotificationType[notification.type] || "General"}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="font-medium">{notification.title}</div>
+                            <div className="text-sm text-muted-foreground">{notification.message}</div>
+                          </TableCell>
+                          <TableCell>
+                            {notification.isRead ? (
+                              <Badge variant="secondary">{t("dashboard.recentActivity.read")}</Badge>
+                            ) : (
+                              <Badge variant="default" className="bg-blue-500">{t("dashboard.recentActivity.unread")}</Badge>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  {t("dashboard.recentActivity.noNotifications")}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -892,4 +834,3 @@ export function DashboardView() {
     </div>
   );
 }
-
