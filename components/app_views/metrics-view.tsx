@@ -56,16 +56,16 @@ export function MetricsView() {
         summary.trialCompanies,
       ],
       backgroundColor: [
-        GENERIC_COLORS.success[0] + "80",
-        GENERIC_COLORS.destructive[0] + "80",
-        GENERIC_COLORS.warning[0] + "80",
-        GENERIC_COLORS.info[0] + "80",
+        GENERIC_COLORS.primary[1] + "80", // Emerald (success)
+        GENERIC_COLORS.primary[3] + "80", // Red (destructive)
+        GENERIC_COLORS.primary[2] + "80", // Amber (warning)
+        GENERIC_COLORS.primary[0] + "80", // Blue (info)
       ],
       borderColor: [
-        GENERIC_COLORS.success[0],
-        GENERIC_COLORS.destructive[0],
-        GENERIC_COLORS.warning[0],
-        GENERIC_COLORS.info[0],
+        GENERIC_COLORS.primary[1], // Emerald (success)
+        GENERIC_COLORS.primary[3], // Red (destructive)
+        GENERIC_COLORS.primary[2], // Amber (warning)
+        GENERIC_COLORS.primary[0], // Blue (info)
       ],
       borderWidth: 1,
     }],

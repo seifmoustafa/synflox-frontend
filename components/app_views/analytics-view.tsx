@@ -84,8 +84,8 @@ export function AnalyticsView({ companyId }: AnalyticsViewProps) {
       datasets: [{
         label: t("analytics.requests"),
         data: sorted.map(([, data]) => data.count),
-        backgroundColor: GENERIC_COLORS.secondary.map(c => c + "80"),
-        borderColor: GENERIC_COLORS.secondary,
+        backgroundColor: GENERIC_COLORS.primary.slice(0, sorted.length).map(c => c + "80"),
+        borderColor: GENERIC_COLORS.primary.slice(0, sorted.length),
         borderWidth: 1,
       }],
     };

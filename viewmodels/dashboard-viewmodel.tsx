@@ -9,10 +9,13 @@ import type {
   DashboardEndpoints,
   MetricsSummary,
   ApiUsageAnalytics,
+  SystemNotification,
+  SystemNotificationsResponse,
 } from "@/domain";
+import { GenerateReportRequest, ReportType } from "@/domain";
 
 export function useDashboardViewModel() {
-  const { dashboardService, metricService, analyticsService, companyService } = useServices();
+  const { dashboardService, metricService, analyticsService, companyService, reportService, notificationSystemService } = useServices();
   const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +25,8 @@ export function useDashboardViewModel() {
   const [metricsSummary, setMetricsSummary] = useState<MetricsSummary | null>(null);
   const [apiUsage, setApiUsage] = useState<ApiUsageAnalytics | null>(null);
   const [trialCompaniesCount, setTrialCompaniesCount] = useState<number>(0);
+  const [expiryReportData, setExpiryReportData] = useState<any[]>([]);
+  const [recentNotifications, setRecentNotifications] = useState<SystemNotification[]>([]);
   const [activeTab, setActiveTab] = useState<"statistics" | "endpoints">("statistics");
 
   const loadDashboardOverview = useCallback(async () => {
@@ -100,12 +105,46 @@ export function useDashboardViewModel() {
     }
   }, [companyService]);
 
+  const loadExpiryReport = useCallback(async () => {
+    try {
+      // Generate subscription expiry report for next 30 days
+      const request = new GenerateReportRequest({
+        reportType: ReportType.SubscriptionSummary, // Using SubscriptionSummary as closest match
+        parameters: { days: 30 },
+      });
+      const report = await reportService.generateReport(request);
+      // The report data structure depends on backend - assuming it has results array
+      if (report.parameters && Array.isArray(report.parameters.results)) {
+        setExpiryReportData(report.parameters.results);
+      }
+    } catch (e) {
+      // Error already shown by service, set empty array
+      setExpiryReportData([]);
+    }
+  }, [reportService]);
+
+  const loadRecentNotifications = useCallback(async () => {
+    try {
+      const response = await notificationSystemService.getNotifications({
+        page: 1,
+        pageSize: 10,
+        isRead: undefined, // Get both read and unread
+      });
+      setRecentNotifications(response.data || []);
+    } catch (e) {
+      // Error already shown, set empty array
+      setRecentNotifications([]);
+    }
+  }, [notificationSystemService]);
+
   useEffect(() => {
     loadDashboardOverview();
     loadMetricsSummary();
     loadApiUsage();
     loadTrialCompaniesCount();
-  }, [loadDashboardOverview, loadMetricsSummary, loadApiUsage, loadTrialCompaniesCount]);
+    loadExpiryReport();
+    loadRecentNotifications();
+  }, [loadDashboardOverview, loadMetricsSummary, loadApiUsage, loadTrialCompaniesCount, loadExpiryReport, loadRecentNotifications]);
 
   return {
     loading,
@@ -116,6 +155,8 @@ export function useDashboardViewModel() {
     metricsSummary,
     apiUsage,
     trialCompaniesCount,
+    expiryReportData,
+    recentNotifications,
     activeTab,
     setActiveTab,
     refresh: loadDashboardOverview,
@@ -123,6 +164,8 @@ export function useDashboardViewModel() {
     refreshEndpoints: loadEndpoints,
     refreshMetrics: loadMetricsSummary,
     refreshApiUsage: loadApiUsage,
+    refreshExpiryReport: loadExpiryReport,
+    refreshNotifications: loadRecentNotifications,
   };
 }
 

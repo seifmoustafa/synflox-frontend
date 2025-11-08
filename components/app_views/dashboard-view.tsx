@@ -167,6 +167,7 @@ export function DashboardView() {
     ],
   };
 
+  // Section 1: Overview Cards (4 main cards as per design guide)
   const statisticsCards = [
     {
       title: t("dashboard.statistics.totalCompanies"),
@@ -176,54 +177,25 @@ export function DashboardView() {
       bgColor: "bg-blue-100 dark:bg-blue-900/20",
     },
     {
-      title: t("dashboard.statistics.totalAdmins"),
-      value: vm.statistics?.totalAdmins || 0,
-      icon: Users,
+      title: t("dashboard.statistics.activeCompanies"),
+      value: vm.statistics?.licenseStatusStats?.active || 0,
+      icon: Activity,
       color: "text-green-600",
       bgColor: "bg-green-100 dark:bg-green-900/20",
     },
     {
-      title: t("dashboard.statistics.totalAdminTypes"),
-      value: vm.statistics?.totalAdminTypes || 0,
-      icon: UserCog,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100 dark:bg-purple-900/20",
-    },
-    {
-      title: t("dashboard.statistics.activeAdmins"),
-      value: vm.statistics?.activeAdmins || 0,
-      icon: Activity,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-100 dark:bg-emerald-900/20",
-    },
-    {
-      title: t("dashboard.statistics.inactiveAdmins"),
-      value: vm.statistics?.inactiveAdmins || 0,
-      icon: Activity,
-      color: "text-gray-600",
-      bgColor: "bg-gray-100 dark:bg-gray-900/20",
-    },
-    {
-      title: t("dashboard.statistics.companiesExpiringSoon"),
-      value: vm.statistics?.companiesExpiringSoon || 0,
+      title: t("dashboard.statistics.expiredCompanies"),
+      value: vm.statistics?.licenseStatusStats?.expired || 0,
       icon: AlertTriangle,
+      color: "text-red-600",
+      bgColor: "bg-red-100 dark:bg-red-900/20",
+    },
+    {
+      title: t("dashboard.statistics.suspendedCompanies"),
+      value: vm.statistics?.licenseStatusStats?.suspended || 0,
+      icon: Lock,
       color: "text-orange-600",
       bgColor: "bg-orange-100 dark:bg-orange-900/20",
-      warning: vm.statistics?.hasExpiringCompanies || false,
-    },
-    {
-      title: t("dashboard.statistics.recentlyCreatedCompanies"),
-      value: vm.statistics?.recentlyCreatedCompanies || 0,
-      icon: TrendingUp,
-      color: "text-cyan-600",
-      bgColor: "bg-cyan-100 dark:bg-cyan-900/20",
-    },
-    {
-      title: t("dashboard.statistics.recentlyCreatedAdmins"),
-      value: vm.statistics?.recentlyCreatedAdmins || 0,
-      icon: Clock,
-      color: "text-indigo-600",
-      bgColor: "bg-indigo-100 dark:bg-indigo-900/20",
     },
   ];
 
@@ -274,7 +246,7 @@ export function DashboardView() {
             })}
           </div>
 
-          {/* License Status Chart */}
+          {/* Section 2: Subscription Status Chart (Doughnut) */}
           {vm.statistics && (
             <Card>
               <CardHeader>
@@ -286,10 +258,34 @@ export function DashboardView() {
                   <GenericChart
                     title=""
                     description=""
-                    data={chartData}
-                    type="pie"
+                    data={{
+                      labels: chartData.labels,
+                      datasets: [{
+                        ...chartData.datasets[0],
+                        cutout: "60%", // Make it a doughnut chart
+                      }],
+                    }}
+                    type="doughnut"
                     height={300}
                     filterable={false}
+                    options={{
+                      plugins: {
+                        legend: {
+                          position: "bottom",
+                        },
+                        tooltip: {
+                          callbacks: {
+                            label: (context: any) => {
+                              const label = context.label || "";
+                              const value = context.parsed || 0;
+                              const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+                              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                              return `${label}: ${value} (${percentage}%)`;
+                            },
+                          },
+                        },
+                      },
+                    }}
                   />
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -329,6 +325,17 @@ export function DashboardView() {
                           </div>
                         </div>
                       </div>
+                      {vm.trialCompaniesCount > 0 && (
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded-full bg-purple-500"></div>
+                            <span className="text-sm font-medium">{t("dashboard.statistics.trialCompanies")}</span>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold">{vm.trialCompaniesCount}</div>
+                          </div>
+                        </div>
+                      )}
                       <div className="pt-2 border-t">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">{t("dashboard.licenseStatus.total")}</span>
@@ -342,12 +349,96 @@ export function DashboardView() {
             </Card>
           )}
 
-          {/* API Usage Chart */}
+          {/* Section 3: Expiry Timeline Chart (Area Chart) */}
+          {vm.expiryReportData && vm.expiryReportData.length > 0 && (() => {
+            // Group companies by expiry date and count
+            const grouped = vm.expiryReportData.reduce((acc: Record<string, number>, company: any) => {
+              if (company.expiryDate) {
+                const date = new Date(company.expiryDate).toISOString().split('T')[0];
+                acc[date] = (acc[date] || 0) + 1;
+              }
+              return acc;
+            }, {});
+
+            // Transform to chart format
+            const expiryChartData = Object.entries(grouped)
+              .map(([date, count]) => ({
+                date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                count: count as number,
+                fullDate: date,
+              }))
+              .sort((a, b) => new Date(a.fullDate).getTime() - new Date(b.fullDate).getTime());
+
+            const maxCount = Math.max(...expiryChartData.map(d => d.count), 0);
+            const peakDate = expiryChartData.find(d => d.count === maxCount);
+
+            return (
+              <Card>
+                <CardHeader>
+                  <CardTitle>{t("dashboard.expiryTimeline.title")}</CardTitle>
+                  <CardDescription>
+                    {peakDate && `${t("dashboard.expiryTimeline.peak")}: ${maxCount} ${t("dashboard.expiryTimeline.companies")} ${t("dashboard.expiryTimeline.on")} ${peakDate.date}`}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <GenericChart
+                    title=""
+                    description=""
+                    data={{
+                      labels: expiryChartData.map(d => d.date),
+                      datasets: [{
+                        label: t("dashboard.expiryTimeline.expiringCompanies"),
+                        data: expiryChartData.map(d => d.count),
+                        borderColor: "#ef4444",
+                        backgroundColor: "rgba(239, 68, 68, 0.2)",
+                        fill: true,
+                        tension: 0.4,
+                      }],
+                    }}
+                    type="line"
+                    height={300}
+                    filterable={false}
+                    options={{
+                      plugins: {
+                        legend: {
+                          display: false,
+                        },
+                      },
+                      scales: {
+                        y: {
+                          beginAtZero: true,
+                          title: {
+                            display: true,
+                            text: t("dashboard.expiryTimeline.companies"),
+                          },
+                        },
+                        x: {
+                          title: {
+                            display: true,
+                            text: t("dashboard.expiryTimeline.date"),
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            );
+          })()}
+
+          {/* Section 4: API Usage Trends (Bar Chart) */}
           {vm.apiUsage && (
             <Card>
               <CardHeader>
                 <CardTitle>{t("dashboard.apiUsage.title")}</CardTitle>
-                <CardDescription>{t("dashboard.apiUsage.description")}</CardDescription>
+                <CardDescription>
+                  {vm.apiUsage.requestsByDay && Object.keys(vm.apiUsage.requestsByDay).length > 0
+                    ? `${t("dashboard.apiUsage.average")}: ${Math.round(
+                        Object.values(vm.apiUsage.requestsByDay).reduce((a: number, b: number) => a + b, 0) /
+                        Object.keys(vm.apiUsage.requestsByDay).length
+                      ).toLocaleString()} ${t("dashboard.apiUsage.requestsPerDay")}`
+                    : t("dashboard.apiUsage.description")}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -370,20 +461,139 @@ export function DashboardView() {
                       title={t("dashboard.apiUsage.dailyChart")}
                       description=""
                       data={{
-                        labels: Object.keys(vm.apiUsage.requestsByDay),
+                        labels: Object.keys(vm.apiUsage.requestsByDay).map(date => {
+                          const d = new Date(date);
+                          return d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+                        }),
                         datasets: [{
                           label: t("dashboard.apiUsage.requests"),
                           data: Object.values(vm.apiUsage.requestsByDay),
-                          backgroundColor: "rgba(59, 130, 246, 0.5)",
+                          backgroundColor: "rgba(59, 130, 246, 0.8)",
                           borderColor: "#3b82f6",
                           borderWidth: 2,
+                          borderRadius: 4,
                         }],
                       }}
-                      type="line"
+                      type="bar"
                       height={300}
                       filterable={false}
+                      options={{
+                        plugins: {
+                          legend: {
+                            display: false,
+                          },
+                        },
+                        scales: {
+                          y: {
+                            beginAtZero: true,
+                            title: {
+                              display: true,
+                              text: t("dashboard.apiUsage.requests"),
+                            },
+                            ticks: {
+                              callback: function(value: any) {
+                                return (value / 1000).toFixed(0) + 'K';
+                              },
+                            },
+                          },
+                        },
+                      }}
                     />
                   )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Section 5: Recent Activity / Notifications Table */}
+          {vm.recentNotifications && vm.recentNotifications.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>{t("dashboard.recentActivity.title")}</CardTitle>
+                    <CardDescription>{t("dashboard.recentActivity.description")}</CardDescription>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.location.href = "/notifications"}
+                  >
+                    {t("dashboard.recentActivity.viewAll")} →
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-2 text-sm font-medium">{t("dashboard.recentActivity.time")}</th>
+                        <th className="text-left p-2 text-sm font-medium">{t("dashboard.recentActivity.type")}</th>
+                        <th className="text-left p-2 text-sm font-medium">{t("dashboard.recentActivity.company")}</th>
+                        <th className="text-left p-2 text-sm font-medium">{t("dashboard.recentActivity.message")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {vm.recentNotifications.slice(0, 10).map((notification) => {
+                        const getNotificationIcon = (type: number) => {
+                          switch (type) {
+                            case 1: return "⚠️"; // ExpiryWarning
+                            case 2: return "🔴"; // Expired
+                            case 3: return "⏸️"; // Suspended
+                            case 4: return "✅"; // Activated
+                            case 5: return "▶️"; // Resumed
+                            case 6: return "📅"; // Extended
+                            default: return "ℹ️"; // General
+                          }
+                        };
+                        const getNotificationTypeName = (type: number) => {
+                          switch (type) {
+                            case 1: return t("dashboard.recentActivity.expiryWarning");
+                            case 2: return t("dashboard.recentActivity.expired");
+                            case 3: return t("dashboard.recentActivity.suspended");
+                            case 4: return t("dashboard.recentActivity.activated");
+                            case 5: return t("dashboard.recentActivity.resumed");
+                            case 6: return t("dashboard.recentActivity.extended");
+                            default: return t("dashboard.recentActivity.general");
+                          }
+                        };
+                        const formatRelativeTime = (dateString: string) => {
+                          const date = new Date(dateString);
+                          const now = new Date();
+                          const diffMs = now.getTime() - date.getTime();
+                          const diffMins = Math.floor(diffMs / 60000);
+                          const diffHours = Math.floor(diffMs / 3600000);
+                          const diffDays = Math.floor(diffMs / 86400000);
+                          
+                          if (diffMins < 60) return `${diffMins} ${t("dashboard.recentActivity.minutesAgo")}`;
+                          if (diffHours < 24) return `${diffHours} ${t("dashboard.recentActivity.hoursAgo")}`;
+                          if (diffDays === 1) return t("dashboard.recentActivity.yesterday");
+                          if (diffDays < 7) return `${diffDays} ${t("dashboard.recentActivity.daysAgo")}`;
+                          return date.toLocaleDateString();
+                        };
+                        return (
+                          <tr
+                            key={notification.id}
+                            className={cn(
+                              "border-b hover:bg-muted/50",
+                              !notification.isRead && "bg-blue-50 dark:bg-blue-950/20"
+                            )}
+                          >
+                            <td className="p-2 text-sm">{formatRelativeTime(notification.createdAt)}</td>
+                            <td className="p-2 text-sm">
+                              <div className="flex items-center gap-2">
+                                <span>{getNotificationIcon(notification.type)}</span>
+                                <span>{getNotificationTypeName(notification.type)}</span>
+                              </div>
+                            </td>
+                            <td className="p-2 text-sm">{notification.companyId}</td>
+                            <td className="p-2 text-sm">{notification.message}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>
