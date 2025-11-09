@@ -128,6 +128,13 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
     loadCompany();
   }, [loadCompany]);
 
+  // Sync licenseKey state with company.licenseKey when company is loaded
+  useEffect(() => {
+    if (company?.licenseKey && company.licenseKey !== licenseKey) {
+      setLicenseKey(company.licenseKey);
+    }
+  }, [company?.licenseKey]);
+
   const loadCustomFields = useCallback(async () => {
     if (!companyId) return;
     try {
@@ -307,6 +314,8 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
       if (key) {
         setLicenseKey(key);
         setLicenseKeyModalOpen(true);
+        // Reload company to update the license key in the main view
+        await loadCompany();
       }
     } catch (e) {
       // Error already shown by service
@@ -323,6 +332,7 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
       if (key) {
         setLicenseKey(key);
         setLicenseKeyModalOpen(true);
+        // Reload company to update the license key in the main view
         await loadCompany();
       }
     } catch (e) {
@@ -769,22 +779,30 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {company.licenseKey ? (
+            {(company.licenseKey || licenseKey) ? (
               <>
                 <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
                   <div className="flex-1">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
                       {t("company.licenseKey")}
                     </label>
-                    <code className="text-sm font-mono break-all">
-                      {company.licenseKey}
-                    </code>
+                    {(operationLoading["generateLicenseKey"] || operationLoading["regenerateLicenseKey"] || licensingVm.loading) ? (
+                      <div className="flex items-center gap-2 py-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                        <span className="text-sm text-muted-foreground">{t("common.loading")}</span>
+                      </div>
+                    ) : (
+                      <code className="text-sm font-mono break-all">
+                        {licenseKey || company.licenseKey}
+                      </code>
+                    )}
                   </div>
                   <Button
                     variant="outline"
                     size="icon"
                     onClick={handleCopyLicenseKey}
                     title={t("common.copy")}
+                    disabled={operationLoading["generateLicenseKey"] || operationLoading["regenerateLicenseKey"] || licensingVm.loading}
                   >
                     {copied ? (
                       <Check className="h-4 w-4 text-green-600" />
