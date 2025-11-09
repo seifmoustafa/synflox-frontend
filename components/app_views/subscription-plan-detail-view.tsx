@@ -27,8 +27,10 @@ import {
   Settings,
   Building2,
   BarChart3,
+  Eye,
 } from "lucide-react";
-import type { SubscriptionPlan, Company, BillingCycle } from "@/domain";
+import type { SubscriptionPlan, Company } from "@/domain";
+import { BillingCycle } from "@/domain";
 import { cn } from "@/lib/utils";
 import { GenericModal } from "@/components/ui/generic-modal";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -464,7 +466,14 @@ export function SubscriptionPlanDetailView({ planId }: SubscriptionPlanDetailVie
                       ),
                     },
                   ]}
-                  onRowClick={(company) => router.push(`/companies/${company.id}`)}
+                  actions={[
+                    {
+                      label: t("company.detail.view"),
+                      icon: Eye,
+                      onClick: (company: Company) => router.push(`/companies/${company.id}`),
+                      variant: "ghost",
+                    },
+                  ]}
                 />
               )}
             </CardContent>
