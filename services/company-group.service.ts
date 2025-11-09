@@ -122,9 +122,10 @@ export class CompanyGroupService implements ICompanyGroupService {
 
   async addCompanies(groupId: string, companyIds: string[]): Promise<void> {
     try {
+      // Backend expects the array directly in the request body, not wrapped in an object
       const response = await this.apiService.post<any>(
         `${API_ENDPOINTS.COMPANY_GROUPS_ADD_COMPANIES}/${groupId}/companies`,
-        { companyIds }
+        companyIds
       );
       const message = response?.message || "Companies added to group successfully";
       this.notificationService.success(message);

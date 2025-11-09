@@ -39,6 +39,7 @@ export const en = {
     companies: "Companies",
     "company-groups": "Company Groups",
     "subscription-plans": "Subscription Plans",
+    companyGroups: "Company Groups",
     system: "System",
     admins: "Admins",
     "admin-types": "Admin Types",
@@ -368,6 +369,7 @@ export const en = {
       addSelected: "Add Selected",
       noCompaniesAvailable: "No companies available to add",
       removeCompany: "Remove Company",
+      confirmRemoveCompanyTitle: "Remove Company from Group",
       confirmRemoveCompany:
         "Are you sure you want to remove {{name}} from this group?",
       bulkOperations: "Bulk Operations",
@@ -839,6 +841,8 @@ export const en = {
     item: "History Entry",
     items: "History Entries",
     actionTypeLabel: "Action Type",
+    noChanges: "No field changes detected",
+    empty: "Empty",
     timestamp: "Timestamp",
     performedBy: "Performed By",
     notes: "Notes",
@@ -2262,6 +2266,8 @@ export const en = {
       },
       // Common chart terms
       common: {
+        show: "Show",
+        hide: "Hide",
         description: "Description",
         sales: "Sales",
         revenue: "Revenue",
@@ -3284,6 +3290,8 @@ export const en = {
   },
   // Common
   common: {
+    show: "Show",
+    hide: "Hide",
     description: "Description",
     more: "More",
     close: "Close",
@@ -3292,6 +3300,7 @@ export const en = {
     back: "Back",
     yes: "Yes",
     no: "No",
+    empty: "Empty",
     collapseAll: "Collapse All",
     expandAll: "Expand All",
     save: "Save",

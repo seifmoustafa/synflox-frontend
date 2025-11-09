@@ -36,9 +36,11 @@ import type { CompanyGroup, Company } from "@/domain";
 import { cn } from "@/lib/utils";
 import { GenericModal } from "@/components/ui/generic-modal";
 import { GenericTable } from "@/components/ui/generic-table";
+import { GenericCrudView } from "@/components/ui/generic-crud-view";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { DatePickerModal } from "@/components/ui/date-picker-modal";
+import { useCompanyGroupCompaniesViewModel } from "@/viewmodels/company-group-companies-viewmodel";
 
 interface CompanyGroupDetailViewProps {
   groupId: string;
@@ -47,12 +49,10 @@ interface CompanyGroupDetailViewProps {
 export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps) {
   const router = useRouter();
   const { companyGroupService, companyService } = useServices();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [group, setGroup] = useState<CompanyGroup | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [companiesLoading, setCompaniesLoading] = useState(false);
   const [addCompaniesModalOpen, setAddCompaniesModalOpen] = useState(false);
   const [allCompanies, setAllCompanies] = useState<Company[]>([]);
   const [selectedCompanyIds, setSelectedCompanyIds] = useState<Set<string>>(new Set());
@@ -84,118 +84,120 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
     loadGroup();
   }, [loadGroup]);
 
-  const loadGroupCompanies = useCallback(async () => {
+  // Define bulk operation handlers first
+  const handleBulkActivate = useCallback(async (date: string) => {
+    if (!group) return;
     try {
-      setCompaniesLoading(true);
-      const response = await companyGroupService.getGroupCompanies(groupId, { pageSize: 1000 });
-      setCompanies(response.data);
+      await companyGroupService.bulkActivateGroup(group.id, date);
     } catch (e) {
       // Error already shown by service
-    } finally {
-      setCompaniesLoading(false);
     }
-  }, [groupId, companyGroupService]);
+  }, [group, companyGroupService]);
 
-  const loadAllCompanies = useCallback(async () => {
+  const handleBulkSuspend = useCallback(async () => {
+    if (!group) return;
+    try {
+      await companyGroupService.bulkSuspendGroup(group.id);
+    } catch (e) {
+      // Error already shown by service
+    }
+  }, [group, companyGroupService]);
+
+  const handleBulkResume = useCallback(async () => {
+    if (!group) return;
+    try {
+      await companyGroupService.bulkResumeGroup(group.id);
+    } catch (e) {
+      // Error already shown by service
+    }
+  }, [group, companyGroupService]);
+
+  const handleBulkExtend = useCallback(async (date: string) => {
+    if (!group) return;
+    try {
+      await companyGroupService.bulkExtendGroup(group.id, date);
+    } catch (e) {
+      // Error already shown by service
+    }
+  }, [group, companyGroupService]);
+
+  // Use the viewModel for companies tab (must be after handlers are defined)
+  const companiesVm = useCompanyGroupCompaniesViewModel({
+    groupId,
+    activeTab,
+    onCompaniesChange: () => {
+      // Refresh group data when companies change
+      loadGroup();
+    },
+    onAddCompaniesClick: () => setAddCompaniesModalOpen(true),
+    onBulkActivateClick: () => {
+      setPendingBulkAction({ action: 'activate' });
+      setDatePickerModalOpen(true);
+    },
+    onBulkSuspendClick: handleBulkSuspend,
+    onBulkResumeClick: handleBulkResume,
+    onBulkExtendClick: () => {
+      setPendingBulkAction({ action: 'extend' });
+      setDatePickerModalOpen(true);
+    },
+  });
+
+  const loadAllCompanies = useCallback(async (existingCompanyIds: Set<string>) => {
     try {
       const response = await companyService.getCompanies({ pageSize: 1000 });
       // Filter out companies already in group
-      const existingCompanyIds = new Set(companies.map(c => c.id));
       const filtered = response.data.filter(c => !existingCompanyIds.has(c.id));
       setAllCompanies(filtered);
     } catch (e) {
       // Error already shown by service
     }
-  }, [companyService, companies]);
+  }, [companyService]);
 
   useEffect(() => {
     if (addCompaniesModalOpen) {
-      loadAllCompanies();
+      const existingCompanyIds = new Set(companiesVm.vm.items.map(c => c.id));
+      loadAllCompanies(existingCompanyIds);
       setSelectedCompanyIds(new Set());
       setSearchQuery("");
     }
-  }, [addCompaniesModalOpen, loadAllCompanies]);
+  }, [addCompaniesModalOpen, loadAllCompanies, companiesVm.vm.items]);
 
-  useEffect(() => {
-    if (activeTab === "companies" && companies.length === 0 && !companiesLoading) {
-      loadGroupCompanies();
-    }
-  }, [activeTab, companies.length, companiesLoading, loadGroupCompanies]);
-
-  const handleAddCompanies = async () => {
+  const handleAddCompanies = useCallback(async () => {
     if (!group || selectedCompanyIds.size === 0) return;
     try {
       const companyIds = Array.from(selectedCompanyIds);
       await companyGroupService.addCompanies(group.id, companyIds);
       setAddCompaniesModalOpen(false);
       setSelectedCompanyIds(new Set());
-      await loadGroupCompanies();
+      await companiesVm.refreshItems();
     } catch (e) {
       // Error already shown by service
     }
-  };
+  }, [group, selectedCompanyIds, companyGroupService, companiesVm]);
 
-  const handleRemoveCompanies = async (companyIds: string[]) => {
+  const handleRemoveCompanies = useCallback(async (companyIds: string[]) => {
     if (!group) return;
     try {
       await companyGroupService.removeCompanies(group.id, companyIds);
-      await loadGroupCompanies();
+      await companiesVm.refreshItems();
     } catch (e) {
       // Error already shown by service
     }
-  };
-
-  const handleBulkActivate = async (date: string) => {
-    if (!group) return;
-    try {
-      await companyGroupService.bulkActivateGroup(group.id, date);
-      await loadGroupCompanies();
-    } catch (e) {
-      // Error already shown by service
-    }
-  };
-
-  const handleBulkSuspend = async () => {
-    if (!group) return;
-    try {
-      await companyGroupService.bulkSuspendGroup(group.id);
-      await loadGroupCompanies();
-    } catch (e) {
-      // Error already shown by service
-    }
-  };
-
-  const handleBulkResume = async () => {
-    if (!group) return;
-    try {
-      await companyGroupService.bulkResumeGroup(group.id);
-      await loadGroupCompanies();
-    } catch (e) {
-      // Error already shown by service
-    }
-  };
-
-  const handleBulkExtend = async (date: string) => {
-    if (!group) return;
-    try {
-      await companyGroupService.bulkExtendGroup(group.id, date);
-      await loadGroupCompanies();
-    } catch (e) {
-      // Error already shown by service
-    }
-  };
+  }, [group, companyGroupService, companiesVm]);
 
   const handleDatePickerConfirm = useCallback(async (date: string) => {
     if (!pendingBulkAction || !group) return;
     
     if (pendingBulkAction.action === 'activate') {
       await handleBulkActivate(date);
+      await companiesVm.refreshItems();
     } else if (pendingBulkAction.action === 'extend') {
       await handleBulkExtend(date);
+      await companiesVm.refreshItems();
     }
     
     setPendingBulkAction(null);
-  }, [pendingBulkAction, group, handleBulkActivate, handleBulkExtend]);
+  }, [pendingBulkAction, group, handleBulkActivate, handleBulkExtend, companiesVm]);
 
   const filteredCompanies = allCompanies.filter(company =>
     company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -203,9 +205,9 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
   );
 
   const statusBreakdown = {
-    active: companies.filter(c => c.isActiveStatus).length,
-    expired: companies.filter(c => c.status.toLowerCase() === 'expired').length,
-    suspended: companies.filter(c => c.status.toLowerCase() === 'suspended').length,
+    active: companiesVm.vm.items.filter(c => c.isActiveStatus).length,
+    expired: companiesVm.vm.items.filter(c => c.status.toLowerCase() === 'expired').length,
+    suspended: companiesVm.vm.items.filter(c => c.status.toLowerCase() === 'suspended').length,
   };
 
   if (loading) {
@@ -278,14 +280,14 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs dir={language === "ar" ? "rtl" : "ltr"} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList>
           <TabsTrigger value="overview">{t("companyGroup.detail.tabs.overview")}</TabsTrigger>
           <TabsTrigger value="companies">
             {t("companyGroup.detail.tabs.companies")}
-            {companies.length > 0 && (
+            {companiesVm.vm.items.length > 0 && (
               <Badge variant="secondary" className="ml-2">
-                {companies.length}
+                {companiesVm.vm.items.length}
               </Badge>
             )}
           </TabsTrigger>
@@ -368,7 +370,7 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
                       <Building2 className="h-4 w-4" />
                       <span>{t("companyGroup.detail.companyCount")}</span>
                     </div>
-                    <p className="text-sm font-medium">{companies.length}</p>
+                    <p className="text-sm font-medium">{companiesVm.vm.items.length}</p>
                   </div>
                 </div>
               </CardContent>
@@ -376,144 +378,14 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
           </div>
         </TabsContent>
 
-        <TabsContent value="companies" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>{t("companyGroup.detail.tabs.companies")}</CardTitle>
-                  <CardDescription>
-                    {t("companyGroup.detail.companiesDescription", { count: companies.length })}
-                  </CardDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="default"
-                    onClick={() => setAddCompaniesModalOpen(true)}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    {t("companyGroup.detail.addCompanies")}
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {/* Bulk Operations Toolbar */}
-              {companies.length > 0 && (
-                <div className="mb-4 p-4 bg-muted rounded-lg flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-medium">{t("companyGroup.detail.bulkOperations")}:</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setPendingBulkAction({ action: 'activate' });
-                      setDatePickerModalOpen(true);
-                    }}
-                  >
-                    <Play className="h-4 w-4 mr-1" />
-                    {t("companyGroup.detail.bulkActivate")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleBulkSuspend}
-                  >
-                    <Pause className="h-4 w-4 mr-1" />
-                    {t("companyGroup.detail.bulkSuspend")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleBulkResume}
-                  >
-                    <RefreshCw className="h-4 w-4 mr-1" />
-                    {t("companyGroup.detail.bulkResume")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setPendingBulkAction({ action: 'extend' });
-                      setDatePickerModalOpen(true);
-                    }}
-                  >
-                    <Calendar className="h-4 w-4 mr-1" />
-                    {t("companyGroup.detail.bulkExtend")}
-                  </Button>
-                </div>
-              )}
-
-              {companiesLoading ? (
-                <div className="p-4 text-center">{t("common.loading")}</div>
-              ) : companies.length === 0 ? (
-                <div className="p-4 text-center text-muted-foreground">
-                  {t("companyGroup.detail.noCompanies")}
-                </div>
-              ) : (
-                <GenericTable
-                  data={companies}
-                  columns={[
-                    {
-                      key: "name",
-                      label: t("company.name"),
-                      render: (_val: unknown, company: Company) => (
-                        <button
-                          onClick={() => router.push(`/companies/${company.id}`)}
-                          className="font-medium text-left hover:text-primary transition-colors"
-                        >
-                          {company.name}
-                        </button>
-                      ),
-                    },
-                    {
-                      key: "status",
-                      label: t("company.status.title"),
-                      render: (_val: unknown, company: Company) => {
-                        const status = company.status;
-                        const statusConfig: Record<string, { variant: "active" | "secondary" | "destructive"; label: string }> = {
-                          active: { variant: "active", label: t("company.status.active") },
-                          expired: { variant: "destructive", label: t("company.status.expired") },
-                          suspended: { variant: "secondary", label: t("company.status.suspended") },
-                        };
-                        const config = statusConfig[status.toLowerCase()] || statusConfig.active;
-                        return (
-                          <Badge variant={config.variant}>
-                            {config.label}
-                          </Badge>
-                        );
-                      },
-                    },
-                    {
-                      key: "expiryDate",
-                      label: t("company.expiryDate"),
-                      render: (_val: unknown, company: Company) => (
-                        <span className="text-sm">
-                          {company.expiryDate 
-                            ? new Date(company.expiryDate).toLocaleDateString()
-                            : "-"}
-                        </span>
-                      ),
-                    },
-                  ]}
-                  actions={[
-                    {
-                      label: t("companyGroup.detail.removeCompany"),
-                      icon: Trash2,
-                      onClick: (company: Company) => {
-                        if (confirm(t("companyGroup.detail.confirmRemoveCompany", { name: company.name }))) {
-                          handleRemoveCompanies([company.id]);
-                        }
-                      },
-                      variant: "destructive",
-                    },
-                  ]}
-                />
-              )}
-            </CardContent>
-          </Card>
+        <TabsContent dir={language === "ar" ? "rtl" : "ltr"} value="companies" className="space-y-6">
+          <GenericCrudView
+            viewModel={companiesVm.vm}
+            config={companiesVm.config}
+          />
         </TabsContent>
 
-        <TabsContent value="statistics" className="space-y-6">
+        <TabsContent dir={language === "ar" ? "rtl" : "ltr"} value="statistics" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
@@ -527,7 +399,7 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
                   <label className="text-sm font-medium text-muted-foreground">
                     {t("companyGroup.detail.totalCompanies")}
                   </label>
-                  <p className="text-2xl font-bold">{companies.length}</p>
+                  <p className="text-2xl font-bold">{companiesVm.vm.items.length}</p>
                 </div>
                 <Separator />
                 <div className="space-y-2">

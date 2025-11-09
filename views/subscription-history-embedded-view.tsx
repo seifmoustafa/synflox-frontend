@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { SubscriptionHistory } from "@/domain";
 import { SubscriptionHistoryActionType } from "@/domain";
-import { Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { Clock, ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SubscriptionHistoryEmbeddedViewProps {
@@ -22,7 +22,7 @@ export function SubscriptionHistoryEmbeddedView({
   limit = 10 
 }: SubscriptionHistoryEmbeddedViewProps) {
   const { subscriptionHistoryService } = useServices();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [history, setHistory] = useState<SubscriptionHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -85,6 +85,160 @@ export function SubscriptionHistoryEmbeddedView({
       }
       return newSet;
     });
+  };
+
+  // Format a value based on its type and key
+  const formatValue = (key: string, value: any): string => {
+    if (value === null || value === undefined) {
+      return t("common.empty") || "-";
+    }
+
+    // Handle dates
+    if (key.toLowerCase().includes('date') || key.toLowerCase().includes('timestamp')) {
+      try {
+        const date = new Date(value);
+        if (!isNaN(date.getTime())) {
+          return date.toLocaleString(language === "ar" ? "ar-EG" : "en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            calendar: "gregory",
+          });
+        }
+      } catch {
+        // Not a valid date
+      }
+    }
+
+    // Handle booleans
+    if (typeof value === 'boolean') {
+      return value ? t("common.yes") || "Yes" : t("common.no") || "No";
+    }
+
+    // Handle numbers
+    if (typeof value === 'number') {
+      return value.toString();
+    }
+
+    // Handle strings
+    return String(value);
+  };
+
+  // Get human-readable field name
+  const getFieldLabel = (key: string): string => {
+    // Map backend field names to translation keys
+    const fieldLabelMap: Record<string, string> = {
+      'Name': "company.name",
+      'IsActive': "company.isActive",
+      'IsTrial': "company.isTrial",
+      'ExpiryDate': "company.expiryDate",
+      'TrialEndDate': "company.trialEndDate",
+      'ContactEmail': "company.contactEmail",
+      'ContactPhone': "company.contactPhone",
+      'Address': "company.address",
+      'SubscriptionPlanId': "company.subscriptionPlan",
+    };
+    
+    const translationKey = fieldLabelMap[key];
+    if (translationKey) {
+      const translated = t(translationKey);
+      // If translation exists and is not the key itself, return it
+      if (translated && translated !== translationKey) {
+        return translated;
+      }
+    }
+    
+    // Fallback to key if no translation found
+    return key;
+  };
+
+  // Render field changes in a readable format
+  const renderFieldChanges = (oldValue: any, newValue: any) => {
+    if (!oldValue && !newValue) return null;
+
+    const old = oldValue || {};
+    const new_ = newValue || {};
+    
+    // Get all unique keys from both objects
+    const allKeys = new Set([...Object.keys(old), ...Object.keys(new_)]);
+    
+    // Filter to only show changed fields
+    const changedFields = Array.from(allKeys).filter(key => {
+      const oldVal = old[key];
+      const newVal = new_[key];
+      
+      // Handle null/undefined comparison
+      if (oldVal === null || oldVal === undefined) {
+        return newVal !== null && newVal !== undefined;
+      }
+      if (newVal === null || newVal === undefined) {
+        return oldVal !== null && oldVal !== undefined;
+      }
+      
+      // Compare values
+      return JSON.stringify(oldVal) !== JSON.stringify(newVal);
+    });
+
+    if (changedFields.length === 0) {
+      return (
+        <div className="text-sm text-muted-foreground italic">
+          {t("subscriptionHistory.noChanges") || "No field changes detected"}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        {changedFields.map((key) => {
+          const oldVal = old[key];
+          const newVal = new_[key];
+          const hasOld = oldVal !== null && oldVal !== undefined;
+          const hasNew = newVal !== null && newVal !== undefined;
+
+          return (
+            <div 
+              key={key} 
+              className="flex items-start gap-3 p-2 rounded-md bg-muted/50 border border-border"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-muted-foreground mb-1">
+                  {getFieldLabel(key)}
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {hasOld ? (
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs px-2 py-1 rounded bg-red-500/10 text-red-600 dark:text-red-400">
+                        {formatValue(key, oldVal)}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground italic">
+                      {t("subscriptionHistory.empty") || "Empty"}
+                    </span>
+                  )}
+                  
+                  <ArrowRight className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                  
+                  {hasNew ? (
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs px-2 py-1 rounded bg-green-500/10 text-green-600 dark:text-green-400">
+                        {formatValue(key, newVal)}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-muted-foreground italic">
+                      {t("subscriptionHistory.empty") || "Empty"}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   if (loading) {
@@ -155,27 +309,10 @@ export function SubscriptionHistoryEmbeddedView({
                       </Button>
                     )}
                     {isExpanded && hasDetails && (
-                      <div className="mt-3 space-y-3 pt-3 border-t">
-                        {entry.oldValue && (
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground mb-1">
-                              {t("subscriptionHistory.oldValue")}
-                            </p>
-                            <pre className="bg-muted p-2 rounded text-xs overflow-auto max-h-32">
-                              {JSON.stringify(entry.parsedOldValue, null, 2)}
-                            </pre>
-                          </div>
-                        )}
-                        {entry.newValue && (
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground mb-1">
-                              {t("subscriptionHistory.newValue")}
-                            </p>
-                            <pre className="bg-muted p-2 rounded text-xs overflow-auto max-h-32">
-                              {JSON.stringify(entry.parsedNewValue, null, 2)}
-                            </pre>
-                          </div>
-                        )}
+                      <div className="mt-3 pt-3 border-t">
+                        {entry.oldValue || entry.newValue ? (
+                          renderFieldChanges(entry.parsedOldValue, entry.parsedNewValue)
+                        ) : null}
                       </div>
                     )}
                   </div>

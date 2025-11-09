@@ -33,6 +33,7 @@ export const ar = {
 
   // Navigation
   nav: {
+    companyGroups: "مجموعات الشركات",
     dashboard: "لوحة التحكم",
     subscribers: "المشتركون",
     companies: "الشركات",
@@ -59,7 +60,46 @@ export const ar = {
     "menu-items": "عناصر القائمة",
     logout: "تسجيل خروج",
   },
-
+  subscriptionHistory:{
+    noChanges: "لم يتم اكتشاف تغييرات في الحقول",
+    empty: "فارغ",
+    actionType:{
+      created: "تم إنشاء",
+      activated: "تم تفعيل",
+      suspended: "تم تعليق",
+      resumed: "تم استئناف",
+      extended: "تم تمديد",
+      expired: "تم انتهاء",
+      deleted: "تم حذف",
+      updated: "تم تحديث",
+      unknown: "غير معروف",
+    },
+    timestamp: "الوقت",
+    performedBy: "المنفذ",
+    notes: "الملاحظات",
+    oldValue: "القيمة القديمة",
+    newValue: "القيمة الجديدة",
+    details: "التفاصيل",
+    filters: "الفلاتر",
+    fromDate: "من تاريخ",
+    toDate: "إلى تاريخ",
+    filter: {
+      all: "الكل",
+    },
+    system: "النظام",
+    performedBySystem: "النظام",
+    performedByUser: "المستخدم",
+    performedByAdmin: "المسؤول",
+    performedBySystemDescription: "النظام",
+    performedByUserDescription: "المستخدم",
+    performedByAdminDescription: "المسؤول",
+    performedBySystemValue: "النظام",
+    performedByUserValue: "المستخدم",
+    performedByAdminValue: "المسؤول",
+    performedBySystemLabel: "النظام",
+    performedByUserLabel: "المستخدم",
+    performedByAdminLabel: "المسؤول",
+  },
   // Company
   company: {
     exportDescription: "تصدير بيانات الشركات",
@@ -94,6 +134,7 @@ export const ar = {
     address: "العنوان",
     addressPlaceholder: "أدخل العنوان",
     isActive: "نشط",
+    isTrial: "تجربة",
     licenseKey: "مفتاح الترخيص",
     activateDescription: "تفعيل اشتراك الشركة {{name}}",
     extendDescription: "تمديد تاريخ انتهاء الاشتراك للشركة {{name}}",
@@ -571,6 +612,7 @@ export const ar = {
       addSelected: "إضافة المحدد",
       noCompaniesAvailable: "لا توجد شركات متاحة للإضافة",
       removeCompany: "إزالة شركة",
+      confirmRemoveCompanyTitle: "إزالة شركة من المجموعة",
       confirmRemoveCompany: "هل أنت متأكد من إزالة {{name}} من هذه المجموعة؟",
       bulkOperations: "العمليات المجمعة",
       bulkActivate: "تفعيل مجمع",
@@ -1417,6 +1459,8 @@ export const ar = {
 
     // Common chart terms
     common: {
+      show: "عرض",
+      hide: "إخفاء",
       description: "الوصف",
       more:"المزيد",
       sales: "المبيعات",
@@ -3056,6 +3100,8 @@ export const ar = {
 
   // Common
   common: {
+    show: "عرض",
+    hide: "إخفاء",
     description: "الوصف",
     confirm: "تأكيد",
     close: "إغلاق",
@@ -3064,6 +3110,7 @@ export const ar = {
     back: "عودة",
     yes: "نعم",
     no: "لا",
+    empty: "فارغ",
     active: "نشط",
     inActive: "غير نشط",
     collapseAll: "طي الكل",
