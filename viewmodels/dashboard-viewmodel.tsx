@@ -115,16 +115,62 @@ export function useDashboardViewModel() {
 
   const loadExpiryReport = useCallback(async () => {
     try {
-      // Generate expiry report for next 30 days
-      // Note: Based on the guide, this should use SubscriptionExpiry report type
-      // For now, we'll skip this as it requires async report generation
-      // The expiry data can be calculated from companies data if needed
-      setExpiryReport([]);
+      // Fetch companies and filter those expiring within the next 30 days
+      const response = await companyService.getCompanies({ page: 1, pageSize: 1000 });
+      const companies = response.data || [];
+      
+      // Calculate date range for next 30 days
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Start of today
+      const thirtyDaysFromNow = new Date(today);
+      thirtyDaysFromNow.setDate(today.getDate() + 30);
+      
+      // Filter companies expiring within the next 30 days
+      const expiringCompanies = companies
+        .filter((company) => {
+          if (!company.expiryDate) return false;
+          
+          const expiryDate = new Date(company.expiryDate);
+          expiryDate.setHours(0, 0, 0, 0); // Normalize to start of day
+          
+          // Include companies that expire today or within the next 30 days
+          return expiryDate >= today && expiryDate <= thirtyDaysFromNow;
+        })
+        .map((company) => {
+          const expiryDate = new Date(company.expiryDate!);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const daysUntilExpiry = Math.ceil(
+            (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+          );
+          
+          // Determine status based on days until expiry
+          let status = "active";
+          if (daysUntilExpiry <= 7) {
+            status = "critical";
+          } else if (daysUntilExpiry <= 15) {
+            status = "warning";
+          }
+          
+          return {
+            companyId: company.id,
+            companyName: company.name,
+            expiryDate: company.expiryDate!,
+            daysUntilExpiry: daysUntilExpiry,
+            status: status,
+          } as ExpiryReportResult;
+        })
+        .sort((a, b) => {
+          // Sort by expiry date (soonest first)
+          return new Date(a.expiryDate).getTime() - new Date(b.expiryDate).getTime();
+        });
+      
+      setExpiryReport(expiringCompanies);
     } catch (e) {
       // Error already shown by service
       setExpiryReport([]);
     }
-  }, [reportService]);
+  }, [companyService]);
 
   const loadRecentNotifications = useCallback(async () => {
     try {

@@ -221,19 +221,52 @@ export function DashboardView() {
     };
   }, [statusBreakdown, t]);
 
-  // Section 3: Expiry Timeline Area Chart Data
-  const expiryAreaChartData = useMemo(() => {
+  // Section 3: Expiry Timeline Bar Chart Data
+  const expiryBarChartData = useMemo(() => {
     if (expiryTimelineData.length === 0) return null;
 
+    // Calculate colors based on days until expiry for each date
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const chartData = expiryTimelineData.map(d => {
+      const expiryDate = new Date(d.fullDate);
+      const daysUntilExpiry = Math.ceil(
+        (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      
+      // Color coding: Critical (≤7 days) = Red, Warning (8-15 days) = Orange, Active (>15 days) = Amber
+      let backgroundColor = "#F59E0B"; // Amber for >15 days
+      let borderColor = "#D97706";
+      
+      if (daysUntilExpiry <= 7) {
+        backgroundColor = "#EF4444"; // Red for critical
+        borderColor = "#DC2626";
+      } else if (daysUntilExpiry <= 15) {
+        backgroundColor = "#F97316"; // Orange for warning
+        borderColor = "#EA580C";
+      }
+
+      return {
+        date: d.date,
+        count: d.count,
+        fullDate: d.fullDate,
+        daysUntilExpiry,
+        backgroundColor,
+        borderColor,
+      };
+    });
+
     return {
-      labels: expiryTimelineData.map(d => d.date),
+      labels: chartData.map(d => d.date),
       datasets: [{
         label: t("dashboard.expiryTimeline.companies"),
-        data: expiryTimelineData.map(d => d.count),
-        borderColor: "#EF4444",
-        backgroundColor: "rgba(239, 68, 68, 0.2)",
-        fill: true,
-        tension: 0.4,
+        data: chartData.map(d => d.count),
+        backgroundColor: chartData.map(d => d.backgroundColor),
+        borderColor: chartData.map(d => d.borderColor),
+        borderWidth: 2,
+        borderRadius: 6,
+        borderSkipped: false,
       }],
     };
   }, [expiryTimelineData, t]);
@@ -472,66 +505,162 @@ export function DashboardView() {
           )}
 
           {/* Section 3: Expiry Timeline Area Chart */}
-          {expiryAreaChartData ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("dashboard.expiryTimeline.title")}</CardTitle>
-                <CardDescription>{t("dashboard.expiryTimeline.description")}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <GenericChart
-                  title=""
-                  description=""
-                  data={expiryAreaChartData}
-                  type="line"
-                  height={300}
-                  filterable={false}
-                  options={{
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                      tooltip: {
-                        callbacks: {
-                        label: (context) => {
-                              const value = context.parsed.y ?? 0;
-                              return `${value} ${t("dashboard.expiryTimeline.companies")}`;
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("dashboard.expiryTimeline.title")}</CardTitle>
+              <CardDescription>{t("dashboard.expiryTimeline.description")}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {vm.expiryReport && vm.expiryReport.length > 0 ? (
+                <div className="space-y-6">
+                  {/* Color Legend */}
+                  <div className="flex flex-wrap items-center gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded bg-red-500"></div>
+                      <span className="text-muted-foreground">
+                        {t("dashboard.expiryTimeline.critical")} (≤7 {t("dashboard.expiryTimeline.days") || "days"})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded bg-orange-500"></div>
+                      <span className="text-muted-foreground">
+                        {t("dashboard.expiryTimeline.warning")} (8-15 {t("dashboard.expiryTimeline.days") || "days"})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded bg-amber-500"></div>
+                      <span className="text-muted-foreground">
+                        {t("company.status.active")} (&gt;15 {t("dashboard.expiryTimeline.days") || "days"})
+                      </span>
+                    </div>
+                  </div>
+                  {expiryBarChartData && (
+                    <GenericChart
+                      title=""
+                      description=""
+                      data={expiryBarChartData}
+                      type="bar"
+                      height={300}
+                      filterable={false}
+                      options={{
+                        plugins: {
+                          legend: {
+                            display: false,
+                          },
+                          tooltip: {
+                            callbacks: {
+                              label: (context) => {
+                                const value = context.parsed.y ?? 0;
+                                const label = context.label || '';
+                                // Find the days until expiry for this date
+                                const chartData = expiryTimelineData.find(d => d.date === label);
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                if (chartData) {
+                                  const expiryDate = new Date(chartData.fullDate);
+                                  const daysUntilExpiry = Math.ceil(
+                                    (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+                                  );
+                                  return `${value} ${t("dashboard.expiryTimeline.companies")} (${daysUntilExpiry} ${daysUntilExpiry === 1 ? "day" : "days"})`;
+                                }
+                                return `${value} ${t("dashboard.expiryTimeline.companies")}`;
+                              },
                             },
+                          },
                         },
-                      },
-                    },
-                    scales: {
-                      y: {
-                        beginAtZero: true,
-                        title: {
-                          display: true,
-                          text: t("dashboard.expiryTimeline.companies"),
+                        scales: {
+                          y: {
+                            beginAtZero: true,
+                            ticks: {
+                              stepSize: 1,
+                            },
+                            title: {
+                              display: true,
+                              text: t("dashboard.expiryTimeline.companies"),
+                            },
+                          },
+                          x: {
+                            title: {
+                              display: true,
+                              text: t("dashboard.expiryTimeline.date"),
+                            },
+                            ticks: {
+                              maxRotation: 45,
+                              minRotation: 45,
+                            },
+                          },
                         },
-                      },
-                      x: {
-                        title: {
-                          display: true,
-                          text: t("dashboard.expiryTimeline.date"),
+                        elements: {
+                          bar: {
+                            borderRadius: 6,
+                          },
                         },
-                      },
-                    },
-                  }}
-                />
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("dashboard.expiryTimeline.title")}</CardTitle>
-                <CardDescription>{t("dashboard.expiryTimeline.description")}</CardDescription>
-              </CardHeader>
-              <CardContent>
+                      }}
+                    />
+                  )}
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>{t("company.name")}</TableHead>
+                          <TableHead>{t("dashboard.expiryTimeline.date")}</TableHead>
+                          <TableHead>{t("dashboard.expiryTimeline.daysUntilExpiry")}</TableHead>
+                          <TableHead>{t("company.status.title")}</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {vm.expiryReport.map((company) => {
+                          const expiryDate = new Date(company.expiryDate);
+                          const statusColor = company.status === "critical" 
+                            ? "text-red-600" 
+                            : company.status === "warning" 
+                            ? "text-orange-600" 
+                            : "text-green-600";
+                          
+                          return (
+                            <TableRow 
+                              key={company.companyId}
+                              className="cursor-pointer hover:bg-muted/50"
+                              onClick={() => window.location.href = `/companies/${company.companyId}`}
+                            >
+                              <TableCell className="font-medium">{company.companyName}</TableCell>
+                              <TableCell>
+                                {expiryDate.toLocaleDateString('en-US', { 
+                                  year: 'numeric', 
+                                  month: 'short', 
+                                  day: 'numeric' 
+                                })}
+                              </TableCell>
+                              <TableCell>
+                                <span className={statusColor}>
+                                  {company.daysUntilExpiry} {company.daysUntilExpiry === 1 ? t("dashboard.expiryTimeline.day") || "day" : t("dashboard.expiryTimeline.days") || "days"}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant={company.status === "critical" ? "destructive" : company.status === "warning" ? "secondary" : "default"}
+                                >
+                                  {company.status === "critical" 
+                                    ? t("dashboard.expiryTimeline.critical")
+                                    : company.status === "warning"
+                                    ? t("dashboard.expiryTimeline.warning")
+                                    : t("company.status.active")}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   {t("dashboard.expiryTimeline.noData")}
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              )}
+            </CardContent>
+          </Card>
 
           {/* Section 4: API Usage Bar Chart */}
           {apiUsageBarChartData && (

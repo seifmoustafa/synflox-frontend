@@ -16,10 +16,10 @@ interface UseCompanyGroupCompaniesViewModelProps {
   activeTab: string;
   onCompaniesChange?: () => void;
   onAddCompaniesClick?: () => void;
-  onBulkActivateClick?: () => void;
-  onBulkSuspendClick?: () => void;
-  onBulkResumeClick?: () => void;
-  onBulkExtendClick?: () => void;
+  onBulkActivateClick?: (count: number) => void;
+  onBulkSuspendClick?: (count: number) => Promise<void>;
+  onBulkResumeClick?: (count: number) => Promise<void>;
+  onBulkExtendClick?: (count: number) => void;
 }
 
 export function useCompanyGroupCompaniesViewModel({ 
@@ -86,16 +86,7 @@ export function useCompanyGroupCompaniesViewModel({
     onCompaniesChange?.();
   }, [vm, onCompaniesChange]);
 
-  // Wrapper functions that refresh after bulk operations
-  const handleBulkSuspendWithRefresh = useCallback(async () => {
-    await onBulkSuspendClick?.();
-    await refreshItems();
-  }, [onBulkSuspendClick, refreshItems]);
-
-  const handleBulkResumeWithRefresh = useCallback(async () => {
-    await onBulkResumeClick?.();
-    await refreshItems();
-  }, [onBulkResumeClick, refreshItems]);
+  // Note: Bulk actions now handle confirmation and refresh in the parent component
 
   const handleRemoveCompany = useCallback(async (company: Company) => {
     try {
@@ -193,7 +184,7 @@ export function useCompanyGroupCompaniesViewModel({
         <Button
           variant="outline"
           size="sm"
-          onClick={onBulkActivateClick}
+          onClick={() => onBulkActivateClick?.(vm.items.length)}
         >
           <Play className="h-4 w-4 mr-1" />
           {t("companyGroup.detail.bulkActivate")}
@@ -201,7 +192,7 @@ export function useCompanyGroupCompaniesViewModel({
         <Button
           variant="outline"
           size="sm"
-          onClick={handleBulkSuspendWithRefresh}
+          onClick={() => onBulkSuspendClick?.(vm.items.length)}
         >
           <Pause className="h-4 w-4 mr-1" />
           {t("companyGroup.detail.bulkSuspend")}
@@ -209,7 +200,7 @@ export function useCompanyGroupCompaniesViewModel({
         <Button
           variant="outline"
           size="sm"
-          onClick={handleBulkResumeWithRefresh}
+          onClick={() => onBulkResumeClick?.(vm.items.length)}
         >
           <RefreshCw className="h-4 w-4 mr-1" />
           {t("companyGroup.detail.bulkResume")}
@@ -217,7 +208,7 @@ export function useCompanyGroupCompaniesViewModel({
         <Button
           variant="outline"
           size="sm"
-          onClick={onBulkExtendClick}
+          onClick={() => onBulkExtendClick?.(vm.items.length)}
         >
           <Calendar className="h-4 w-4 mr-1" />
           {t("companyGroup.detail.bulkExtend")}
@@ -226,7 +217,7 @@ export function useCompanyGroupCompaniesViewModel({
     ) : undefined,
     itemTypeKey: "company.item",
     getItemDisplayName: (company: Company) => company.name,
-  }), [vm.items.length, router, t, language, handleRemoveCompany, onAddCompaniesClick, onBulkActivateClick, handleBulkSuspendWithRefresh, handleBulkResumeWithRefresh, onBulkExtendClick]);
+  }), [vm.items.length, vm, router, t, language, handleRemoveCompany, onAddCompaniesClick, onBulkActivateClick, onBulkSuspendClick, onBulkResumeClick, onBulkExtendClick]);
 
   return {
     vm,

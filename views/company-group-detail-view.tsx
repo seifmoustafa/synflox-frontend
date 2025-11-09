@@ -41,6 +41,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { DatePickerModal } from "@/components/ui/date-picker-modal";
 import { useCompanyGroupCompaniesViewModel } from "@/viewmodels/company-group-companies-viewmodel";
+import { useConfirmationDialog } from "@/components/ui/confirmation-dialog";
 
 interface CompanyGroupDetailViewProps {
   groupId: string;
@@ -50,6 +51,7 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
   const router = useRouter();
   const { companyGroupService, companyService } = useServices();
   const { t, language } = useI18n();
+  const confirmationDialog = useConfirmationDialog();
   const [group, setGroup] = useState<CompanyGroup | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -130,15 +132,49 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
       loadGroup();
     },
     onAddCompaniesClick: () => setAddCompaniesModalOpen(true),
-    onBulkActivateClick: () => {
-      setPendingBulkAction({ action: 'activate' });
-      setDatePickerModalOpen(true);
+    onBulkActivateClick: (count: number) => {
+      confirmationDialog.showConfirmation({
+        title: t("companyGroup.detail.confirmBulkActivateTitle"),
+        description: t("companyGroup.detail.confirmBulkActivateDescription", { count }),
+        variant: "warning",
+        onConfirm: async () => {
+          setPendingBulkAction({ action: 'activate' });
+          setDatePickerModalOpen(true);
+        },
+      });
     },
-    onBulkSuspendClick: handleBulkSuspend,
-    onBulkResumeClick: handleBulkResume,
-    onBulkExtendClick: () => {
-      setPendingBulkAction({ action: 'extend' });
-      setDatePickerModalOpen(true);
+    onBulkSuspendClick: async (count: number) => {
+      confirmationDialog.showConfirmation({
+        title: t("companyGroup.detail.confirmBulkSuspendTitle"),
+        description: t("companyGroup.detail.confirmBulkSuspendDescription", { count }),
+        variant: "warning",
+        onConfirm: async () => {
+          await handleBulkSuspend();
+          await companiesVm.refreshItems();
+        },
+      });
+    },
+    onBulkResumeClick: async (count: number) => {
+      confirmationDialog.showConfirmation({
+        title: t("companyGroup.detail.confirmBulkResumeTitle"),
+        description: t("companyGroup.detail.confirmBulkResumeDescription", { count }),
+        variant: "default",
+        onConfirm: async () => {
+          await handleBulkResume();
+          await companiesVm.refreshItems();
+        },
+      });
+    },
+    onBulkExtendClick: (count: number) => {
+      confirmationDialog.showConfirmation({
+        title: t("companyGroup.detail.confirmBulkExtendTitle"),
+        description: t("companyGroup.detail.confirmBulkExtendDescription", { count }),
+        variant: "warning",
+        onConfirm: async () => {
+          setPendingBulkAction({ action: 'extend' });
+          setDatePickerModalOpen(true);
+        },
+      });
     },
   });
 
@@ -212,7 +248,7 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div dir={language === "ar" ? "rtl" : "ltr"} className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="text-muted-foreground">{t("common.loading")}</p>
@@ -223,7 +259,7 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
 
   if (error || !group) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+      <div dir={language === "ar" ? "rtl" : "ltr"} className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <div className="text-center space-y-2">
           <h2 className="text-2xl font-bold">{t("companyGroup.error.title")}</h2>
           <p className="text-muted-foreground">
@@ -239,7 +275,7 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
   }
 
   return (
-    <div className="space-y-6">
+    <div dir={language === "ar" ? "rtl" : "ltr"} className="space-y-6">
       {/* Breadcrumbs */}
       <PageBreadcrumbs
         showHome={false}
@@ -498,6 +534,8 @@ export function CompanyGroupDetailView({ groupId }: CompanyGroupDetailViewProps)
       </GenericModal>
 
       {/* Date Picker Modal for Bulk Operations */}
+      {confirmationDialog.ConfirmationDialog && <confirmationDialog.ConfirmationDialog />}
+      
       <DatePickerModal
         open={datePickerModalOpen}
         onOpenChange={setDatePickerModalOpen}
