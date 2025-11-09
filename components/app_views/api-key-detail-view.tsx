@@ -44,7 +44,7 @@ interface ApiKeyDetailViewProps {
 export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
   const router = useRouter();
   const { apiKeyService, companyService } = useServices();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [apiKey, setApiKey] = useState<ApiKey | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +52,7 @@ export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
   const [regenerateModalOpen, setRegenerateModalOpen] = useState(false);
   const [regeneratedKey, setRegeneratedKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
 
   const loadApiKey = useCallback(async () => {
     try {
@@ -84,13 +85,25 @@ export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
 
   const handleRegenerate = async () => {
     if (!apiKey) return;
+    setRegenerating(true);
+    setRegeneratedKey(null); // Clear previous key
     try {
       const response = await apiKeyService.regenerateApiKey(apiKey.id);
-      setRegeneratedKey(response.fullKey);
-      setRegenerateModalOpen(true);
-      await loadApiKey();
+      if (response && response.fullKey) {
+        setRegeneratedKey(response.fullKey);
+        setRegenerateModalOpen(true);
+        await loadApiKey();
+      } else {
+        console.error("No fullKey in response:", response);
+        // Still open modal to show error state
+        setRegenerateModalOpen(true);
+      }
     } catch (e) {
       // Error already shown by service
+      console.error("Error regenerating API key:", e);
+      // Don't open modal on error
+    } finally {
+      setRegenerating(false);
     }
   };
 
@@ -176,6 +189,8 @@ export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
           <Button
             variant="outline"
             onClick={handleRegenerate}
+            disabled={regenerating}
+            isLoading={regenerating}
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             {t("apiKey.detail.regenerate")}
@@ -236,15 +251,6 @@ export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
                 <Separator />
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">
-                    {t("apiKey.key")}
-                  </label>
-                  <code className="text-sm font-mono bg-muted p-2 rounded block">
-                    {apiKey.maskedKey}
-                  </code>
-                </div>
-                <Separator />
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">
                     {t("apiKey.status")}
                   </label>
                   <div className="flex items-center gap-2">
@@ -291,7 +297,12 @@ export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
                       <span>{t("apiKey.detail.createdAt")}</span>
                     </div>
                     <p className="text-sm font-medium">
-                      {new Date(apiKey.createdAt).toLocaleDateString()}
+                      {new Date(apiKey.createdAt).toLocaleDateString(language === "ar" ? "ar-EG" : "en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        calendar: "gregory",
+                      })}
                     </p>
                   </div>
                   {apiKey.updatedAt && (
@@ -301,7 +312,12 @@ export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
                         <span>{t("apiKey.detail.updatedAt")}</span>
                       </div>
                       <p className="text-sm font-medium">
-                        {new Date(apiKey.updatedAt).toLocaleDateString()}
+                        {new Date(apiKey.updatedAt).toLocaleDateString(language === "ar" ? "ar-EG" : "en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          calendar: "gregory",
+                        })}
                       </p>
                     </div>
                   )}
@@ -312,7 +328,12 @@ export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
                         <span>{t("apiKey.expiresAt")}</span>
                       </div>
                       <p className="text-sm font-medium">
-                        {new Date(apiKey.expiresAt).toLocaleDateString()}
+                        {new Date(apiKey.expiresAt).toLocaleDateString(language === "ar" ? "ar-EG" : "en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          calendar: "gregory",
+                        })}
                         {apiKey.isExpired && (
                           <Badge variant="destructive" className="ml-2">
                             {t("apiKey.expired")}
@@ -328,7 +349,14 @@ export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
                     </div>
                     <p className="text-sm font-medium">
                       {apiKey.lastUsedAt 
-                        ? new Date(apiKey.lastUsedAt).toLocaleString()
+                        ? new Date(apiKey.lastUsedAt).toLocaleString(language === "ar" ? "ar-EG" : "en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            calendar: "gregory",
+                          })
                         : t("apiKey.detail.neverUsed")}
                     </p>
                   </div>
@@ -357,7 +385,14 @@ export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
                   </label>
                   <p className="text-base">
                     {apiKey.lastUsedAt 
-                      ? new Date(apiKey.lastUsedAt).toLocaleString()
+                      ? new Date(apiKey.lastUsedAt).toLocaleString(language === "ar" ? "ar-EG" : "en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          calendar: "gregory",
+                        })
                       : t("apiKey.detail.neverUsed")}
                   </p>
                 </div>
@@ -402,32 +437,46 @@ export function ApiKeyDetailView({ apiKeyId }: ApiKeyDetailViewProps) {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>{t("apiKey.key")}</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={regeneratedKey || ""}
-                  readOnly
-                  className="font-mono text-sm"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={handleCopyKey}
-                  title={t("common.copy")}
-                >
-                  {copied ? (
-                    <Check className="w-4 h-4 text-green-600" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </Button>
+            {regenerating ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="text-center space-y-2">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                  <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
+                </div>
               </div>
-              {copied && (
-                <p className="text-sm text-green-600">{t("common.copied")}</p>
-              )}
-            </div>
+            ) : (
+              <div className="space-y-2">
+                <Label>{t("apiKey.key")}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={regeneratedKey || ""}
+                    readOnly
+                    className="font-mono text-sm"
+                    placeholder={regeneratedKey ? undefined : t("apiKey.detail.noKey")}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={handleCopyKey}
+                    title={t("common.copy")}
+                    disabled={!regeneratedKey}
+                  >
+                    {copied ? (
+                      <Check className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+                {copied && (
+                  <p className="text-sm text-green-600">{t("common.copied")}</p>
+                )}
+                {!regeneratedKey && (
+                  <p className="text-sm text-muted-foreground">{t("apiKey.detail.keyNotAvailable")}</p>
+                )}
+              </div>
+            )}
             <div className="flex justify-end">
               <Button onClick={() => setRegenerateModalOpen(false)}>
                 {t("common.close")}

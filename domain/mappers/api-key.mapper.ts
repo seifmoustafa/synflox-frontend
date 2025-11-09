@@ -95,9 +95,19 @@ export class ApiKeyMapper {
    */
   static createResponseFromJson(response: any): CreateApiKeyResponse {
     // The API returns the full key in response.data.apiKey
+    // SYNFLOX format: { statusCode, message, data: { id, apiKey, keyPrefix, ... } }
     // We need to extract it before creating the ApiKey object (which doesn't store the full key)
     const responseData = response?.data || response;
-    const fullKey = responseData?.apiKey || responseData?.fullKey || response?.fullKey || '';
+    
+    // Try multiple paths to find the full key
+    const fullKey = 
+      responseData?.apiKey ||           // response.data.apiKey (SYNFLOX format)
+      responseData?.fullKey ||          // Alternative format
+      response?.data?.apiKey ||          // Direct access
+      response?.data?.fullKey ||         // Direct access alternative
+      response?.fullKey ||              // Top-level fallback
+      response?.apiKey ||                // Top-level fallback
+      '';
     
     // For the ApiKey object, we need to use the data without the full key
     // The response.data contains id, apiKey (full), keyPrefix, signingSecret, etc.
@@ -127,9 +137,19 @@ export class ApiKeyMapper {
    */
   static regenerateResponseFromJson(response: any): RegenerateApiKeyResponse {
     // The API returns the full key in response.data.apiKey
+    // SYNFLOX format: { statusCode, message, data: { id, apiKey, keyPrefix, ... } }
     // We need to extract it before creating the ApiKey object (which doesn't store the full key)
     const responseData = response?.data || response;
-    const fullKey = responseData?.apiKey || responseData?.fullKey || response?.fullKey || '';
+    
+    // Try multiple paths to find the full key
+    const fullKey = 
+      responseData?.apiKey ||           // response.data.apiKey (SYNFLOX format)
+      responseData?.fullKey ||         // Alternative format
+      response?.data?.apiKey ||         // Direct access
+      response?.data?.fullKey ||        // Direct access alternative
+      response?.fullKey ||              // Top-level fallback
+      response?.apiKey ||               // Top-level fallback
+      '';
     
     // For the ApiKey object, we need to use the data without the full key
     // The response.data contains id, apiKey (full), keyPrefix, signingSecret, etc.

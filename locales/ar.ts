@@ -649,7 +649,8 @@ export const ar = {
     neverExpires: "لا ينتهي أبداً",
     expired: "منتهي الصلاحية",
     regenerate: "إعادة توليد",
-    confirmRegenerate: "هل أنت متأكد من إعادة توليد مفتاح API هذا؟ سيتم إلغاء المفتاح القديم.",
+    confirmRegenerate: "إعادة توليد مفتاح API",
+    confirmRegenerateDescription: "هل أنت متأكد من إعادة توليد مفتاح API '{name}'؟ سيتم إلغاء المفتاح القديم ولن يمكن استخدامه بعد الآن.",
     fullKey: "مفتاح API الكامل",
     showKey: {
       title: "تم إنشاء مفتاح API",

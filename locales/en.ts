@@ -396,7 +396,8 @@ export const en = {
     neverExpires: "Never expires",
     expired: "Expired",
     regenerate: "Regenerate",
-    confirmRegenerate: "Are you sure you want to regenerate this API key? The old key will be invalidated.",
+    confirmRegenerate: "Regenerate API Key",
+    confirmRegenerateDescription: "Are you sure you want to regenerate the API key '{name}'? The old key will be invalidated and cannot be used anymore.",
     fullKey: "Full API Key",
     showKey: {
       title: "API Key Created",

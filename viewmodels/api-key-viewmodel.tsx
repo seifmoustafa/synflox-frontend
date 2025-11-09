@@ -19,7 +19,7 @@ import { Copy, Check, Key } from "lucide-react";
 export function useApiKeyViewModel() {
   const router = useRouter();
   const { apiKeyService, companyService } = useServices();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [companyOptions, setCompanyOptions] = useState<Array<{value: string, label: string}>>([]);
   const [showKeyModalOpen, setShowKeyModalOpen] = useState(false);
   const [fullKey, setFullKey] = useState<string | null>(null);
@@ -110,16 +110,6 @@ export function useApiKeyViewModel() {
           ),
         },
         {
-          key: "keyPrefix",
-          label: t("apiKey.key"),
-          render: (_val: unknown, key: ApiKey) => (
-            <div className="flex items-center gap-2">
-              <Key className="h-4 w-4 text-muted-foreground" />
-              <code className="text-sm font-mono">{key.maskedKey}</code>
-            </div>
-          ),
-        },
-        {
           key: "companyId",
           label: t("apiKey.company"),
           render: (_val: unknown, key: ApiKey) => {
@@ -149,7 +139,14 @@ export function useApiKeyViewModel() {
           render: (_val: unknown, key: ApiKey) => (
             <span className="text-sm text-muted-foreground">
               {key.lastUsedAt 
-                ? new Date(key.lastUsedAt).toLocaleDateString()
+                ? new Date(key.lastUsedAt).toLocaleString(language === "ar" ? "ar-EG" : "en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    calendar: "gregory",
+                  })
                 : t("apiKey.neverUsed")}
             </span>
           ),
@@ -160,7 +157,12 @@ export function useApiKeyViewModel() {
           render: (_val: unknown, key: ApiKey) => (
             <span className="text-sm text-muted-foreground">
               {key.expiresAt 
-                ? new Date(key.expiresAt).toLocaleDateString()
+                ? new Date(key.expiresAt).toLocaleDateString(language === "ar" ? "ar-EG" : "en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    calendar: "gregory",
+                  })
                 : t("apiKey.neverExpires")}
             </span>
           ),
@@ -247,11 +249,12 @@ export function useApiKeyViewModel() {
           {
             label: t("apiKey.regenerate"),
             onClick: async (item: ApiKey) => {
-              if (confirm(t("apiKey.confirmRegenerate"))) {
-                await handleRegenerate(item);
-              }
+              await handleRegenerate(item);
             },
             variant: "ghost" as const,
+            confirmTitle: t("apiKey.confirmRegenerate"),
+            confirmDescription: t("apiKey.confirmRegenerateDescription"),
+            confirmationVariant: "warning",
           },
           {
             label: t("common.delete"),
