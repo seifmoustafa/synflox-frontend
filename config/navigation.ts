@@ -231,6 +231,102 @@ export const isNavigationItemActive = (
 };
 
 /**
+ * Finds the best matching navigation item for a given pathname.
+ * Returns the parent item name that should be active/selected.
+ * Handles nested routes (e.g., /company/[id] -> finds /company parent)
+ */
+export const findBestMatchingNavigationItem = (
+  navigation: NavigationItem[],
+  pathname: string
+): string | null => {
+  // Helper to check if a path matches an item's href
+  const pathMatches = (itemHref: string | undefined, path: string): boolean => {
+    if (!itemHref) return false;
+    if (itemHref === path) return true;
+    if (itemHref !== "/" && path.startsWith(itemHref)) {
+      const nextChar = path[itemHref.length];
+      return nextChar === undefined || nextChar === "/";
+    }
+    return false;
+  };
+
+  // Recursively search for the best match
+  const findMatch = (
+    items: NavigationItem[],
+    currentPath: string,
+    parentName: string | null = null
+  ): string | null => {
+    for (const item of items) {
+      // Check if current item matches
+      if (pathMatches(item.href, currentPath)) {
+        // If it has children, check if any child matches (deeper match)
+        if (item.children && item.children.length > 0) {
+          const childMatch = findMatch(item.children, currentPath, item.name);
+          if (childMatch) {
+            // A child matches, so this parent should be active
+            return item.name;
+          }
+        }
+        // This item matches and no deeper match found
+        return item.name;
+      }
+
+      // Check children for matches
+      if (item.children && item.children.length > 0) {
+        const childMatch = findMatch(item.children, currentPath, item.name);
+        if (childMatch) {
+          // A child matches, so this parent should be active
+          return item.name;
+        }
+      }
+    }
+
+    return null;
+  };
+
+  return findMatch(navigation, pathname);
+};
+
+/**
+ * Finds all parent items that should be expanded to show the active item
+ */
+export const findExpandedItemsForPath = (
+  navigation: NavigationItem[],
+  pathname: string
+): string[] => {
+  const expanded: string[] = [];
+
+  const shouldExpandParent = (item: NavigationItem): boolean => {
+    if (!item.children) return false;
+    return item.children.some((child) => {
+      if (child.href) {
+        if (pathname === child.href) return true;
+        if (child.href !== "/" && pathname.startsWith(child.href)) {
+          const nextChar = pathname[child.href.length];
+          if (nextChar === undefined || nextChar === "/") {
+            return true;
+          }
+        }
+      }
+      if (child.children) return shouldExpandParent(child);
+      return false;
+    });
+  };
+
+  const checkItem = (item: NavigationItem) => {
+    if (shouldExpandParent(item)) {
+      expanded.push(item.name);
+    }
+    if (item.children) {
+      item.children.forEach(checkItem);
+    }
+  };
+
+  navigation.forEach(checkItem);
+  return expanded;
+};
+
+/**
  * Flattens nested navigation items into a single array (useful for search)
  */
 export const getFlatNavigationItems = (

@@ -32,8 +32,15 @@ import {
   Edit,
   FileText,
   History,
+  Package,
+  Sparkles,
+  BarChart3,
+  RefreshCw,
+  Play,
+  ArrowRight,
+  Plus,
 } from "lucide-react";
-import type { Company } from "@/domain";
+import type { Company, SubscriptionPlan } from "@/domain";
 import { CompanyCustomField, CustomFieldType } from "@/domain";
 import { cn } from "@/lib/utils";
 import { GenericModal } from "@/components/ui/generic-modal";
@@ -41,6 +48,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import GenericSelect from "@/components/ui/generic-select";
 import { Textarea } from "@/components/ui/textarea";
+import { DatePicker } from "@/components/ui/date-picker";
+import { useLicensingViewModel } from "@/viewmodels/licensing-viewmodel";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { SubscriptionHistoryEmbeddedView } from "./subscription-history-embedded-view";
 
 interface CompanyDetailViewProps {
   companyId: string;
@@ -48,12 +59,28 @@ interface CompanyDetailViewProps {
 
 export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
   const router = useRouter();
-  const { companyService, companyCustomFieldService } = useServices();
+  const { companyService, companyCustomFieldService, subscriptionPlanService } = useServices();
   const { t } = useI18n();
+  const licensingVm = useLicensingViewModel();
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
+  const [operationLoading, setOperationLoading] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // Helper function to set loading state (handles both initial and operation loading)
+  const setLoadingState = useCallback((keyOrValue: string | boolean, value?: boolean) => {
+    if (typeof keyOrValue === "boolean") {
+      // Initial loading
+      setLoading(keyOrValue);
+    } else if (typeof keyOrValue === "string" && typeof value === "boolean") {
+      // Operation loading
+      setOperationLoading((prev) => ({
+        ...prev,
+        [keyOrValue]: value,
+      }));
+    }
+  }, []);
   const [customFields, setCustomFields] = useState<CompanyCustomField[]>([]);
   const [customFieldsLoading, setCustomFieldsLoading] = useState(false);
   const [customFieldModalOpen, setCustomFieldModalOpen] = useState(false);
@@ -63,10 +90,28 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
     fieldType: CustomFieldType.String.toString(),
     fieldValue: "",
   });
+  
+  // Trial modals
+  const [startTrialModalOpen, setStartTrialModalOpen] = useState(false);
+  const [convertTrialModalOpen, setConvertTrialModalOpen] = useState(false);
+  const [trialDays, setTrialDays] = useState("30");
+  const [convertExpiryDate, setConvertExpiryDate] = useState("");
+  
+  // Subscription plan
+  const [subscriptionPlan, setSubscriptionPlan] = useState<SubscriptionPlan | null>(null);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [changePlanModalOpen, setChangePlanModalOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("");
+  const [planOptions, setPlanOptions] = useState<Array<{value: string, label: string}>>([]);
+  
+  // License key
+  const [licenseKeyModalOpen, setLicenseKeyModalOpen] = useState(false);
+  const [licenseKey, setLicenseKey] = useState<string | null>(null);
+  const [licenseKeyCopied, setLicenseKeyCopied] = useState(false);
 
   const loadCompany = useCallback(async () => {
     try {
-      setLoading(true);
+      setLoadingState(true);
       setError(null);
       const data = await companyService.getCompanyById(companyId);
       setCompany(data);
@@ -75,7 +120,7 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
         e instanceof Error ? e.message : t("company.error.loadFailed");
       setError(errorMessage);
     } finally {
-      setLoading(false);
+      setLoadingState(false);
     }
   }, [companyId, companyService, t]);
 
@@ -99,8 +144,44 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
   useEffect(() => {
     if (company) {
       loadCustomFields();
+      if (company.subscriptionPlanId) {
+        loadSubscriptionPlan();
+      } else {
+        setSubscriptionPlan(null);
+      }
     }
   }, [company, loadCustomFields]);
+
+  const loadSubscriptionPlan = useCallback(async () => {
+    if (!company?.subscriptionPlanId) return;
+    try {
+      setPlanLoading(true);
+      const plan = await subscriptionPlanService.getPlanById(company.subscriptionPlanId);
+      setSubscriptionPlan(plan);
+    } catch (e) {
+      // Error already shown by service
+      setSubscriptionPlan(null);
+    } finally {
+      setPlanLoading(false);
+    }
+  }, [company?.subscriptionPlanId, subscriptionPlanService]);
+
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        const response = await subscriptionPlanService.getPlans({ pageSize: 100, isActive: true });
+        setPlanOptions(
+          response.data.map(plan => ({
+            value: plan.id,
+            label: plan.name,
+          }))
+        );
+      } catch (e) {
+        // Error already shown by service
+      }
+    };
+    loadPlans();
+  }, [subscriptionPlanService]);
 
   const handleOpenCustomFieldModal = (field?: CompanyCustomField) => {
     if (field) {
@@ -164,7 +245,15 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
   };
 
   const handleCopyLicenseKey = useCallback(async () => {
-    if (company?.licenseKey) {
+    if (licenseKey) {
+      try {
+        await navigator.clipboard.writeText(licenseKey);
+        setLicenseKeyCopied(true);
+        setTimeout(() => setLicenseKeyCopied(false), 2000);
+      } catch (error) {
+        console.error("Failed to copy license key:", error);
+      }
+    } else if (company?.licenseKey) {
       try {
         await navigator.clipboard.writeText(company.licenseKey);
         setCopied(true);
@@ -173,7 +262,104 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
         console.error("Failed to copy license key:", error);
       }
     }
-  }, [company?.licenseKey]);
+  }, [company?.licenseKey, licenseKey]);
+
+  const handleStartTrial = async () => {
+    if (!company) return;
+    setLoadingState("startTrial", true);
+    try {
+      const days = parseInt(trialDays) || 30;
+      const success = await licensingVm.startTrial(company.id, days);
+      if (success) {
+        setStartTrialModalOpen(false);
+        setTrialDays("30");
+        await loadCompany();
+      }
+    } catch (e) {
+      // Error already shown by service
+    } finally {
+      setLoadingState("startTrial", false);
+    }
+  };
+
+  const handleConvertTrial = async () => {
+    if (!company || !convertExpiryDate) return;
+    setLoadingState("convertTrial", true);
+    try {
+      const success = await licensingVm.convertTrial(company.id, new Date(convertExpiryDate).toISOString());
+      if (success) {
+        setConvertTrialModalOpen(false);
+        setConvertExpiryDate("");
+        await loadCompany();
+      }
+    } catch (e) {
+      // Error already shown by service
+    } finally {
+      setLoadingState("convertTrial", false);
+    }
+  };
+
+  const handleGenerateLicenseKey = async () => {
+    if (!company) return;
+    setLoadingState("generateLicenseKey", true);
+    try {
+      const key = await licensingVm.generateLicenseKey(company.id);
+      if (key) {
+        setLicenseKey(key);
+        setLicenseKeyModalOpen(true);
+      }
+    } catch (e) {
+      // Error already shown by service
+    } finally {
+      setLoadingState("generateLicenseKey", false);
+    }
+  };
+
+  const handleRegenerateLicenseKey = async () => {
+    if (!company) return;
+    setLoadingState("regenerateLicenseKey", true);
+    try {
+      const key = await licensingVm.regenerateLicenseKey(company.id);
+      if (key) {
+        setLicenseKey(key);
+        setLicenseKeyModalOpen(true);
+        await loadCompany();
+      }
+    } catch (e) {
+      // Error already shown by service
+    } finally {
+      setLoadingState("regenerateLicenseKey", false);
+    }
+  };
+
+  const handleChangePlan = async () => {
+    if (!company || !selectedPlanId) return;
+    setLoadingState("changePlan", true);
+    try {
+      const { UpdateCompanyRequest } = await import("@/domain");
+      const request = new UpdateCompanyRequest({
+        id: company.id,
+        subscriptionPlanId: selectedPlanId,
+      });
+      await companyService.updateCompany(company.id, request);
+      setChangePlanModalOpen(false);
+      setSelectedPlanId("");
+      await loadCompany();
+    } catch (e) {
+      // Error already shown by service
+    } finally {
+      setLoadingState("changePlan", false);
+    }
+  };
+
+  const calculateTrialDaysRemaining = (): number | null => {
+    if (!company?.isTrial || !company?.trialEndDate) return null;
+    const endDate = new Date(company.trialEndDate);
+    const now = new Date();
+    const diff = endDate.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return days > 0 ? days : 0;
+  };
 
   if (loading) {
     return (
@@ -284,6 +470,7 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
             )}
           </TabsTrigger>
           <TabsTrigger value="history">{t("company.detail.tabs.history")}</TabsTrigger>
+          <TabsTrigger value="analytics">{t("company.detail.tabs.analytics")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -417,20 +604,173 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
           </CardContent>
         </Card>
 
-        {/* License Key Information - Only show if license key exists */}
-        {company.licenseKey && (
+        {/* Trial Information */}
+        {company.isTrial && (
           <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5" />
-                {t("company.licenseKey")}
+                <Sparkles className="h-5 w-5" />
+                {t("company.detail.trial.status")}
               </CardTitle>
               <CardDescription>
-                {t("company.detail.licenseKeyDescription")}
+                {t("company.detail.trial.description")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Badge variant="active">
+                  {t("company.detail.trial.active")}
+                </Badge>
+                {company.trialEndDate && (
+                  <>
+                    <span className="text-sm text-muted-foreground">
+                      {t("company.detail.trial.endDate")}:
+                    </span>
+                    <span className="text-sm font-medium">
+                      {new Date(company.trialEndDate).toLocaleDateString()}
+                    </span>
+                    {calculateTrialDaysRemaining() !== null && (
+                      <>
+                        <span className="text-sm text-muted-foreground">
+                          ({t("company.detail.trial.daysRemaining", { days: calculateTrialDaysRemaining() })})
+                        </span>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+              <Button
+                variant="default"
+                onClick={() => setConvertTrialModalOpen(true)}
+                isLoading={operationLoading["convertTrial"] || licensingVm.loading}
+              >
+                <ArrowRight className="h-4 w-4 mr-2" />
+                {t("company.detail.trial.convert")}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Start Trial Button - Only show if not in trial */}
+        {!company.isTrial && (
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                {t("company.detail.trial.title")}
+              </CardTitle>
+              <CardDescription>
+                {t("company.detail.trial.startDescription")}
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <Button
+                variant="default"
+                onClick={() => setStartTrialModalOpen(true)}
+              >
+                <Play className="h-4 w-4 mr-2" />
+                {t("company.detail.trial.start")}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Subscription Plan Information */}
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  {t("company.detail.subscriptionPlan.title")}
+                </CardTitle>
+                <CardDescription>
+                  {t("company.detail.subscriptionPlan.description")}
+                </CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedPlanId(company.subscriptionPlanId || "");
+                  setChangePlanModalOpen(true);
+                }}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                {t("company.detail.subscriptionPlan.change")}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {planLoading ? (
+              <div className="p-4 text-center">{t("common.loading")}</div>
+            ) : subscriptionPlan ? (
               <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">
+                    {t("subscriptionPlan.name")}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <p className="text-base font-semibold">{subscriptionPlan.name}</p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => router.push(`/subscription-plans/${subscriptionPlan.id}`)}
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <Separator />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">
+                      {t("subscriptionPlan.price")}
+                    </label>
+                    <p className="text-base">{subscriptionPlan.formattedPrice}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-muted-foreground">
+                      {t("subscriptionPlan.billingCycle")}
+                    </label>
+                    <p className="text-base">{subscriptionPlan.billingCycleName}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-muted-foreground mb-4">
+                  {t("company.detail.subscriptionPlan.noPlan")}
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedPlanId("");
+                    setChangePlanModalOpen(true);
+                  }}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("company.detail.subscriptionPlan.assign")}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* License Key Management */}
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Key className="h-5 w-5" />
+              {t("company.detail.licenseKey.title")}
+            </CardTitle>
+            <CardDescription>
+              {t("company.detail.licenseKey.description")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {company.licenseKey ? (
+              <>
                 <div className="flex items-center gap-2 p-4 bg-muted rounded-lg">
                   <div className="flex-1">
                     <label className="text-sm font-medium text-muted-foreground mb-2 block">
@@ -459,10 +799,27 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
                     {t("common.copied")}
                   </p>
                 )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                <Button
+                  variant="outline"
+                  onClick={handleRegenerateLicenseKey}
+                  isLoading={operationLoading["regenerateLicenseKey"] || licensingVm.loading}
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  {t("company.detail.licenseKey.regenerate")}
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="default"
+                onClick={handleGenerateLicenseKey}
+                isLoading={operationLoading["generateLicenseKey"] || licensingVm.loading}
+              >
+                <Key className="h-4 w-4 mr-2" />
+                {t("company.detail.licenseKey.generate")}
+              </Button>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Timestamps */}
         <Card className="md:col-span-2">
@@ -586,19 +943,49 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
         <TabsContent value="history" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t("company.detail.history.title")}</CardTitle>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>{t("company.detail.history.title")}</CardTitle>
+                  <CardDescription>
+                    {t("company.detail.history.description")}
+                  </CardDescription>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push(`/companies/${companyId}/history`)}
+                >
+                  <History className="h-4 w-4 mr-2" />
+                  {t("company.detail.history.viewHistory")}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <SubscriptionHistoryEmbeddedView companyId={companyId} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                {t("company.detail.tabs.analytics")}
+              </CardTitle>
               <CardDescription>
-                {t("company.detail.history.description")}
+                {t("company.detail.analytics.description")}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button
-                variant="outline"
-                onClick={() => router.push(`/companies/${companyId}/history`)}
-              >
-                <History className="h-4 w-4 mr-2" />
-                {t("company.detail.history.viewHistory")}
-              </Button>
+              <div className="text-center py-8">
+                <Button
+                  variant="default"
+                  onClick={() => router.push(`/companies/${companyId}/analytics`)}
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  {t("company.detail.analytics.viewFull")}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -690,7 +1077,177 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
             </Button>
           </div>
         </div>
+        </GenericModal>
+
+      {/* Start Trial Modal */}
+      <GenericModal
+        open={startTrialModalOpen}
+        onOpenChange={setStartTrialModalOpen}
+        title={t("company.detail.trial.start")}
+        description={t("company.detail.trial.startDescription")}
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="trialDays">{t("company.detail.trial.days")}</Label>
+            <Input
+              id="trialDays"
+              type="number"
+              value={trialDays}
+              onChange={(e) => setTrialDays(e.target.value)}
+              placeholder="30"
+              min="1"
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setStartTrialModalOpen(false);
+                setTrialDays("30");
+              }}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={handleStartTrial}
+              isLoading={operationLoading["startTrial"] || licensingVm.loading}
+              disabled={!trialDays}
+            >
+              {t("company.detail.trial.start")}
+            </Button>
+          </div>
+        </div>
       </GenericModal>
+
+      {/* Convert Trial Modal */}
+      <GenericModal
+        open={convertTrialModalOpen}
+        onOpenChange={setConvertTrialModalOpen}
+        title={t("company.detail.trial.convert")}
+        description={t("company.detail.trial.convertDescription")}
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="convertExpiryDate">{t("company.expiryDate")}</Label>
+            <DatePicker
+              id="convertExpiryDate"
+              value={convertExpiryDate}
+              onChange={setConvertExpiryDate}
+              placeholder={t("company.expiryDatePlaceholder")}
+              required
+              type="date"
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setConvertTrialModalOpen(false);
+                setConvertExpiryDate("");
+              }}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={handleConvertTrial}
+              isLoading={operationLoading["convertTrial"] || licensingVm.loading}
+              disabled={!convertExpiryDate}
+            >
+              {t("company.detail.trial.convert")}
+            </Button>
+          </div>
+        </div>
+      </GenericModal>
+
+      {/* Change Plan Modal */}
+      <GenericModal
+        open={changePlanModalOpen}
+        onOpenChange={setChangePlanModalOpen}
+        title={t("company.detail.subscriptionPlan.change")}
+        description={t("company.detail.subscriptionPlan.changeDescription")}
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="planSelect">{t("subscriptionPlan.name")}</Label>
+            <GenericSelect
+              id="planSelect"
+              options={planOptions}
+              value={selectedPlanId}
+              onValueChange={(value: string | string[]) => setSelectedPlanId(Array.isArray(value) ? value[0] : value)}
+              placeholder={t("company.detail.subscriptionPlan.selectPlan")}
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setChangePlanModalOpen(false);
+                setSelectedPlanId("");
+              }}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={handleChangePlan}
+              isLoading={operationLoading["changePlan"]}
+              disabled={!selectedPlanId}
+            >
+              {t("common.save")}
+            </Button>
+          </div>
+        </div>
+      </GenericModal>
+
+      {/* License Key Display Modal */}
+      <Dialog open={licenseKeyModalOpen} onOpenChange={setLicenseKeyModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Key className="w-5 h-5" />
+              {t("licensing.viewKey")}
+            </DialogTitle>
+            <DialogDescription>
+              {t("company.licenseKeyDescription", { name: company?.name || "" })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>{t("company.licenseKey")}</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={licenseKey || ""}
+                  readOnly
+                  className="font-mono text-sm"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={handleCopyLicenseKey}
+                  title={t("common.copy")}
+                >
+                  {licenseKeyCopied ? (
+                    <Check className="w-4 h-4 text-green-600" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+              {licenseKeyCopied && (
+                <p className="text-sm text-green-600">{t("common.copied")}</p>
+              )}
+            </div>
+            <div className="flex justify-end">
+              <Button onClick={() => setLicenseKeyModalOpen(false)}>
+                {t("common.close")}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

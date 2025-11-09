@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import { useGenericCrudViewModel } from "@/hooks/use-generic-crud-viewmodel";
@@ -10,6 +11,7 @@ import type { CrudConfig } from "@/components/ui/generic-crud-view";
 import { Badge } from "@/components/ui/badge";
 
 export function useSubscriptionPlanViewModel() {
+  const router = useRouter();
   const { subscriptionPlanService } = useServices();
   const { t } = useI18n();
   const [moduleAssignmentOpen, setModuleAssignmentOpen] = useState(false);
@@ -232,8 +234,7 @@ export function useSubscriptionPlanViewModel() {
           {
             label: t("common.view"),
             onClick: (item: SubscriptionPlan) => {
-              // Navigate to detail page or show modal
-              setSelectedPlan(item);
+              router.push(`/subscription-plans/${item.id}`);
             },
             variant: "ghost" as const,
           },

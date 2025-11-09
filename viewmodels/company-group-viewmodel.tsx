@@ -19,6 +19,13 @@ export function useCompanyGroupViewModel() {
   const { t } = useI18n();
   const [manageCompaniesOpen, setManageCompaniesOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<CompanyGroup | null>(null);
+  
+  // Date picker modal states for bulk operations
+  const [datePickerModalOpen, setDatePickerModalOpen] = useState(false);
+  const [pendingBulkAction, setPendingBulkAction] = useState<{
+    action: 'activate' | 'extend';
+    groupId: string;
+  } | null>(null);
 
   const vm = useGenericCrudViewModel<
     CompanyGroup,
@@ -171,14 +178,9 @@ export function useCompanyGroupViewModel() {
         {
           label: t("licensing.bulkActivate"),
           onClick: async (selectedIds: string[]) => {
-            // For groups, we need to get companies first, then activate
-            // This is a simplified version - in real implementation, would need to handle multiple groups
             if (selectedIds.length === 1) {
-              const expiryDate = prompt(t("company.expiryDate") + " (YYYY-MM-DD):");
-              if (expiryDate) {
-                await companyGroupService.bulkActivateGroup(selectedIds[0], new Date(expiryDate).toISOString());
-                await vm.refreshItems();
-              }
+              setPendingBulkAction({ action: 'activate', groupId: selectedIds[0] });
+              setDatePickerModalOpen(true);
             }
           },
           confirmTitle: t("licensing.bulkActivate"),
@@ -213,11 +215,8 @@ export function useCompanyGroupViewModel() {
           label: t("licensing.bulkExtend"),
           onClick: async (selectedIds: string[]) => {
             if (selectedIds.length === 1) {
-              const expiryDate = prompt(t("company.newExpiryDate") + " (YYYY-MM-DD):");
-              if (expiryDate) {
-                await companyGroupService.bulkExtendGroup(selectedIds[0], new Date(expiryDate).toISOString());
-                await vm.refreshItems();
-              }
+              setPendingBulkAction({ action: 'extend', groupId: selectedIds[0] });
+              setDatePickerModalOpen(true);
             }
           },
           confirmTitle: t("licensing.bulkExtend"),
@@ -226,8 +225,24 @@ export function useCompanyGroupViewModel() {
         },
       ],
     }),
-    [t, router, handleDelete, companyGroupService, vm]
+    [t, router, handleDelete, companyGroupService, vm, setPendingBulkAction, setDatePickerModalOpen]
   );
+
+  const handleDatePickerConfirm = useCallback(async (date: string) => {
+    if (!pendingBulkAction) return;
+    
+    const { action, groupId } = pendingBulkAction;
+    
+    if (action === 'activate') {
+      await companyGroupService.bulkActivateGroup(groupId, date);
+      await vm.refreshItems();
+    } else if (action === 'extend') {
+      await companyGroupService.bulkExtendGroup(groupId, date);
+      await vm.refreshItems();
+    }
+    
+    setPendingBulkAction(null);
+  }, [pendingBulkAction, companyGroupService, vm]);
 
   return {
     vm,
@@ -237,6 +252,10 @@ export function useCompanyGroupViewModel() {
     setManageCompaniesOpen,
     selectedGroup,
     setSelectedGroup,
+    // Date picker modal
+    datePickerModalOpen,
+    setDatePickerModalOpen,
+    handleDatePickerConfirm,
   };
 }
 

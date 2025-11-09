@@ -23,6 +23,7 @@ export interface ICompanyService {
     page?: number;
     pageSize?: number;
     search?: string;
+    subscriptionPlanId?: string;
   }): Promise<CompaniesResponse>;
   getCompanyById(id: string): Promise<Company>;
   createCompany(data: CreateCompanyRequest): Promise<Company>;
@@ -42,6 +43,7 @@ export class CompanyService implements ICompanyService {
     page?: number;
     pageSize?: number;
     search?: string;
+    subscriptionPlanId?: string;
   }): Promise<CompaniesResponse> {
     try {
       // SYNFLOX API: GET /api/companies?page=1&pageSize=10&search=...

@@ -47,7 +47,6 @@ export function NavigationMainSidebar({
     iconStyle,
   } = useSettings();
 
-
   const getBorderRadiusClass = () => {
     switch (borderRadius) {
       case "none":
@@ -72,7 +71,7 @@ export function NavigationMainSidebar({
 
   const getIconClasses = () => {
     const baseClasses = "w-6 h-6";
-    
+
     switch (iconStyle) {
       case "filled":
         return cn(baseClasses, "fill-current");
@@ -86,8 +85,10 @@ export function NavigationMainSidebar({
   };
 
   const getNavigationStyleClasses = (isActive: boolean, isMobile = false) => {
-    const baseClasses = isMobile ? "w-full justify-start gap-3 h-12" : "w-14 h-14 relative group";
-    
+    const baseClasses = isMobile
+      ? "w-full justify-start gap-3 h-12"
+      : "w-14 h-14 relative group";
+
     if (!isActive) {
       return cn(baseClasses, "hover:bg-accent hover:text-accent-foreground");
     }
@@ -123,15 +124,24 @@ export function NavigationMainSidebar({
           "rounded-none", // Remove border radius for clean sidebar style
           // For desktop main sidebar: right border for LTR, left border for RTL
           // For mobile: left border for LTR, right border for RTL
-          isMobile 
-            ? (direction === "rtl" ? "border-r-4" : "border-l-4")
-            : (direction === "rtl" ? "border-l-4" : "border-r-4"),
-          colorTheme === "blue" && "bg-blue-600/20 border-blue-600 text-blue-600",
-          colorTheme === "purple" && "bg-purple-600/20 border-purple-600 text-purple-600",
-          colorTheme === "green" && "bg-green-600/20 border-green-600 text-green-600",
-          colorTheme === "orange" && "bg-orange-600/20 border-orange-600 text-orange-600",
+          isMobile
+            ? direction === "rtl"
+              ? "border-r-4"
+              : "border-l-4"
+            : direction === "rtl"
+            ? "border-l-4"
+            : "border-r-4",
+          colorTheme === "blue" &&
+            "bg-blue-600/20 border-blue-600 text-blue-600",
+          colorTheme === "purple" &&
+            "bg-purple-600/20 border-purple-600 text-purple-600",
+          colorTheme === "green" &&
+            "bg-green-600/20 border-green-600 text-green-600",
+          colorTheme === "orange" &&
+            "bg-orange-600/20 border-orange-600 text-orange-600",
           colorTheme === "red" && "bg-red-600/20 border-red-600 text-red-600",
-          colorTheme === "teal" && "bg-teal-600/20 border-teal-600 text-teal-600"
+          colorTheme === "teal" &&
+            "bg-teal-600/20 border-teal-600 text-teal-600"
         );
       default: // "default"
         return cn(
@@ -182,12 +192,13 @@ export function NavigationMainSidebar({
     // Check if item is selected (user clicked) or active (URL-based)
     const isSelected = item.name === selectedItem;
     const isActive = item.name === activeItem;
-    const isCurrentlyFocused = isSelected || (isActive && selectedItem === null);
-    
+    const isCurrentlyFocused =
+      isSelected || (isActive && selectedItem === null);
+
     // Apply primary highlight if selected, secondary if active (but not selected)
     let itemIsHighlighted = false;
     let itemOpacity = "opacity-100";
-    
+
     if (isSelected) {
       // User clicked this item - primary highlight
       itemIsHighlighted = true;
@@ -332,11 +343,12 @@ export function NavigationMainSidebar({
               // Check if item is selected (user clicked) or active (URL-based)
               const isSelected = item.name === selectedItem;
               const isActive = item.name === activeItem;
-              const isCurrentlyFocused = isSelected || (isActive && selectedItem === null);
-              
+              const isCurrentlyFocused =
+                isSelected || (isActive && selectedItem === null);
+
               // Apply primary highlight if selected, secondary if active (but not selected)
               let itemOpacity = "opacity-100";
-              
+
               if (isSelected) {
                 // User clicked this item - primary highlight
                 itemOpacity = "opacity-100";

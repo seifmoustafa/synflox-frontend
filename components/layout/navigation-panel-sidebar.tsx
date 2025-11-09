@@ -44,29 +44,7 @@ export function NavigationPanelSidebar({
     iconStyle,
   } = useSettings();
 
-  // Load expanded items from localStorage on mount
-  const [expandedItems, setExpandedItems] = useState<string[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('nav_expandedItems');
-        return saved ? JSON.parse(saved) : [];
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  });
-  
-  // Save expanded items to localStorage whenever they change
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('nav_expandedItems', JSON.stringify(expandedItems));
-      } catch (e) {
-        // Ignore localStorage errors
-      }
-    }
-  }, [expandedItems]);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   // Get the selected main navigation item
   const selectedNavItem = navigation.find(
@@ -230,7 +208,12 @@ export function NavigationPanelSidebar({
     // Check if this item is active - exact match or if pathname starts with item href
     // Ensure proper path segment match (next char must be '/' or end of string)
     let isActive = pathname === item.href;
-    if (!isActive && item.href && item.href !== "/" && pathname.startsWith(item.href)) {
+    if (
+      !isActive &&
+      item.href &&
+      item.href !== "/" &&
+      pathname.startsWith(item.href)
+    ) {
       // Ensure the next character after the href is either '/' or end of string
       // This prevents partial matches like /system/entryGate matching /system/entryGateVisitor
       const nextChar = pathname[item.href.length];

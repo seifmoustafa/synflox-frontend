@@ -4,6 +4,7 @@ import { GenericCrudView } from "@/components/ui/generic-crud-view";
 import { useCompanyGroupViewModel } from "@/viewmodels/company-group-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
 import { GenericModal } from "@/components/ui/generic-modal";
+import { DatePickerModal } from "@/components/ui/date-picker-modal";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useServices } from "@/providers/service-provider";
@@ -14,7 +15,17 @@ import type { Company } from "@/domain";
 export function CompanyGroupView() {
   const { t } = useI18n();
   const { companyGroupService, companyService } = useServices();
-  const { vm, config, manageCompaniesOpen, setManageCompaniesOpen, selectedGroup, setSelectedGroup } = useCompanyGroupViewModel();
+  const { 
+    vm, 
+    config, 
+    manageCompaniesOpen, 
+    setManageCompaniesOpen, 
+    selectedGroup, 
+    setSelectedGroup,
+    datePickerModalOpen,
+    setDatePickerModalOpen,
+    handleDatePickerConfirm,
+  } = useCompanyGroupViewModel();
   const [groupCompanies, setGroupCompanies] = useState<Company[]>([]);
   const [allCompanies, setAllCompanies] = useState<Company[]>([]);
   const [selectedCompanyIds, setSelectedCompanyIds] = useState<Set<string>>(new Set());
@@ -128,6 +139,16 @@ export function CompanyGroupView() {
           </div>
         )}
       </GenericModal>
+
+      {/* Date Picker Modal for Bulk Operations */}
+      <DatePickerModal
+        open={datePickerModalOpen}
+        onOpenChange={setDatePickerModalOpen}
+        onConfirm={handleDatePickerConfirm}
+        title={t("datePickerModal.title")}
+        description={t("datePickerModal.selectDate")}
+        required
+      />
     </>
   );
 }

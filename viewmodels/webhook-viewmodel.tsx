@@ -57,10 +57,22 @@ export function useWebhookViewModel() {
         const eventTypes = Array.isArray(data.eventTypes) 
           ? data.eventTypes.map(et => typeof et === 'string' ? parseInt(et) : et)
           : [];
+        
+        // Validate that at least one event type is selected
+        if (!Array.isArray(eventTypes) || eventTypes.length === 0) {
+          throw new Error(t("webhook.error.eventTypesRequired"));
+        }
+        
         const request = new CreateWebhookRequest({
           ...data,
           eventTypes: eventTypes as WebhookEventType[],
         });
+        
+        // Validate the request
+        if (!request.isValid) {
+          throw new Error(t("webhook.error.invalidRequest"));
+        }
+        
         return await webhookService.createWebhook(request);
       },
       update: async (id: string, data: UpdateWebhookRequest) => {
@@ -152,7 +164,7 @@ export function useWebhookViewModel() {
         },
         {
           key: "eventTypes",
-          label: t("webhook.eventTypes"),
+          label: t("webhook.eventTypes.title"),
           render: (_val: unknown, webhook: Webhook) => (
             <div className="flex flex-wrap gap-1">
               {webhook.eventTypes.map((et) => (
@@ -224,7 +236,7 @@ export function useWebhookViewModel() {
         },
         {
           name: "eventTypes",
-          label: t("webhook.eventTypes"),
+          label: t("webhook.eventTypes.title"),
           type: "multi-select" as const,
           placeholder: t("webhook.eventTypesPlaceholder"),
           options: eventTypeOptions,
@@ -264,7 +276,7 @@ export function useWebhookViewModel() {
         },
         {
           name: "eventTypes",
-          label: t("webhook.eventTypes"),
+          label: t("webhook.eventTypes.title"),
           type: "multi-select" as const,
           placeholder: t("webhook.eventTypesPlaceholder"),
           options: eventTypeOptions,

@@ -33,8 +33,10 @@ export class WebhookMapper {
    * Convert JSON/API response to Webhook domain model
    */
   static fromJson(json: any): Webhook {
-    const eventTypes = Array.isArray(json.eventTypes) 
-      ? json.eventTypes.map((et: any) => typeof et === 'number' ? et : WebhookEventType[et as keyof typeof WebhookEventType] || et)
+    // Backend uses "events" field, but we map it to "eventTypes" in domain model
+    const events = json.events || json.eventTypes || [];
+    const eventTypes = Array.isArray(events) 
+      ? events.map((et: any) => typeof et === 'number' ? et : WebhookEventType[et as keyof typeof WebhookEventType] || et)
       : [];
 
     return new Webhook({
@@ -46,7 +48,7 @@ export class WebhookMapper {
       isActive: json.isActive ?? true,
       retryCount: json.retryCount ?? 3,
       timeoutSeconds: json.timeoutSeconds ?? 30,
-      lastDeliveryAt: json.lastDeliveryAt,
+      lastDeliveryAt: json.lastDeliveryAt || json.lastTriggeredAt,
       lastDeliveryStatus: json.lastDeliveryStatus,
       createdAt: json.createdAt || json.createdTimestamp || new Date().toISOString(),
       updatedAt: json.updatedAt || json.updatedTimestamp,
@@ -103,7 +105,7 @@ export class WebhookMapper {
     const json: any = {
       companyId: request.companyId,
       url: request.url,
-      eventTypes: request.eventTypes,
+      events: request.eventTypes, // Backend expects "events" field
       isActive: request.isActive,
       retryCount: request.retryCount,
       timeoutSeconds: request.timeoutSeconds,
@@ -121,7 +123,7 @@ export class WebhookMapper {
     const json: any = {};
     if (request.url !== undefined) json.url = request.url;
     if (request.secret !== undefined) json.secret = request.secret;
-    if (request.eventTypes !== undefined) json.eventTypes = request.eventTypes;
+    if (request.eventTypes !== undefined) json.events = request.eventTypes; // Backend expects "events" field
     if (request.isActive !== undefined) json.isActive = request.isActive;
     if (request.retryCount !== undefined) json.retryCount = request.retryCount;
     if (request.timeoutSeconds !== undefined) json.timeoutSeconds = request.timeoutSeconds;
@@ -164,9 +166,10 @@ export class WebhookMapper {
             }
           };
         }
+        // Backend response format: { data: { webhooks: [...], pagination: {...} } }
         if ('webhooks' in data || 'hooks' in data) {
           const webhooks = data.webhooks || data.hooks || [];
-          const pagination = data.pagination || {};
+          const pagination = data.pagination || response.pagination || {};
           return {
             data: Array.isArray(webhooks) 
               ? webhooks.map((item: any) => this.fromJson(item))

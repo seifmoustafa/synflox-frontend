@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
+import { DatePickerModal } from "@/components/ui/date-picker-modal";
 import { useCompanyViewModel } from "@/viewmodels/company-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
 import { Copy, Check, Loader2, Calendar, Key } from "lucide-react";
@@ -32,6 +33,9 @@ export function CompanyView() {
     handleCopyLicenseKey,
     copied,
     licensingLoading,
+    datePickerModalOpen,
+    setDatePickerModalOpen,
+    handleDatePickerConfirm,
   } = useCompanyViewModel();
 
   const [activateExpiryDate, setActivateExpiryDate] = useState("");
@@ -212,6 +216,16 @@ export function CompanyView() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Date Picker Modal for Bulk Operations */}
+      <DatePickerModal
+        open={datePickerModalOpen}
+        onOpenChange={setDatePickerModalOpen}
+        onConfirm={handleDatePickerConfirm}
+        title={t("datePickerModal.title")}
+        description={t("datePickerModal.selectDate")}
+        required
+      />
     </>
   );
 }

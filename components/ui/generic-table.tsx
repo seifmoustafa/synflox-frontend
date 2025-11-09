@@ -89,13 +89,17 @@ interface Action<T> {
   /** Optional icon for the action */
   icon?: React.ComponentType<{ className?: string }>;
   /** Callback when the action is clicked */
-  onClick: (row: T) => void;
+  onClick: (row: T) => void | Promise<void>;
   /** Visual variant of the action */
   variant?: "default" | "destructive" | "ghost";
   /** Additional CSS classes */
   className?: string;
   /** Function to determine if the action should be shown */
   show?: (row: T) => boolean;
+  /** Loading state for async actions */
+  loading?: boolean | ((row: T) => boolean);
+  /** Whether the action is disabled */
+  disabled?: boolean | ((row: T) => boolean);
 }
 
 /**
@@ -1363,27 +1367,46 @@ export function GenericTable<T extends Record<string, any>>({
                                         (action) =>
                                           !action.show || action.show(row)
                                       )
-                                      .map((action, actionIndex) => (
-                                        <DropdownMenuItem
-                                          key={actionIndex}
-                                          onClick={() => action.onClick(row)}
-                                          className={cn(
-                                            "transition-all duration-200 cursor-pointer",
-                                            "hover:bg-primary/10 hover:shadow-sm",
-                                            action.variant === "destructive"
-                                              ? "text-destructive focus:text-destructive hover:bg-destructive/10"
-                                              : "hover:text-primary",
-                                            action.className
-                                          )}
-                                        >
-                                          {action.icon && (
-                                            <action.icon className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2 transition-transform duration-200 group-hover:scale-110" />
-                                          )}
-                                          <span className="font-medium">
-                                            {action.label}
-                                          </span>
-                                        </DropdownMenuItem>
-                                      ))}
+                                      .map((action, actionIndex) => {
+                                        const isLoading = typeof action.loading === 'function' 
+                                          ? action.loading(row) 
+                                          : action.loading || false;
+                                        const isDisabled = typeof action.disabled === 'function'
+                                          ? action.disabled(row)
+                                          : action.disabled || false;
+                                        
+                                        return (
+                                          <DropdownMenuItem
+                                            key={actionIndex}
+                                            onClick={async () => {
+                                              if (!isLoading && !isDisabled) {
+                                                await action.onClick(row);
+                                              }
+                                            }}
+                                            disabled={isLoading || isDisabled}
+                                            className={cn(
+                                              "transition-all duration-200",
+                                              (isLoading || isDisabled) 
+                                                ? "cursor-not-allowed opacity-50" 
+                                                : "cursor-pointer",
+                                              "hover:bg-primary/10 hover:shadow-sm",
+                                              action.variant === "destructive"
+                                                ? "text-destructive focus:text-destructive hover:bg-destructive/10"
+                                                : "hover:text-primary",
+                                              action.className
+                                            )}
+                                          >
+                                            {isLoading ? (
+                                              <Loader2 className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2 animate-spin" />
+                                            ) : action.icon ? (
+                                              <action.icon className="w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2 transition-transform duration-200 group-hover:scale-110" />
+                                            ) : null}
+                                            <span className="font-medium">
+                                              {action.label}
+                                            </span>
+                                          </DropdownMenuItem>
+                                        );
+                                      })}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </div>

@@ -36,7 +36,7 @@ import { useSettings } from "@/providers/settings-provider";
 import { cn, getHoverEffectClasses } from "@/lib/utils";
 import type { PaginationInfo } from "@/lib/pagination";
 import { useI18n } from "@/providers/i18n-provider";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { appLogger } from "@/lib/logger";
 
 /* ========================================
@@ -334,6 +334,9 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
     [deleteSystem, viewModel, config, t]
   );
 
+  // Track loading state for bulk actions
+  const [bulkActionLoading, setBulkActionLoading] = useState<Record<string, boolean>>({});
+
   // Generic bulk action handler
   const handleBulkAction = useCallback(
     async (action: BulkAction, selectedIds: string[]) => {
@@ -584,17 +587,24 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
                     !action.maxItems ||
                     viewModel.selectedItems.length <= action.maxItems;
                   const enabled = meetsMin && meetsMax;
+                  const isLoading = bulkActionLoading[action.label] || false;
 
                   return (
                     <Button
                       key={index}
-                      onClick={() =>
-                        handleBulkAction(action, viewModel.selectedItems)
-                      }
+                      onClick={async () => {
+                        setBulkActionLoading(prev => ({ ...prev, [action.label]: true }));
+                        try {
+                          await handleBulkAction(action, viewModel.selectedItems);
+                        } finally {
+                          setBulkActionLoading(prev => ({ ...prev, [action.label]: false }));
+                        }
+                      }}
                       variant={action.variant || "outline"}
                       size={getButtonSize()}
                       className="flex-1 sm:flex-none"
-                      disabled={!enabled}
+                      isLoading={isLoading}
+                      disabled={!enabled || isLoading}
                     >
                       {action.icon && (
                         <span className="mr-2">{action.icon}</span>

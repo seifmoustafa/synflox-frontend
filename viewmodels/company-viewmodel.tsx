@@ -28,6 +28,35 @@ export function useCompanyViewModel() {
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [licenseKey, setLicenseKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  
+  // Date picker modal states for bulk operations
+  const [datePickerModalOpen, setDatePickerModalOpen] = useState(false);
+  const [pendingBulkAction, setPendingBulkAction] = useState<{
+    action: 'activate' | 'extend';
+    selectedIds: string[];
+  } | null>(null);
+  
+  // Track loading state per action per company
+  const [actionLoading, setActionLoading] = useState<Record<string, Set<string>>>({});
+  
+  const setActionLoadingState = useCallback((action: string, companyId: string, loading: boolean) => {
+    setActionLoading(prev => {
+      const newState = { ...prev };
+      if (!newState[action]) {
+        newState[action] = new Set();
+      }
+      if (loading) {
+        newState[action].add(companyId);
+      } else {
+        newState[action].delete(companyId);
+      }
+      return newState;
+    });
+  }, []);
+  
+  const isActionLoading = useCallback((action: string, companyId: string) => {
+    return actionLoading[action]?.has(companyId) || false;
+  }, [actionLoading]);
 
   // Load subscription plans for dropdown
   useEffect(() => {
@@ -277,9 +306,14 @@ export function useCompanyViewModel() {
           {
             label: t("licensing.suspend"),
             onClick: async (item: Company) => {
-              const success = await licensingVm.suspendCompany(item.id);
-              if (success) {
-                await vm.refreshItems();
+              setActionLoadingState("suspend", item.id, true);
+              try {
+                const success = await licensingVm.suspendCompany(item.id);
+                if (success) {
+                  await vm.refreshItems();
+                }
+              } finally {
+                setActionLoadingState("suspend", item.id, false);
               }
             },
             variant: "ghost" as const,
@@ -288,13 +322,19 @@ export function useCompanyViewModel() {
             confirmTitle: t("licensing.suspend"),
             confirmDescription: t("licensing.confirmSuspend", { name: "{name}" }),
             confirmationVariant: "warning", // Use warning variant for suspend
+            loading: (item: Company) => isActionLoading("suspend", item.id),
           },
           {
             label: t("licensing.resume"),
             onClick: async (item: Company) => {
-              const success = await licensingVm.resumeCompany(item.id);
-              if (success) {
-                await vm.refreshItems();
+              setActionLoadingState("resume", item.id, true);
+              try {
+                const success = await licensingVm.resumeCompany(item.id);
+                if (success) {
+                  await vm.refreshItems();
+                }
+              } finally {
+                setActionLoadingState("resume", item.id, false);
               }
             },
             variant: "ghost" as const,
@@ -303,6 +343,7 @@ export function useCompanyViewModel() {
             confirmTitle: t("licensing.resume"),
             confirmDescription: t("licensing.confirmResume", { name: "{name}" }),
             confirmationVariant: "info", // Use info variant for resume
+            loading: (item: Company) => isActionLoading("resume", item.id),
           },
           {
             label: t("licensing.extend"),
@@ -319,16 +360,22 @@ export function useCompanyViewModel() {
           {
             label: t("licensing.generateKey"),
             onClick: async (item: Company) => {
-              const key = await licensingVm.generateLicenseKey(item.id);
-              if (key) {
-                setLicenseKey(key);
-                setSelectedCompany(item);
-                setLicenseKeyModalOpen(true);
-                await vm.refreshItems();
+              setActionLoadingState("generateKey", item.id, true);
+              try {
+                const key = await licensingVm.generateLicenseKey(item.id);
+                if (key) {
+                  setLicenseKey(key);
+                  setSelectedCompany(item);
+                  setLicenseKeyModalOpen(true);
+                  await vm.refreshItems();
+                }
+              } finally {
+                setActionLoadingState("generateKey", item.id, false);
               }
             },
             variant: "ghost" as const,
             className: "text-purple-600 hover:text-purple-700",
+            loading: (item: Company) => isActionLoading("generateKey", item.id),
           },
           {
             label: t("common.makeInactive"),
@@ -374,14 +421,8 @@ export function useCompanyViewModel() {
         {
           label: t("licensing.bulkActivate"),
           onClick: async (selectedIds: string[]) => {
-            // Show date picker modal for expiry date, then call bulkActivate
-            const expiryDate = prompt(t("company.expiryDate") + " (YYYY-MM-DD):");
-            if (expiryDate) {
-              const result = await licensingVm.bulkActivate(selectedIds, new Date(expiryDate).toISOString());
-              if (result) {
-                await vm.refreshItems();
-              }
-            }
+            setPendingBulkAction({ action: 'activate', selectedIds });
+            setDatePickerModalOpen(true);
           },
           confirmTitle: t("licensing.bulkActivate"),
           confirmDescription: t("licensing.confirmBulkActivate", { count: "{count}" }),
@@ -414,14 +455,8 @@ export function useCompanyViewModel() {
         {
           label: t("licensing.bulkExtend"),
           onClick: async (selectedIds: string[]) => {
-            // Show date picker modal for expiry date
-            const expiryDate = prompt(t("company.newExpiryDate") + " (YYYY-MM-DD):");
-            if (expiryDate) {
-              const result = await licensingVm.bulkExtend(selectedIds, new Date(expiryDate).toISOString());
-              if (result) {
-                await vm.refreshItems();
-              }
-            }
+            setPendingBulkAction({ action: 'extend', selectedIds });
+            setDatePickerModalOpen(true);
           },
           confirmTitle: t("licensing.bulkExtend"),
           confirmDescription: t("licensing.confirmBulkExtend", { count: "{count}" }),
@@ -487,6 +522,26 @@ export function useCompanyViewModel() {
     }
   }, [licenseKey]);
 
+  const handleDatePickerConfirm = useCallback(async (date: string) => {
+    if (!pendingBulkAction) return;
+    
+    const { action, selectedIds } = pendingBulkAction;
+    
+    if (action === 'activate') {
+      const result = await licensingVm.bulkActivate(selectedIds, date);
+      if (result) {
+        await vm.refreshItems();
+      }
+    } else if (action === 'extend') {
+      const result = await licensingVm.bulkExtend(selectedIds, date);
+      if (result) {
+        await vm.refreshItems();
+      }
+    }
+    
+    setPendingBulkAction(null);
+  }, [pendingBulkAction, licensingVm, vm]);
+
   return { 
     vm, 
     config, 
@@ -507,6 +562,10 @@ export function useCompanyViewModel() {
     handleCopyLicenseKey,
     copied,
     licensingLoading: licensingVm.loading,
+    // Date picker modal
+    datePickerModalOpen,
+    setDatePickerModalOpen,
+    handleDatePickerConfirm,
   };
 }
 
