@@ -57,6 +57,24 @@ interface CompanyDetailViewProps {
   companyId: string;
 }
 
+// Helper function to get CustomFieldType name
+const getCustomFieldTypeName = (fieldType: CustomFieldType): string => {
+  switch (fieldType) {
+    case CustomFieldType.String:
+      return 'string';
+    case CustomFieldType.Number:
+      return 'number';
+    case CustomFieldType.Boolean:
+      return 'boolean';
+    case CustomFieldType.Date:
+      return 'date';
+    case CustomFieldType.Json:
+      return 'json';
+    default:
+      return 'string';
+  }
+};
+
 export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
   const router = useRouter();
   const { companyService, companyCustomFieldService, subscriptionPlanService } = useServices();
@@ -924,7 +942,7 @@ export function CompanyDetailView({ companyId }: CompanyDetailViewProps) {
                         <div className="font-medium">{field.fieldName}</div>
                         <div className="text-sm text-muted-foreground mt-1">
                           <Badge variant="secondary" className="mr-2">
-                            {t(`company.detail.customFields.types.${CustomFieldType[field.fieldType]?.toLowerCase() || 'string'}`)}
+                            {t(`company.detail.customFields.types.${getCustomFieldTypeName(field.fieldType)}`)}
                           </Badge>
                           <span>{field.formattedValue}</span>
                         </div>

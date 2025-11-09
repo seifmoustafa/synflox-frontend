@@ -94,8 +94,27 @@ export class ApiKeyMapper {
    * Convert API response to CreateApiKeyResponse
    */
   static createResponseFromJson(response: any): CreateApiKeyResponse {
-    const apiKeyData = response?.data?.apiKey || response?.apiKey || response?.data || response;
-    const fullKey = response?.data?.fullKey || response?.fullKey || '';
+    // The API returns the full key in response.data.apiKey
+    // We need to extract it before creating the ApiKey object (which doesn't store the full key)
+    const responseData = response?.data || response;
+    const fullKey = responseData?.apiKey || responseData?.fullKey || response?.fullKey || '';
+    
+    // For the ApiKey object, we need to use the data without the full key
+    // The response.data contains id, apiKey (full), keyPrefix, signingSecret, etc.
+    // We need to construct the ApiKey from the available fields
+    const apiKeyData = {
+      id: responseData?.id || '',
+      companyId: responseData?.companyId || '',
+      keyPrefix: responseData?.keyPrefix || '',
+      keyHash: responseData?.keyHash || '',
+      name: responseData?.name || '',
+      description: responseData?.description,
+      isActive: responseData?.isActive ?? true,
+      lastUsedAt: responseData?.lastUsedAt,
+      expiresAt: responseData?.expiresAt,
+      createdAt: responseData?.createdAt || responseData?.createdTimestamp || new Date().toISOString(),
+      updatedAt: responseData?.updatedAt || responseData?.updatedTimestamp,
+    };
     
     return new CreateApiKeyResponse({
       apiKey: this.fromJson(apiKeyData),
@@ -107,8 +126,27 @@ export class ApiKeyMapper {
    * Convert API response to RegenerateApiKeyResponse
    */
   static regenerateResponseFromJson(response: any): RegenerateApiKeyResponse {
-    const apiKeyData = response?.data?.apiKey || response?.apiKey || response?.data || response;
-    const fullKey = response?.data?.fullKey || response?.fullKey || '';
+    // The API returns the full key in response.data.apiKey
+    // We need to extract it before creating the ApiKey object (which doesn't store the full key)
+    const responseData = response?.data || response;
+    const fullKey = responseData?.apiKey || responseData?.fullKey || response?.fullKey || '';
+    
+    // For the ApiKey object, we need to use the data without the full key
+    // The response.data contains id, apiKey (full), keyPrefix, signingSecret, etc.
+    // We need to construct the ApiKey from the available fields
+    const apiKeyData = {
+      id: responseData?.id || '',
+      companyId: responseData?.companyId || '',
+      keyPrefix: responseData?.keyPrefix || '',
+      keyHash: responseData?.keyHash || '',
+      name: responseData?.name || '',
+      description: responseData?.description,
+      isActive: responseData?.isActive ?? true,
+      lastUsedAt: responseData?.lastUsedAt,
+      expiresAt: responseData?.expiresAt,
+      createdAt: responseData?.createdAt || responseData?.createdTimestamp || new Date().toISOString(),
+      updatedAt: responseData?.updatedAt || responseData?.updatedTimestamp,
+    };
     
     return new RegenerateApiKeyResponse({
       apiKey: this.fromJson(apiKeyData),
