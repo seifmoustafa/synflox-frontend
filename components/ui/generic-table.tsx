@@ -58,7 +58,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, ArrowUpDown, Search } from "lucide-react";
+import { MoreHorizontal, ArrowUpDown, Search, Loader2 } from "lucide-react";
 import GenericSelect from "@/components/ui/generic-select";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSettings } from "@/providers/settings-provider";

@@ -36,6 +36,11 @@ export function useCompanyViewModel() {
     selectedIds: string[];
   } | null>(null);
   
+  // Export modal states
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'xlsx' | 'csv'>('xlsx');
+  const [exporting, setExporting] = useState(false);
+  
   // Track loading state per action per company
   const [actionLoading, setActionLoading] = useState<Record<string, Set<string>>>({});
   
@@ -377,32 +382,32 @@ export function useCompanyViewModel() {
             className: "text-purple-600 hover:text-purple-700",
             loading: (item: Company) => isActionLoading("generateKey", item.id),
           },
-          {
-            label: t("common.makeInactive"),
-            onClick: async (item: Company) => {
-              await companyService.toggleActive(item.id, false);
-              await vm.refreshItems();
-            },
-            variant: "ghost" as const,
-            className: "text-orange-600 hover:text-orange-700",
-            show: (item: Company) => item.isActive === true,
-            confirmTitle: t("common.makeInactive"),
-            confirmDescription: t("common.confirmMakeInactive", { name: "{name}" }),
-            confirmationVariant: "warning", // Use warning variant for make inactive
-          },
-          {
-            label: t("common.makeActive"),
-            onClick: async (item: Company) => {
-              await companyService.toggleActive(item.id, true);
-              await vm.refreshItems();
-            },
-            variant: "ghost" as const,
-            className: "text-green-600 hover:text-green-700",
-            show: (item: Company) => item.isActive !== true,
-            confirmTitle: t("common.makeActive"),
-            confirmDescription: t("common.confirmMakeActive", { name: "{name}" }),
-            confirmationVariant: "info", // Use info variant for make active
-          },
+          // {
+          //   label: t("common.makeInactive"),
+          //   onClick: async (item: Company) => {
+          //     await companyService.toggleActive(item.id, false);
+          //     await vm.refreshItems();
+          //   },
+          //   variant: "ghost" as const,
+          //   className: "text-orange-600 hover:text-orange-700",
+          //   show: (item: Company) => item.isActive === true,
+          //   confirmTitle: t("common.makeInactive"),
+          //   confirmDescription: t("common.confirmMakeInactive", { name: "{name}" }),
+          //   confirmationVariant: "warning", // Use warning variant for make inactive
+          // },
+          // {
+          //   label: t("common.makeActive"),
+          //   onClick: async (item: Company) => {
+          //     await companyService.toggleActive(item.id, true);
+          //     await vm.refreshItems();
+          //   },
+          //   variant: "ghost" as const,
+          //   className: "text-green-600 hover:text-green-700",
+          //   show: (item: Company) => item.isActive !== true,
+          //   confirmTitle: t("common.makeActive"),
+          //   confirmDescription: t("common.confirmMakeActive", { name: "{name}" }),
+          //   confirmationVariant: "info", // Use info variant for make active
+          // },
           {
             label: t("common.delete"),
             onClick: (item: Company) => handleDelete?.(item),
@@ -467,21 +472,7 @@ export function useCompanyViewModel() {
         {
           label: t("company.export"),
           onClick: async () => {
-            // Show dropdown to select format
-            const format = confirm(t("company.exportFormatPrompt")) ? 'excel' : 'csv';
-            try {
-              const blob = await companyService.exportCompanies(format);
-              const url = window.URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `companies.${format === 'excel' ? 'xlsx' : 'csv'}`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              window.URL.revokeObjectURL(url);
-            } catch (e) {
-              // Error already shown by service
-            }
+            setExportModalOpen(true);
           },
           variant: "outline" as const,
         },
@@ -496,7 +487,8 @@ export function useCompanyViewModel() {
             input.onchange = async (e) => {
               const file = (e.target as HTMLInputElement).files?.[0];
               if (file) {
-                const format = file.name.endsWith('.xlsx') || file.name.endsWith('.xls') ? 'excel' : 'csv';
+                // Determine format from file extension
+                const format: 'xlsx' | 'csv' = file.name.endsWith('.xlsx') || file.name.endsWith('.xls') ? 'xlsx' : 'csv';
                 try {
                   await companyService.importCompanies(file, format);
                   await vm.refreshItems();
@@ -511,7 +503,7 @@ export function useCompanyViewModel() {
         },
       ],
     }),
-    [t, setActivateModalOpen, setExtendModalOpen, setLicenseKeyModalOpen, setSelectedCompany, setLicenseKey, licensingVm, vm, handleDelete, companyService, subscriptionPlanOptions]
+    [t, setActivateModalOpen, setExtendModalOpen, setLicenseKeyModalOpen, setSelectedCompany, setLicenseKey, licensingVm, vm, handleDelete, companyService, subscriptionPlanOptions, setExportModalOpen]
   );
 
   const handleCopyLicenseKey = useCallback(async () => {
@@ -542,6 +534,19 @@ export function useCompanyViewModel() {
     setPendingBulkAction(null);
   }, [pendingBulkAction, licensingVm, vm]);
 
+  const handleExport = useCallback(async () => {
+    setExporting(true);
+    try {
+      await companyService.exportCompanies(exportFormat);
+      setExportModalOpen(false);
+      setExportFormat('xlsx'); // Reset to default
+    } catch (e) {
+      // Error already shown by service
+    } finally {
+      setExporting(false);
+    }
+  }, [exportFormat, companyService]);
+
   return { 
     vm, 
     config, 
@@ -566,6 +571,13 @@ export function useCompanyViewModel() {
     datePickerModalOpen,
     setDatePickerModalOpen,
     handleDatePickerConfirm,
+    // Export modal
+    exportModalOpen,
+    setExportModalOpen,
+    exportFormat,
+    setExportFormat,
+    exporting,
+    handleExport,
   };
 }
 

@@ -11,7 +11,8 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { DatePickerModal } from "@/components/ui/date-picker-modal";
 import { useCompanyViewModel } from "@/viewmodels/company-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
-import { Copy, Check, Loader2, Calendar, Key } from "lucide-react";
+import { Copy, Check, Loader2, Calendar, Key, Download } from "lucide-react";
+import GenericSelect from "@/components/ui/generic-select";
 
 export function CompanyView() {
   const { t } = useI18n();
@@ -36,6 +37,12 @@ export function CompanyView() {
     datePickerModalOpen,
     setDatePickerModalOpen,
     handleDatePickerConfirm,
+    exportModalOpen,
+    setExportModalOpen,
+    exportFormat,
+    setExportFormat,
+    exporting,
+    handleExport,
   } = useCompanyViewModel();
 
   const [activateExpiryDate, setActivateExpiryDate] = useState("");
@@ -226,6 +233,52 @@ export function CompanyView() {
         description={t("datePickerModal.selectDate")}
         required
       />
+
+      {/* Export Modal */}
+      <GenericModal
+        open={exportModalOpen}
+        onOpenChange={setExportModalOpen}
+        title={t("company.export")}
+        description={t("company.exportDescription")}
+        size="md"
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>{t("company.exportFormat")}</Label>
+            <GenericSelect
+              options={[
+                { value: 'xlsx', label: t("company.exportFormatXlsx") },
+                { value: 'csv', label: t("company.exportFormatCsv") },
+              ]}
+              value={exportFormat}
+              onValueChange={(value: string | string[]) => {
+                setExportFormat((Array.isArray(value) ? value[0] : value) as 'xlsx' | 'csv');
+              }}
+              placeholder={t("company.exportFormatPlaceholder")}
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setExportModalOpen(false);
+                setExportFormat('xlsx');
+              }}
+              disabled={exporting}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={handleExport}
+              disabled={exporting}
+              isLoading={exporting}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {t("company.export")}
+            </Button>
+          </div>
+        </div>
+      </GenericModal>
     </>
   );
 }

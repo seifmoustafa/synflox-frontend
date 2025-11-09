@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { ProjectDetailView } from "@/components/app_views/project-detail-view";
+import { ProjectDetailView } from "@/views/project-detail-view";
 
 interface ProjectDetailPageProps {
   params: Promise<{

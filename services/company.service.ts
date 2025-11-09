@@ -29,8 +29,8 @@ export interface ICompanyService {
   createCompany(data: CreateCompanyRequest): Promise<Company>;
   updateCompany(id: string, data: UpdateCompanyRequest): Promise<Company>;
   deleteCompany(id: string): Promise<void>;
-  exportCompanies(format: 'csv' | 'excel'): Promise<Blob>;
-  importCompanies(file: File, format: 'csv' | 'excel'): Promise<{ totalRows: number; imported: number; errors: Array<{ row: number; field: string; message: string }>; errorCount: number }>;
+  exportCompanies(format: 'xlsx' | 'csv'): Promise<Blob>;
+  importCompanies(file: File, format: 'xlsx' | 'csv'): Promise<{ totalRows: number; imported: number; errors: Array<{ row: number; field: string; message: string }>; errorCount: number }>;
 }
 
 export class CompanyService implements ICompanyService {
@@ -137,9 +137,9 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async exportCompanies(format: 'csv' | 'excel'): Promise<Blob> {
+  async exportCompanies(format: 'xlsx' | 'csv'): Promise<Blob> {
     try {
-      // SYNFLOX API: GET /api/companies/export?format=csv|excel
+      // SYNFLOX API: GET /api/companies/export?format=xlsx|csv
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
       const url = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
       const token = secureTokenService.getAccessToken();
@@ -161,7 +161,29 @@ export class CompanyService implements ICompanyService {
         throw new Error(errorData.message || `Failed to export companies as ${format}`);
       }
 
+      // Get the file from response body
       const blob = await response.blob();
+      
+      // Extract filename from Content-Disposition header if available
+      const contentDisposition = response.headers.get('content-disposition');
+      let filename = `companies_export.${format}`;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1].replace(/['"]/g, '');
+        }
+      }
+      
+      // Download the file
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(downloadUrl);
+      
       this.notificationService.success(`Companies exported successfully as ${format.toUpperCase()}`);
       return blob;
     } catch (e) {
@@ -171,12 +193,11 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async importCompanies(file: File, format: 'csv' | 'excel'): Promise<{ totalRows: number; imported: number; errors: Array<{ row: number; field: string; message: string }>; errorCount: number }> {
+  async importCompanies(file: File, format: 'xlsx' | 'csv'): Promise<{ totalRows: number; imported: number; errors: Array<{ row: number; field: string; message: string }>; errorCount: number }> {
     try {
-      // SYNFLOX API: POST /api/companies/import (multipart/form-data)
+      // SYNFLOX API: POST /api/companies/import?format=xlsx|csv (multipart/form-data)
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('format', format);
 
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
       const url = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
@@ -184,7 +205,7 @@ export class CompanyService implements ICompanyService {
       const language = typeof window !== 'undefined' ? localStorage.getItem('language') || 'ar' : 'ar';
 
       const response = await fetch(
-        `${url}${API_ENDPOINTS.COMPANIES_IMPORT}`,
+        `${url}${API_ENDPOINTS.COMPANIES_IMPORT}?format=${format}`,
         {
           method: 'POST',
           headers: {

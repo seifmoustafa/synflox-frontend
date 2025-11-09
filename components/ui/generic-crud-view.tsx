@@ -363,22 +363,33 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
   // Generic custom action handler
   const handleCustomAction = useCallback(
     async (action: CustomAction) => {
-      await deleteSystem.confirmDelete(
-        async () => {
-          await action.onClick();
-          await viewModel.refreshItems();
-        },
-        {
-          itemName: t("common.allItems"),
-          itemType: config?.itemTypeKey ? t(config.itemTypeKey) : t("common.item"),
-          confirmTitle: action.confirmTitle || action.label,
-          confirmDescription:
+      // If action has confirmTitle, it needs confirmation
+      if (action.confirmTitle || action.confirmDescription) {
+        // Use generic confirmation dialog for custom actions
+        confirmationDialog.showConfirmation({
+          title: action.confirmTitle || action.label,
+          description:
             action.confirmDescription ||
             t("common.confirmAction", { action: action.label.toLowerCase() }),
-        }
-      );
+          confirmText: action.label,
+          cancelText: t("common.cancel"),
+          onConfirm: async () => {
+            await action.onClick();
+            await viewModel.refreshItems();
+            confirmationDialog.hideConfirmation();
+          },
+          onCancel: () => {
+            confirmationDialog.hideConfirmation();
+          },
+          variant: "default",
+        });
+      } else {
+        // No confirmation needed, just execute
+        await action.onClick();
+        await viewModel.refreshItems();
+      }
     },
-    [deleteSystem, viewModel, config, t]
+    [confirmationDialog, viewModel, config, t]
   );
 
   // Generic individual action handler
@@ -566,11 +577,12 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
           {config?.customActions?.map((action, index) => (
             <Button
               key={index}
-              onClick={action.onClick}
+              onClick={() => handleCustomAction(action)}
               variant={action.variant || "default"}
               size={getButtonSize()}
               className={cn("flex-1 sm:flex-none", action.className)}
               disabled={action.disabled}
+              isLoading={action.loading}
             >
               {action.icon && <span className="mr-2">{action.icon}</span>}
               {action.label}

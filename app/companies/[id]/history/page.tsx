@@ -1,4 +1,4 @@
-import { SubscriptionHistoryView } from "@/components/app_views/subscription-history-view";
+import { SubscriptionHistoryView } from "@/views/subscription-history-view";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 interface CompanyHistoryPageProps {

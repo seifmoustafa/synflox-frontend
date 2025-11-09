@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { ApiKeyDetailView } from "@/components/app_views/api-key-detail-view";
+import { ApiKeyDetailView } from "@/views/api-key-detail-view";
 
 interface ApiKeyDetailPageProps {
   params: Promise<{

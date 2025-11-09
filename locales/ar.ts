@@ -62,6 +62,10 @@ export const ar = {
 
   // Company
   company: {
+    subscriptionPlan: "خطة الاشتراك",
+    subscriptionPlanPlaceholder: "اختر خطة الاشتراك",
+    import: "استيراد",
+    export: "تصدير",
     title: "إدارة الشركات",
     description: "إدارة الشركات والاشتراكات",
     item: "شركة",
@@ -3065,6 +3069,11 @@ export const ar = {
     create: "إنشاء",
     export: "تصدير",
     exportFormatPrompt: "تصدير كملف Excel؟ (موافق لـ Excel، إلغاء لـ CSV)",
+    exportDescription: "اختر تنسيق تصدير بيانات الشركات",
+    exportFormat: "تنسيق التصدير",
+    exportFormatXlsx: "Excel (XLSX)",
+    exportFormatCsv: "CSV",
+    exportFormatPlaceholder: "اختر تنسيق التصدير",
     import: "استيراد",
     save: "حفظ",
     cancel: "إلغاء",

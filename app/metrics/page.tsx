@@ -1,4 +1,4 @@
-import { MetricsView } from "@/components/app_views/metrics-view";
+import { MetricsView } from "@/views/metrics-view";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 export default async function MetricsPage() {

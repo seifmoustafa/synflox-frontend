@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { WebhookDetailView } from "@/components/app_views/webhook-detail-view";
+import { WebhookDetailView } from "@/views/webhook-detail-view";
 
 interface WebhookDetailPageProps {
   params: Promise<{

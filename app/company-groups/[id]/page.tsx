@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { CompanyGroupDetailView } from "@/components/app_views/company-group-detail-view";
+import { CompanyGroupDetailView } from "@/views/company-group-detail-view";
 
 interface CompanyGroupDetailPageProps {
   params: Promise<{

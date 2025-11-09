@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import { ModuleDetailView } from "@/components/app_views/module-detail-view";
+import { ModuleDetailView } from "@/views/module-detail-view";
 
 interface ModuleDetailPageProps {
   params: Promise<{
