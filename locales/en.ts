@@ -63,6 +63,18 @@ export const en = {
 
   // Company
   company: {
+    exportDescription: "Select the format for exporting companies data",
+    exportFormat: "Export Format",
+    exportFormatXlsx: "Excel (XLSX)",
+    exportFormatCsv: "CSV",
+    exportFormatPlaceholder: "Select export format",
+    exportCreating: "Creating export file...",
+    exportSuccess: "Export file created successfully! Download starting...",
+    exportCompleted: "Download Complete",
+    subscriptionPlan: "Subscription Plan",
+    subscriptionPlanPlaceholder: "Select subscription plan",
+    import: "Import",
+    export: "Export",
     title: "Companies Management",
     description: "Manage companies and subscriptions",
     item: "Company",
@@ -129,7 +141,8 @@ export const en = {
         start: "Start Trial",
         startDescription: "Start a trial period for this company",
         convert: "Convert to Paid",
-        convertDescription: "Convert this trial subscription to a paid subscription",
+        convertDescription:
+          "Convert this trial subscription to a paid subscription",
         days: "Trial Duration (days)",
       },
       subscriptionPlan: {
@@ -156,7 +169,8 @@ export const en = {
         description: "View subscription history and audit logs",
         viewHistory: "View Full History",
         embedded: "History timeline will be displayed here",
-        embeddedDescription: "Click 'View Full History' to see complete subscription history",
+        embeddedDescription:
+          "Click 'View Full History' to see complete subscription history",
         noHistory: "No subscription history available",
         showMore: "Show {{count}} more",
         showLess: "Show Less",
@@ -190,18 +204,11 @@ export const en = {
     isTrial: "Is Trial",
     trial: "Trial",
     trialBadge: "Trial",
-    subscriptionPlan: "Subscription Plan",
-    subscriptionPlanPlaceholder: "Select subscription plan",
-    export: "Export",
+
     exportCsv: "Export as CSV",
     exportExcel: "Export as Excel",
     exportFormatPrompt: "Export as Excel? (OK for Excel, Cancel for CSV)",
-    exportDescription: "Select the format for exporting companies data",
-    exportFormat: "Export Format",
-    exportFormatXlsx: "Excel (XLSX)",
-    exportFormatCsv: "CSV",
-    exportFormatPlaceholder: "Select export format",
-    import: "Import",
+
     importCompanies: "Import Companies",
     exportCompanies: "Export Companies",
   },
@@ -308,7 +315,8 @@ export const en = {
       updatedAt: "Updated At",
       noDescription: "No description",
       projectsDescription: "Projects that include this module ({count} total)",
-      plansDescription: "Subscription plans that include this module ({count} total)",
+      plansDescription:
+        "Subscription plans that include this module ({count} total)",
       noProjects: "This module is not assigned to any projects",
       noPlans: "This module is not included in any subscription plans",
       statistics: "Statistics",
@@ -360,7 +368,8 @@ export const en = {
       addSelected: "Add Selected",
       noCompaniesAvailable: "No companies available to add",
       removeCompany: "Remove Company",
-      confirmRemoveCompany: "Are you sure you want to remove {{name}} from this group?",
+      confirmRemoveCompany:
+        "Are you sure you want to remove {{name}} from this group?",
       bulkOperations: "Bulk Operations",
       bulkActivate: "Bulk Activate",
       bulkSuspend: "Bulk Suspend",
@@ -402,12 +411,15 @@ export const en = {
     expired: "Expired",
     regenerate: "Regenerate",
     confirmRegenerate: "Regenerate API Key",
-    confirmRegenerateDescription: "Are you sure you want to regenerate the API key '{name}'? The old key will be invalidated and cannot be used anymore.",
+    confirmRegenerateDescription:
+      "Are you sure you want to regenerate the API key '{name}'? The old key will be invalidated and cannot be used anymore.",
     fullKey: "Full API Key",
     showKey: {
       title: "API Key Created",
-      description: "This is your API key. Copy it now - you won't be able to see it again!",
-      warning: "Make sure to copy your API key now. You won't be able to see it again after closing this dialog.",
+      description:
+        "This is your API key. Copy it now - you won't be able to see it again!",
+      warning:
+        "Make sure to copy your API key now. You won't be able to see it again after closing this dialog.",
     },
     detail: {
       title: "API Key Details",
@@ -426,11 +438,14 @@ export const en = {
       noDescription: "No description",
       regenerate: "Regenerate Key",
       revoke: "Revoke Key",
-      confirmDelete: "Are you sure you want to revoke this API key? This action cannot be undone.",
+      confirmDelete:
+        "Are you sure you want to revoke this API key? This action cannot be undone.",
       usageDescription: "API key usage statistics and analytics",
-      usageStatsNote: "Usage statistics are tracked automatically. Detailed analytics coming soon.",
+      usageStatsNote:
+        "Usage statistics are tracked automatically. Detailed analytics coming soon.",
       settingsDescription: "API key settings and configuration",
-      settingsNote: "Settings can be modified using the Edit button. IP whitelisting and rate limiting features coming soon.",
+      settingsNote:
+        "Settings can be modified using the Edit button. IP whitelisting and rate limiting features coming soon.",
       neverUsed: "Never used",
     },
     error: {
@@ -492,7 +507,8 @@ export const en = {
     },
     error: {
       eventTypesRequired: "At least one event type must be selected",
-      invalidRequest: "Invalid webhook request. Please check all required fields.",
+      invalidRequest:
+        "Invalid webhook request. Please check all required fields.",
       loadFailed: "Failed to load webhook",
       notFound: "Webhook not found",
       title: "Error Loading Webhook",
@@ -515,7 +531,8 @@ export const en = {
       deliveryHistory: "Delivery history for this webhook",
       noDeliveries: "No deliveries recorded yet",
       retryFailed: "Retry Failed Deliveries",
-      confirmDelete: "Are you sure you want to delete this webhook? This action cannot be undone.",
+      confirmDelete:
+        "Are you sure you want to delete this webhook? This action cannot be undone.",
       settingsDescription: "Webhook settings and configuration",
       settingsNote: "Settings can be modified using the Edit button.",
       editNote: "Use the Edit button in the header to modify webhook settings.",
@@ -657,24 +674,30 @@ export const en = {
     requirements: "Password Requirements",
     minLength: "Minimum Length",
     requireUppercase: "Require Uppercase",
-    requireUppercaseDescription: "Password must contain at least one uppercase letter",
+    requireUppercaseDescription:
+      "Password must contain at least one uppercase letter",
     requireLowercase: "Require Lowercase",
-    requireLowercaseDescription: "Password must contain at least one lowercase letter",
+    requireLowercaseDescription:
+      "Password must contain at least one lowercase letter",
     requireNumbers: "Require Numbers",
     requireNumbersDescription: "Password must contain at least one number",
     requireSpecialCharacters: "Require Special Characters",
-    requireSpecialCharactersDescription: "Password must contain at least one special character",
+    requireSpecialCharactersDescription:
+      "Password must contain at least one special character",
     expiration: "Password Expiration",
     maxAgeDays: "Maximum Age (Days)",
     maxAgeDaysPlaceholder: "Enter days (0 = no expiration)",
-    maxAgeDaysDescription: "Number of days before password expires (0 = never expires)",
+    maxAgeDaysDescription:
+      "Number of days before password expires (0 = never expires)",
     preventReuseCount: "Prevent Reuse Count",
     preventReuseCountPlaceholder: "Enter number of previous passwords",
-    preventReuseCountDescription: "Number of previous passwords that cannot be reused",
+    preventReuseCountDescription:
+      "Number of previous passwords that cannot be reused",
     lockout: "Account Lockout",
     lockoutAttempts: "Lockout Attempts",
     lockoutAttemptsPlaceholder: "Enter number of failed attempts",
-    lockoutAttemptsDescription: "Number of failed login attempts before account lockout",
+    lockoutAttemptsDescription:
+      "Number of failed login attempts before account lockout",
     lockoutDurationMinutes: "Lockout Duration (Minutes)",
     lockoutDurationMinutesPlaceholder: "Enter minutes",
     lockoutDurationMinutesDescription: "Duration of account lockout in minutes",
@@ -793,7 +816,8 @@ export const en = {
       features: "Features",
       featuresDescription: "Plan features and capabilities",
       noFeatures: "No features defined",
-      modulesDescription: "Project modules assigned to this plan ({count} enabled)",
+      modulesDescription:
+        "Project modules assigned to this plan ({count} enabled)",
       companiesDescription: "Companies using this plan ({count} total)",
       statisticsDescription: "Plan usage statistics and metrics",
       noModules: "No modules assigned to this plan",
@@ -896,9 +920,12 @@ export const en = {
     bulkActivate: "Activate Selected",
     bulkDeactivate: "Deactivate Selected",
     bulkDelete: "Delete Selected",
-    confirmBulkActivate: "Are you sure you want to activate {count} selected admins?",
-    confirmBulkDeactivate: "Are you sure you want to deactivate {count} selected admins?",
-    confirmBulkDelete: "Are you sure you want to delete {count} selected admins? This action cannot be undone.",
+    confirmBulkActivate:
+      "Are you sure you want to activate {count} selected admins?",
+    confirmBulkDeactivate:
+      "Are you sure you want to deactivate {count} selected admins?",
+    confirmBulkDelete:
+      "Are you sure you want to delete {count} selected admins? This action cannot be undone.",
   },
 
   // Admin Type
@@ -917,9 +944,12 @@ export const en = {
     bulkActivate: "Activate Selected",
     bulkDeactivate: "Deactivate Selected",
     bulkDelete: "Delete Selected",
-    confirmBulkActivate: "Are you sure you want to activate {count} selected admin types?",
-    confirmBulkDeactivate: "Are you sure you want to deactivate {count} selected admin types?",
-    confirmBulkDelete: "Are you sure you want to delete {count} selected admin types? This action cannot be undone.",
+    confirmBulkActivate:
+      "Are you sure you want to activate {count} selected admin types?",
+    confirmBulkDeactivate:
+      "Are you sure you want to deactivate {count} selected admin types?",
+    confirmBulkDelete:
+      "Are you sure you want to delete {count} selected admin types? This action cannot be undone.",
   },
 
   // Dashboard
@@ -3850,7 +3880,8 @@ export const en = {
   // Confirmation Dialog
   confirmationDialog: {
     deleteItem: "Delete Item",
-    deleteDescription: "Are you sure you want to delete this item? This action cannot be undone.",
+    deleteDescription:
+      "Are you sure you want to delete this item? This action cannot be undone.",
     warning: "Warning",
     warningDescription: "Please confirm this action.",
     information: "Information",

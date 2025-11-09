@@ -29,7 +29,7 @@ export interface ICompanyService {
   createCompany(data: CreateCompanyRequest): Promise<Company>;
   updateCompany(id: string, data: UpdateCompanyRequest): Promise<Company>;
   deleteCompany(id: string): Promise<void>;
-  exportCompanies(format: 'xlsx' | 'csv'): Promise<Blob>;
+  exportCompanies(format: 'xlsx' | 'csv'): Promise<void>;
   importCompanies(file: File, format: 'xlsx' | 'csv'): Promise<{ totalRows: number; imported: number; errors: Array<{ row: number; field: string; message: string }>; errorCount: number }>;
 }
 
@@ -137,55 +137,111 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async exportCompanies(format: 'xlsx' | 'csv'): Promise<Blob> {
+  async exportCompanies(format: 'xlsx' | 'csv'): Promise<void> {
     try {
-      // SYNFLOX API: GET /api/companies/export?format=xlsx|csv
+      // SYNFLOX API: POST /api/companies/export?format=excel|csv
+      // Step 1: Create export file and get download URL
+      // Note: Backend expects "excel" not "xlsx"
+      const apiFormat = format === 'xlsx' ? 'excel' : format;
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
       const url = baseUrl.startsWith('http') ? baseUrl : `https://${baseUrl}`;
       const token = secureTokenService.getAccessToken();
       const language = typeof window !== 'undefined' ? localStorage.getItem('language') || 'ar' : 'ar';
 
-      const response = await fetch(
-        `${url}${API_ENDPOINTS.COMPANIES_EXPORT}?format=${format}`,
+      const createResponse = await fetch(
+        `${url}${API_ENDPOINTS.COMPANIES_EXPORT}?format=${apiFormat}`,
         {
-          method: 'GET',
+          method: 'POST',
           headers: {
             'Authorization': token ? `Bearer ${token}` : '',
             'Accept-Language': language,
+            'Content-Type': 'application/json',
           },
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to export companies as ${format}`);
+      if (!createResponse.ok) {
+        let errorMessage = `Failed to create export file as ${format}`;
+        try {
+          const errorData = await createResponse.json();
+          errorMessage = errorData.message || errorData.data?.message || errorMessage;
+        } catch {
+          const errorText = await createResponse.text().catch(() => '');
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
-      // Get the file from response body
-      const blob = await response.blob();
+      // Parse the response to get download URL and filename
+      const result = await createResponse.json();
+      const exportData = result?.data || result;
       
-      // Extract filename from Content-Disposition header if available
-      const contentDisposition = response.headers.get('content-disposition');
-      let filename = `companies_export.${format}`;
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-        if (filenameMatch && filenameMatch[1]) {
-          filename = filenameMatch[1].replace(/['"]/g, '');
-        }
+      if (!exportData?.downloadUrl) {
+        throw new Error('Export file created but no download URL received');
       }
+
+      const downloadUrl = exportData.downloadUrl;
+      const fileName = exportData.fileName || `companies_export_${new Date().toISOString().replace(/[:.]/g, '-')}.${format}`;
+      const fileSize = exportData.fileSize;
+
+      // Ensure we're in browser environment
+      if (typeof window === 'undefined') {
+        throw new Error('File download is only available in browser environment');
+      }
+
+      // Step 2: Download the file (auto-deletes after download)
+      // Using fetch + blob method for better UX (doesn't navigate away from page)
+      const downloadResponse = await fetch(downloadUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Accept-Language': language,
+        },
+      });
+
+      if (!downloadResponse.ok) {
+        let errorMessage = 'Failed to download export file';
+        try {
+          const errorData = await downloadResponse.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          const errorText = await downloadResponse.text().catch(() => '');
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Get the file blob from response
+      const blob = await downloadResponse.blob();
       
-      // Download the file
-      const downloadUrl = window.URL.createObjectURL(blob);
+      if (blob.size === 0) {
+        throw new Error('Downloaded file is empty');
+      }
+
+      // Create download link and trigger download
+      const blobUrl = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = filename;
+      a.href = blobUrl;
+      a.download = fileName;
+      a.style.display = 'none';
       document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(downloadUrl);
       
-      this.notificationService.success(`Companies exported successfully as ${format.toUpperCase()}`);
-      return blob;
+      // Trigger download
+      a.click();
+      
+      // Cleanup after download starts
+      setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+        if (document.body.contains(a)) {
+          document.body.removeChild(a);
+        }
+      }, 1000);
+      
+      // Success notification with file details
+      const fileSizeText = fileSize ? ` (${(fileSize / 1024).toFixed(2)} KB)` : '';
+      this.notificationService.success(
+        `Export file created successfully. Downloading ${fileName}${fileSizeText}...`
+      );
     } catch (e) {
       const errorMessage = e instanceof Error ? e.message : `Failed to export companies as ${format}`;
       this.notificationService.error(errorMessage);

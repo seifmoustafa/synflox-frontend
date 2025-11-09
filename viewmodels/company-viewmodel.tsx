@@ -13,6 +13,12 @@ import type {
 } from "@/domain";
 import type { CrudConfig } from "@/components/ui/generic-crud-view";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
+import GenericSelect from "@/components/ui/generic-select";
+import { Copy, Check, Calendar, Key, Download, Loader2 } from "lucide-react";
 
 export function useCompanyViewModel() {
   const router = useRouter();
@@ -21,25 +27,9 @@ export function useCompanyViewModel() {
   const licensingVm = useLicensingViewModel();
   const [subscriptionPlanOptions, setSubscriptionPlanOptions] = useState<Array<{value: string, label: string}>>([]);
   
-  // Licensing modal states
-  const [activateModalOpen, setActivateModalOpen] = useState(false);
-  const [extendModalOpen, setExtendModalOpen] = useState(false);
-  const [licenseKeyModalOpen, setLicenseKeyModalOpen] = useState(false);
+  // Licensing state (for license key modal)
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
   const [licenseKey, setLicenseKey] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  
-  // Date picker modal states for bulk operations
-  const [datePickerModalOpen, setDatePickerModalOpen] = useState(false);
-  const [pendingBulkAction, setPendingBulkAction] = useState<{
-    action: 'activate' | 'extend';
-    selectedIds: string[];
-  } | null>(null);
-  
-  // Export modal states
-  const [exportModalOpen, setExportModalOpen] = useState(false);
-  const [exportFormat, setExportFormat] = useState<'xlsx' | 'csv'>('xlsx');
-  const [exporting, setExporting] = useState(false);
   
   // Track loading state per action per company
   const [actionLoading, setActionLoading] = useState<Record<string, Set<string>>>({});
@@ -111,25 +101,6 @@ export function useCompanyViewModel() {
     await vm.refreshItems();
   }, [companyService, vm]);
 
-  const handleActivate = useCallback(async (expiryDate: string) => {
-    if (!selectedCompany) return;
-    const success = await licensingVm.activateCompany(selectedCompany.id, expiryDate);
-    if (success) {
-      setActivateModalOpen(false);
-      setSelectedCompany(null);
-      await vm.refreshItems();
-    }
-  }, [selectedCompany, licensingVm, vm]);
-
-  const handleExtend = useCallback(async (newExpiryDate: string) => {
-    if (!selectedCompany) return;
-    const success = await licensingVm.extendCompany(selectedCompany.id, newExpiryDate);
-    if (success) {
-      setExtendModalOpen(false);
-      setSelectedCompany(null);
-      await vm.refreshItems();
-    }
-  }, [selectedCompany, licensingVm, vm]);
 
   const config: CrudConfig<Company> = useMemo(
     () => ({
@@ -300,13 +271,80 @@ export function useCompanyViewModel() {
         actions.push(
           {
             label: t("licensing.activate"),
-            onClick: (item: Company) => {
-              setSelectedCompany(item);
-              setActivateModalOpen(true);
-            },
             variant: "ghost" as const,
             show: (item: Company) => status(item)?.toLowerCase() !== "active",
             className: "text-green-600 hover:text-green-700",
+            modal: {
+              title: (item?: Company) => t("licensing.activate"),
+              description: (item?: Company) => item ? t("company.activateDescription").replace("{{name}}", item.name) : "",
+              size: "md",
+              content: (item?: Company, context?: any, onClose?: () => void) => {
+                // Use closure to access viewmodel state
+                const ActivateModalContent = () => {
+                  const [expiryDate, setExpiryDate] = useState("");
+                  const [submitting, setSubmitting] = useState(false);
+                  
+                  const handleSubmit = async (e: React.FormEvent) => {
+                    e.preventDefault();
+                    if (!expiryDate || !item) return;
+                    setSubmitting(true);
+                    try {
+                      const success = await licensingVm.activateCompany(item!.id, new Date(expiryDate).toISOString());
+                      if (success) {
+                        onClose?.();
+                        await vm.refreshItems();
+                      }
+                    } finally {
+                      setSubmitting(false);
+                    }
+                  };
+
+                  return (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="activateExpiryDate">{t("company.expiryDate")}</Label>
+                        <DatePicker
+                          id="activateExpiryDate"
+                          value={expiryDate}
+                          onChange={setExpiryDate}
+                          placeholder={t("company.expiryDatePlaceholder")}
+                          required
+                          type="date"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={onClose}
+                          disabled={submitting}
+                        >
+                          {t("common.cancel")}
+                        </Button>
+                        <Button
+                          type="submit"
+                          disabled={licensingVm.loading || !expiryDate || submitting}
+                        >
+                          {submitting || licensingVm.loading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              {t("common.loading")}
+                            </>
+                          ) : (
+                            <>
+                              <Calendar className="w-4 h-4 mr-2" />
+                              {t("licensing.activate")}
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  );
+                };
+                return <ActivateModalContent />;
+              },
+              refreshAfterModal: true,
+            },
           },
           {
             label: t("licensing.suspend"),
@@ -352,18 +390,87 @@ export function useCompanyViewModel() {
           },
           {
             label: t("licensing.extend"),
-            onClick: (item: Company) => {
-              setSelectedCompany(item);
-              setExtendModalOpen(true);
-            },
             variant: "ghost" as const,
             show: (item: Company) => {
               const itemStatus = status(item)?.toLowerCase();
               return itemStatus === "active" || itemStatus === "expired";
             },
+            modal: {
+              title: (item?: Company) => t("licensing.extend"),
+              description: (item?: Company) => item ? t("company.extendDescription").replace("{{name}}", item.name) : "",
+              size: "md",
+              content: (item?: Company, context?: any, onClose?: () => void) => {
+                const ExtendModalContent = () => {
+                  const [expiryDate, setExpiryDate] = useState("");
+                  const [submitting, setSubmitting] = useState(false);
+                  
+                  const handleSubmit = async (e: React.FormEvent) => {
+                    e.preventDefault();
+                    if (!expiryDate || !item) return;
+                    setSubmitting(true);
+                    try {
+                      const success = await licensingVm.extendCompany(item!.id, new Date(expiryDate).toISOString());
+                      if (success) {
+                        onClose?.();
+                        await vm.refreshItems();
+                      }
+                    } finally {
+                      setSubmitting(false);
+                    }
+                  };
+
+                  return (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="extendExpiryDate">{t("company.newExpiryDate")}</Label>
+                        <DatePicker
+                          id="extendExpiryDate"
+                          value={expiryDate}
+                          onChange={setExpiryDate}
+                          placeholder={t("company.expiryDatePlaceholder")}
+                          required
+                          type="date"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={onClose}
+                          disabled={submitting}
+                        >
+                          {t("common.cancel")}
+                        </Button>
+                        <Button
+                          type="submit"
+                          disabled={licensingVm.loading || !expiryDate || submitting}
+                        >
+                          {submitting || licensingVm.loading ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              {t("common.loading")}
+                            </>
+                          ) : (
+                            <>
+                              <Calendar className="w-4 h-4 mr-2" />
+                              {t("licensing.extend")}
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  );
+                };
+                return <ExtendModalContent />;
+              },
+              refreshAfterModal: true,
+            },
           },
           {
             label: t("licensing.generateKey"),
+            variant: "ghost" as const,
+            className: "text-purple-600 hover:text-purple-700",
+            loading: (item: Company) => isActionLoading("generateKey", item.id),
             onClick: async (item: Company) => {
               setActionLoadingState("generateKey", item.id, true);
               try {
@@ -371,16 +478,71 @@ export function useCompanyViewModel() {
                 if (key) {
                   setLicenseKey(key);
                   setSelectedCompany(item);
-                  setLicenseKeyModalOpen(true);
-                  await vm.refreshItems();
+                  // Show license key modal
+                  // Note: This will be handled by a separate modal trigger
                 }
+                await vm.refreshItems();
               } finally {
                 setActionLoadingState("generateKey", item.id, false);
               }
             },
-            variant: "ghost" as const,
-            className: "text-purple-600 hover:text-purple-700",
-            loading: (item: Company) => isActionLoading("generateKey", item.id),
+            modal: {
+              title: t("licensing.viewKey"),
+              description: (item?: Company) => item ? t("company.licenseKeyDescription").replace("{{name}}", item.name) : "",
+              size: "md",
+              content: (item?: Company, context?: any, onClose?: () => void) => {
+                const LicenseKeyModalContent = () => {
+                  const [copiedState, setCopiedState] = useState(false);
+                  const currentKey = licenseKey || item?.licenseKey || "";
+                  
+                  const handleCopy = async () => {
+                    if (currentKey) {
+                      await navigator.clipboard.writeText(currentKey);
+                      setCopiedState(true);
+                      setTimeout(() => setCopiedState(false), 2000);
+                    }
+                  };
+
+                  return (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>{t("company.licenseKey")}</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            value={currentKey}
+                            readOnly
+                            className="font-mono text-sm"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={handleCopy}
+                            title={t("common.copy")}
+                          >
+                            {copiedState ? (
+                              <Check className="w-4 h-4 text-green-600" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </div>
+                        {copiedState && (
+                          <p className="text-sm text-green-600">{t("common.copied")}</p>
+                        )}
+                      </div>
+                      <div className="flex justify-end">
+                        <Button onClick={onClose}>
+                          {t("common.close")}
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                };
+                return <LicenseKeyModalContent />;
+              },
+              refreshAfterModal: false,
+            },
           },
           // {
           //   label: t("common.makeInactive"),
@@ -425,13 +587,78 @@ export function useCompanyViewModel() {
       bulkActions: [
         {
           label: t("licensing.bulkActivate"),
-          onClick: async (selectedIds: string[]) => {
-            setPendingBulkAction({ action: 'activate', selectedIds });
-            setDatePickerModalOpen(true);
-          },
           confirmTitle: t("licensing.bulkActivate"),
           confirmDescription: t("licensing.confirmBulkActivate", { count: "{count}" }),
           variant: "default" as const,
+          onClick: async (selectedIds: string[]) => {
+            // Modal will be opened by GenericCrudView
+          },
+          modal: {
+            title: (item?: any, context?: { selectedIds: string[]; count: number }) => t("licensing.bulkActivate"),
+            description: (item?: any, context?: { selectedIds: string[]; count: number }) => t("datePickerModal.selectDate"),
+            size: "md",
+            content: (item?: any, context?: { selectedIds: string[]; count: number }, onClose?: () => void) => {
+              const BulkActivateModalContent = () => {
+                const [expiryDate, setExpiryDate] = useState("");
+                const [submitting, setSubmitting] = useState(false);
+                
+                const handleSubmit = async (e: React.FormEvent) => {
+                  e.preventDefault();
+                  if (!expiryDate || !context?.selectedIds?.length) return;
+                  setSubmitting(true);
+                  try {
+                    const result = await licensingVm.bulkActivate(context?.selectedIds || [], expiryDate);
+                    if (result) {
+                      onClose?.();
+                      await vm.refreshItems();
+                    }
+                  } finally {
+                    setSubmitting(false);
+                  }
+                };
+
+                return (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>{t("company.expiryDate")}</Label>
+                      <DatePicker
+                        value={expiryDate}
+                        onChange={setExpiryDate}
+                        placeholder={t("company.expiryDatePlaceholder")}
+                        required
+                        type="date"
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onClose}
+                        disabled={submitting}
+                      >
+                        {t("common.cancel")}
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={!expiryDate || submitting}
+                      >
+                        {submitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            {t("common.loading")}
+                          </>
+                        ) : (
+                          t("licensing.bulkActivate")
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                );
+              };
+              return <BulkActivateModalContent />;
+            },
+            refreshAfterModal: true,
+          },
         },
         {
           label: t("licensing.bulkSuspend"),
@@ -459,22 +686,183 @@ export function useCompanyViewModel() {
         },
         {
           label: t("licensing.bulkExtend"),
-          onClick: async (selectedIds: string[]) => {
-            setPendingBulkAction({ action: 'extend', selectedIds });
-            setDatePickerModalOpen(true);
-          },
           confirmTitle: t("licensing.bulkExtend"),
           confirmDescription: t("licensing.confirmBulkExtend", { count: "{count}" }),
           variant: "default" as const,
+          onClick: async (selectedIds: string[]) => {
+            // Modal will be opened by GenericCrudView
+          },
+          modal: {
+            title: (item?: any, context?: { selectedIds: string[]; count: number }) => t("licensing.bulkExtend"),
+            description: (item?: any, context?: { selectedIds: string[]; count: number }) => t("datePickerModal.selectDate"),
+            size: "md",
+            content: (item?: any, context?: { selectedIds: string[]; count: number }, onClose?: () => void) => {
+              const BulkExtendModalContent = () => {
+                const [expiryDate, setExpiryDate] = useState("");
+                const [submitting, setSubmitting] = useState(false);
+                
+                const handleSubmit = async (e: React.FormEvent) => {
+                  e.preventDefault();
+                  if (!expiryDate || !context?.selectedIds?.length) return;
+                  setSubmitting(true);
+                  try {
+                    const result = await licensingVm.bulkExtend(context?.selectedIds || [], expiryDate);
+                    if (result) {
+                      onClose?.();
+                      await vm.refreshItems();
+                    }
+                  } finally {
+                    setSubmitting(false);
+                  }
+                };
+
+                return (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>{t("company.newExpiryDate")}</Label>
+                      <DatePicker
+                        value={expiryDate}
+                        onChange={setExpiryDate}
+                        placeholder={t("company.expiryDatePlaceholder")}
+                        required
+                        type="date"
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onClose}
+                        disabled={submitting}
+                      >
+                        {t("common.cancel")}
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={!expiryDate || submitting}
+                      >
+                        {submitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            {t("common.loading")}
+                          </>
+                        ) : (
+                          t("licensing.bulkExtend")
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                );
+              };
+              return <BulkExtendModalContent />;
+            },
+            refreshAfterModal: true,
+          },
         },
       ],
       customActions: [
         {
           label: t("company.export"),
-          onClick: async () => {
-            setExportModalOpen(true);
-          },
           variant: "outline" as const,
+          onClick: async () => {
+            // Modal will be opened by GenericCrudView
+          },
+          modal: {
+            title: t("company.export"),
+            description: t("company.exportDescription"),
+            size: "md",
+            content: (item?: any, context?: any, onClose?: () => void) => {
+              const ExportModalContent = () => {
+                const [format, setFormat] = useState<'xlsx' | 'csv'>('xlsx');
+                const [isExporting, setIsExporting] = useState(false);
+                const [exportStatus, setExportStatus] = useState<'idle' | 'creating' | 'downloading' | 'success'>('idle');
+                
+                const handleExport = async () => {
+                  setIsExporting(true);
+                  setExportStatus('creating');
+                  
+                  try {
+                    await companyService.exportCompanies(format);
+                    setExportStatus('success');
+                    // Close modal after a short delay to show success
+                    setTimeout(() => {
+                      onClose?.();
+                    }, 1500);
+                  } catch (error) {
+                    // Error already shown by service
+                    setExportStatus('idle');
+                    // Don't close modal on error so user can try again
+                  } finally {
+                    setIsExporting(false);
+                  }
+                };
+
+                return (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>{t("company.exportFormat")}</Label>
+                      <GenericSelect
+                        options={[
+                          { value: 'xlsx', label: t("company.exportFormatXlsx") },
+                          { value: 'csv', label: t("company.exportFormatCsv") },
+                        ]}
+                        value={format}
+                        onValueChange={(value: string | string[]) => {
+                          setFormat((Array.isArray(value) ? value[0] : value) as 'xlsx' | 'csv');
+                        }}
+                        placeholder={t("company.exportFormatPlaceholder")}
+                        disabled={isExporting}
+                      />
+                    </div>
+                    
+                    {/* Export Status Messages */}
+                    {exportStatus === 'creating' && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>{t("company.exportCreating")}</span>
+                      </div>
+                    )}
+                    
+                    {exportStatus === 'success' && (
+                      <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                        <Check className="w-4 h-4" />
+                        <span>{t("company.exportSuccess")}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={onClose}
+                        disabled={isExporting}
+                      >
+                        {t("common.cancel")}
+                      </Button>
+                      <Button
+                        onClick={handleExport}
+                        disabled={isExporting || exportStatus === 'success'}
+                        isLoading={isExporting}
+                      >
+                        {exportStatus === 'success' ? (
+                          <>
+                            <Check className="w-4 h-4 mr-2" />
+                            {t("company.exportCompleted")}
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-4 h-4 mr-2" />
+                            {t("company.export")}
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                );
+              };
+              return <ExportModalContent />;
+            },
+            refreshAfterModal: false,
+          },
         },
         {
           label: t("company.import"),
@@ -503,81 +891,16 @@ export function useCompanyViewModel() {
         },
       ],
     }),
-    [t, setActivateModalOpen, setExtendModalOpen, setLicenseKeyModalOpen, setSelectedCompany, setLicenseKey, licensingVm, vm, handleDelete, companyService, subscriptionPlanOptions, setExportModalOpen]
+    [t, setSelectedCompany, setLicenseKey, licensingVm, vm, handleDelete, companyService, subscriptionPlanOptions, licenseKey]
   );
 
-  const handleCopyLicenseKey = useCallback(async () => {
-    if (licenseKey) {
-      await navigator.clipboard.writeText(licenseKey);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [licenseKey]);
 
-  const handleDatePickerConfirm = useCallback(async (date: string) => {
-    if (!pendingBulkAction) return;
-    
-    const { action, selectedIds } = pendingBulkAction;
-    
-    if (action === 'activate') {
-      const result = await licensingVm.bulkActivate(selectedIds, date);
-      if (result) {
-        await vm.refreshItems();
-      }
-    } else if (action === 'extend') {
-      const result = await licensingVm.bulkExtend(selectedIds, date);
-      if (result) {
-        await vm.refreshItems();
-      }
-    }
-    
-    setPendingBulkAction(null);
-  }, [pendingBulkAction, licensingVm, vm]);
-
-  const handleExport = useCallback(async () => {
-    setExporting(true);
-    try {
-      await companyService.exportCompanies(exportFormat);
-      setExportModalOpen(false);
-      setExportFormat('xlsx'); // Reset to default
-    } catch (e) {
-      // Error already shown by service
-    } finally {
-      setExporting(false);
-    }
-  }, [exportFormat, companyService]);
 
   return { 
     vm, 
     config, 
     handleDelete,
     handleToggleActive,
-    // Licensing modals
-    activateModalOpen,
-    setActivateModalOpen,
-    extendModalOpen,
-    setExtendModalOpen,
-    licenseKeyModalOpen,
-    setLicenseKeyModalOpen,
-    selectedCompany,
-    setSelectedCompany,
-    licenseKey,
-    handleActivate,
-    handleExtend,
-    handleCopyLicenseKey,
-    copied,
-    licensingLoading: licensingVm.loading,
-    // Date picker modal
-    datePickerModalOpen,
-    setDatePickerModalOpen,
-    handleDatePickerConfirm,
-    // Export modal
-    exportModalOpen,
-    setExportModalOpen,
-    exportFormat,
-    setExportFormat,
-    exporting,
-    handleExport,
   };
 }
 

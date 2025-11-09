@@ -63,6 +63,28 @@ export interface CrudColumn<TItem = any> {
 }
 
 /**
+ * Modal configuration for actions
+ */
+export interface ActionModalConfig<TItem = any, TContext = any> {
+  /** Modal title */
+  title: string | ((item?: TItem, context?: TContext) => string);
+  /** Modal description */
+  description?: string | ((item?: TItem, context?: TContext) => string);
+  /** Modal content (React component or render function) */
+  content: React.ReactNode | ((item?: TItem, context?: TContext, onClose?: () => void) => React.ReactNode);
+  /** Modal size */
+  size?: "sm" | "md" | "lg" | "xl" | "full";
+  /** Whether to show header */
+  showHeader?: boolean;
+  /** Whether to show description */
+  showDescription?: boolean;
+  /** Custom modal key for re-rendering */
+  modalKey?: string | ((item?: TItem, context?: TContext) => string);
+  /** Whether to refresh items after modal closes (default: true) */
+  refreshAfterModal?: boolean;
+}
+
+/**
  * Configuration for individual row actions
  * @template TItem - The type of items the action operates on
  */
@@ -93,6 +115,10 @@ export interface CrudAction<TItem = any> {
   tooltip?: string;
   /** Loading state for async actions */
   loading?: boolean;
+  /** Modal configuration - if provided, opens modal instead of direct onClick */
+  modal?: ActionModalConfig<TItem>;
+  /** Whether to refresh items after modal action completes */
+  refreshAfterModal?: boolean;
 }
 
 /**
@@ -119,6 +145,10 @@ export interface BulkAction {
   maxItems?: number;
   /** Whether the action requires confirmation */
   requiresConfirmation?: boolean;
+  /** Modal configuration - if provided, opens modal instead of direct onClick */
+  modal?: ActionModalConfig<any, { selectedIds: string[]; count: number }>;
+  /** Whether to refresh items after modal action completes */
+  refreshAfterModal?: boolean;
 }
 
 /**
@@ -145,6 +175,10 @@ export interface CustomAction {
   tooltip?: string;
   /** Loading state for async actions */
   loading?: boolean;
+  /** Modal configuration - if provided, opens modal instead of direct onClick */
+  modal?: ActionModalConfig;
+  /** Whether to refresh items after modal action completes */
+  refreshAfterModal?: boolean;
 }
 
 /**
@@ -337,32 +371,69 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
   // Track loading state for bulk actions
   const [bulkActionLoading, setBulkActionLoading] = useState<Record<string, boolean>>({});
 
+  // Modal state management
+  const [activeModal, setActiveModal] = useState<{
+    type: 'action' | 'bulk' | 'custom';
+    actionKey: string;
+    item?: T;
+    context?: any;
+    config: ActionModalConfig;
+  } | null>(null);
+
   // Generic bulk action handler
   const handleBulkAction = useCallback(
     async (action: BulkAction, selectedIds: string[]) => {
-      await deleteSystem.confirmDelete(
-        async () => {
-          await action.onClick(selectedIds);
-          await viewModel.refreshItems();
-        },
-        {
-          itemName: `${selectedIds.length} items`,
-          itemType: config?.itemTypeKey ? t(config.itemTypeKey) : "Items",
-          confirmTitle: action.confirmTitle || action.label,
-          confirmDescription:
-            action.confirmDescription ||
-            `Are you sure you want to ${action.label.toLowerCase()} ${
-              selectedIds.length
-            } items?`,
-        }
-      );
+      // If action has modal configuration, open modal
+      if (action.modal) {
+        setActiveModal({
+          type: 'bulk',
+          actionKey: action.label,
+          context: { selectedIds, count: selectedIds.length },
+          config: action.modal,
+        });
+        return;
+      }
+
+      // Use confirmation dialog if needed
+      if (action.confirmTitle || action.confirmDescription || action.requiresConfirmation) {
+        await deleteSystem.confirmDelete(
+          async () => {
+            await action.onClick(selectedIds);
+            await viewModel.refreshItems();
+          },
+          {
+            itemName: `${selectedIds.length} items`,
+            itemType: config?.itemTypeKey ? t(config.itemTypeKey) : "Items",
+            confirmTitle: action.confirmTitle || action.label,
+            confirmDescription:
+              action.confirmDescription?.replace("{count}", selectedIds.length.toString()) ||
+              `Are you sure you want to ${action.label.toLowerCase()} ${
+                selectedIds.length
+              } items?`,
+          }
+        );
+      } else {
+        // No confirmation needed
+        await action.onClick(selectedIds);
+        await viewModel.refreshItems();
+      }
     },
-    [deleteSystem, viewModel, config, t]
+    [viewModel, config, t, deleteSystem]
   );
 
   // Generic custom action handler
   const handleCustomAction = useCallback(
     async (action: CustomAction) => {
+      // If action has modal configuration, open modal
+      if (action.modal) {
+        setActiveModal({
+          type: 'custom',
+          actionKey: action.label,
+          config: action.modal,
+        });
+        return;
+      }
+
       // If action has confirmTitle, it needs confirmation
       if (action.confirmTitle || action.confirmDescription) {
         // Use generic confirmation dialog for custom actions
@@ -392,9 +463,28 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
     [confirmationDialog, viewModel, config, t]
   );
 
+  // Handle modal close
+  const handleModalClose = useCallback(async (shouldRefresh?: boolean) => {
+    if (shouldRefresh && activeModal?.config.refreshAfterModal !== false) {
+      await viewModel.refreshItems();
+    }
+    setActiveModal(null);
+  }, [activeModal, viewModel]);
+
   // Generic individual action handler
   const handleIndividualAction = useCallback(
     async (action: any, item: any) => {
+      // If action has modal configuration, open modal
+      if (action.modal) {
+        setActiveModal({
+          type: 'action',
+          actionKey: action.label,
+          item,
+          config: action.modal,
+        });
+        return;
+      }
+
       // If action has confirmTitle, it needs confirmation
       if (action.confirmTitle || action.confirmDescription) {
         const itemDisplayName = config?.getItemDisplayName
@@ -405,7 +495,7 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
         if (action.isDeleteAction) {
           await deleteSystem.confirmDelete(
             async () => {
-              await action.onClick(item);
+              await action.onClick?.(item);
               await viewModel.refreshItems();
             },
             {
@@ -427,7 +517,7 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
             confirmText: action.label,
             cancelText: t("common.cancel"),
             onConfirm: async () => {
-              await action.onClick(item);
+              await action.onClick?.(item);
               await viewModel.refreshItems();
               confirmationDialog.hideConfirmation();
             },
@@ -439,7 +529,7 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
         }
       } else {
         // No confirmation needed, just execute and refresh
-        await action.onClick(item);
+        await action.onClick?.(item);
         await viewModel.refreshItems();
       }
     },
@@ -808,6 +898,43 @@ export function GenericCrudView<T>(props: GenericCrudViewProps<T>) {
 
       {/* Generic confirmation dialog for non-delete actions */}
       {confirmationDialog.ConfirmationDialog && <confirmationDialog.ConfirmationDialog />}
+
+      {/* Dynamic Modal for Actions */}
+      {activeModal && (() => {
+        const { config: modalConfig, item, context } = activeModal;
+        const title = typeof modalConfig.title === 'function' 
+          ? modalConfig.title(item, context) 
+          : modalConfig.title;
+        const description = typeof modalConfig.description === 'function'
+          ? modalConfig.description(item, context)
+          : modalConfig.description;
+        const modalKey = typeof modalConfig.modalKey === 'function'
+          ? modalConfig.modalKey(item, context)
+          : modalConfig.modalKey || activeModal.actionKey;
+        const content = typeof modalConfig.content === 'function'
+          ? modalConfig.content(item, context, () => handleModalClose(true))
+          : modalConfig.content;
+
+        return (
+          <GenericModal
+            key={modalKey}
+            open={true}
+            onOpenChange={(open) => {
+              if (!open) {
+                handleModalClose(false);
+              }
+            }}
+            title={title}
+            description={description}
+            size={modalConfig.size || "md"}
+            showHeader={modalConfig.showHeader !== false}
+            showDescription={modalConfig.showDescription !== false}
+            formKey={modalKey}
+          >
+            {content}
+          </GenericModal>
+        );
+      })()}
     </div>
   );
 }
