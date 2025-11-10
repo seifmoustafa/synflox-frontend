@@ -11,6 +11,14 @@ export enum BillingCycle {
   OneTime = 4,
 }
 
+export enum PlanTier {
+  Free = 0,
+  Basic = 1,
+  Pro = 2,
+  Enterprise = 3,
+  Ultimate = 4,
+}
+
 export interface SubscriptionPlanData {
   id: string; // Encrypted GUID
   name: string;
@@ -106,14 +114,14 @@ export class SubscriptionPlan {
    * Get plan tier display name
    */
   get planTierName(): string {
-    const tierNames: Record<number, string> = {
-      0: "Free",
-      1: "Basic", 
-      2: "Pro",
-      3: "Enterprise",
-      4: "Ultimate"
+    const tierNames: Record<PlanTier, string> = {
+      [PlanTier.Free]: "Free",
+      [PlanTier.Basic]: "Basic", 
+      [PlanTier.Pro]: "Pro",
+      [PlanTier.Enterprise]: "Enterprise",
+      [PlanTier.Ultimate]: "Ultimate"
     };
-    return tierNames[this.planTier] || `Tier ${this.planTier}`;
+    return tierNames[this.planTier as PlanTier] || `Tier ${this.planTier}`;
   }
 }
 

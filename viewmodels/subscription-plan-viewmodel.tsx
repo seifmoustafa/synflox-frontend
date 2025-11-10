@@ -1,12 +1,12 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import { useGenericCrudViewModel } from "@/hooks/use-generic-crud-viewmodel";
 import type { SubscriptionPlan, CreateSubscriptionPlanRequest, UpdateSubscriptionPlanRequest } from "@/domain";
-import { SubscriptionPlanMapper, BillingCycle } from "@/domain";
+import { SubscriptionPlanMapper, BillingCycle, PlanTier } from "@/domain";
 import type { CrudConfig } from "@/components/ui/generic-crud-view";
 import { Badge } from "@/components/ui/badge";
 
@@ -16,6 +16,7 @@ export function useSubscriptionPlanViewModel() {
   const { t } = useI18n();
   const [moduleAssignmentOpen, setModuleAssignmentOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
+  const [availablePlans, setAvailablePlans] = useState<SubscriptionPlan[]>([]);
 
   const vm = useGenericCrudViewModel<
     SubscriptionPlan,
@@ -60,6 +61,42 @@ export function useSubscriptionPlanViewModel() {
     return names[cycle] || t("subscriptionPlan.billingCycle.unknown");
   }, [t]);
 
+  const getPlanTierName = useCallback((tier: PlanTier): string => {
+    const names: Record<PlanTier, string> = {
+      [PlanTier.Free]: t("subscriptionPlan.planTier.free"),
+      [PlanTier.Basic]: t("subscriptionPlan.planTier.basic"),
+      [PlanTier.Pro]: t("subscriptionPlan.planTier.pro"),
+      [PlanTier.Enterprise]: t("subscriptionPlan.planTier.enterprise"),
+      [PlanTier.Ultimate]: t("subscriptionPlan.planTier.ultimate"),
+    };
+    return names[tier] || t("subscriptionPlan.planTier.unknown");
+  }, [t]);
+
+  // Fetch available plans for parent plan selection
+  const fetchAvailablePlans = useCallback(async () => {
+    try {
+      const response = await subscriptionPlanService.getPlans({ page: 1, pageSize: 100 });
+      setAvailablePlans(response.data);
+    } catch (error) {
+      console.error("Failed to fetch subscription plans:", error);
+    }
+  }, [subscriptionPlanService]);
+
+  // Get plan options excluding current plan (for edit)
+  const getParentPlanOptions = useCallback((excludePlanId?: string) => {
+    return availablePlans
+      .filter(plan => plan.id !== excludePlanId)
+      .map(plan => ({
+        value: plan.id,
+        label: `${plan.name} (${getPlanTierName(plan.planTier as PlanTier)})`,
+      }));
+  }, [availablePlans, getPlanTierName]);
+
+  // Fetch plans on mount
+  useEffect(() => {
+    fetchAvailablePlans();
+  }, [fetchAvailablePlans]);
+
   const config: CrudConfig<SubscriptionPlan> = useMemo(
     () => ({
       titleKey: "subscriptionPlan.title",
@@ -81,7 +118,7 @@ export function useSubscriptionPlanViewModel() {
         },
         {
           key: "billingCycle",
-          label: t("subscriptionPlan.billingCycle"),
+          label: t("subscriptionPlan.billingCycle.title"),
           render: (_val: unknown, plan: SubscriptionPlan) => (
             <Badge variant="secondary">
               {getBillingCycleName(plan.billingCycle)}
@@ -108,10 +145,10 @@ export function useSubscriptionPlanViewModel() {
         },
         {
           key: "planTier",
-          label: t("subscriptionPlan.planTier"),
+          label: t("subscriptionPlan.planTier.title"),
           render: (_val: unknown, plan: SubscriptionPlan) => (
             <Badge variant="outline">
-              {plan.planTierName}
+              {getPlanTierName(plan.planTier as PlanTier)}
             </Badge>
           ),
         },
@@ -135,7 +172,7 @@ export function useSubscriptionPlanViewModel() {
         },
         {
           name: "description",
-          label: t("subscriptionPlan.description"),
+          label: t("subscriptionPlan.tableDescription"),
           type: "textarea" as const,
           placeholder: t("subscriptionPlan.descriptionPlaceholder"),
         },
@@ -155,7 +192,7 @@ export function useSubscriptionPlanViewModel() {
         },
         {
           name: "billingCycle",
-          label: t("subscriptionPlan.billingCycle"),
+          label: t("subscriptionPlan.billingCycle.title"),
           type: "select" as const,
           placeholder: t("subscriptionPlan.billingCyclePlaceholder"),
           required: true,
@@ -174,16 +211,25 @@ export function useSubscriptionPlanViewModel() {
         },
         {
           name: "planTier",
-          label: t("subscriptionPlan.planTier"),
-          type: "number" as const,
+          label: t("subscriptionPlan.planTier.title"),
+          type: "select" as const,
           placeholder: t("subscriptionPlan.planTierPlaceholder"),
+          options: [
+            { value: PlanTier.Free.toString(), label: t("subscriptionPlan.planTier.free") },
+            { value: PlanTier.Basic.toString(), label: t("subscriptionPlan.planTier.basic") },
+            { value: PlanTier.Pro.toString(), label: t("subscriptionPlan.planTier.pro") },
+            { value: PlanTier.Enterprise.toString(), label: t("subscriptionPlan.planTier.enterprise") },
+            { value: PlanTier.Ultimate.toString(), label: t("subscriptionPlan.planTier.ultimate") },
+          ],
         },
         {
           name: "parentPlanId",
           label: t("subscriptionPlan.parentPlan"),
-          type: "select" as const,
+          type: "searchable-select" as const,
           placeholder: t("subscriptionPlan.parentPlanPlaceholder"),
-          options: [], // Will be populated dynamically with available plans
+          searchPlaceholder: t("subscriptionPlan.searchParentPlan"),
+          options: getParentPlanOptions(),
+          allowClear: true,
         },
         {
           name: "isActive",
@@ -201,7 +247,7 @@ export function useSubscriptionPlanViewModel() {
         },
         {
           name: "description",
-          label: t("subscriptionPlan.description"),
+          label: t("subscriptionPlan.tableDescription"),
           type: "textarea" as const,
           placeholder: t("subscriptionPlan.descriptionPlaceholder"),
         },
@@ -221,7 +267,7 @@ export function useSubscriptionPlanViewModel() {
         },
         {
           name: "billingCycle",
-          label: t("subscriptionPlan.billingCycle"),
+          label: t("subscriptionPlan.billingCycle.title"),
           type: "select" as const,
           placeholder: t("subscriptionPlan.billingCyclePlaceholder"),
           required: true,
@@ -241,20 +287,24 @@ export function useSubscriptionPlanViewModel() {
         {
           name: "planTier",
           label: t("subscriptionPlan.planTier"),
-          type: "number" as const,
+          type: "select" as const,
           placeholder: t("subscriptionPlan.planTierPlaceholder"),
+          options: [
+            { value: PlanTier.Free.toString(), label: t("subscriptionPlan.planTier.free") },
+            { value: PlanTier.Basic.toString(), label: t("subscriptionPlan.planTier.basic") },
+            { value: PlanTier.Pro.toString(), label: t("subscriptionPlan.planTier.pro") },
+            { value: PlanTier.Enterprise.toString(), label: t("subscriptionPlan.planTier.enterprise") },
+            { value: PlanTier.Ultimate.toString(), label: t("subscriptionPlan.planTier.ultimate") },
+          ],
         },
         {
           name: "parentPlanId",
           label: t("subscriptionPlan.parentPlan"),
-          type: "select" as const,
+          type: "searchable-select" as const,
           placeholder: t("subscriptionPlan.parentPlanPlaceholder"),
-          options: [], // Will be populated dynamically with available plans
-        },
-        {
-          name: "isActive",
-          label: t("subscriptionPlan.isActive"),
-          type: "checkbox" as const,
+          searchPlaceholder: t("subscriptionPlan.searchParentPlan"),
+          options: getParentPlanOptions(), // Will be filtered in onChange
+          allowClear: true,
         },
         { name: "id", type: "hidden" as const, required: true },
       ],
@@ -310,7 +360,7 @@ export function useSubscriptionPlanViewModel() {
         ];
       },
     }),
-    [t, getBillingCycleName, handleDelete]
+    [t, getBillingCycleName, getPlanTierName, getParentPlanOptions, handleDelete]
   );
 
   return {

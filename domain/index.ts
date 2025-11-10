@@ -140,6 +140,7 @@ export type { SystemNotificationsResponse } from './mappers/notification-system.
 export {
   SubscriptionPlan,
   BillingCycle,
+  PlanTier,
   CreateSubscriptionPlanRequest,
   UpdateSubscriptionPlanRequest,
   type SubscriptionPlanData,

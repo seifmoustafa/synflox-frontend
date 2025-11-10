@@ -471,7 +471,15 @@ export const ar = {
   subscriptionPlan: {
     features: "الميزات",
   featuresPlaceholder: "أدخل اسم الميزة",
-  planTier: "مستوى الخطة",
+  planTier:{
+  title:"مستوى الخطة",
+   free: "مجاني",
+   basic: "احترافي", 
+   pro: "متطور",
+   enterprise: "مؤسسي",
+   ultimate: "متميز",
+   unknown: "مستوى غير معروف",
+  },
   planTierPlaceholder: "أدخل مستوى الخطة (0=مجاني، 1=احترافي، 2=مؤسسي)",
   parentPlan: "الخطة الأساسية",
   parentPlanPlaceholder: "اختر الخطة الأساسية",
@@ -493,6 +501,7 @@ export const ar = {
     billingCycleLabel: "دورة الفوترة",
     billingCyclePlaceholder: "اختر دورة الفوترة",
     billingCycle: {
+      title: "دورة الفوترة",
       monthly: "شهري",
       yearly: "سنوي",
       quarterly: "ربع سنوي",

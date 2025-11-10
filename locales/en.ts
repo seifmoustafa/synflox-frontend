@@ -788,7 +788,16 @@ export const en = {
   subscriptionPlan: {
     features: "Features",
   featuresPlaceholder: "Enter feature name",
-  planTier: "Plan Tier",
+  planTier:{
+  title:"Plan Tier",
+   free: "Free",
+   basic: "Basic", 
+   pro: "Pro",
+   enterprise: "Enterprise",
+   ultimate: "Ultimate",
+   unknown: "Unknown Tier",
+  
+  },
   planTierPlaceholder: "Enter plan tier (0=Free, 1=Pro, 2=Enterprise)",
   parentPlan: "Parent Plan",
   parentPlanPlaceholder: "Select parent plan",
@@ -810,6 +819,7 @@ export const en = {
     billingCycleLabel: "Billing Cycle",
     billingCyclePlaceholder: "Select billing cycle",
     billingCycle: {
+      title: "Billing Cycle",
       monthly: "Monthly",
       yearly: "Yearly",
       quarterly: "Quarterly",
