@@ -1,0 +1,105 @@
+# SYNFLOX Frontend Development Rules
+
+You are a Next.js Clean Architecture expert working on the SYNFLOX frontend.
+
+## Project Context
+- SYNFLOX frontend built with Next.js 14, TypeScript, Tailwind CSS
+- Follows Clean Architecture with strict layer separation
+- Uses domain models with business logic, never raw JSON
+- Implements comprehensive error handling and user notifications
+- Supports multi-language (English/Arabic) with i18n
+
+## Architecture Layer Order (MANDATORY)
+1. Domain Model → domain/models/[feature].model.ts
+2. Mapper → domain/mappers/[feature].mapper.ts  
+3. Service → services/[feature].service.ts
+4. ViewModel → viewmodels/[feature]-viewmodel.ts
+5. View → views/[feature]-view.tsx
+6. Page → app/[feature]/page.tsx
+
+## Domain Model Requirements
+- MUST have [Feature]Data interface for API data
+- MUST have [Feature] class with readonly properties and business logic
+- MUST have Create[Feature]Request and Update[Feature]Request classes
+- MUST include isValid getter for validation
+- MUST have update() method for immutability
+- Include business logic in getters (displayName, isActive, etc.)
+
+## Mapper Requirements
+- MUST be static class [Feature]Mapper
+- MUST have fromJson() for API → Domain conversion
+- MUST have toJson() for Domain → API conversion
+- MUST have createRequestToJson() and updateRequestToJson()
+- MUST have handleApiResponse() for API response handling
+- MUST define [Features]Response interface
+
+## Service Requirements
+- MUST implement I[Feature]Service interface
+- MUST accept IApiService and INotificationService in constructor
+- MUST use mappers for ALL conversions
+- MUST use NotificationService for user feedback
+- MUST handle errors properly with try/catch
+- NEVER work with raw JSON, always use domain models
+
+## ViewModel Requirements
+- MUST be hook: use[Feature]ViewModel()
+- MUST use useServices() and useI18n()
+- MUST use useGenericCrudViewModel for CRUD operations
+- MUST return { vm, config, handleDelete }
+- MUST work with domain models only
+- Handle all business logic and state management
+
+## View Requirements
+- MUST be client component ("use client")
+- MUST use ViewModel hook for all logic
+- MUST use GenericCrudView for CRUD operations
+- Minimal logic - mainly composition and UI
+- NO direct API calls or business logic
+
+## Page Requirements
+- MUST be server component (default Next.js)
+- MUST wrap content in DashboardLayout
+- Minimal logic - composition only
+- NO business logic or state management
+
+## Required Updates When Creating Features
+- domain/index.ts - Export models and mappers
+- domain/mappers/index.ts - Export mapper
+- config/api-endpoints.ts - Add API endpoints
+- providers/service-provider.tsx - Register service
+- locales/en.ts and locales/ar.ts - Add translations
+
+## Naming Conventions (STRICT)
+- Pages: [feature]/page.tsx
+- Views: [feature]-view.tsx or [Feature]View
+- ViewModels: use[Feature]ViewModel
+- Services: [Feature]Service, I[Feature]Service
+- Models: [Feature], [Feature]Data
+- Mappers: [Feature]Mapper
+
+## Import Order
+1. React/Next.js imports
+2. Third-party library imports
+3. Internal providers
+4. Internal hooks
+5. Internal components
+6. Domain models
+7. Utilities
+
+## Forbidden Patterns
+- NEVER use raw JSON in components
+- NEVER skip mapper layer
+- NEVER put business logic in views or pages
+- NEVER make API calls directly in components
+- NEVER use 'any' type without justification
+- NEVER skip error handling or notifications
+
+## Always Required
+- Use domain models everywhere
+- Use mappers for all API conversions
+- Use services for all API operations
+- Use ViewModels for all business logic
+- Handle errors with proper notifications
+- Follow strict layer architecture
+- Use TypeScript with proper typing
+- Show loading states and error messages
