@@ -137,7 +137,7 @@ export function DashboardView() {
   // Format date helper
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const locale = language === "ar" ? "ar-SA" : "en-US";
+    const locale = language === "ar" ? "ar-US" : "en-US";
     return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
   };
 
@@ -146,7 +146,7 @@ export function DashboardView() {
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-    const locale = language === "ar" ? "ar-SA" : "en-US";
+    const locale = language === "ar" ? "ar-US" : "en-US";
     const isArabic = language === "ar";
     
     if (diffInSeconds < 60) return isArabic ? `منذ ${diffInSeconds} ثانية` : `${diffInSeconds} seconds ago`;
@@ -287,7 +287,7 @@ export function DashboardView() {
     return {
       labels: sortedEntries.map(([date]) => {
         const d = new Date(date);
-        const locale = language === "ar" ? "ar-SA" : "en-US";
+        const locale = language === "ar" ? "ar-US" : "en-US";
         return d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric' });
       }),
       datasets: [{

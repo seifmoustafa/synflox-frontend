@@ -29,7 +29,7 @@ export class CompanyGroupMapper {
       name: json.name || '',
       description: json.description,
       isActive: json.isActive ?? true,
-      companyCount: json.companyCount,
+      companyCount: json.companyCount || json.companiesCount,
       createdAt: json.createdAt || json.createdTimestamp || new Date().toISOString(),
       updatedAt: json.updatedAt || json.updatedTimestamp,
     });
@@ -114,15 +114,17 @@ export class CompanyGroupMapper {
         if ('groups' in data || 'companyGroups' in data) {
           const groups = data.groups || data.companyGroups || [];
           const pagination = data.pagination || {};
+          const itemsCount = pagination.itemsCount || pagination.totalItems || 0;
+          const pageSize = pagination.pageSize || 10;
           return {
             data: Array.isArray(groups) 
               ? groups.map((item: any) => this.fromJson(item))
               : [],
             pagination: {
-              itemsCount: pagination.itemsCount || pagination.totalItems || 0,
-              pageSize: pagination.pageSize || 10,
+              itemsCount,
+              pageSize,
               page: pagination.currentPage || pagination.page || 1,
-              pagesCount: pagination.pagesCount || pagination.totalPages || 0,
+              pagesCount: pagination.pagesCount || pagination.totalPages || Math.ceil(itemsCount / pageSize) || 0,
             }
           };
         }

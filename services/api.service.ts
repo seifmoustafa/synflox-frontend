@@ -124,21 +124,53 @@ export class ApiService implements IApiService {
         }
 
         if (response.status === 401) {
-          if(window.location.pathname != "/login"){
-            const error = new Error(errorMessage || "Unauthorized - please login again");
-            const appError = handleError(error, `API Request: ${url}`);
-            toast.error(errorMessage || getUserFriendlyErrorMessage(appError));
-            secureTokenService.clearTokens();
-            // Use Next.js router instead of direct window manipulation
-            if (typeof window !== 'undefined') {
-              window.location.href = "/login";
-            }
-            throw error;
-          } else {
-            // For login page, don't show toast - let the form handle the error display
+          // If already on login, let the page handle its own error UI
+          if (typeof window !== "undefined" && window.location.pathname === "/login") {
             const error = new Error(errorMessage);
             throw error;
           }
+
+          // Attempt token refresh once using single-flight guard
+          const { withRefreshSingleFlight } = await import("@/lib/refresh-guard");
+          const { AuthService } = await import("@/services/auth.service");
+          const auth = new AuthService(this);
+
+          const newAccess = await withRefreshSingleFlight(async () => {
+            const refreshResp = await auth.refreshToken();
+            return refreshResp?.accessToken ?? null;
+          });
+
+          if (newAccess) {
+            // Retry original request once with the new token
+            const retryHeaders: Record<string, string> = {
+              ...(config.headers as Record<string, string>),
+              Authorization: `Bearer ${newAccess}`,
+            };
+            const retryResponse = await fetch(url, { ...config, headers: retryHeaders });
+
+            if (!retryResponse.ok) {
+              // If retry fails, log out
+              const { secureTokenService } = await import("@/lib/secure-token-service");
+              secureTokenService.clearTokens();
+              if (typeof window !== "undefined") window.location.href = "/login";
+              const errTxt = await retryResponse.text();
+              throw new Error(errTxt || retryResponse.statusText);
+            }
+
+            if (retryResponse.status === 204) {
+              return null as T;
+            }
+
+            const retryJson = await retryResponse.json();
+            return this.unwrap<T>(retryJson);
+          }
+
+          // Refresh failed → logout + redirect
+          const { secureTokenService } = await import("@/lib/secure-token-service");
+          secureTokenService.clearTokens();
+          if (typeof window !== "undefined") window.location.href = "/login";
+          const unauthorizedError = new Error(errorMessage || "Unauthorized - please login again");
+          throw unauthorizedError;
         }
         
         const error = new Error(errorMessage);
