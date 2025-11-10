@@ -786,8 +786,17 @@ export const en = {
 
   // Subscription Plans
   subscriptionPlan: {
-    title: "Subscription Plans",
-    description: "Manage subscription plans and pricing tiers",
+    features: "Features",
+  featuresPlaceholder: "Enter feature name",
+  planTier: "Plan Tier",
+  planTierPlaceholder: "Enter plan tier (0=Free, 1=Pro, 2=Enterprise)",
+  parentPlan: "Parent Plan",
+  parentPlanPlaceholder: "Select parent plan",
+  noParent: "No Parent",
+  unlimited: "Unlimited",
+  title: "Subscription Plans Management",
+  description: "Manage subscription plans and their hierarchy",
+    tableDescription: "Description",
     item: "Subscription Plan",
     items: "Subscription Plans",
     name: "Name",
@@ -809,13 +818,11 @@ export const en = {
     },
     maxCompanies: "Max Companies",
     maxCompaniesPlaceholder: "Enter max companies (leave empty for unlimited)",
-    unlimited: "Unlimited",
     isActive: "Is Active",
     status: "Status",
     assignModules: "Assign Modules",
     assignModulesDescription: "Assign project modules to {{planName}}",
     noModulesAvailable: "No modules available",
-    features: "Features",
     detail: {
       title: "Subscription Plan Details",
       description: "View and manage subscription plan details",

@@ -469,7 +469,16 @@ export const ar = {
 
   // Subscription Plans
   subscriptionPlan: {
-    title: "خطط الاشتراك",
+    features: "الميزات",
+  featuresPlaceholder: "أدخل اسم الميزة",
+  planTier: "مستوى الخطة",
+  planTierPlaceholder: "أدخل مستوى الخطة (0=مجاني، 1=احترافي، 2=مؤسسي)",
+  parentPlan: "الخطة الأساسية",
+  parentPlanPlaceholder: "اختر الخطة الأساسية",
+  noParent: "لا توجد خطة أساسية",
+  unlimited: "غير محدود",
+  title: "إدارة خطط الاشتراك",
+  tableDescription: "الوصف",
     description: "إدارة خطط الاشتراك ومستويات الأسعار",
     item: "خطة اشتراك",
     items: "خطط الاشتراك",
@@ -492,13 +501,11 @@ export const ar = {
     },
     maxCompanies: "الحد الأقصى للشركات",
     maxCompaniesPlaceholder: "أدخل الحد الأقصى للشركات (اتركه فارغاً للحد غير المحدود)",
-    unlimited: "غير محدود",
     isActive: "نشط",
     status: "الحالة",
     assignModules: "تعيين الوحدات",
     assignModulesDescription: "تعيين وحدات المشروع إلى {{planName}}",
     noModulesAvailable: "لا توجد وحدات متاحة",
-    features: "الميزات",
     formDescription: "الوصف",
     detail: {
       title: "تفاصيل خطة الاشتراك",
