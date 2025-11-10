@@ -142,6 +142,8 @@ interface GenericTableProps<T> {
   stickyActions?: boolean;
   /** Custom render function for actions column - completely overrides default actions */
   renderActions?: (row: T) => React.ReactNode;
+  /** Callback when a row is clicked */
+  onRowClick?: (row: T) => void;
 }
 
 /**
@@ -185,6 +187,7 @@ export function GenericTable<T extends Record<string, any>>({
   overrideTableStyle,
   stickyActions = true,
   renderActions,
+  onRowClick,
 }: GenericTableProps<T>) {
   const { t, direction } = useI18n();
   const settings = useSettings();
@@ -926,8 +929,10 @@ export function GenericTable<T extends Record<string, any>>({
                 key={index}
                 className={cn(
                   getCardClasses(),
-                  isSelected && "ring-2 ring-primary"
+                  isSelected && "ring-2 ring-primary",
+                  onRowClick && "cursor-pointer"
                 )}
+                onClick={() => onRowClick && onRowClick(row)}
               >
                 {selectable && (
                   <div className="flex items-center space-x-2 rtl:space-x-reverse pb-2 border-b">
@@ -1228,7 +1233,11 @@ export function GenericTable<T extends Record<string, any>>({
                   return (
                     <TableRow
                       key={index}
-                      className={getRowClasses(index, isSelected)}
+                      className={cn(
+                        getRowClasses(index, isSelected),
+                        onRowClick && "cursor-pointer"
+                      )}
+                      onClick={() => onRowClick && onRowClick(row)}
                     >
                       {selectable && (
                         <TableCell className={cn(getCellPadding(), "relative")}>

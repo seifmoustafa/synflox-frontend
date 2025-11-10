@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { GenericChart } from "@/components/charts/generic-chart";
 import { Button } from "@/components/ui/button";
+import { GenericTable } from "@/components/ui/generic-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
   Building2, 
@@ -41,10 +42,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SystemNotificationType } from "@/domain";
+import type { ExpiryReportResult } from "@/viewmodels/dashboard-viewmodel";
 
 export function DashboardView() {
   const vm = useDashboardViewModel();
-  const { t } = useI18n();
+  const { t, direction, language } = useI18n();
   const [copiedRoute, setCopiedRoute] = useState<string | null>(null);
   const [expandedControllers, setExpandedControllers] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState("");
@@ -135,7 +137,8 @@ export function DashboardView() {
   // Format date helper
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const locale = language === "ar" ? "ar-SA" : "en-US";
+    return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
   };
 
   // Format relative time helper
@@ -143,12 +146,14 @@ export function DashboardView() {
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    const locale = language === "ar" ? "ar-SA" : "en-US";
+    const isArabic = language === "ar";
     
-    if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (diffInSeconds < 60) return isArabic ? `منذ ${diffInSeconds} ثانية` : `${diffInSeconds} seconds ago`;
+    if (diffInSeconds < 3600) return isArabic ? `منذ ${Math.floor(diffInSeconds / 60)} دقيقة` : `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400) return isArabic ? `منذ ${Math.floor(diffInSeconds / 3600)} ساعة` : `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 604800) return isArabic ? `منذ ${Math.floor(diffInSeconds / 86400)} يوم` : `${Math.floor(diffInSeconds / 86400)} days ago`;
+    return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
   };
 
   // Get notification icon
@@ -193,7 +198,7 @@ export function DashboardView() {
         fullDate: date
       }))
       .sort((a, b) => new Date(a.fullDate).getTime() - new Date(b.fullDate).getTime());
-  }, [vm.expiryReport]);
+  }, [vm.expiryReport, language]);
 
   // Section 2: Enhanced Donut Chart Data
   const statusBreakdown = vm.statistics?.licenseStatusStats;
@@ -282,7 +287,8 @@ export function DashboardView() {
     return {
       labels: sortedEntries.map(([date]) => {
         const d = new Date(date);
-        return d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+        const locale = language === "ar" ? "ar-SA" : "en-US";
+        return d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric' });
       }),
       datasets: [{
         label: t("dashboard.apiUsage.requests"),
@@ -293,7 +299,7 @@ export function DashboardView() {
         borderRadius: 8,
       }],
     };
-  }, [vm.apiUsage, t]);
+  }, [vm.apiUsage, t, language]);
 
   // Section 1: Statistics Cards (4 main cards as per guide)
   const mainStatisticsCards = useMemo(() => [
@@ -367,13 +373,13 @@ export function DashboardView() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={language === "ar" ? "rtl" : "ltr"}>
       <div>
         <h1 className="text-3xl font-bold tracking-tight">{t("dashboard.title")}</h1>
         <p className="text-muted-foreground mt-2">{t("dashboard.description")}</p>
       </div>
 
-      <Tabs value={vm.activeTab} onValueChange={(v) => vm.setActiveTab(v as "statistics" | "endpoints")} className="w-full">
+      <Tabs dir={direction} value={vm.activeTab} onValueChange={(v) => vm.setActiveTab(v as "statistics" | "endpoints")} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="statistics">{t("dashboard.tabs.statistics")}</TabsTrigger>
           <TabsTrigger value="endpoints">{t("dashboard.tabs.endpoints")}</TabsTrigger>
@@ -389,7 +395,7 @@ export function DashboardView() {
                   key={index} 
                   className={cn(
                     "transition-all hover:shadow-lg cursor-pointer",
-                    `border-l-4 ${card.borderColor}`
+                    `border-s-4 ${card.borderColor}`
                   )}
                   onClick={() => {
                     // Navigate to filtered companies list
@@ -397,14 +403,14 @@ export function DashboardView() {
                   }}
                 >
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+                    <CardTitle className="text-sm font-medium text-start">{card.title}</CardTitle>
                     <div className={cn("p-2 rounded-lg", card.bgColor)}>
                       <Icon className={cn("h-4 w-4", card.color)} />
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-3xl font-bold">{card.value.toLocaleString()}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <div className="text-3xl font-bold text-start">{card.value.toLocaleString()}</div>
+                    <p className="text-xs text-muted-foreground mt-1 text-start">
                       {card.title.includes("Total") 
                         ? `${t("dashboard.statistics.allCompanies")}`
                         : `${t("dashboard.statistics.subscriptionStatus")}`
@@ -460,7 +466,7 @@ export function DashboardView() {
                           <div className="w-4 h-4 rounded-full bg-green-500"></div>
                           <span className="text-sm font-medium">{t("dashboard.licenseStatus.active")}</span>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <div className="font-bold text-lg">{statusBreakdown?.active || 0}</div>
                           <div className="text-xs text-muted-foreground">
                             {statusBreakdown ? `${statusBreakdown.activePercentage}%` : "0%"}
@@ -472,7 +478,7 @@ export function DashboardView() {
                           <div className="w-4 h-4 rounded-full bg-red-500"></div>
                           <span className="text-sm font-medium">{t("dashboard.licenseStatus.expired")}</span>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <div className="font-bold text-lg">{statusBreakdown?.expired || 0}</div>
                           <div className="text-xs text-muted-foreground">
                             {statusBreakdown ? `${statusBreakdown.expiredPercentage}%` : "0%"}
@@ -484,7 +490,7 @@ export function DashboardView() {
                           <div className="w-4 h-4 rounded-full bg-orange-500"></div>
                           <span className="text-sm font-medium">{t("dashboard.licenseStatus.suspended")}</span>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <div className="font-bold text-lg">{statusBreakdown?.suspended || 0}</div>
                           <div className="text-xs text-muted-foreground">
                             {statusBreakdown ? `${statusBreakdown.suspendedPercentage}%` : "0%"}
@@ -598,19 +604,37 @@ export function DashboardView() {
                       }}
                     />
                   )}
-                  <div className="rounded-md border">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>{t("company.name")}</TableHead>
-                          <TableHead>{t("dashboard.expiryTimeline.date")}</TableHead>
-                          <TableHead>{t("dashboard.expiryTimeline.daysUntilExpiry")}</TableHead>
-                          <TableHead>{t("company.status.title")}</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {vm.expiryReport.map((company) => {
+                  <GenericTable
+                    data={vm.expiryReport}
+                    columns={[
+                      {
+                        key: "companyName",
+                        label: t("company.name"),
+                        render: (_val: unknown, company: ExpiryReportResult) => (
+                          <div className="font-medium">{company.companyName}</div>
+                        ),
+                      },
+                      {
+                        key: "expiryDate",
+                        label: t("dashboard.expiryTimeline.date"),
+                        render: (_val: unknown, company: ExpiryReportResult) => {
                           const expiryDate = new Date(company.expiryDate);
+                          const locale = language === "ar" ? "ar-US" : "en-US";
+                          return (
+                            <span className="text-sm">
+                              {expiryDate.toLocaleDateString(locale, { 
+                                year: 'numeric', 
+                                month: 'short', 
+                                day: 'numeric' 
+                              })}
+                            </span>
+                          );
+                        },
+                      },
+                      {
+                        key: "daysUntilExpiry",
+                        label: t("dashboard.expiryTimeline.daysUntilExpiry"),
+                        render: (_val: unknown, company: ExpiryReportResult) => {
                           const statusColor = company.status === "critical" 
                             ? "text-red-600" 
                             : company.status === "warning" 
@@ -618,41 +642,33 @@ export function DashboardView() {
                             : "text-green-600";
                           
                           return (
-                            <TableRow 
-                              key={company.companyId}
-                              className="cursor-pointer hover:bg-muted/50"
-                              onClick={() => window.location.href = `/companies/${company.companyId}`}
-                            >
-                              <TableCell className="font-medium">{company.companyName}</TableCell>
-                              <TableCell>
-                                {expiryDate.toLocaleDateString('en-US', { 
-                                  year: 'numeric', 
-                                  month: 'short', 
-                                  day: 'numeric' 
-                                })}
-                              </TableCell>
-                              <TableCell>
-                                <span className={statusColor}>
-                                  {company.daysUntilExpiry} {company.daysUntilExpiry === 1 ? t("dashboard.expiryTimeline.day") || "day" : t("dashboard.expiryTimeline.days") || "days"}
-                                </span>
-                              </TableCell>
-                              <TableCell>
-                                <Badge 
-                                  variant={company.status === "critical" ? "destructive" : company.status === "warning" ? "secondary" : "default"}
-                                >
-                                  {company.status === "critical" 
-                                    ? t("dashboard.expiryTimeline.critical")
-                                    : company.status === "warning"
-                                    ? t("dashboard.expiryTimeline.warning")
-                                    : t("company.status.active")}
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
+                            <span className={statusColor}>
+                              {company.daysUntilExpiry} {company.daysUntilExpiry === 1 ? t("dashboard.expiryTimeline.day") : t("dashboard.expiryTimeline.days")}
+                            </span>
                           );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </div>
+                        },
+                      },
+                      {
+                        key: "status",
+                        label: t("company.status.title"),
+                        render: (_val: unknown, company: ExpiryReportResult) => (
+                          <Badge 
+                            variant={company.status === "critical" ? "destructive" : company.status === "warning" ? "secondary" : "default"}
+                          >
+                            {company.status === "critical" 
+                              ? t("dashboard.expiryTimeline.critical")
+                              : company.status === "warning"
+                              ? t("dashboard.expiryTimeline.warning")
+                              : t("company.status.active")}
+                          </Badge>
+                        ),
+                      },
+                    ]}
+                    onRowClick={(company: ExpiryReportResult) => {
+                      window.location.href = `/companies/${company.companyId}`;
+                    }}
+                    emptyMessage={t("dashboard.expiryTimeline.noData")}
+                  />
                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
@@ -859,9 +875,9 @@ export function DashboardView() {
                     {Object.entries(filteredEndpoints.endpointsByController).map(([controller, endpoints]) => (
                         <AccordionItem key={controller} value={controller}>
                           <AccordionTrigger>
-                            <div className="flex items-center justify-between w-full pr-4">
+                            <div className="flex items-center justify-between w-full pe-4">
                               <span className="font-semibold">{controller}</span>
-                              <Badge variant="secondary" className="ml-2">
+                              <Badge variant="secondary" className="ms-2">
                                 {endpoints.length} {t("dashboard.endpoints.endpoints")}
                               </Badge>
                             </div>
@@ -869,7 +885,11 @@ export function DashboardView() {
                           <AccordionContent>
                             <div className="space-y-3 pt-2">
                               {endpoints.map((endpoint, index) => (
-                                <Card key={index} className="border-l-4" style={{ borderLeftColor: endpoint.methodColor }}>
+                                <Card 
+                                  key={index} 
+                                  className="border-s-4"
+                                  style={{ borderInlineStartColor: endpoint.methodColor }}
+                                >
                                   <CardHeader className="pb-3">
                                     <div className="flex items-start justify-between">
                                       <div className="flex-1">
@@ -931,8 +951,8 @@ export function DashboardView() {
                                             >
                                               <div>
                                                 <span className="font-medium">{param.name}</span>
-                                                <span className="text-muted-foreground ml-2">({param.type})</span>
-                                                <Badge variant="outline" className="ml-2 text-xs">
+                                                <span className="text-muted-foreground ms-2">({param.type})</span>
+                                                <Badge variant="outline" className="text-xs ms-2">
                                                   {param.source}
                                                 </Badge>
                                               </div>
