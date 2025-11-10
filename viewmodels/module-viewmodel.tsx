@@ -65,6 +65,28 @@ export function useModuleViewModel() {
           ),
         },
         {
+          key: "features",
+          label: t("module.features"),
+          render: (_val: unknown, module: Module) => (
+            <div className="flex flex-wrap gap-1">
+              {module.features && module.features.length > 0 ? (
+                module.features.slice(0, 3).map((feature, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {feature}
+                  </Badge>
+                ))
+              ) : (
+                <span className="text-sm text-muted-foreground">-</span>
+              )}
+              {module.features && module.features.length > 3 && (
+                <Badge variant="secondary" className="text-xs">
+                  +{module.features.length - 3}
+                </Badge>
+              )}
+            </div>
+          ),
+        },
+        {
           key: "isActive",
           label: t("module.status"),
           render: (_val: unknown, module: Module) => (
@@ -89,6 +111,12 @@ export function useModuleViewModel() {
           placeholder: t("module.descriptionPlaceholder"),
         },
         {
+          name: "features",
+          label: t("module.features"),
+          type: "string-array" as const,
+          placeholder: t("module.featuresPlaceholder"),
+        },
+        {
           name: "isActive",
           label: t("module.isActive"),
           type: "checkbox" as const,
@@ -109,6 +137,12 @@ export function useModuleViewModel() {
           placeholder: t("module.descriptionPlaceholder"),
         },
         {
+          name: "features",
+          label: t("module.features"),
+          type: "string-array" as const,
+          placeholder: t("module.featuresPlaceholder"),
+        },
+        {
           name: "isActive",
           label: t("module.isActive"),
           type: "checkbox" as const,
@@ -121,6 +155,7 @@ export function useModuleViewModel() {
       editInitialValues: (module: Module) => ({
         name: module.name,
         description: module.description || "",
+        features: module.features || [],
         isActive: module.isActive,
         id: module.id,
       }),

@@ -32,6 +32,16 @@ export interface ISubscriptionPlanService {
     page?: number;
     pageSize?: number;
   }): Promise<SubscriptionPlansResponse>;
+  getPlanFeaturesWithInheritance(planId: string): Promise<{
+    ownFeatures: string[];
+    allFeatures: string[];
+    projectModules: Array<{projectModuleId: string, projectName: string, moduleName: string, isEnabled: boolean}>;
+    inheritedProjectModules: Array<{projectModuleId: string, projectName: string, moduleName: string, isEnabled: boolean}>;
+    parentPlan?: SubscriptionPlan;
+    childPlans: SubscriptionPlan[];
+  }>;
+  getUpgradePath(planId: string): Promise<SubscriptionPlan[]>;
+  setPlanParent(planId: string, parentPlanId?: string): Promise<SubscriptionPlan>;
 }
 
 export class SubscriptionPlanService implements ISubscriptionPlanService {
@@ -143,33 +153,58 @@ export class SubscriptionPlanService implements ISubscriptionPlanService {
     pageSize?: number;
   }): Promise<SubscriptionPlansResponse> {
     try {
-      // Get all plans and filter by module inclusion
-      // This is a frontend filter approach - backend may provide a dedicated endpoint
-      const allPlans = await this.getPlans({ pageSize: 1000, ...params });
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.pageSize) queryParams.append('pageSize', params.pageSize.toString());
       
-      // Filter plans that include this module
-      const plansWithModule: SubscriptionPlan[] = [];
-      for (const plan of allPlans.data) {
-        try {
-          const planModules = await this.getPlanModules(plan.id);
-          const hasModule = planModules.some(
-            pm => pm.projectModuleId && planModules.some(
-              p => p.moduleName && p.moduleName.toLowerCase().includes(moduleId.toLowerCase())
-            )
-          );
-          // Better approach: check if any project-module combination includes this module
-          // For now, we'll get all plans and let the frontend filter
-          // This is not ideal but works until backend provides proper endpoint
-        } catch (e) {
-          // Skip plans that fail to load modules
-        }
-      }
-      
-      // For now, return all plans - proper filtering should be done by backend
-      // This is a temporary solution until backend endpoint is available
-      return allPlans;
-    } catch (e) {
-      throw e;
+      const url = `/subscription-plans/by-module/${moduleId}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      const response = await this.apiService.get(url);
+      return SubscriptionPlanMapper.handleApiResponse(response);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getPlanFeaturesWithInheritance(planId: string): Promise<{
+    ownFeatures: string[];
+    allFeatures: string[];
+    projectModules: Array<{projectModuleId: string, projectName: string, moduleName: string, isEnabled: boolean}>;
+    inheritedProjectModules: Array<{projectModuleId: string, projectName: string, moduleName: string, isEnabled: boolean}>;
+    parentPlan?: SubscriptionPlan;
+    childPlans: SubscriptionPlan[];
+  }> {
+    try {
+      const response = await this.apiService.get<any>(`/subscription-plans/${planId}/features-with-inheritance`);
+      return {
+        ownFeatures: response.ownFeatures || [],
+        allFeatures: response.allFeatures || [],
+        projectModules: response.projectModules || [],
+        inheritedProjectModules: response.inheritedProjectModules || [],
+        parentPlan: response.parentPlan ? SubscriptionPlanMapper.fromJson(response.parentPlan) : undefined,
+        childPlans: (response.childPlans || []).map((plan: any) => SubscriptionPlanMapper.fromJson(plan))
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getUpgradePath(planId: string): Promise<SubscriptionPlan[]> {
+    try {
+      const response = await this.apiService.get<any[]>(`/subscription-plans/${planId}/upgrade-path`);
+      return (response || []).map((plan: any) => SubscriptionPlanMapper.fromJson(plan));
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async setPlanParent(planId: string, parentPlanId?: string): Promise<SubscriptionPlan> {
+    try {
+      const response = await this.apiService.put<any>(`/subscription-plans/${planId}/parent`, {
+        parentPlanId: parentPlanId || null
+      });
+      return SubscriptionPlanMapper.fromJson(response);
+    } catch (error) {
+      throw error;
     }
   }
 }

@@ -54,6 +54,7 @@ import { useI18n } from "@/providers/i18n-provider";
 import { cn, toDateInputValue, fromDateInputValue } from "@/lib/utils";
 import { DatePicker } from "@/components/ui/date-picker";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { StringArrayField } from "./string-array-field";
 import { ImageUploader } from "@/components/ui/image-uploader";
 
 /**
@@ -105,7 +106,8 @@ export interface FieldConfig {
     | "week"
     | "color"
     | "file"
-    | "image";
+    | "image"
+    | "string-array";
   placeholder?: string;
   searchPlaceholder?: string; // For searchable selects
   required?: boolean;
@@ -797,6 +799,15 @@ export function GenericForm({
                     showPreview={field.showPreview !== false}
                     aspectRatio={field.aspectRatio}
                   />
+                ) : field.type === "string-array" ? (
+                  <StringArrayField
+                    name={field.name}
+                    label="" // Label is already rendered above
+                    placeholder={field.placeholder}
+                    value={formData[field.name] || []}
+                    onChange={(value) => handleChange(field.name, value)}
+                    required={field.required}
+                  />
                 ) : field.type === "file" ? (
                   <Input
                     id={field.name}
@@ -813,14 +824,10 @@ export function GenericForm({
                       }
                     }}
                     required={field.required}
-                    className={cn(
-                      getInputClasses(getInputHeight()),
-                      direction === "rtl" ? "text-right" : "text-left"
-                    )}
+                    disabled={field.disabled || readOnly}
+                    className={getInputClasses(getInputHeight())}
                     accept={field.accept}
                     multiple={field.multiple}
-                    disabled={field.disabled || readOnly}
-                    dir={direction}
                   />
                 ) : (
                   <Input

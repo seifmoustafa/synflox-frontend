@@ -28,6 +28,7 @@ export class ProjectMapper {
       id: json.id || '',
       name: json.name || '',
       description: json.description,
+      features: json.features || null,
       isActive: json.isActive ?? true,
       createdAt: json.createdAt || json.createdTimestamp || new Date().toISOString(),
       updatedAt: json.updatedAt || json.updatedTimestamp,
@@ -42,6 +43,7 @@ export class ProjectMapper {
       id: project.id,
       name: project.name,
       description: project.description,
+      features: project.features,
       isActive: project.isActive,
       createdAt: project.createdAt,
       updatedAt: project.updatedAt,
@@ -59,6 +61,9 @@ export class ProjectMapper {
     if (request.description !== undefined) {
       json.description = request.description;
     }
+    if (request.features !== undefined) {
+      json.features = request.features;
+    }
     return json;
   }
 
@@ -69,9 +74,11 @@ export class ProjectMapper {
     const json: any = {};
     if (request.name !== undefined) json.name = request.name;
     if (request.description !== undefined) json.description = request.description;
+    if (request.features !== undefined) json.features = request.features;
     if (request.isActive !== undefined) json.isActive = request.isActive;
     return json;
   }
+
 
   /**
    * Handle different API response formats and convert to ProjectsResponse

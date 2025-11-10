@@ -106,6 +106,24 @@ export function useSubscriptionPlanViewModel() {
             </span>
           ),
         },
+        {
+          key: "planTier",
+          label: t("subscriptionPlan.planTier"),
+          render: (_val: unknown, plan: SubscriptionPlan) => (
+            <Badge variant="outline">
+              {plan.planTierName}
+            </Badge>
+          ),
+        },
+        {
+          key: "parentPlan",
+          label: t("subscriptionPlan.parentPlan"),
+          render: (_val: unknown, plan: SubscriptionPlan) => (
+            <span className="text-sm">
+              {plan.parentPlanName ?? t("subscriptionPlan.noParent")}
+            </span>
+          ),
+        },
       ],
       createFields: [
         {
@@ -153,6 +171,19 @@ export function useSubscriptionPlanViewModel() {
           label: t("subscriptionPlan.maxCompanies"),
           type: "number" as const,
           placeholder: t("subscriptionPlan.maxCompaniesPlaceholder"),
+        },
+        {
+          name: "planTier",
+          label: t("subscriptionPlan.planTier"),
+          type: "number" as const,
+          placeholder: t("subscriptionPlan.planTierPlaceholder"),
+        },
+        {
+          name: "parentPlanId",
+          label: t("subscriptionPlan.parentPlan"),
+          type: "select" as const,
+          placeholder: t("subscriptionPlan.parentPlanPlaceholder"),
+          options: [], // Will be populated dynamically with available plans
         },
         {
           name: "isActive",
@@ -208,6 +239,19 @@ export function useSubscriptionPlanViewModel() {
           placeholder: t("subscriptionPlan.maxCompaniesPlaceholder"),
         },
         {
+          name: "planTier",
+          label: t("subscriptionPlan.planTier"),
+          type: "number" as const,
+          placeholder: t("subscriptionPlan.planTierPlaceholder"),
+        },
+        {
+          name: "parentPlanId",
+          label: t("subscriptionPlan.parentPlan"),
+          type: "select" as const,
+          placeholder: t("subscriptionPlan.parentPlanPlaceholder"),
+          options: [], // Will be populated dynamically with available plans
+        },
+        {
           name: "isActive",
           label: t("subscriptionPlan.isActive"),
           type: "checkbox" as const,
@@ -217,6 +261,7 @@ export function useSubscriptionPlanViewModel() {
       createInitialValues: {
         currency: "USD",
         billingCycle: BillingCycle.Monthly.toString(),
+        planTier: 0,
         isActive: true,
       },
       editInitialValues: (plan: SubscriptionPlan) => ({
@@ -226,6 +271,8 @@ export function useSubscriptionPlanViewModel() {
         currency: plan.currency,
         billingCycle: plan.billingCycle.toString(),
         maxCompanies: plan.maxCompanies ?? "",
+        planTier: plan.planTier,
+        parentPlanId: plan.parentPlanId || "",
         isActive: plan.isActive,
         id: plan.id,
       }),

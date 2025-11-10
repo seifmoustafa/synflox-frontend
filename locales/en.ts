@@ -246,6 +246,8 @@ export const en = {
 
   // Projects
   project: {
+    features: "Features",
+  featuresPlaceholder: "Enter feature name",
     title: "Projects Management",
     description: "Manage projects and their modules",
     item: "Project",
@@ -288,6 +290,8 @@ export const en = {
 
   // Modules
   module: {
+    features: "Features",
+  featuresPlaceholder: "Enter feature name",
     title: "Modules Management",
     description: "Manage modules and their associations",
     item: "Module",
@@ -3303,6 +3307,7 @@ export const en = {
   },
   // Common
   common: {
+    value: "Value",
     show: "Show",
     hide: "Hide",
     description: "Description",

@@ -8,6 +8,7 @@ export interface ModuleData {
   id: string; // Encrypted GUID
   name: string;
   description: string | null;
+  features: string[] | null; // Array of custom feature strings
   isActive: boolean;
   createdAt: string;
   updatedAt: string | null;
@@ -17,6 +18,7 @@ export class Module {
   public readonly id: string;
   public readonly name: string;
   public readonly description: string | null;
+  public readonly features: string[] | null;
   public readonly isActive: boolean;
   public readonly createdAt: string;
   public readonly updatedAt: string | null;
@@ -25,6 +27,7 @@ export class Module {
     this.id = data.id;
     this.name = data.name;
     this.description = data.description;
+    this.features = data.features;
     this.isActive = data.isActive;
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
@@ -51,17 +54,20 @@ export class Module {
 export interface CreateModuleRequestData {
   name: string;
   description?: string;
+  features?: string[];
   isActive?: boolean;
 }
 
 export class CreateModuleRequest {
   public readonly name: string;
   public readonly description?: string;
+  public readonly features?: string[];
   public readonly isActive?: boolean;
 
   constructor(data: CreateModuleRequestData) {
     this.name = data.name;
     this.description = data.description;
+    this.features = data.features;
     this.isActive = data.isActive ?? true;
   }
 
@@ -77,6 +83,7 @@ export interface UpdateModuleRequestData {
   id: string;
   name?: string;
   description?: string;
+  features?: string[];
   isActive?: boolean;
 }
 
@@ -84,12 +91,14 @@ export class UpdateModuleRequest {
   public readonly id: string;
   public readonly name?: string;
   public readonly description?: string;
+  public readonly features?: string[];
   public readonly isActive?: boolean;
 
   constructor(data: UpdateModuleRequestData) {
     this.id = data.id;
     this.name = data.name;
     this.description = data.description;
+    this.features = data.features;
     this.isActive = data.isActive;
   }
 

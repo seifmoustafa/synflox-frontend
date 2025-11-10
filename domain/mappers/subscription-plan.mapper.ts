@@ -35,6 +35,9 @@ export class SubscriptionPlanMapper {
       isActive: json.isActive ?? true,
       features: json.features,
       maxCompanies: json.maxCompanies !== undefined && json.maxCompanies !== null ? (typeof json.maxCompanies === 'string' ? parseInt(json.maxCompanies) : json.maxCompanies) : null,
+      planTier: typeof json.planTier === 'string' ? parseInt(json.planTier) : (json.planTier || 0),
+      parentPlanId: json.parentPlanId,
+      parentPlanName: json.parentPlanName,
       createdAt: json.createdAt || json.createdTimestamp || new Date().toISOString(),
       updatedAt: json.updatedAt || json.updatedTimestamp,
     });
@@ -54,6 +57,9 @@ export class SubscriptionPlanMapper {
       isActive: plan.isActive,
       features: plan.features,
       maxCompanies: plan.maxCompanies,
+      planTier: plan.planTier,
+      parentPlanId: plan.parentPlanId,
+      parentPlanName: plan.parentPlanName,
       createdAt: plan.createdAt,
       updatedAt: plan.updatedAt,
     };
@@ -73,6 +79,10 @@ export class SubscriptionPlanMapper {
       maxCompanies: formData.maxCompanies && formData.maxCompanies !== '' 
         ? (typeof formData.maxCompanies === 'string' ? parseInt(formData.maxCompanies) : formData.maxCompanies)
         : undefined,
+      planTier: formData.planTier !== undefined && formData.planTier !== ''
+        ? (typeof formData.planTier === 'string' ? parseInt(formData.planTier) : formData.planTier)
+        : undefined,
+      parentPlanId: formData.parentPlanId || undefined,
       isActive: formData.isActive,
     });
   }
@@ -96,6 +106,10 @@ export class SubscriptionPlanMapper {
       maxCompanies: formData.maxCompanies !== undefined && formData.maxCompanies !== ''
         ? (typeof formData.maxCompanies === 'string' ? parseInt(formData.maxCompanies) : formData.maxCompanies)
         : undefined,
+      planTier: formData.planTier !== undefined && formData.planTier !== ''
+        ? (typeof formData.planTier === 'string' ? parseInt(formData.planTier) : formData.planTier)
+        : undefined,
+      parentPlanId: formData.parentPlanId !== undefined ? formData.parentPlanId : undefined,
       isActive: formData.isActive,
     });
   }
@@ -113,10 +127,16 @@ export class SubscriptionPlanMapper {
       isActive: request.isActive,
     };
     if (request.features !== undefined) {
-      json.features = JSON.stringify(request.features);
+      json.features = request.features;
     }
     if (request.maxCompanies !== undefined && request.maxCompanies !== null) {
       json.maxCompanies = request.maxCompanies;
+    }
+    if (request.planTier !== undefined) {
+      json.planTier = request.planTier;
+    }
+    if (request.parentPlanId !== undefined) {
+      json.parentPlanId = request.parentPlanId;
     }
     return json;
   }
@@ -132,10 +152,12 @@ export class SubscriptionPlanMapper {
     if (request.currency !== undefined) json.currency = request.currency;
     if (request.billingCycle !== undefined) json.billingCycle = request.billingCycle;
     if (request.isActive !== undefined) json.isActive = request.isActive;
-    if (request.features !== undefined) json.features = JSON.stringify(request.features);
+    if (request.features !== undefined) json.features = request.features;
     if (request.maxCompanies !== undefined && request.maxCompanies !== null) {
       json.maxCompanies = request.maxCompanies;
     }
+    if (request.planTier !== undefined) json.planTier = request.planTier;
+    if (request.parentPlanId !== undefined) json.parentPlanId = request.parentPlanId;
     return json;
   }
 

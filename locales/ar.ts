@@ -540,6 +540,8 @@ export const ar = {
 
   // Projects
   project: {
+    features: "الميزات",
+  featuresPlaceholder: "أدخل اسم الميزة",
     title: "إدارة المشاريع",
     description: "إدارة المشاريع ووحداتها",
     item: "مشروع",
@@ -649,6 +651,8 @@ export const ar = {
 
   // Modules
   module: {
+    features: "الميزات", 
+    featuresPlaceholder: "أدخل اسم الميزة",
     title: "إدارة الوحدات",
     description: "إدارة الوحدات وارتباطاتها",
     item: "وحدة",
@@ -3114,6 +3118,7 @@ export const ar = {
 
   // Common
   common: {
+    value: "القيمة",
     show: "عرض",
     hide: "إخفاء",
     description: "الوصف",

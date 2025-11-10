@@ -19,8 +19,11 @@ export interface SubscriptionPlanData {
   currency: string;
   billingCycle: BillingCycle;
   isActive: boolean;
-  features: string | null; // JSON array of strings
+  features: string[] | null; // Array of feature strings
   maxCompanies: number | null;
+  planTier: number;
+  parentPlanId: string | null; // Encrypted GUID
+  parentPlanName: string | null;
   createdAt: string;
   updatedAt: string | null;
 }
@@ -33,8 +36,11 @@ export class SubscriptionPlan {
   public readonly currency: string;
   public readonly billingCycle: BillingCycle;
   public readonly isActive: boolean;
-  public readonly features: string | null;
+  public readonly features: string[] | null;
   public readonly maxCompanies: number | null;
+  public readonly planTier: number;
+  public readonly parentPlanId: string | null;
+  public readonly parentPlanName: string | null;
   public readonly createdAt: string;
   public readonly updatedAt: string | null;
 
@@ -48,6 +54,9 @@ export class SubscriptionPlan {
     this.isActive = data.isActive;
     this.features = data.features;
     this.maxCompanies = data.maxCompanies;
+    this.planTier = data.planTier;
+    this.parentPlanId = data.parentPlanId;
+    this.parentPlanName = data.parentPlanName;
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
   }
@@ -80,15 +89,31 @@ export class SubscriptionPlan {
   }
 
   /**
-   * Parse features JSON
+   * Get features array
    */
   get parsedFeatures(): string[] {
-    if (!this.features) return [];
-    try {
-      return JSON.parse(this.features);
-    } catch {
-      return [];
-    }
+    return this.features || [];
+  }
+
+  /**
+   * Check if this plan has a parent plan (inherits features)
+   */
+  get hasParentPlan(): boolean {
+    return !!this.parentPlanId;
+  }
+
+  /**
+   * Get plan tier display name
+   */
+  get planTierName(): string {
+    const tierNames: Record<number, string> = {
+      0: "Free",
+      1: "Basic", 
+      2: "Pro",
+      3: "Enterprise",
+      4: "Ultimate"
+    };
+    return tierNames[this.planTier] || `Tier ${this.planTier}`;
   }
 }
 
@@ -100,6 +125,8 @@ export interface CreateSubscriptionPlanRequestData {
   billingCycle: BillingCycle;
   features?: string[];
   maxCompanies?: number;
+  planTier?: number;
+  parentPlanId?: string;
   isActive?: boolean;
 }
 
@@ -111,6 +138,8 @@ export class CreateSubscriptionPlanRequest {
   public readonly billingCycle: BillingCycle;
   public readonly features?: string[];
   public readonly maxCompanies?: number;
+  public readonly planTier?: number;
+  public readonly parentPlanId?: string;
   public readonly isActive?: boolean;
 
   constructor(data: CreateSubscriptionPlanRequestData) {
@@ -121,6 +150,8 @@ export class CreateSubscriptionPlanRequest {
     this.billingCycle = data.billingCycle;
     this.features = data.features;
     this.maxCompanies = data.maxCompanies;
+    this.planTier = data.planTier;
+    this.parentPlanId = data.parentPlanId;
     this.isActive = data.isActive ?? true;
   }
 
@@ -138,6 +169,8 @@ export interface UpdateSubscriptionPlanRequestData {
   billingCycle?: BillingCycle;
   features?: string[];
   maxCompanies?: number;
+  planTier?: number;
+  parentPlanId?: string;
   isActive?: boolean;
 }
 
@@ -150,6 +183,8 @@ export class UpdateSubscriptionPlanRequest {
   public readonly billingCycle?: BillingCycle;
   public readonly features?: string[];
   public readonly maxCompanies?: number;
+  public readonly planTier?: number;
+  public readonly parentPlanId?: string;
   public readonly isActive?: boolean;
 
   constructor(data: UpdateSubscriptionPlanRequestData) {
@@ -161,6 +196,8 @@ export class UpdateSubscriptionPlanRequest {
     this.billingCycle = data.billingCycle;
     this.features = data.features;
     this.maxCompanies = data.maxCompanies;
+    this.planTier = data.planTier;
+    this.parentPlanId = data.parentPlanId;
     this.isActive = data.isActive;
   }
 

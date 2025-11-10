@@ -65,6 +65,28 @@ export function useProjectViewModel() {
           ),
         },
         {
+          key: "features",
+          label: t("project.features"),
+          render: (_val: unknown, project: Project) => (
+            <div className="flex flex-wrap gap-1">
+              {project.features && project.features.length > 0 ? (
+                project.features.slice(0, 3).map((feature, index) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {feature}
+                  </Badge>
+                ))
+              ) : (
+                <span className="text-sm text-muted-foreground">-</span>
+              )}
+              {project.features && project.features.length > 3 && (
+                <Badge variant="secondary" className="text-xs">
+                  +{project.features.length - 3}
+                </Badge>
+              )}
+            </div>
+          ),
+        },
+        {
           key: "isActive",
           label: t("project.status"),
           render: (_val: unknown, project: Project) => (
@@ -89,6 +111,12 @@ export function useProjectViewModel() {
           placeholder: t("project.descriptionPlaceholder"),
         },
         {
+          name: "features",
+          label: t("project.features"),
+          type: "string-array" as const,
+          placeholder: t("project.featuresPlaceholder"),
+        },
+        {
           name: "isActive",
           label: t("project.isActive"),
           type: "checkbox" as const,
@@ -109,6 +137,12 @@ export function useProjectViewModel() {
           placeholder: t("project.descriptionPlaceholder"),
         },
         {
+          name: "features",
+          label: t("project.features"),
+          type: "string-array" as const,
+          placeholder: t("project.featuresPlaceholder"),
+        },
+        {
           name: "isActive",
           label: t("project.isActive"),
           type: "checkbox" as const,
@@ -121,6 +155,7 @@ export function useProjectViewModel() {
       editInitialValues: (project: Project) => ({
         name: project.name,
         description: project.description || "",
+        features: project.features || [],
         isActive: project.isActive,
         id: project.id,
       }),
