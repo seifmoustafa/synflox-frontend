@@ -6,35 +6,23 @@
 
 export interface AdminTypeData {
   id: string; // Encrypted GUID from backend
-  name: string;
-  description?: string;
-  isActive?: boolean;
-  createdTimestamp?: string;
-  updatedTimestamp?: string;
+  adminTypeName: string;
 }
 
 export class AdminType {
   public readonly id: string;
-  public readonly name: string;
-  public readonly description?: string;
-  public readonly isActive?: boolean;
-  public readonly createdTimestamp?: string;
-  public readonly updatedTimestamp?: string;
+  public readonly adminTypeName: string;
 
   constructor(data: AdminTypeData) {
     this.id = data.id;
-    this.name = data.name;
-    this.description = data.description;
-    this.isActive = data.isActive;
-    this.createdTimestamp = data.createdTimestamp;
-    this.updatedTimestamp = data.updatedTimestamp;
+    this.adminTypeName = data.adminTypeName;
   }
 
   /**
    * Get admin type's display name
    */
   get displayName(): string {
-    return this.name;
+    return this.adminTypeName;
   }
 
   /**
@@ -52,24 +40,21 @@ export class AdminType {
  * Create Admin Type Request Model
  */
 export interface CreateAdminTypeRequestData {
-  name: string;
-  description?: string;
+  adminTypeName: string;
 }
 
 export class CreateAdminTypeRequest {
-  public readonly name: string;
-  public readonly description?: string;
+  public readonly adminTypeName: string;
 
   constructor(data: CreateAdminTypeRequestData) {
-    this.name = data.name;
-    this.description = data.description;
+    this.adminTypeName = data.adminTypeName;
   }
 
   /**
    * Validate the request data
    */
   get isValid(): boolean {
-    return !!(this.name && this.name.trim().length > 0);
+    return !!(this.adminTypeName && this.adminTypeName.trim().length > 0);
   }
 }
 
@@ -78,29 +63,23 @@ export class CreateAdminTypeRequest {
  */
 export interface UpdateAdminTypeRequestData {
   id: string;
-  name?: string;
-  description?: string;
-  isActive?: boolean;
+  adminTypeName?: string;
 }
 
 export class UpdateAdminTypeRequest {
   public readonly id: string;
-  public readonly name?: string;
-  public readonly description?: string;
-  public readonly isActive?: boolean;
+  public readonly adminTypeName?: string;
 
   constructor(data: UpdateAdminTypeRequestData) {
     this.id = data.id;
-    this.name = data.name;
-    this.description = data.description;
-    this.isActive = data.isActive;
+    this.adminTypeName = data.adminTypeName;
   }
 
   /**
    * Validate the request data
    */
   get isValid(): boolean {
-    return !!(this.id && (this.name === undefined || this.name.trim().length > 0));
+    return !!(this.id && (this.adminTypeName === undefined || this.adminTypeName.trim().length > 0));
   }
 }
 

@@ -26,11 +26,7 @@ export class AdminTypeMapper {
   static fromJson(json: any): AdminType {
     return new AdminType({
       id: json.id || '',
-      name: json.adminTypeName || json.name || '', // Map adminTypeName to name
-      description: json.description,
-      isActive: json.isActive ?? true, // Default to true if not provided
-      createdTimestamp: json.createdTimestamp || new Date().toISOString(),
-      updatedTimestamp: json.updatedTimestamp,
+      adminTypeName: json.adminTypeName || '',
     });
   }
 
@@ -40,11 +36,7 @@ export class AdminTypeMapper {
   static toJson(adminType: AdminType): any {
     return {
       id: adminType.id,
-      name: adminType.name,
-      description: adminType.description,
-      isActive: adminType.isActive,
-      createdTimestamp: adminType.createdTimestamp,
-      updatedTimestamp: adminType.updatedTimestamp,
+      adminTypeName: adminType.adminTypeName,
     };
   }
 
@@ -53,8 +45,7 @@ export class AdminTypeMapper {
    */
   static createRequestToJson(request: CreateAdminTypeRequest): any {
     return {
-      name: request.name,
-      description: request.description,
+      adminTypeName: request.adminTypeName,
     };
   }
 
@@ -63,9 +54,7 @@ export class AdminTypeMapper {
    */
   static updateRequestToJson(request: UpdateAdminTypeRequest): any {
     const json: any = {};
-    if (request.name !== undefined) json.name = request.name;
-    if (request.description !== undefined) json.description = request.description;
-    if (request.isActive !== undefined) json.isActive = request.isActive;
+    if (request.adminTypeName !== undefined) json.adminTypeName = request.adminTypeName;
     return json;
   }
 

@@ -27,14 +27,11 @@ export class AdminMapper {
     return new Admin({
       id: json.id || '',
       username: json.username || '',
-      firstName: json.firstName || '',
-      lastName: json.lastName || '',
-      phoneNumber: json.phoneNumber || '',
-      adminTypeId: json.adminTypeId, // May not be in response
-      adminTypeName: json.adminTypeName,
-      isActive: json.isActive ?? true, // Default to true if not provided
-      createdTimestamp: json.createdTimestamp || new Date().toISOString(),
-      updatedTimestamp: json.updatedTimestamp,
+      firstName: json.firstName || null,
+      lastName: json.lastName || null,
+      phoneNumber: json.phoneNumber || null,
+      adminTypeId: json.adminTypeId || '',
+      adminTypeName: json.adminTypeName || null,
     });
   }
 
@@ -50,9 +47,6 @@ export class AdminMapper {
       phoneNumber: admin.phoneNumber,
       adminTypeId: admin.adminTypeId,
       adminTypeName: admin.adminTypeName,
-      isActive: admin.isActive,
-      createdTimestamp: admin.createdTimestamp,
-      updatedTimestamp: admin.updatedTimestamp,
     };
   }
 
@@ -80,7 +74,6 @@ export class AdminMapper {
     if (request.lastName !== undefined) json.lastName = request.lastName;
     if (request.phoneNumber !== undefined) json.phoneNumber = request.phoneNumber;
     if (request.adminTypeId !== undefined) json.adminTypeId = request.adminTypeId;
-    if (request.isActive !== undefined) json.isActive = request.isActive;
     return json;
   }
 

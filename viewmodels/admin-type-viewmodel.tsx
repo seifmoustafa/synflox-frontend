@@ -42,74 +42,38 @@ export function useAdminTypeViewModel() {
       subtitleKey: "adminType.description",
       columns: [
         {
-          key: "name",
-          label: t("adminType.name"),
+          key: "adminTypeName",
+          label: t("adminType.adminTypeName"),
           render: (_val: unknown, adminType: AdminType) => (
-            <div className="font-medium">{adminType.name}</div>
+            <div className="font-medium">{adminType.adminTypeName}</div>
           ),
         },
-        {
-          key: "description",
-          label: t("common.description"),
-          render: (_val: unknown, adminType: AdminType) => (
-            <span className="text-sm text-muted-foreground">
-              {adminType.description || "-"}
-            </span>
-          ),
-        },
-        {
-          key: "isActive",
-          label: t("adminType.status"),
-          render: (_val: unknown, adminType: AdminType) => (
-            <Badge variant={adminType.isActive ? "active" : "secondary"}>
-              {adminType.isActive
-                ? t("adminType.active")
-                : t("adminType.inactive")}
-            </Badge>
-          ),
-        },
+       
+       
       ],
       createFields: [
         {
-          name: "name",
-          label: t("adminType.name"),
+          name: "adminTypeName",
+          label: t("adminType.adminTypeName"),
           type: "text" as const,
-          placeholder: t("adminType.namePlaceholder"),
+          placeholder: t("adminType.adminTypeNamePlaceholder"),
           required: true,
-        },
-        {
-          name: "description",
-          label: t("common.description"),
-          type: "textarea" as const,
-          placeholder: t("adminType.descriptionPlaceholder"),
         },
       ],
       editFields: [
         {
-          name: "name",
-          label: t("adminType.name"),
+          name: "adminTypeName",
+          label: t("adminType.adminTypeName"),
           type: "text" as const,
-          placeholder: t("adminType.namePlaceholder"),
+          placeholder: t("adminType.adminTypeNamePlaceholder"),
           required: true,
         },
-        {
-          name: "description",
-          label: t("common.description"),
-          type: "textarea" as const,
-          placeholder: t("adminType.descriptionPlaceholder"),
-        },
-        {
-          name: "isActive",
-          label: t("adminType.isActive"),
-          type: "checkbox" as const,
-        },
+        
         { name: "id", type: "hidden" as const, required: true },
       ],
       createInitialValues: {},
       editInitialValues: (adminType: AdminType) => ({
-        name: adminType.name,
-        description: adminType.description || "",
-        isActive: adminType.isActive ?? true,
+        adminTypeName: adminType.adminTypeName,
         id: adminType.id,
       }),
       getActions: (vm: any, t: any, handleDelete) => [
@@ -123,30 +87,8 @@ export function useAdminTypeViewModel() {
           onClick: (item: AdminType) => vm.openEditModal(item),
           variant: "ghost" as const,
         },
-        {
-          label: t("common.makeInactive"),
-          onClick: async (item: AdminType) => {
-            await adminTypeService.toggleActive(item.id, false);
-            await vm.refreshItems();
-          },
-          variant: "ghost" as const,
-          className: "text-orange-600 hover:text-orange-700",
-          show: (item: AdminType) => item.isActive === true,
-          confirmTitle: t("common.makeInactive"),
-          confirmDescription: t("common.confirmMakeInactive", { name: "{name}" }),
-        },
-        {
-          label: t("common.makeActive"),
-          onClick: async (item: AdminType) => {
-            await adminTypeService.toggleActive(item.id, true);
-            await vm.refreshItems();
-          },
-          variant: "ghost" as const,
-          className: "text-green-600 hover:text-green-700",
-          show: (item: AdminType) => item.isActive !== true,
-          confirmTitle: t("common.makeActive"),
-          confirmDescription: t("common.confirmMakeActive", { name: "{name}" }),
-        },
+        
+       
         {
           label: t("common.delete"),
           onClick: (item: AdminType) => handleDelete?.(item),
@@ -168,13 +110,7 @@ export function useAdminTypeViewModel() {
     [adminTypeService, vm]
   );
 
-  const handleToggleActive = useCallback(
-    async (adminType: AdminType) => {
-      await adminTypeService.toggleActive(adminType.id, !adminType.isActive);
-      await vm.refreshItems();
-    },
-    [adminTypeService, vm]
-  );
+  
 
-  return { vm, config, handleDelete, handleToggleActive };
+  return { vm, config, handleDelete };
 }
