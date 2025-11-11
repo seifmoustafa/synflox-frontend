@@ -74,6 +74,7 @@ export class SecureTokenService {
 
   /**
    * Store all token data at once
+   * If expiresAt is not provided, calculates it based on access token lifetime (5 minutes)
    */
   static setTokens(tokenData: TokenData): boolean {
     try {
@@ -83,9 +84,9 @@ export class SecureTokenService {
         this.setRefreshToken(tokenData.refreshToken);
       }
       
-      if (tokenData.expiresAt) {
-        this.setTokenExpiry(tokenData.expiresAt);
-      }
+      // Calculate expiry if not provided (5 minutes from now for access token)
+      const expiresAt = tokenData.expiresAt || (Date.now() + (5 * 60 * 1000));
+      this.setTokenExpiry(expiresAt);
       
       return success;
     } catch (error) {

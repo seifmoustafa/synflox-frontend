@@ -28,8 +28,13 @@ export class AuthService {
       const loginResponse = AuthMapper.loginResponseFromJson(loginData);
 
       if (loginResponse.isSuccessful && loginResponse.accessToken) {
-        secureTokenService.setAccessToken(loginResponse.accessToken);
-        secureTokenService.setRefreshToken(loginResponse.refreshToken);
+        // Store tokens with automatic expiry calculation (5 minutes for access token)
+        secureTokenService.setTokens({
+          accessToken: loginResponse.accessToken,
+          refreshToken: loginResponse.refreshToken,
+        });
+        
+        appLogger.api("Login successful, tokens stored");
         
         // If admin data is in response, use it; otherwise fetch user
         if (loginData?.admin) {
@@ -95,11 +100,13 @@ export class AuthService {
 
       const loginData = response?.data || response;
       const loginResponse = AuthMapper.loginResponseFromJson(loginData);
-      if (loginResponse.isSuccessful) {
-        secureTokenService.setAccessToken(loginResponse.accessToken);
-        if (loginResponse.refreshToken) {
-          secureTokenService.setRefreshToken(loginResponse.refreshToken);
-        }
+      if (loginResponse.isSuccessful && loginResponse.accessToken) {
+        // Store tokens with automatic expiry calculation
+        secureTokenService.setTokens({
+          accessToken: loginResponse.accessToken,
+          refreshToken: loginResponse.refreshToken,
+        });
+        appLogger.api("Token refresh successful via service");
       }
       return loginResponse;
     } catch (error) {

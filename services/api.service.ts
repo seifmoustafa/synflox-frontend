@@ -14,6 +14,11 @@ export interface IApiService {
 export class ApiService implements IApiService {
   private baseUrl: string;
   private defaultHeaders: Record<string, string>;
+  private isRefreshing: boolean = false;
+  private failedRequestsQueue: Array<{
+    resolve: (token: string) => void;
+    reject: (error: any) => void;
+  }> = [];
 
   constructor(baseUrl: string = process.env.NEXT_PUBLIC_API_URL || "/api") {
     this.baseUrl = baseUrl;
@@ -21,6 +26,82 @@ export class ApiService implements IApiService {
       "Content-Type": "application/json",
       Accept: "application/json",
     };
+  }
+
+  /**
+   * Handle token refresh and queue management
+   */
+  private async handleTokenRefresh(): Promise<string | null> {
+    if (this.isRefreshing) {
+      // If already refreshing, wait for it to complete
+      return new Promise((resolve, reject) => {
+        this.failedRequestsQueue.push({ resolve, reject });
+      });
+    }
+
+    this.isRefreshing = true;
+
+    try {
+      const refreshToken = secureTokenService.getRefreshToken();
+      if (!refreshToken) {
+        throw new Error("No refresh token available");
+      }
+
+      // Import AuthMapper and RefreshTokenRequest dynamically to avoid circular dependency
+      const { AuthMapper } = await import("@/domain/mappers/auth.mapper");
+      const { RefreshTokenRequest } = await import("@/domain/models/auth.model");
+
+      const refreshRequest = new RefreshTokenRequest({ refreshToken });
+      
+      // Make refresh request WITHOUT going through the interceptor to avoid infinite loop
+      const url = this.buildUrl("/admin/auth/refresh-token");
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(AuthMapper.refreshTokenRequestToJson(refreshRequest)),
+      });
+
+      if (!response.ok) {
+        throw new Error("Token refresh failed");
+      }
+
+      const data = await response.json();
+      const loginData = data?.data || data;
+      const loginResponse = AuthMapper.loginResponseFromJson(loginData);
+
+      if (loginResponse.isSuccessful && loginResponse.accessToken) {
+        // Store tokens with automatic expiry calculation (5 minutes for access token)
+        secureTokenService.setTokens({
+          accessToken: loginResponse.accessToken,
+          refreshToken: loginResponse.refreshToken,
+        });
+
+        // Process queued requests with new token
+        this.failedRequestsQueue.forEach(({ resolve }) => {
+          resolve(loginResponse.accessToken);
+        });
+        this.failedRequestsQueue = [];
+
+        appLogger.api("Token refreshed successfully");
+        return loginResponse.accessToken;
+      }
+
+      throw new Error("Invalid refresh response");
+    } catch (error) {
+      // Reject all queued requests
+      this.failedRequestsQueue.forEach(({ reject }) => {
+        reject(error);
+      });
+      this.failedRequestsQueue = [];
+
+      appLogger.error("Token refresh failed:", error);
+      return null;
+    } finally {
+      this.isRefreshing = false;
+    }
   }
 
   private buildUrl(endpoint: string) {
@@ -47,11 +128,16 @@ export class ApiService implements IApiService {
     return "ar"; // Default for SSR
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}, signal?: AbortSignal): Promise<T> {
+  private async request<T>(
+    endpoint: string, 
+    options: RequestInit = {}, 
+    signal?: AbortSignal,
+    isRetry: boolean = false
+  ): Promise<T> {
     const url = this.buildUrl(endpoint);
     
     // Only log in development
-    appLogger.api("Request:", { method: options.method || "GET", url });
+    appLogger.api("Request:", { method: options.method || "GET", url, isRetry });
 
     // Check if request was aborted before making the request
     if (signal?.aborted) {
@@ -124,12 +210,28 @@ export class ApiService implements IApiService {
         }
 
         if (response.status === 401) {
-          if(window.location.pathname != "/login"){
+          // Skip login page and refresh endpoint from auto-refresh
+          const isLoginPage = typeof window !== 'undefined' && window.location.pathname === "/login";
+          const isRefreshEndpoint = endpoint.includes("/refresh-token");
+          
+          if (!isLoginPage && !isRefreshEndpoint && !isRetry) {
+            // Attempt token refresh for authenticated requests
+            appLogger.api("Access token expired, attempting refresh...");
+            const newToken = await this.handleTokenRefresh();
+            
+            if (newToken) {
+              // Retry the original request with new token
+              appLogger.api("Token refreshed, retrying request...");
+              return this.request<T>(endpoint, options, signal, true);
+            }
+          }
+          
+          // Token refresh failed or not applicable - clear and redirect
+          if (!isLoginPage) {
             const error = new Error(errorMessage || "Unauthorized - please login again");
             const appError = handleError(error, `API Request: ${url}`);
-            toast.error(errorMessage || getUserFriendlyErrorMessage(appError));
+            toast.error("Session expired. Please login again.");
             secureTokenService.clearTokens();
-            // Use Next.js router instead of direct window manipulation
             if (typeof window !== 'undefined') {
               window.location.href = "/login";
             }
