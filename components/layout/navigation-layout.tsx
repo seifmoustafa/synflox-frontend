@@ -31,7 +31,7 @@ export function NavigationLayout({
   const [selectedMainItem, setSelectedMainItem] = useState<string | null>(null);
   const [panelSidebarOpen, setPanelSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return window.innerWidth < 1024;
     }
     return false;
@@ -78,7 +78,11 @@ export function NavigationLayout({
           // Check nested children
           if (child.children) {
             for (const nestedChild of child.children) {
-              if (nestedChild.href && nestedChild.href !== "/" && path.startsWith(nestedChild.href)) {
+              if (
+                nestedChild.href &&
+                nestedChild.href !== "/" &&
+                path.startsWith(nestedChild.href)
+              ) {
                 const nextChar = path[nestedChild.href.length];
                 if (nextChar === undefined || nextChar === "/") {
                   return item.name;
@@ -100,7 +104,7 @@ export function NavigationLayout({
       manualSelectionRef.current = false;
       return;
     }
-    
+
     const parentItem = findParentItemForPath(pathname);
     setActiveMainItem(parentItem);
 
@@ -128,9 +132,7 @@ export function NavigationLayout({
 
   // Get the current item to display (selected takes priority over active)
   const currentItem = selectedMainItem || activeMainItem;
-  const currentNavItem = navigation.find(
-    (item) => item.name === currentItem
-  );
+  const currentNavItem = navigation.find((item) => item.name === currentItem);
   const hasChildren =
     currentNavItem?.children && currentNavItem.children.length > 0;
   const shouldShowPanel = hasChildren && panelSidebarOpen && !isMobile;
@@ -138,19 +140,22 @@ export function NavigationLayout({
   // Handle main item selection
   const handleMainItemSelect = (itemName: string) => {
     manualSelectionRef.current = true;
-    
+
     // If empty string, clear selection
     if (!itemName || itemName === "") {
       setSelectedMainItem(null);
       // Return to active item's panel
-      const activeNavItem = navigation.find((item) => item.name === activeMainItem);
-      const activeHasChildren = activeNavItem?.children && activeNavItem.children.length > 0;
+      const activeNavItem = navigation.find(
+        (item) => item.name === activeMainItem
+      );
+      const activeHasChildren =
+        activeNavItem?.children && activeNavItem.children.length > 0;
       if (activeHasChildren && !isMobile) {
         setPanelSidebarOpen(true);
       }
       return;
     }
-    
+
     const newItem = navigation.find((item) => item.name === itemName);
     const newHasChildren = newItem?.children && newItem.children.length > 0;
 

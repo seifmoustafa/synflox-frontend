@@ -208,7 +208,12 @@ export function NavigationPanelSidebar({
     // Check if this item is active - exact match or if pathname starts with item href
     // Ensure proper path segment match (next char must be '/' or end of string)
     let isActive = pathname === item.href;
-    if (!isActive && item.href && item.href !== "/" && pathname.startsWith(item.href)) {
+    if (
+      !isActive &&
+      item.href &&
+      item.href !== "/" &&
+      pathname.startsWith(item.href)
+    ) {
       // Ensure the next character after the href is either '/' or end of string
       // This prevents partial matches like /system/entryGate matching /system/entryGateVisitor
       const nextChar = pathname[item.href.length];
