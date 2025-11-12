@@ -4,7 +4,7 @@ import { GenericCrudView } from "@/components/ui/generic-crud-view";
 import { useAdminTypeViewModel } from "@/viewmodels/admin-type-viewmodel";
 
 export function AdminTypeView() {
-  const { vm, config, handleDelete, handleToggleActive } = useAdminTypeViewModel();
+  const { vm, config, handleDelete } = useAdminTypeViewModel();
 
   return (
       <GenericCrudView 

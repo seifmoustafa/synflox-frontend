@@ -111,14 +111,14 @@ export class AdminTypeService implements IAdminTypeService {
     }
   }
 
-  async toggleActive(id: string, isActive: boolean): Promise<AdminType> {
-    try {
-      const updateRequest = new UpdateAdminTypeRequest({ id, isActive });
-      return await this.updateAdminType(id, updateRequest);
-    } catch (e) {
-      // Error message already shown by API service with backend message
-      throw e;
-    }
-  }
+  // async toggleActive(id: string, isActive: boolean): Promise<AdminType> {
+  //   try {
+  //     const updateRequest = new UpdateAdminTypeRequest({ id, isActive });
+  //     return await this.updateAdminType(id, updateRequest);
+  //   } catch (e) {
+  //     // Error message already shown by API service with backend message
+  //     throw e;
+  //   }
+  // }
 }
 

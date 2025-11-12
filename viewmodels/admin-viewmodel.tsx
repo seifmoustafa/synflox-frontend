@@ -65,15 +65,7 @@ export function useAdminViewModel() {
             <span className="text-sm text-muted-foreground">{admin.phoneNumber}</span>
           ),
         },
-        {
-          key: "isActive",
-          label: t("admin.status"),
-          render: (_val: unknown, admin: Admin) => (
-            <Badge variant={admin.isActive ? "active" : "secondary"}>
-              {admin.isActive ? t("admin.active") : t("admin.inactive")}
-            </Badge>
-          ),
-        },
+        
       ],
       createFields: [
         {
@@ -119,7 +111,7 @@ export function useAdminViewModel() {
           searchType: "server" as const,
           onServerSearch: async (query: string) => {
             const res = await adminTypeService.getAdminTypes({ search: query });
-            return res.data.map(at => ({ value: at.id, label: at.name }));
+            return res.data.map(at => ({ value: at.id, label: at.adminTypeName }));
           },
           required: true,
         },
@@ -160,7 +152,7 @@ export function useAdminViewModel() {
           searchType: "server" as const,
           onServerSearch: async (query: string) => {
             const res = await adminTypeService.getAdminTypes({ search: query });
-            return res.data.map(at => ({ value: at.id, label: at.name }));
+            return res.data.map(at => ({ value: at.id, label: at.adminTypeName }));
           },
           required: true,
         },
@@ -178,7 +170,6 @@ export function useAdminViewModel() {
         lastName: admin.lastName,
         phoneNumber: admin.phoneNumber,
         adminTypeId: admin.adminTypeId,
-        isActive: admin.isActive ?? true,
         id: admin.id,
       }),
       getActions: (vm: any, t: any, handleDelete) => [
@@ -192,30 +183,8 @@ export function useAdminViewModel() {
           onClick: (item: Admin) => vm.openEditModal(item),
           variant: "ghost" as const,
         },
-        {
-          label: t("common.makeInactive"),
-          onClick: async (item: Admin) => {
-            await adminService.toggleActive(item.id, false);
-            await vm.refreshItems();
-          },
-          variant: "ghost" as const,
-          className: "text-orange-600 hover:text-orange-700",
-          show: (item: Admin) => item.isActive === true,
-          confirmTitle: t("common.makeInactive"),
-          confirmDescription: t("common.confirmMakeInactive", { name: "{name}" }),
-        },
-        {
-          label: t("common.makeActive"),
-          onClick: async (item: Admin) => {
-            await adminService.toggleActive(item.id, true);
-            await vm.refreshItems();
-          },
-          variant: "ghost" as const,
-          className: "text-green-600 hover:text-green-700",
-          show: (item: Admin) => item.isActive !== true,
-          confirmTitle: t("common.makeActive"),
-          confirmDescription: t("common.confirmMakeActive", { name: "{name}" }),
-        },
+        
+        
         {
           label: t("common.delete"),
           onClick: (item: Admin) => handleDelete?.(item),
@@ -234,11 +203,8 @@ export function useAdminViewModel() {
     await vm.refreshItems();
   }, [adminService, vm]);
 
-  const handleToggleActive = useCallback(async (admin: Admin) => {
-    await adminService.toggleActive(admin.id, !admin.isActive);
-    await vm.refreshItems();
-  }, [adminService, vm]);
+  
 
-  return { vm, config, handleDelete, handleToggleActive };
+  return { vm, config, handleDelete };
 }
 
