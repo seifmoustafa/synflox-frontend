@@ -174,11 +174,9 @@ export class ApiService implements IApiService {
             appLogger.api("📡 Calling refresh endpoint...");
             
             // Import dynamically to avoid circular dependency
-            const { AuthMapper } = await import("@/domain/mappers/auth.mapper");
-            const { RefreshTokenRequest } = await import("@/domain/models/auth.model");
-            
-            const refreshRequest = new RefreshTokenRequest({ refreshToken });
             const refreshUrl = this.buildUrl("/admin/auth/refresh-token");
+            
+            appLogger.api("📡 Calling refresh endpoint...", { refreshToken: refreshToken.substring(0, 20) + "..." });
             
             try {
               const refreshResponse = await fetch(refreshUrl, {
@@ -187,34 +185,59 @@ export class ApiService implements IApiService {
                   "Content-Type": "application/json",
                   Accept: "application/json",
                 },
-                body: JSON.stringify(AuthMapper.refreshTokenRequestToJson(refreshRequest)),
+                // ⭐ Backend expects PascalCase: { "RefreshToken": "..." }
+                body: JSON.stringify({ RefreshToken: refreshToken }),
               });
               
-              appLogger.api("📥 Refresh response", { status: refreshResponse.status });
+              appLogger.api("📥 Refresh response", { status: refreshResponse.status, ok: refreshResponse.ok });
               
               if (!refreshResponse.ok) {
-                appLogger.error("❌ Refresh failed", { status: refreshResponse.status });
+                const errorText = await refreshResponse.text();
+                appLogger.error("❌ Refresh failed", { status: refreshResponse.status, error: errorText });
                 return null;
               }
               
               const refreshData = await refreshResponse.json();
-              const loginData = refreshData?.data || refreshData;
-              const loginResponse = AuthMapper.loginResponseFromJson(loginData);
+              appLogger.api("📦 Refresh data received", { 
+                keys: Object.keys(refreshData),
+                fullResponse: refreshData
+              });
               
-              if (loginResponse.isSuccessful && loginResponse.accessToken) {
-                appLogger.api("✅ Got new access token!");
+              // ⭐ Backend returns AuthenticationResponse DIRECTLY (not wrapped)
+              // Controller: return Ok(response); 
+              // So we get: { Success, AccessToken, RefreshToken, ErrorMessage }
+              
+              appLogger.api("🔍 Checking response structure", { 
+                hasSuccess: 'Success' in refreshData,
+                hasAccessToken: 'AccessToken' in refreshData,
+                hasRefreshToken: 'RefreshToken' in refreshData,
+                Success: refreshData.Success,
+                hasErrorMessage: !!refreshData.ErrorMessage
+              });
+              
+              // ✅ Check for success and required fields
+              if (refreshData.Success && refreshData.AccessToken && refreshData.RefreshToken) {
+                appLogger.api("✅ Got new tokens from backend!", {
+                  accessToken: refreshData.AccessToken.substring(0, 20) + "...",
+                  refreshToken: refreshData.RefreshToken.substring(0, 20) + "..."
+                });
                 
                 // Store new tokens
                 secureTokenService.setTokens({
-                  accessToken: loginResponse.accessToken,
-                  refreshToken: loginResponse.refreshToken,
+                  accessToken: refreshData.AccessToken,
+                  refreshToken: refreshData.RefreshToken,
                 });
                 
-                appLogger.api("💾 Tokens stored in localStorage");
-                return loginResponse.accessToken;
+                appLogger.api("💾 New tokens stored in localStorage!");
+                return refreshData.AccessToken;
               }
               
-              appLogger.error("❌ Invalid refresh response");
+              // ❌ Refresh failed - log detailed error
+              appLogger.error("❌ Refresh response invalid or failed", { 
+                success: refreshData.Success,
+                errorMessage: refreshData.ErrorMessage,
+                fullResponse: refreshData
+              });
               return null;
             } catch (error) {
               appLogger.error("💥 Refresh request failed", { error });

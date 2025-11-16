@@ -17,15 +17,15 @@ export class AuthService {
   async login(credentials: LoginRequest): Promise<User> {
     try {
       // SYNFLOX API: POST /api/admin/auth/login
-      // Backend returns: { statusCode, message, data: { success, accessToken, refreshToken, expiresIn, admin, errorMessage? } }
+      // Backend returns AuthenticationResponse DIRECTLY: { Success, AccessToken, RefreshToken, ErrorMessage }
+      // Controller: return Ok(response);
       const response = await this.apiService.post<any>(
         API_ENDPOINTS.AUTH_LOGIN,
         AuthMapper.loginRequestToJson(credentials)
       );
 
-      // Handle SYNFLOX response format
-      const loginData = response?.data || response;
-      const loginResponse = AuthMapper.loginResponseFromJson(loginData);
+      // Response is already the AuthenticationResponse (not wrapped)
+      const loginResponse = AuthMapper.loginResponseFromJson(response);
 
       if (loginResponse.isSuccessful && loginResponse.accessToken) {
         // Store tokens with automatic expiry calculation (5 minutes for access token)
@@ -36,10 +36,8 @@ export class AuthService {
         
         appLogger.api("Login successful, tokens stored");
         
-        // If admin data is in response, use it; otherwise fetch user
-        if (loginData?.admin) {
-          return UserMapper.fromJson(loginData.admin);
-        }
+        // Backend doesn't return admin data in login response
+        // So we always fetch user via getMe()
         return this.getMe();
       }
 
