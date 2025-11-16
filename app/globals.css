@@ -1010,6 +1010,180 @@ html[data-compact-mode="true"] {
 }
 
 /* ========================================
+   LOGIN PAGE ANIMATIONS
+   ======================================== */
+@keyframes mesh-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(60px); }
+}
+
+@keyframes orb-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  33% { transform: translate(-40px, -50px) scale(1.1); opacity: 0.8; }
+  66% { transform: translate(30px, 40px) scale(0.9); opacity: 0.7; }
+}
+
+@keyframes orb-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  33% { transform: translate(50px, -30px) scale(1.15); opacity: 0.7; }
+  66% { transform: translate(-30px, 50px) scale(0.95); opacity: 0.6; }
+}
+
+@keyframes orb-3 {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; }
+}
+
+@keyframes particle-float {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1); 
+    opacity: 0; 
+  }
+  10% { 
+    opacity: 0.3; 
+  }
+  50% { 
+    transform: translate(100px, -200px) scale(1.5); 
+    opacity: 0.6; 
+  }
+  90% { 
+    opacity: 0.3; 
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scaleX(0.95);
+  }
+}
+
+@keyframes dna-float {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(-30px) scaleY(1.05);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes ray-move {
+  0% {
+    transform: translateX(-100%) rotate(15deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateX(100vw) rotate(15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.animate-orb-1 {
+  animation: orb-1 30s ease-in-out infinite;
+}
+
+.animate-orb-2 {
+  animation: orb-2 35s ease-in-out infinite;
+}
+
+.animate-orb-3 {
+  animation: orb-3 25s ease-in-out infinite;
+}
+
+.animate-ripple {
+  animation: ripple 1s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+.animate-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.animate-gradient {
+  animation: gradient 5s ease infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
+
+.animate-typing-wave {
+  animation: typing-wave 2s ease-in-out infinite;
+}
+
+.animate-checkmark-draw {
+  animation: checkmark-draw 1s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+.animate-success-scale {
+  animation: success-scale 1s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ========================================
    COMPONENT-SPECIFIC STYLES - TREEVIEW
    ======================================== */
 .custom-tree {

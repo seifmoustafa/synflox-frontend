@@ -9,8 +9,6 @@ export { UserMapper } from './user.mapper';
 export { AuthMapper } from './auth.mapper';
 export { NavigationMapper } from './navigation.mapper';
 export { NotificationMapper } from './notification.mapper';
-export { CompanyMapper } from './company.mapper';
-export { LicensingMapper } from './licensing.mapper';
+
 export { AdminMapper } from './admin.mapper';
 export { AdminTypeMapper } from './admin-type.mapper';
-export { DashboardMapper } from './dashboard.mapper';

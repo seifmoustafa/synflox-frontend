@@ -41,33 +41,8 @@ export {
   type NotificationConfigData
 } from './models/notification.model';
 
-// Company domain
-export {
-  Company,
-  CreateCompanyRequest,
-  UpdateCompanyRequest,
-  type CompanyData,
-  type CreateCompanyRequestData,
-  type UpdateCompanyRequestData
-} from './models/company.model';
-export type { CompaniesResponse } from './mappers/company.mapper';
 
-// Licensing domain
-export {
-  ActivateCompanyRequest,
-  ExtendCompanyRequest,
-  CompanyStatusResponse,
-  GenerateLicenseKeyResponse,
-  ValidateLicenseKeyRequest,
-  LicenseKeyValidationResponse,
-  LicenseStatus,
-  type ActivateCompanyRequestData,
-  type ExtendCompanyRequestData,
-  type CompanyStatusResponseData,
-  type GenerateLicenseKeyResponseData,
-  type ValidateLicenseKeyRequestData,
-  type LicenseKeyValidationResponseData,
-} from './models/licensing.model';
+
 
 // Admin domain
 export {
@@ -91,22 +66,7 @@ export {
 } from './models/admin-type.model';
 export type { AdminTypesResponse } from './mappers/admin-type.mapper';
 
-// Dashboard domain
-export {
-  DashboardOverview,
-  SystemStatistics,
-  DashboardEndpoints,
-  LicenseStatusStats,
-  EndpointInfo,
-  ParameterInfo,
-  type DashboardOverviewData,
-  type SystemStatisticsData,
-  type DashboardEndpointsData,
-  type LicenseStatusStatsData,
-  type EndpointInfoData,
-  type ParameterInfoData,
-} from './models/dashboard.model';
-export type { DashboardOverviewResponse } from './mappers/dashboard.mapper';
+
 
 // Mappers
-export { UserMapper, AuthMapper, NavigationMapper, NotificationMapper, CompanyMapper, LicensingMapper, AdminMapper, AdminTypeMapper, DashboardMapper } from './mappers';
+export { UserMapper, AuthMapper, NavigationMapper, NotificationMapper, AdminMapper, AdminTypeMapper } from './mappers';
