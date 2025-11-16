@@ -17,27 +17,24 @@ export class AuthService {
   async login(credentials: LoginRequest): Promise<User> {
     try {
       // SYNFLOX API: POST /api/admin/auth/login
-      // Backend returns AuthenticationResponse DIRECTLY: { Success, AccessToken, RefreshToken, ErrorMessage }
-      // Controller: return Ok(response);
+      // Backend returns: { statusCode, message, data: { success, accessToken, refreshToken, expiresIn, admin, errorMessage? } }
       const response = await this.apiService.post<any>(
         API_ENDPOINTS.AUTH_LOGIN,
         AuthMapper.loginRequestToJson(credentials)
       );
 
-      // Response is already the AuthenticationResponse (not wrapped)
-      const loginResponse = AuthMapper.loginResponseFromJson(response);
+      // Handle SYNFLOX response format
+      const loginData = response?.data || response;
+      const loginResponse = AuthMapper.loginResponseFromJson(loginData);
 
       if (loginResponse.isSuccessful && loginResponse.accessToken) {
-        // Store tokens with automatic expiry calculation (5 minutes for access token)
-        secureTokenService.setTokens({
-          accessToken: loginResponse.accessToken,
-          refreshToken: loginResponse.refreshToken,
-        });
+        secureTokenService.setAccessToken(loginResponse.accessToken);
+        secureTokenService.setRefreshToken(loginResponse.refreshToken);
         
-        appLogger.api("Login successful, tokens stored");
-        
-        // Backend doesn't return admin data in login response
-        // So we always fetch user via getMe()
+        // If admin data is in response, use it; otherwise fetch user
+        if (loginData?.admin) {
+          return UserMapper.fromJson(loginData.admin);
+        }
         return this.getMe();
       }
 
@@ -98,13 +95,11 @@ export class AuthService {
 
       const loginData = response?.data || response;
       const loginResponse = AuthMapper.loginResponseFromJson(loginData);
-      if (loginResponse.isSuccessful && loginResponse.accessToken) {
-        // Store tokens with automatic expiry calculation
-        secureTokenService.setTokens({
-          accessToken: loginResponse.accessToken,
-          refreshToken: loginResponse.refreshToken,
-        });
-        appLogger.api("Token refresh successful via service");
+      if (loginResponse.isSuccessful) {
+        secureTokenService.setAccessToken(loginResponse.accessToken);
+        if (loginResponse.refreshToken) {
+          secureTokenService.setRefreshToken(loginResponse.refreshToken);
+        }
       }
       return loginResponse;
     } catch (error) {

@@ -162,6 +162,11 @@ export const GenericSelect = React.forwardRef<
     const inFlightRequestRef = React.useRef<
       { query: string; controller: AbortController } | null
     >(null);
+    // Store latest onServerSearch function in ref to avoid re-triggering effects
+    const onServerSearchRef = React.useRef(onServerSearch);
+    React.useEffect(() => {
+      onServerSearchRef.current = onServerSearch;
+    }, [onServerSearch]);
     const [dropdownPosition, setDropdownPosition] = React.useState({
       top: 0,
       left: 0,
@@ -507,6 +512,7 @@ export const GenericSelect = React.forwardRef<
     ]);
 
     // Server-side search with debouncing
+    // ⭐ FIX: Use ref for onServerSearch to prevent unnecessary effect runs
     React.useEffect(() => {
       if (searchType === "server" && searchQuery.trim()) {
         if (debounceRef.current) {
@@ -516,8 +522,8 @@ export const GenericSelect = React.forwardRef<
         debounceRef.current = setTimeout(async () => {
           setIsSearching(true);
           try {
-            if (onServerSearch) {
-              const results = await onServerSearch(searchQuery);
+            if (onServerSearchRef.current) {
+              const results = await onServerSearchRef.current(searchQuery);
               setServerOptions(results);
             } else if (searchEndpoint) {
               const response = await fetch(
@@ -541,47 +547,18 @@ export const GenericSelect = React.forwardRef<
     }, [
       searchQuery,
       searchType,
-      onServerSearch,
       searchEndpoint,
       debounceMs,
-      options,
     ]);
 
-    // Initialize server options and load initial data
+    // Initialize server options from props
+    // ⭐ FIX: Don't load data on mount - only when user opens dropdown
+    // This prevents duplicate requests (mount + dropdown open)
     React.useEffect(() => {
       if (searchType === "server") {
         setServerOptions(options);
-        // Load initial data when component mounts if onServerSearch is available
-        if (onServerSearch && options.length === 0) {
-          // ⭐ DEDUPLICATION: Skip if already loading
-          if (inFlightRequestRef.current?.query === "") {
-            appLogger.api("Skipping duplicate initial load - already in flight");
-            return;
-          }
-          
-          const controller = new AbortController();
-          inFlightRequestRef.current = { query: "", controller };
-          
-          setIsSearching(true);
-          onServerSearch("")
-            .then((results: GenericSelectOption[]) => {
-              if (inFlightRequestRef.current?.controller === controller) {
-                setServerOptions(results);
-                setIsSearching(false);
-                inFlightRequestRef.current = null;
-              }
-            })
-            .catch((error: any) => {
-              if (inFlightRequestRef.current?.controller === controller) {
-                appLogger.error("Failed to load initial server options:", error);
-                setServerOptions([]);
-                setIsSearching(false);
-                inFlightRequestRef.current = null;
-              }
-            });
-        }
       }
-    }, [options, searchType, onServerSearch]);
+    }, [options, searchType]);
 
     // Recalculate position when server options change
     React.useEffect(() => {
@@ -701,7 +678,8 @@ export const GenericSelect = React.forwardRef<
         requestAnimationFrame(() => setAnimateOpen(true));
 
         // Load initial data when dropdown opens for server search
-        if (searchType === "server" && onServerSearch) {
+        // ⭐ FIX: Use ref to avoid issues with function reference changes
+        if (searchType === "server" && onServerSearchRef.current) {
           // Load initial data when dropdown opens if we don't have data or if we want to refresh
           if (serverOptions.length === 0 || searchQuery === "") {
             const query = searchQuery || "";
@@ -722,7 +700,7 @@ export const GenericSelect = React.forwardRef<
             inFlightRequestRef.current = { query, controller };
             
             setIsSearching(true);
-            onServerSearch(query)
+            onServerSearchRef.current(query)
               .then((results: GenericSelectOption[]) => {
                 if (inFlightRequestRef.current?.controller === controller) {
                   setServerOptions(results);

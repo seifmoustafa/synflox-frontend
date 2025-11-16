@@ -1,5 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable React Strict Mode to prevent duplicate API requests in development
+  // React Strict Mode intentionally double-mounts components to detect side effects,
+  // but this causes duplicate network requests which overload the server.
+  // The deduplication logic in useGenericCrudViewModel can't prevent this because
+  // the cleanup function aborts the first request before the second mount.
+  reactStrictMode: false,
+  
   // Enable proper TypeScript error checking
   typescript: {
     ignoreBuildErrors: false,

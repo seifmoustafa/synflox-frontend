@@ -588,11 +588,13 @@ export function useTreeViewModel<
     return result;
   }, [tree, config]);
 
-  // Mount/unmount effect
+  // Combined mount + search effect to prevent duplicate calls
+  // ⭐ FIX: Single effect handles both initial load and search changes
   useEffect(() => {
     mountedRef.current = true;
 
     // Auto-load data if enabled and not using static data
+    // This also handles search term changes (initial searchTerm is "")
     if (config.autoLoad !== false && !config.staticData && service) {
       listTree();
     }
@@ -604,14 +606,7 @@ export function useTreeViewModel<
         clearTimeout(searchTimeoutRef.current);
       }
     };
-  }, [listTree, config.autoLoad, config.staticData, service]);
-
-  // Re-run listTree when searchTerm changes (debounced)
-  useEffect(() => {
-    if (!config.staticData && service) {
-      listTree();
-    }
-  }, [searchTerm, listTree, config.staticData, service]);
+  }, [searchTerm, listTree, config.autoLoad, config.staticData, service]);
 
   return {
     // Tree data

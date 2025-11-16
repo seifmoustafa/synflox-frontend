@@ -28,26 +28,23 @@ export class AuthMapper {
 
   /**
    * Convert LoginRequest domain model to JSON for API requests
-   * Backend expects PascalCase: { Username, Password }
    */
   static loginRequestToJson(request: LoginRequest): any {
     return {
-      Username: request.username,  // Backend expects PascalCase
-      Password: request.password,  // Backend expects PascalCase
+      username: request.username,
+      password: request.password,
     };
   }
 
   /**
    * Convert JSON/API response to LoginResponse domain model
-   * Backend returns PascalCase: { Success, AccessToken, RefreshToken, ErrorMessage }
    */
   static loginResponseFromJson(json: any): LoginResponse {
     return new LoginResponse({
-      // Handle both PascalCase (backend) and camelCase (legacy)
-      success: json.Success ?? json.success ?? false,
-      accessToken: json.AccessToken ?? json.accessToken ?? '',
-      refreshToken: json.RefreshToken ?? json.refreshToken ?? '',
-      errorMessage: json.ErrorMessage ?? json.errorMessage,
+      success: json.success || false,
+      accessToken: json.accessToken || '',
+      refreshToken: json.refreshToken || '',
+      errorMessage: json.errorMessage,
     });
   }
 
@@ -74,11 +71,10 @@ export class AuthMapper {
 
   /**
    * Convert RefreshTokenRequest domain model to JSON for API requests
-   * Backend expects PascalCase: { RefreshToken }
    */
   static refreshTokenRequestToJson(request: RefreshTokenRequest): any {
     return {
-      RefreshToken: request.refreshToken,  // Backend expects PascalCase
+      refreshToken: request.refreshToken,
     };
   }
 }

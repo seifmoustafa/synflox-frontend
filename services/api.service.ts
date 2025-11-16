@@ -14,11 +14,8 @@ export interface IApiService {
 export class ApiService implements IApiService {
   private baseUrl: string;
   private defaultHeaders: Record<string, string>;
-  private isRefreshing: boolean = false;
-  private failedRequestsQueue: Array<{
-    resolve: (token: string) => void;
-    reject: (error: any) => void;
-  }> = [];
+  private readonly MAX_RETRIES = 3;
+  private readonly RETRY_DELAY_MS = 1000; // 1 second base delay
 
   constructor(baseUrl: string = process.env.NEXT_PUBLIC_API_URL || "/api") {
     this.baseUrl = baseUrl;
@@ -27,8 +24,6 @@ export class ApiService implements IApiService {
       Accept: "application/json",
     };
   }
-
-  // Removed - using withRefreshSingleFlight from refresh-guard.ts instead
 
   private buildUrl(endpoint: string) {
     const baseUrl = this.baseUrl.startsWith("http") ? this.baseUrl : `https://${this.baseUrl}`;
@@ -54,23 +49,107 @@ export class ApiService implements IApiService {
     return "ar"; // Default for SSR
   }
 
-  private async request<T>(
-    endpoint: string, 
-    options: RequestInit = {}, 
-    signal?: AbortSignal,
-    isRetry: boolean = false
-  ): Promise<T> {
-    const url = this.buildUrl(endpoint);
-    
-    // Only log in development
-    appLogger.api("Request:", { method: options.method || "GET", url, isRetry });
+  /**
+   * Internal retry helper with exponential backoff
+   */
+  private async sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
-    // Check if request was aborted before making the request
+  /**
+   * Determines if an error is retryable
+   * - Network errors (fetch failures): YES
+   * - 5xx server errors: YES
+   * - 4xx client errors: NO (except 401 which has special handling)
+   */
+  private isRetryableError(error: Error): boolean {
+    // Network errors (TypeError from fetch)
+    if (error instanceof TypeError) {
+      return true;
+    }
+    
+    // Check error message for retryable status codes
+    if (error.message.includes("Server error:") || error.message.includes("500")) {
+      return true;
+    }
+    
+    // Don't retry client errors (400-499)
+    if (error.message.includes("Client error") || /4[0-9]{2}/.test(error.message)) {
+      return false;
+    }
+    
+    // Default: retry
+    return true;
+  }
+
+  /**
+   * Makes HTTP request with automatic retry logic (up to 3 attempts)
+   * - Retries on network errors (fetch failures)
+   * - Retries on 5xx server errors
+   * - Does NOT retry 4xx client errors (except 401 which has special handling)
+   * - Uses exponential backoff: 1s, 2s, 4s
+   */
+  private async request<T>(endpoint: string, options: RequestInit = {}, signal?: AbortSignal): Promise<T> {
+    const url = this.buildUrl(endpoint);
+    let lastError: Error | null = null;
+    
+    // Retry loop: attempt 0 = first try, attempts 1-3 = retries
+    for (let attempt = 0; attempt <= this.MAX_RETRIES; attempt++) {
+      try {
+        // Log attempt (only in development)
+        if (attempt === 0) {
+          appLogger.api("Request:", { method: options.method || "GET", url });
+        } else {
+          appLogger.api(`🔄 Retry ${attempt}/${this.MAX_RETRIES}:`, { method: options.method || "GET", url });
+        }
+        
+        return await this.performRequest<T>(url, endpoint, options, signal);
+      } catch (error) {
+        lastError = error as Error;
+        
+        // Don't retry if request was aborted
+        if (signal?.aborted || lastError.name === 'AbortError') {
+          appLogger.api("Request aborted - not retrying");
+          throw lastError;
+        }
+        
+        // Check if this is a retryable error
+        const isRetryable = this.isRetryableError(lastError);
+        
+        // If not retryable, fail immediately
+        if (!isRetryable) {
+          appLogger.error("Non-retryable error:", lastError.message);
+          throw lastError;
+        }
+        
+        // Don't retry on last attempt
+        if (attempt === this.MAX_RETRIES) {
+          appLogger.error(`❌ All ${this.MAX_RETRIES} retries failed`);
+          // Show toast only on final failure
+          const appError = handleError(lastError, `API Request: ${url}`);
+          toast.error(getUserFriendlyErrorMessage(appError));
+          throw lastError;
+        }
+        
+        // Exponential backoff: 1s, 2s, 4s
+        const delayMs = this.RETRY_DELAY_MS * Math.pow(2, attempt);
+        appLogger.api(`⏳ Retrying in ${delayMs}ms...`, { error: lastError.message });
+        await this.sleep(delayMs);
+      }
+    }
+    
+    // Should never reach here, but TypeScript doesn't know that
+    throw lastError || new Error("Request failed after all retries");
+  }
+
+  /**
+   * Performs the actual HTTP request (separated for retry logic)
+   */
+  private async performRequest<T>(url: string, endpoint: string, options: RequestInit, signal?: AbortSignal): Promise<T> {
+
+    // Check if request was aborted
     if (signal?.aborted) {
-      const error = new Error('Request was aborted');
-      const appError = handleError(error, `API Request: ${url}`);
-      toast.error(getUserFriendlyErrorMessage(appError));
-      throw error;
+      throw new Error('Request was aborted');
     }
 
     const token = secureTokenService.getAccessToken();
@@ -135,159 +214,76 @@ export class ApiService implements IApiService {
           // If parsing fails, use status text
         }
 
+        // 401 Unauthorized - Special handling with token refresh
         if (response.status === 401) {
-          const isLoginPage = typeof window !== 'undefined' && window.location.pathname === "/login";
-          const isRefreshEndpoint = endpoint.includes("/refresh-token");
-          
-          appLogger.api("⭐ 401 Unauthorized detected", { 
-            endpoint, 
-            isLoginPage, 
-            isRefreshEndpoint
-          });
-          
-          // If already on login page, let it handle the error
-          if (isLoginPage) {
-            appLogger.api("401 on login page - not refreshing");
+          // If on login page, don't try to refresh
+          if (typeof window !== "undefined" && window.location.pathname === "/login") {
             throw new Error(errorMessage);
           }
-          
-          // Don't try to refresh the refresh endpoint itself
-          if (isRefreshEndpoint) {
-            appLogger.error("❌ Refresh endpoint returned 401 - refresh token expired");
-            secureTokenService.clearTokens();
-            if (typeof window !== 'undefined') window.location.href = "/login";
-            throw new Error("Refresh token expired");
-          }
-          
-          // ⭐ Attempt token refresh using single-flight pattern
-          appLogger.api("🔄 Attempting token refresh with single-flight guard...");
-          
+
+          appLogger.api("401 Unauthorized - attempting token refresh...");
+
+          // Attempt token refresh using single-flight guard
           const { withRefreshSingleFlight } = await import("@/lib/refresh-guard");
-          
-          const newAccessToken = await withRefreshSingleFlight(async () => {
-            const refreshToken = secureTokenService.getRefreshToken();
-            if (!refreshToken) {
-              appLogger.error("❌ No refresh token found");
-              return null;
-            }
-            
-            appLogger.api("📡 Calling refresh endpoint...");
-            
-            // Import dynamically to avoid circular dependency
-            const refreshUrl = this.buildUrl("/admin/auth/refresh-token");
-            
-            appLogger.api("📡 Calling refresh endpoint...", { refreshToken: refreshToken.substring(0, 20) + "..." });
-            
-            try {
-              const refreshResponse = await fetch(refreshUrl, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Accept: "application/json",
-                },
-                // ⭐ Backend expects PascalCase: { "RefreshToken": "..." }
-                body: JSON.stringify({ RefreshToken: refreshToken }),
-              });
-              
-              appLogger.api("📥 Refresh response", { status: refreshResponse.status, ok: refreshResponse.ok });
-              
-              if (!refreshResponse.ok) {
-                const errorText = await refreshResponse.text();
-                appLogger.error("❌ Refresh failed", { status: refreshResponse.status, error: errorText });
-                return null;
-              }
-              
-              const refreshData = await refreshResponse.json();
-              appLogger.api("📦 Refresh data received", { 
-                keys: Object.keys(refreshData),
-                fullResponse: refreshData
-              });
-              
-              // ⭐ Backend returns AuthenticationResponse DIRECTLY (not wrapped)
-              // Controller: return Ok(response); 
-              // So we get: { Success, AccessToken, RefreshToken, ErrorMessage }
-              
-              appLogger.api("🔍 Checking response structure", { 
-                hasSuccess: 'Success' in refreshData,
-                hasAccessToken: 'AccessToken' in refreshData,
-                hasRefreshToken: 'RefreshToken' in refreshData,
-                Success: refreshData.Success,
-                hasErrorMessage: !!refreshData.ErrorMessage
-              });
-              
-              // ✅ Check for success and required fields
-              if (refreshData.Success && refreshData.AccessToken && refreshData.RefreshToken) {
-                appLogger.api("✅ Got new tokens from backend!", {
-                  accessToken: refreshData.AccessToken.substring(0, 20) + "...",
-                  refreshToken: refreshData.RefreshToken.substring(0, 20) + "..."
-                });
-                
-                // Store new tokens
-                secureTokenService.setTokens({
-                  accessToken: refreshData.AccessToken,
-                  refreshToken: refreshData.RefreshToken,
-                });
-                
-                appLogger.api("💾 New tokens stored in localStorage!");
-                return refreshData.AccessToken;
-              }
-              
-              // ❌ Refresh failed - log detailed error
-              appLogger.error("❌ Refresh response invalid or failed", { 
-                success: refreshData.Success,
-                errorMessage: refreshData.ErrorMessage,
-                fullResponse: refreshData
-              });
-              return null;
-            } catch (error) {
-              appLogger.error("💥 Refresh request failed", { error });
-              return null;
-            }
+          const { AuthService } = await import("@/services/auth.service");
+          const auth = new AuthService(this);
+
+          const newAccess = await withRefreshSingleFlight(async () => {
+            const refreshResp = await auth.refreshToken();
+            return refreshResp?.accessToken ?? null;
           });
-          
-          // ⭐ If refresh succeeded, retry the original request
-          if (newAccessToken) {
-            appLogger.api("🔄 Retrying original request with new token...");
+
+          if (newAccess) {
+            appLogger.api("Token refresh successful - retrying original request");
             
+            // Retry original request ONCE with new token
             const retryHeaders: Record<string, string> = {
-              ...headers,
-              Authorization: `Bearer ${newAccessToken}`,
+              ...(config.headers as Record<string, string>),
+              Authorization: `Bearer ${newAccess}`,
             };
-            
             const retryResponse = await fetch(url, { ...config, headers: retryHeaders });
-            
+
             if (!retryResponse.ok) {
-              appLogger.error("❌ Retry failed after refresh", { status: retryResponse.status });
-              // If retry fails, logout
+              appLogger.error("Request failed after token refresh");
+              // If retry fails, log out
+              const { secureTokenService } = await import("@/lib/secure-token-service");
               secureTokenService.clearTokens();
-              if (typeof window !== 'undefined') window.location.href = "/login";
-              const errTxt = await retryResponse.text();
-              throw new Error(errTxt || retryResponse.statusText);
+              if (typeof window !== "undefined") window.location.href = "/login";
+              throw new Error(await retryResponse.text() || retryResponse.statusText);
             }
-            
+
             if (retryResponse.status === 204) {
-              appLogger.api("✅ Retry succeeded (204)");
               return null as T;
             }
-            
-            const retryJson = await retryResponse.json();
-            appLogger.api("✅ Retry succeeded!");
-            return this.unwrap<T>(retryJson);
+
+            return this.unwrap<T>(await retryResponse.json());
           }
-          
-          // ❌ Refresh failed - logout and redirect
-          appLogger.error("🚪 Refresh failed - redirecting to login");
-          toast.error("Session expired. Please login again.");
+
+          // Refresh failed → logout
+          appLogger.error("Token refresh failed - logging out");
+          const { secureTokenService } = await import("@/lib/secure-token-service");
           secureTokenService.clearTokens();
-          if (typeof window !== 'undefined') window.location.href = "/login";
-          throw new Error(errorMessage || "Unauthorized - please login again");
+          if (typeof window !== "undefined") window.location.href = "/login";
+          throw new Error(errorMessage || "Session expired - please login again");
         }
         
-        const error = new Error(errorMessage);
-        const appError = handleError(error, `API Request: ${url}`);
-        // Prefer backend message over generic error handler message
-        toast.error(errorMessage || getUserFriendlyErrorMessage(appError));
-        throw error;
+        // 5xx Server errors - WILL BE RETRIED by retry loop
+        if (response.status >= 500) {
+          appLogger.error("Server error - will retry", { status: response.status, statusText: response.statusText });
+          throw new Error(errorMessage || `Server error: ${response.status}`);
+        }
+        
+        // 4xx Client errors (except 401) - DO NOT RETRY
+        if (response.status >= 400 && response.status < 500) {
+          appLogger.error("Client error - not retrying", { status: response.status, statusText: response.statusText });
+          const error = new Error(errorMessage);
+          const appError = handleError(error, `API Request: ${url}`);
+          toast.error(errorMessage || getUserFriendlyErrorMessage(appError));
+          throw error;
+        }
+        
+        // Unknown error
+        throw new Error(errorMessage);
       }
 
       if (response.status === 204) {
@@ -300,30 +296,12 @@ export class ApiService implements IApiService {
       const unwrapped = this.unwrap<T>(json);
       appLogger.api("Success (unwrapped):", unwrapped);
       return unwrapped;
-    } catch (error) {
-      // Handle abort errors specifically
-      if (error instanceof Error && error.name === 'AbortError') {
-        appLogger.api("Request aborted:", url);
-        const abortError = new Error('Request was aborted');
-        const appError = handleError(abortError, `API Request: ${url}`);
-        toast.error(getUserFriendlyErrorMessage(appError));
-        throw abortError;
-      }
-      
-      // Handle network errors
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        const networkError = new Error("Network error");
-        const appError = handleError(networkError, `API Request: ${url}`);
-        toast.error(getUserFriendlyErrorMessage(appError));
-        throw networkError;
-      }
-      
-      // Handle other errors
-      const appError = handleError(error as Error, `API Request: ${url}`);
-      toast.error(getUserFriendlyErrorMessage(appError));
+    } catch (error) {      
+      // Just throw - let the retry loop handle it
+      // Toast will be shown by request() on final failure
       throw error;
     }
-  }
+  } // end of performRequest
 
   async get<T>(endpoint: string, params?: Record<string, any>, signal?: AbortSignal): Promise<T> {
     const queryString = params ? "?" + new URLSearchParams(params).toString() : "";

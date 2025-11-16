@@ -352,11 +352,18 @@ export function useGenericCrudViewModel<
     
     return () => {
       mountedRef.current = false;
-      // Cancel any in-flight requests on unmount
-      if (inFlightRequestRef.current) {
-        inFlightRequestRef.current.controller.abort();
-        inFlightRequestRef.current = null;
-      }
+      // Don't abort on unmount - let deduplication handle it
+      // Aborting causes duplicate requests in React Strict Mode:
+      // Mount 1 → starts request → unmount → aborts request
+      // Mount 2 → starts NEW request (deduplication can't help)
+      // Result: 2 requests to server!
+      //
+      // Instead, keep the request running. If component re-mounts
+      // with same params, deduplication will return the same promise.
+      // Only abort if component is truly destroyed (rare in SPA).
+      
+      // Note: We still clean up in-flight request when params change
+      // (see lines 171-177 in list() function)
     };
   }, [searchTerm, list]); // Triggers on mount (searchTerm = "") and searchTerm changes
 
