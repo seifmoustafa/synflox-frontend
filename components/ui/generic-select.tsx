@@ -158,7 +158,10 @@ export const GenericSelect = React.forwardRef<
     const [isSearching, setIsSearching] = React.useState(false);
     const [serverOptions, setServerOptions] = React.useState<
       GenericSelectOption[]
-    >([]);
+    >(options);
+    const inFlightRequestRef = React.useRef<
+      { query: string; controller: AbortController } | null
+    >(null);
     const [dropdownPosition, setDropdownPosition] = React.useState({
       top: 0,
       left: 0,
@@ -550,16 +553,31 @@ export const GenericSelect = React.forwardRef<
         setServerOptions(options);
         // Load initial data when component mounts if onServerSearch is available
         if (onServerSearch && options.length === 0) {
+          // ⭐ DEDUPLICATION: Skip if already loading
+          if (inFlightRequestRef.current?.query === "") {
+            appLogger.api("Skipping duplicate initial load - already in flight");
+            return;
+          }
+          
+          const controller = new AbortController();
+          inFlightRequestRef.current = { query: "", controller };
+          
           setIsSearching(true);
           onServerSearch("")
             .then((results: GenericSelectOption[]) => {
-              setServerOptions(results);
-              setIsSearching(false);
+              if (inFlightRequestRef.current?.controller === controller) {
+                setServerOptions(results);
+                setIsSearching(false);
+                inFlightRequestRef.current = null;
+              }
             })
             .catch((error: any) => {
-              appLogger.error("Failed to load initial server options:", error);
-              setServerOptions([]);
-              setIsSearching(false);
+              if (inFlightRequestRef.current?.controller === controller) {
+                appLogger.error("Failed to load initial server options:", error);
+                setServerOptions([]);
+                setIsSearching(false);
+                inFlightRequestRef.current = null;
+              }
             });
         }
       }
@@ -686,16 +704,39 @@ export const GenericSelect = React.forwardRef<
         if (searchType === "server" && onServerSearch) {
           // Load initial data when dropdown opens if we don't have data or if we want to refresh
           if (serverOptions.length === 0 || searchQuery === "") {
+            const query = searchQuery || "";
+            
+            // ⭐ DEDUPLICATION: Skip if same request is already in flight
+            if (inFlightRequestRef.current?.query === query) {
+              appLogger.api("Skipping duplicate dropdown open load - already in flight", { query });
+              return;
+            }
+            
+            // ⭐ DEDUPLICATION: Cancel previous request if different query
+            if (inFlightRequestRef.current) {
+              appLogger.api("Cancelling previous request", { old: inFlightRequestRef.current.query, new: query });
+              inFlightRequestRef.current.controller.abort();
+            }
+            
+            const controller = new AbortController();
+            inFlightRequestRef.current = { query, controller };
+            
             setIsSearching(true);
-            onServerSearch(searchQuery || "")
+            onServerSearch(query)
               .then((results: GenericSelectOption[]) => {
-                setServerOptions(results);
-                setIsSearching(false);
+                if (inFlightRequestRef.current?.controller === controller) {
+                  setServerOptions(results);
+                  setIsSearching(false);
+                  inFlightRequestRef.current = null;
+                }
               })
               .catch((error: any) => {
-                appLogger.error("Failed to load server options:", error);
-                setServerOptions([]);
-                setIsSearching(false);
+                if (inFlightRequestRef.current?.controller === controller) {
+                  appLogger.error("Failed to load server options:", error);
+                  setServerOptions([]);
+                  setIsSearching(false);
+                  inFlightRequestRef.current = null;
+                }
               });
           }
         }

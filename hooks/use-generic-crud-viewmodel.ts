@@ -117,6 +117,11 @@ export function useGenericCrudViewModel<
   const paginationRef = useRef(pagination);
   const searchTermRef = useRef(searchTerm);
   const mountedRef = useRef(true);
+  const inFlightRequestRef = useRef<{
+    controller: AbortController;
+    requestKey: string;
+    promise: Promise<TItem[]>;
+  } | null>(null);
   paginationRef.current = pagination;
   searchTermRef.current = searchTerm;
 
@@ -149,6 +154,28 @@ export function useGenericCrudViewModel<
     const currentSearchTerm = searchTermRef.current;
     const wasSearchFocused = searchInputRef.current === document.activeElement;
     
+    // ⭐ DEDUPLICATION: Create unique key for this request
+    const requestKey = JSON.stringify({
+      page: currentPagination.page,
+      pageSize: currentPagination.pageSize,
+      search: currentSearchTerm
+    });
+    
+    // ⭐ DEDUPLICATION: Return same promise if exact same request is already in flight
+    if (inFlightRequestRef.current && inFlightRequestRef.current.requestKey === requestKey) {
+      appLogger.api("Returning existing in-flight request", { requestKey });
+      return inFlightRequestRef.current.promise;
+    }
+    
+    // ⭐ DEDUPLICATION: Cancel previous request if different params
+    if (inFlightRequestRef.current) {
+      appLogger.api("Cancelling previous request", { 
+        old: inFlightRequestRef.current.requestKey, 
+        new: requestKey 
+      });
+      inFlightRequestRef.current.controller.abort();
+    }
+    
     // Create abort controller for this request
     const abortController = new AbortController();
     
@@ -164,6 +191,8 @@ export function useGenericCrudViewModel<
       }
     };
 
+    // ⭐ DEDUPLICATION: Create promise for this request
+    const requestPromise = (async (): Promise<TItem[]> => {
     try {
       setLoading(true);
       setError(null);
@@ -209,12 +238,18 @@ export function useGenericCrudViewModel<
     } catch (err) {
       // Check if request was aborted
       if (err instanceof Error && err.name === 'AbortError') {
+        appLogger.api("Request aborted");
         return [];
       }
       
       setError(err instanceof Error ? err.message : "Failed to load data");
       return []; // return empty array on error
     } finally {
+      // ⭐ DEDUPLICATION: Clear in-flight request if it's the current one
+      if (inFlightRequestRef.current?.controller === abortController) {
+        inFlightRequestRef.current = null;
+      }
+      
       if (!mountedRef.current) return[];
       setLoading(false);
       
@@ -222,6 +257,16 @@ export function useGenericCrudViewModel<
       setTimeout(() => maintainFocus(), 50);
       setTimeout(() => maintainFocus(), 100);
     }
+    })(); // ⭐ Close and execute the async promise
+    
+    // ⭐ DEDUPLICATION: Store the promise
+    inFlightRequestRef.current = {
+      controller: abortController,
+      requestKey,
+      promise: requestPromise
+    };
+    
+    return requestPromise;
   }, []); // stable
 
   // Remove the old useEffect since we now handle debouncing in handleSearchChange
@@ -297,19 +342,23 @@ export function useGenericCrudViewModel<
     }, 300); // 300ms debounce
   }, []);
 
-  // Mount / unmount
+  // Mount / unmount + search term changes
+  // ⭐ FIX: Combined into single effect to prevent duplicate calls
   useEffect(() => {
     mountedRef.current = true;
-    list(); // initial load
+    
+    // Initial load or search term change
+    list();
+    
     return () => {
       mountedRef.current = false;
+      // Cancel any in-flight requests on unmount
+      if (inFlightRequestRef.current) {
+        inFlightRequestRef.current.controller.abort();
+        inFlightRequestRef.current = null;
+      }
     };
-  }, [list]);
-
-  // Re-run on debounced search term
-  useEffect(() => {
-    list();
-  }, [searchTerm, list]);
+  }, [searchTerm, list]); // Triggers on mount (searchTerm = "") and searchTerm changes
 
   // Pagination handlers
   const changePage = useCallback((page: number) => {

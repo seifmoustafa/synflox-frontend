@@ -34,18 +34,23 @@ export class ApiService implements IApiService {
   private async handleTokenRefresh(): Promise<string | null> {
     if (this.isRefreshing) {
       // If already refreshing, wait for it to complete
+      appLogger.api("⏳ Token refresh already in progress - queuing request", { queueSize: this.failedRequestsQueue.length });
       return new Promise((resolve, reject) => {
         this.failedRequestsQueue.push({ resolve, reject });
       });
     }
 
+    appLogger.api("🔄 Starting token refresh process...");
     this.isRefreshing = true;
 
     try {
       const refreshToken = secureTokenService.getRefreshToken();
       if (!refreshToken) {
+        appLogger.error("❌ No refresh token found in storage");
         throw new Error("No refresh token available");
       }
+      
+      appLogger.api("✅ Refresh token found, calling refresh endpoint...");
 
       // Import AuthMapper and RefreshTokenRequest dynamically to avoid circular dependency
       const { AuthMapper } = await import("@/domain/mappers/auth.mapper");
@@ -55,6 +60,8 @@ export class ApiService implements IApiService {
       
       // Make refresh request WITHOUT going through the interceptor to avoid infinite loop
       const url = this.buildUrl("/admin/auth/refresh-token");
+      appLogger.api("📡 POST /admin/auth/refresh-token", { url });
+      
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -64,8 +71,12 @@ export class ApiService implements IApiService {
         body: JSON.stringify(AuthMapper.refreshTokenRequestToJson(refreshRequest)),
       });
 
+      appLogger.api("📥 Refresh endpoint response", { status: response.status, ok: response.ok });
+
       if (!response.ok) {
-        throw new Error("Token refresh failed");
+        const errorText = await response.text();
+        appLogger.error("❌ Refresh endpoint returned error", { status: response.status, errorText });
+        throw new Error(`Token refresh failed: ${response.status}`);
       }
 
       const data = await response.json();
@@ -73,34 +84,42 @@ export class ApiService implements IApiService {
       const loginResponse = AuthMapper.loginResponseFromJson(loginData);
 
       if (loginResponse.isSuccessful && loginResponse.accessToken) {
+        appLogger.api("✅ Got new access token from refresh endpoint");
+        
         // Store tokens with automatic expiry calculation (5 minutes for access token)
         secureTokenService.setTokens({
           accessToken: loginResponse.accessToken,
           refreshToken: loginResponse.refreshToken,
         });
+        
+        appLogger.api("💾 New tokens stored in localStorage");
 
         // Process queued requests with new token
+        appLogger.api("🔄 Processing queued requests", { queueSize: this.failedRequestsQueue.length });
         this.failedRequestsQueue.forEach(({ resolve }) => {
           resolve(loginResponse.accessToken);
         });
         this.failedRequestsQueue = [];
 
-        appLogger.api("Token refreshed successfully");
+        appLogger.api("🎉 Token refresh completed successfully!");
         return loginResponse.accessToken;
       }
 
+      appLogger.error("❌ Refresh response invalid", { isSuccessful: loginResponse.isSuccessful, hasAccessToken: !!loginResponse.accessToken });
       throw new Error("Invalid refresh response");
     } catch (error) {
       // Reject all queued requests
+      appLogger.error("❌ Token refresh process failed", { error, queueSize: this.failedRequestsQueue.length });
       this.failedRequestsQueue.forEach(({ reject }) => {
         reject(error);
       });
       this.failedRequestsQueue = [];
 
-      appLogger.error("Token refresh failed:", error);
+      appLogger.error("💥 Token refresh failed - returning null");
       return null;
     } finally {
       this.isRefreshing = false;
+      appLogger.api("🏁 Token refresh process ended");
     }
   }
 
@@ -210,26 +229,55 @@ export class ApiService implements IApiService {
         }
 
         if (response.status === 401) {
-          // Skip login page and refresh endpoint from auto-refresh
           const isLoginPage = typeof window !== 'undefined' && window.location.pathname === "/login";
           const isRefreshEndpoint = endpoint.includes("/refresh-token");
           
+          appLogger.api("⭐ 401 Unauthorized detected", { 
+            endpoint, 
+            isLoginPage, 
+            isRefreshEndpoint, 
+            isRetry,
+            hasRefreshToken: !!secureTokenService.getRefreshToken()
+          });
+          
+          // ⭐ CRITICAL: ALWAYS attempt refresh if we have a refresh token (except on login page or refresh endpoint itself)
           if (!isLoginPage && !isRefreshEndpoint && !isRetry) {
-            // Attempt token refresh for authenticated requests
-            appLogger.api("Access token expired, attempting refresh...");
+            appLogger.api("⭐ Attempting token refresh...");
+            
+            const refreshToken = secureTokenService.getRefreshToken();
+            if (!refreshToken) {
+              appLogger.error("❗ No refresh token available - cannot refresh");
+              toast.error("Session expired. Please login again.");
+              secureTokenService.clearTokens();
+              if (typeof window !== 'undefined') {
+                window.location.href = "/login";
+              }
+              throw new Error("No refresh token available");
+            }
+            
+            // ⭐ WAIT for refresh to complete
             const newToken = await this.handleTokenRefresh();
             
             if (newToken) {
-              // Retry the original request with new token
-              appLogger.api("Token refreshed, retrying request...");
+              // ✅ Refresh succeeded - retry original request
+              appLogger.api("✅ Token refreshed successfully! Retrying original request...");
               return this.request<T>(endpoint, options, signal, true);
+            } else {
+              // ❌ Refresh failed - tokens are invalid
+              appLogger.error("❌ Token refresh failed - refresh token is invalid or expired");
+              toast.error("Session expired. Please login again.");
+              secureTokenService.clearTokens();
+              if (typeof window !== 'undefined') {
+                window.location.href = "/login";
+              }
+              throw new Error("Token refresh failed");
             }
           }
           
-          // Token refresh failed or not applicable - clear and redirect
+          // ⭐ Only redirect if we're NOT on login page and this is a retry or special endpoint
           if (!isLoginPage) {
+            appLogger.warn("⚠️ 401 on retry or special endpoint - redirecting to login", { isRetry, isRefreshEndpoint });
             const error = new Error(errorMessage || "Unauthorized - please login again");
-            const appError = handleError(error, `API Request: ${url}`);
             toast.error("Session expired. Please login again.");
             secureTokenService.clearTokens();
             if (typeof window !== 'undefined') {
@@ -238,6 +286,7 @@ export class ApiService implements IApiService {
             throw error;
           } else {
             // For login page, don't show toast - let the form handle the error display
+            appLogger.api("401 on login page - not refreshing");
             const error = new Error(errorMessage);
             throw error;
           }
