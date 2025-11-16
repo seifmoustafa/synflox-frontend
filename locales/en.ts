@@ -103,12 +103,14 @@ export const en = {
     total: "Total",
     inactive: "Inactive",
     inactiveAdmins: "Inactive Admins",
+    activeSubscription: "Active Subscription",
+    activeSubscriptions_plural: "Active Subscriptions",
     
     // Detailed Stats
     companyBreakdown: "Company Breakdown",
-    activeCompanies: "Companies (Active License)",
-    suspendedCompanies: "Companies (Suspended License)",
-    expiredCompanies: "Companies (Expired License)",
+    activeCompanies: "With Active Subscription",
+    suspendedCompanies: "With Suspended Subscription",
+    expiredCompanies: "With Expired Subscription",
     growth: "Growth",
     growthThisMonth: "Growth This Month",
     
@@ -131,8 +133,8 @@ export const en = {
     
     // Charts
     charts: {
-      companyStatus: "Company Status Distribution",
-      companyStatusDesc: "Active, suspended, and expired companies",
+      companyStatus: "Company Subscription Status",
+      companyStatusDesc: "Companies by subscription status (active, suspended, expired)",
       subscriptionStatus: "Subscription Status",
       subscriptionStatusDesc: "Distribution of subscription statuses",
       growthTrends: "Growth Trends",
@@ -199,6 +201,24 @@ export const en = {
       weeklyGrowth: "Weekly Growth",
       avgDailyGrowth: "Avg. Daily Growth",
       retentionRate: "Retention Rate",
+    },
+    
+    // Time-Series
+    timeSeries: {
+      title: "30-Day Historical Trends",
+      subtitle: "Daily activity and growth patterns over the last month",
+      growthTimeline: "30-Day Growth Timeline",
+      growthTimelineDesc: "Daily entity creation trends",
+      activeOverTime: "Active Entities Over Time",
+      activeOverTimeDesc: "Active entity counts over 30 days",
+      growthStats: "Growth Statistics",
+      totalGrowth: "Total Growth (30 days)",
+      avgDailyGrowth: "Avg. Daily Growth",
+      dataPoints: "Data Points",
+      last30Days: "Last 30 days",
+      companiesGrowth: "Companies Created",
+      subscriptionsGrowth: "Subscriptions Created",
+      adminsGrowth: "Admins Created",
     },
   },
 

@@ -12,7 +12,9 @@ import {
   Alerts,
   AlertsData,
   RecentActivity,
-  RecentActivityData
+  RecentActivityData,
+  TimeSeries,
+  TimeSeriesData
 } from '../models/dashboard.model';
 
 // Response interface from API
@@ -36,6 +38,7 @@ export class DashboardMapper {
       this.mapAdminStats(data.admins),
       this.mapAlerts(data.alerts),
       this.mapRecentActivity(data.recentActivity),
+      this.mapTimeSeries(data.timeSeries),
       new Date(data.generatedAtUtc)
     );
   }
@@ -126,6 +129,13 @@ export class DashboardMapper {
       data.subscriptionsLast24Hours,
       data.adminsLast24Hours
     );
+  }
+
+  /**
+   * Maps time-series data to domain model
+   */
+  private static mapTimeSeries(data: TimeSeriesData): TimeSeries {
+    return new TimeSeries(data.last30Days);
   }
 
   /**

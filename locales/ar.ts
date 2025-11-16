@@ -98,11 +98,13 @@ export const ar = {
     expiringSoon: "تنتهي قريباً",
     total: "الإجمالي",
     inactive: "غير نشط",
+    activeSubscription: "باشتراك نشط",
+    activeSubscriptions_plural: "باشتراكات نشطة",
     // Detailed Stats
     companyBreakdown: "تفصيل الشركات",
-    activeCompanies: "شركات (ترخيص نشط)",
-    suspendedCompanies: "شركات (ترخيص معلق)",
-    expiredCompanies: "شركات (ترخيص منتهي)",
+    activeCompanies: "باشتراك نشط",
+    suspendedCompanies: "باشتراك معلق",
+    expiredCompanies: "باشتراك منتهي",
     growth: "النمو",
     growthThisMonth: "النمو هذا الشهر",
     subscriptionBreakdown: "تفصيل الاشتراكات",
@@ -126,8 +128,8 @@ export const ar = {
     adminTypeDistribution: "توزيع المسؤولين حسب النوع",
     // Charts
     charts: {
-      companyStatus: "توزيع حالة الشركات",
-      companyStatusDesc: "الشركات النشطة والمعلقة والمنتهية",
+      companyStatus: "حالة اشتراكات الشركات",
+      companyStatusDesc: "الشركات حسب حالة الاشتراك (نشط، معلق، منتهي)",
       subscriptionStatus: "حالة الاشتراكات",
       subscriptionStatusDesc: "توزيع حالات الاشتراكات",
       growthTrends: "اتجاهات النمو",
@@ -189,6 +191,24 @@ export const ar = {
       weeklyGrowth: "النمو الأسبوعي",
       avgDailyGrowth: "متوسط النمو اليومي",
       retentionRate: "معدل الاحتفاظ",
+    },
+    
+    // Time-Series
+    timeSeries: {
+      title: "الاتجاهات التاريخية لمدة 30 يوم",
+      subtitle: "أنماط النشاط والنمو اليومية خلال الشهر الماضي",
+      growthTimeline: "الجدول الزمني للنمو لمدة 30 يوم",
+      growthTimelineDesc: "اتجاهات إنشاء الكيانات اليومية",
+      activeOverTime: "الكيانات النشطة عبر الوقت",
+      activeOverTimeDesc: "عدد الكيانات النشطة على مدى 30 يوم",
+      growthStats: "إحصائيات النمو",
+      totalGrowth: "إجمالي النمو (30 يوم)",
+      avgDailyGrowth: "متوسط النمو اليومي",
+      dataPoints: "نقاط البيانات",
+      last30Days: "آخر 30 يوم",
+      companiesGrowth: "الشركات المُنشأة",
+      subscriptionsGrowth: "الاشتراكات المُنشأة",
+      adminsGrowth: "المسؤولون المُنشأون",
     },
   },
 

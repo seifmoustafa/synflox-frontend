@@ -11,6 +11,7 @@ export interface DashboardData {
   admins: AdminStatsData;
   alerts: AlertsData;
   recentActivity: RecentActivityData;
+  timeSeries: TimeSeriesData;
   generatedAtUtc: string;
 }
 
@@ -70,6 +71,20 @@ export interface RecentActivityData {
   companiesLast24Hours: number;
   subscriptionsLast24Hours: number;
   adminsLast24Hours: number;
+}
+
+export interface TimeSeriesData {
+  last30Days: DailyMetric[];
+}
+
+export interface DailyMetric {
+  date: string;
+  companiesCreated: number;
+  subscriptionsCreated: number;
+  adminsCreated: number;
+  companiesActive: number;
+  subscriptionsActive: number;
+  adminsActive: number;
 }
 
 // ============================================
@@ -299,6 +314,46 @@ export class RecentActivity {
   }
 }
 
+export class TimeSeries {
+  constructor(public readonly last30Days: DailyMetric[]) {}
+
+  get dates(): string[] {
+    return this.last30Days.map(d => new Date(d.date).toLocaleDateString());
+  }
+
+  get companiesCreatedData(): number[] {
+    return this.last30Days.map(d => d.companiesCreated);
+  }
+
+  get subscriptionsCreatedData(): number[] {
+    return this.last30Days.map(d => d.subscriptionsCreated);
+  }
+
+  get adminsCreatedData(): number[] {
+    return this.last30Days.map(d => d.adminsCreated);
+  }
+
+  get companiesActiveData(): number[] {
+    return this.last30Days.map(d => d.companiesActive);
+  }
+
+  get subscriptionsActiveData(): number[] {
+    return this.last30Days.map(d => d.subscriptionsActive);
+  }
+
+  get adminsActiveData(): number[] {
+    return this.last30Days.map(d => d.adminsActive);
+  }
+
+  get totalGrowth(): number {
+    return this.last30Days.reduce((sum, d) => sum + d.companiesCreated + d.subscriptionsCreated + d.adminsCreated, 0);
+  }
+
+  get averageDailyGrowth(): number {
+    return this.totalGrowth / Math.max(this.last30Days.length, 1);
+  }
+}
+
 export class Dashboard {
   constructor(
     public readonly overview: OverviewStats,
@@ -307,6 +362,7 @@ export class Dashboard {
     public readonly admins: AdminStats,
     public readonly alerts: Alerts,
     public readonly recentActivity: RecentActivity,
+    public readonly timeSeries: TimeSeries,
     public readonly generatedAt: Date
   ) {}
 
