@@ -66,7 +66,24 @@ export {
 } from './models/admin-type.model';
 export type { AdminTypesResponse } from './mappers/admin-type.mapper';
 
-
+// Dashboard domain
+export {
+  Dashboard,
+  OverviewStats,
+  CompanyStats,
+  SubscriptionStats,
+  AdminStats,
+  Alerts,
+  RecentActivity,
+  type DashboardData,
+  type OverviewStatsData,
+  type CompanyStatsData,
+  type SubscriptionStatsData,
+  type AdminStatsData,
+  type AlertsData,
+  type RecentActivityData
+} from './models/dashboard.model';
+export type { DashboardResponse } from './mappers/dashboard.mapper';
 
 // Mappers
-export { UserMapper, AuthMapper, NavigationMapper, NotificationMapper, AdminMapper, AdminTypeMapper } from './mappers';
+export { UserMapper, AuthMapper, NavigationMapper, NotificationMapper, AdminMapper, AdminTypeMapper, DashboardMapper } from './mappers';

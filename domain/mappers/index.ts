@@ -12,3 +12,4 @@ export { NotificationMapper } from './notification.mapper';
 
 export { AdminMapper } from './admin.mapper';
 export { AdminTypeMapper } from './admin-type.mapper';
+export { DashboardMapper } from './dashboard.mapper';
