@@ -32,7 +32,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
       {/* KPI Performance Gauges */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-500/10 to-blue-600/5 shadow-lg">
-          <div className={cn("flex items-center gap-3 mb-4", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-3 mb-4", )}>
             <Building2 className="w-6 h-6 text-blue-500" />
             <h3 className="font-semibold">{t("dashboard.analytics.companyHealth")}</h3>
           </div>
@@ -46,7 +46,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
         </div>
 
         <div className="p-6 rounded-2xl border bg-gradient-to-br from-purple-500/10 to-purple-600/5 shadow-lg">
-          <div className={cn("flex items-center gap-3 mb-4", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-3 mb-4", )}>
             <CreditCard className="w-6 h-6 text-purple-500" />
             <h3 className="font-semibold">{t("dashboard.analytics.subscriptionHealth")}</h3>
           </div>
@@ -60,7 +60,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
         </div>
 
         <div className="p-6 rounded-2xl border bg-gradient-to-br from-green-500/10 to-green-600/5 shadow-lg">
-          <div className={cn("flex items-center gap-3 mb-4", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-3 mb-4", )}>
             <Users className="w-6 h-6 text-green-500" />
             <h3 className="font-semibold">{t("dashboard.analytics.adminHealth")}</h3>
           </div>
@@ -208,7 +208,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
       {/* Real-Time Activity Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl border bg-gradient-to-br from-blue-500/5 to-cyan-500/5">
-          <div className={cn("flex items-center gap-2 mb-2", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-2 mb-2", )}>
             <Building2 className="w-4 h-4 text-blue-500" />
             <span className="text-sm font-medium">{t("dashboard.analytics.companiesLast24h")}</span>
           </div>
@@ -217,7 +217,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
         </div>
 
         <div className="p-4 rounded-xl border bg-gradient-to-br from-purple-500/5 to-pink-500/5">
-          <div className={cn("flex items-center gap-2 mb-2", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-2 mb-2", )}>
             <CreditCard className="w-4 h-4 text-purple-500" />
             <span className="text-sm font-medium">{t("dashboard.analytics.subscriptionsLast24h")}</span>
           </div>
@@ -226,7 +226,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
         </div>
 
         <div className="p-4 rounded-xl border bg-gradient-to-br from-green-500/5 to-emerald-500/5">
-          <div className={cn("flex items-center gap-2 mb-2", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-2 mb-2", )}>
             <UserPlus className="w-4 h-4 text-green-500" />
             <span className="text-sm font-medium">{t("dashboard.analytics.adminsLast24h")}</span>
           </div>
@@ -235,7 +235,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
         </div>
 
         <div className="p-4 rounded-xl border bg-gradient-to-br from-orange-500/5 to-red-500/5">
-          <div className={cn("flex items-center gap-2 mb-2", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-2 mb-2", )}>
             <Activity className="w-4 h-4 text-orange-500" />
             <span className="text-sm font-medium">{t("dashboard.analytics.systemScore")}</span>
           </div>
@@ -247,24 +247,24 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
       {/* Critical & Growth Metrics Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="p-6 rounded-2xl border bg-gradient-to-br from-red-500/10 to-orange-500/5 shadow-lg">
-          <h3 className={cn("text-lg font-bold mb-4 flex items-center gap-2", isRTL && "flex-row-reverse")}>
+          <h3 className={cn("text-lg font-bold mb-4 flex items-center gap-2", )}>
             <AlertTriangle className="w-5 h-5 text-red-500" />
             {t("dashboard.analytics.criticalMetrics")}
           </h3>
           <div className="space-y-3">
-            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", )}>
               <span className="text-sm">{t("dashboard.analytics.expiringToday")}</span>
               <span className="text-xl font-bold text-red-500">{alerts.subscriptionsExpiringToday}</span>
             </div>
-            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", )}>
               <span className="text-sm">{t("dashboard.analytics.expiredCompanies")}</span>
               <span className="text-xl font-bold text-red-500">{alerts.companiesWithExpiredLicense}</span>
             </div>
-            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", )}>
               <span className="text-sm">{t("dashboard.analytics.suspendedCompanies")}</span>
               <span className="text-xl font-bold text-orange-500">{alerts.companiesWithSuspendedLicense}</span>
             </div>
-            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", )}>
               <span className="text-sm">{t("dashboard.analytics.inactiveAdmins")}</span>
               <span className="text-xl font-bold text-orange-500">{alerts.inactiveAdmins}</span>
             </div>
@@ -272,24 +272,24 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
         </div>
 
         <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-500/10 to-cyan-500/5 shadow-lg">
-          <h3 className={cn("text-lg font-bold mb-4 flex items-center gap-2", isRTL && "flex-row-reverse")}>
+          <h3 className={cn("text-lg font-bold mb-4 flex items-center gap-2", )}>
             <Sparkles className="w-5 h-5 text-blue-500" />
             {t("dashboard.analytics.growthMetrics")}
           </h3>
           <div className="space-y-3">
-            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", )}>
               <span className="text-sm">{t("dashboard.analytics.monthlyGrowth")}</span>
               <span className="text-xl font-bold text-blue-500">+{companies.createdThisMonth + subscriptions.createdThisMonth}</span>
             </div>
-            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", )}>
               <span className="text-sm">{t("dashboard.analytics.weeklyGrowth")}</span>
               <span className="text-xl font-bold text-purple-500">+{companies.createdThisWeek + subscriptions.createdThisWeek}</span>
             </div>
-            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", )}>
               <span className="text-sm">{t("dashboard.analytics.avgDailyGrowth")}</span>
               <span className="text-xl font-bold text-green-500">+{Math.round((companies.createdThisMonth + subscriptions.createdThisMonth) / 30)}</span>
             </div>
-            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", )}>
               <span className="text-sm">{t("dashboard.analytics.retentionRate")}</span>
               <span className="text-xl font-bold text-purple-500">{((subscriptions.active / Math.max(subscriptions.total, 1)) * 100).toFixed(1)}%</span>
             </div>
@@ -299,7 +299,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
 
       {/* REVENUE ANALYTICS */}
       <div className="space-y-6">
-        <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+        <div className={cn("flex items-center justify-between", )}>
           <h2 className="text-2xl font-bold flex items-center gap-3">
             <DollarSign className="w-6 h-6 text-green-500" />
             <span>{t("dashboard.revenue.title")}</span>
@@ -310,7 +310,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* MRR Card */}
           <div className="p-6 rounded-2xl border bg-gradient-to-br from-green-500/10 to-emerald-600/5 shadow-lg">
-            <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center gap-3 mb-2", )}>
               <TrendingUp className="w-5 h-5 text-green-500" />
               <h3 className="text-sm font-medium text-muted-foreground">{t("dashboard.revenue.mrr")}</h3>
             </div>
@@ -320,7 +320,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
 
           {/* ARR Card */}
           <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-500/10 to-cyan-600/5 shadow-lg">
-            <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center gap-3 mb-2", )}>
               <Sparkles className="w-5 h-5 text-blue-500" />
               <h3 className="text-sm font-medium text-muted-foreground">{t("dashboard.revenue.arr")}</h3>
             </div>
@@ -330,7 +330,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
 
           {/* ARPC Card */}
           <div className="p-6 rounded-2xl border bg-gradient-to-br from-purple-500/10 to-violet-600/5 shadow-lg">
-            <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center gap-3 mb-2", )}>
               <Wallet className="w-5 h-5 text-purple-500" />
               <h3 className="text-sm font-medium text-muted-foreground">{t("dashboard.revenue.arpc")}</h3>
             </div>
@@ -345,7 +345,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
               ? "bg-gradient-to-br from-green-500/10 to-emerald-600/5" 
               : "bg-gradient-to-br from-orange-500/10 to-red-600/5"
           )}>
-            <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center gap-3 mb-2", )}>
               {revenue.isGrowing ? (
                 <TrendingUp className="w-5 h-5 text-green-500" />
               ) : (
@@ -425,22 +425,22 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
             </h3>
             
             <div className="space-y-3">
-              <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
+              <div className={cn("flex items-center justify-between pb-3 border-b", )}>
                 <span className="text-sm text-muted-foreground">{t("dashboard.revenue.payingCustomers")}</span>
                 <span className="text-2xl font-bold text-green-500">{revenue.payingCustomers}</span>
               </div>
               
-              <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
+              <div className={cn("flex items-center justify-between pb-3 border-b", )}>
                 <span className="text-sm text-muted-foreground">{t("dashboard.revenue.trialCustomers")}</span>
                 <span className="text-2xl font-bold text-blue-500">{revenue.trialSubscriptions}</span>
               </div>
               
-              <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
+              <div className={cn("flex items-center justify-between pb-3 border-b", )}>
                 <span className="text-sm text-muted-foreground">{t("dashboard.revenue.conversionRate")}</span>
                 <span className="text-2xl font-bold text-purple-500">{revenue.conversionRate.toFixed(1)}%</span>
               </div>
               
-              <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+              <div className={cn("flex items-center justify-between", )}>
                 <span className="text-sm text-muted-foreground">{t("dashboard.revenue.totalRevenue")}</span>
                 <span className="text-2xl font-bold">${revenue.totalRevenue.toLocaleString()}</span>
               </div>
@@ -451,7 +451,7 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
 
       {/* 30-DAY TIME-SERIES CHARTS */}
       <div className="space-y-6">
-        <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+        <div className={cn("flex items-center justify-between", )}>
           <h2 className="text-2xl font-bold">{t("dashboard.timeSeries.title")}</h2>
           <p className="text-sm text-muted-foreground">{t("dashboard.timeSeries.subtitle")}</p>
         </div>
@@ -542,15 +542,15 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
             <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-500/10 to-purple-500/5 shadow-lg">
               <h3 className={cn("text-lg font-bold mb-4", isRTL && "text-right")}>{t("dashboard.timeSeries.growthStats")}</h3>
               <div className="space-y-4">
-                <div className={cn("flex items-center justify-between p-4 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+                <div className={cn("flex items-center justify-between p-4 rounded-lg bg-background/50", )}>
                   <span className="text-sm font-medium">{t("dashboard.timeSeries.totalGrowth")}</span>
                   <span className="text-3xl font-bold text-blue-500">+{timeSeries.totalGrowth}</span>
                 </div>
-                <div className={cn("flex items-center justify-between p-4 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+                <div className={cn("flex items-center justify-between p-4 rounded-lg bg-background/50", )}>
                   <span className="text-sm font-medium">{t("dashboard.timeSeries.avgDailyGrowth")}</span>
                   <span className="text-3xl font-bold text-purple-500">+{timeSeries.averageDailyGrowth.toFixed(1)}</span>
                 </div>
-                <div className={cn("flex items-center justify-between p-4 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
+                <div className={cn("flex items-center justify-between p-4 rounded-lg bg-background/50", )}>
                   <span className="text-sm font-medium">{t("dashboard.timeSeries.dataPoints")}</span>
                   <span className="text-2xl font-bold text-green-500">{timeSeries.last30Days.length}</span>
                 </div>

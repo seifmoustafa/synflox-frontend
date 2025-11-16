@@ -76,7 +76,7 @@ export function OverviewTab({ dashboard, t, isRTL, hasAnim }: OverviewTabProps) 
         )}>
           <div className="absolute -inset-[1px] bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-gradient bg-[length:200%_200%]" />
           <div className={cn("relative p-6 rounded-2xl border bg-card shadow-lg group-hover:shadow-xl transition-shadow duration-300")}>
-            <div className={cn("flex items-start justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-start justify-between", )}>
               <div className={cn("space-y-2", isRTL && "text-right")}>
                 <p className="text-sm font-medium text-muted-foreground">{t("dashboard.companies")}</p>
                 <h3 className="text-3xl font-bold tracking-tight">{overview.totalCompanies.toLocaleString()}</h3>
@@ -100,7 +100,7 @@ export function OverviewTab({ dashboard, t, isRTL, hasAnim }: OverviewTabProps) 
         )}>
           <div className="absolute -inset-[1px] bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-gradient bg-[length:200%_200%]" />
           <div className={cn("relative p-6 rounded-2xl border bg-card shadow-lg group-hover:shadow-xl transition-shadow duration-300")}>
-            <div className={cn("flex items-start justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-start justify-between", )}>
               <div className={cn("space-y-2", isRTL && "text-right")}>
                 <p className="text-sm font-medium text-muted-foreground">{t("dashboard.subscriptions")}</p>
                 <h3 className="text-3xl font-bold tracking-tight">{overview.totalSubscriptions.toLocaleString()}</h3>
@@ -124,7 +124,7 @@ export function OverviewTab({ dashboard, t, isRTL, hasAnim }: OverviewTabProps) 
         )}>
           <div className="absolute -inset-[1px] bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-gradient bg-[length:200%_200%]" />
           <div className={cn("relative p-6 rounded-2xl border bg-card shadow-lg group-hover:shadow-xl transition-shadow duration-300")}>
-            <div className={cn("flex items-start justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-start justify-between", )}>
               <div className={cn("space-y-2", isRTL && "text-right")}>
                 <p className="text-sm font-medium text-muted-foreground">{t("dashboard.admins")}</p>
                 <h3 className="text-3xl font-bold tracking-tight">{overview.totalAdmins.toLocaleString()}</h3>
@@ -150,18 +150,18 @@ export function OverviewTab({ dashboard, t, isRTL, hasAnim }: OverviewTabProps) 
             <div className="absolute -inset-[1px] bg-gradient-to-r from-red-500 via-orange-500 to-red-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-gradient bg-[length:200%_200%]" />
           )}
           <div className={cn("relative p-6 rounded-2xl border bg-card shadow-lg group-hover:shadow-xl transition-shadow duration-300")}>
-            <div className={cn("flex items-start justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-start justify-between", )}>
               <div className={cn("space-y-2", isRTL && "text-right")}>
                 <p className="text-sm font-medium text-muted-foreground">{t("dashboard.systemAlerts")}</p>
                 <h3 className="text-3xl font-bold tracking-tight">{alerts.totalAlerts.toLocaleString()}</h3>
                 <div className="space-y-1">
                   {alerts.hasCriticalAlerts && (
-                    <div className={cn("flex items-center gap-2 text-sm", isRTL && "flex-row-reverse")}>
+                    <div className={cn("flex items-center gap-2 text-sm", )}>
                       <span className="text-red-500 font-medium">{alerts.subscriptionsExpiringToday + alerts.companiesWithExpiredLicense} {t("dashboard.critical")}</span>
                     </div>
                   )}
                   {alerts.hasWarnings && (
-                    <div className={cn("flex items-center gap-2 text-sm", isRTL && "flex-row-reverse")}>
+                    <div className={cn("flex items-center gap-2 text-sm", )}>
                       <span className="text-orange-500 font-medium">{alerts.subscriptionsExpiringThisWeek + alerts.companiesWithSuspendedLicense} {t("dashboard.warnings")}</span>
                     </div>
                   )}

@@ -26,7 +26,7 @@ export function RevenueTab({ dashboard, t, isRTL }: RevenueTabProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* MRR Card */}
         <div className="p-6 rounded-2xl border bg-gradient-to-br from-green-500/10 to-emerald-600/5 shadow-lg">
-          <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-3 mb-2", )}>
             <TrendingUp className="w-5 h-5 text-green-500" />
             <h3 className="text-sm font-medium text-muted-foreground">{t("dashboard.revenue.mrr")}</h3>
           </div>
@@ -36,7 +36,7 @@ export function RevenueTab({ dashboard, t, isRTL }: RevenueTabProps) {
 
         {/* ARR Card */}
         <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-500/10 to-cyan-600/5 shadow-lg">
-          <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-3 mb-2", )}>
             <Sparkles className="w-5 h-5 text-blue-500" />
             <h3 className="text-sm font-medium text-muted-foreground">{t("dashboard.revenue.arr")}</h3>
           </div>
@@ -46,7 +46,7 @@ export function RevenueTab({ dashboard, t, isRTL }: RevenueTabProps) {
 
         {/* ARPC Card */}
         <div className="p-6 rounded-2xl border bg-gradient-to-br from-purple-500/10 to-violet-600/5 shadow-lg">
-          <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-3 mb-2", )}>
             <Wallet className="w-5 h-5 text-purple-500" />
             <h3 className="text-sm font-medium text-muted-foreground">{t("dashboard.revenue.arpc")}</h3>
           </div>
@@ -61,7 +61,7 @@ export function RevenueTab({ dashboard, t, isRTL }: RevenueTabProps) {
             ? "bg-gradient-to-br from-green-500/10 to-emerald-600/5" 
             : "bg-gradient-to-br from-orange-500/10 to-red-600/5"
         )}>
-          <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-3 mb-2", )}>
             {revenue.isGrowing ? (
               <TrendingUp className="w-5 h-5 text-green-500" />
             ) : (
@@ -141,22 +141,22 @@ export function RevenueTab({ dashboard, t, isRTL }: RevenueTabProps) {
           </h3>
           
           <div className="space-y-3">
-            <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between pb-3 border-b", )}>
               <span className="text-sm text-muted-foreground">{t("dashboard.revenue.payingCustomers")}</span>
               <span className="text-2xl font-bold text-green-500">{revenue.payingCustomers}</span>
             </div>
             
-            <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between pb-3 border-b", )}>
               <span className="text-sm text-muted-foreground">{t("dashboard.revenue.trialCustomers")}</span>
               <span className="text-2xl font-bold text-blue-500">{revenue.trialSubscriptions}</span>
             </div>
             
-            <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between pb-3 border-b", )}>
               <span className="text-sm text-muted-foreground">{t("dashboard.revenue.conversionRate")}</span>
               <span className="text-2xl font-bold text-purple-500">{revenue.conversionRate.toFixed(1)}%</span>
             </div>
             
-            <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between", )}>
               <span className="text-sm text-muted-foreground">{t("dashboard.revenue.totalRevenue")}</span>
               <span className="text-2xl font-bold">${revenue.totalRevenue.toLocaleString()}</span>
             </div>
@@ -168,7 +168,7 @@ export function RevenueTab({ dashboard, t, isRTL }: RevenueTabProps) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Top Performing Plan */}
         <div className="p-6 rounded-2xl border bg-gradient-to-br from-green-500/10 to-emerald-500/5 shadow-lg">
-          <h3 className={cn("text-lg font-bold mb-4 flex items-center gap-2", isRTL && "flex-row-reverse")}>
+          <h3 className={cn("text-lg font-bold mb-4 flex items-center gap-2", )}>
             <Sparkles className="w-5 h-5 text-green-500" />
             {t("dashboard.revenue.topPlan")}
           </h3>
@@ -185,7 +185,7 @@ export function RevenueTab({ dashboard, t, isRTL }: RevenueTabProps) {
           </h3>
           <div className="space-y-2">
             {revenue.currencyCodes.map((currency, idx) => (
-              <div key={currency} className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+              <div key={currency} className={cn("flex items-center justify-between", )}>
                 <span className="text-sm font-medium">{currency}</span>
                 <span className="text-lg font-bold text-blue-600">
                   ${revenue.currencyRevenues[idx].toLocaleString()}
@@ -202,7 +202,7 @@ export function RevenueTab({ dashboard, t, isRTL }: RevenueTabProps) {
             ? "bg-gradient-to-br from-green-500/10 to-emerald-500/5" 
             : "bg-gradient-to-br from-orange-500/10 to-red-500/5"
         )}>
-          <h3 className={cn("text-lg font-bold mb-4 flex items-center gap-2", isRTL && "flex-row-reverse")}>
+          <h3 className={cn("text-lg font-bold mb-4 flex items-center gap-2", )}>
             {revenue.isGrowing ? (
               <TrendingUp className="w-5 h-5 text-green-500" />
             ) : (

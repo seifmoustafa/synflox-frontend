@@ -81,15 +81,15 @@ export function SubscriptionsTab({ dashboard, t, isRTL }: SubscriptionsTabProps)
         <div className="p-6 rounded-2xl border bg-card shadow-lg">
           <h3 className={cn("text-xl font-bold mb-4", isRTL && "text-right")}>{t("dashboard.subscriptionBreakdown")}</h3>
           <div className="space-y-3">
-            <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between pb-3 border-b", )}>
               <span className="text-muted-foreground">{t("dashboard.total")}</span>
               <span className="text-2xl font-bold">{subscriptions.total}</span>
             </div>
-            <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between", )}>
               <span className="text-sm">{t("dashboard.activeSubscriptions")}</span>
               <span className="font-medium text-green-500">{subscriptions.active}</span>
             </div>
-            <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between", )}>
               <span className="text-sm">{t("dashboard.trialSubscriptions")}</span>
               <span className="font-medium text-blue-500">{subscriptions.trial}</span>
             </div>
@@ -99,7 +99,7 @@ export function SubscriptionsTab({ dashboard, t, isRTL }: SubscriptionsTabProps)
         <div className="p-6 rounded-2xl border bg-card shadow-lg">
           <h3 className={cn("text-xl font-bold mb-4", isRTL && "text-right")}>{t("dashboard.expirations")}</h3>
           <div className="space-y-3">
-            <div className={cn("flex items-center gap-3", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center gap-3", )}>
               <div className="p-2 rounded-lg bg-red-500/10">
                 <Clock className="h-5 w-5 text-red-500" />
               </div>
@@ -108,7 +108,7 @@ export function SubscriptionsTab({ dashboard, t, isRTL }: SubscriptionsTabProps)
                 <p className="text-sm text-muted-foreground">{t("dashboard.expiring7Days")}</p>
               </div>
             </div>
-            <div className={cn("flex items-center gap-3 pt-3 border-t", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center gap-3 pt-3 border-t", )}>
               <div className="p-2 rounded-lg bg-orange-500/10">
                 <Clock className="h-5 w-5 text-orange-500" />
               </div>
@@ -123,11 +123,11 @@ export function SubscriptionsTab({ dashboard, t, isRTL }: SubscriptionsTabProps)
         <div className="p-6 rounded-2xl border bg-card shadow-lg">
           <h3 className={cn("text-xl font-bold mb-4", isRTL && "text-right")}>{t("dashboard.statusBreakdown")}</h3>
           <div className="space-y-2">
-            <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between", )}>
               <span className="text-sm">{t("dashboard.expiredSubscriptions")}</span>
               <span className="font-medium text-red-500">{subscriptions.expired}</span>
             </div>
-            <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between", )}>
               <span className="text-sm">{t("dashboard.suspendedCompanies")}</span>
               <span className="font-medium text-orange-500">{subscriptions.suspended}</span>
             </div>

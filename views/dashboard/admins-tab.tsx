@@ -75,15 +75,15 @@ export function AdminsTab({ dashboard, t, isRTL }: AdminsTabProps) {
         <div className="p-6 rounded-2xl border bg-card shadow-lg">
           <h3 className={cn("text-xl font-bold mb-4", isRTL && "text-right")}>{t("dashboard.adminStats")}</h3>
           <div className="space-y-3">
-            <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between pb-3 border-b", )}>
               <span className="text-muted-foreground">{t("dashboard.total")}</span>
               <span className="text-2xl font-bold">{admins.total}</span>
             </div>
-            <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between", )}>
               <span className="text-sm">{t("dashboard.active")}</span>
               <span className="font-medium text-green-500">{admins.active}</span>
             </div>
-            <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between", )}>
               <span className="text-sm">{t("dashboard.inactive")}</span>
               <span className="font-medium text-red-500">{admins.inactive}</span>
             </div>
@@ -94,7 +94,7 @@ export function AdminsTab({ dashboard, t, isRTL }: AdminsTabProps) {
           <h3 className={cn("text-xl font-bold mb-4", isRTL && "text-right")}>{t("dashboard.adminTypes")}</h3>
           <div className="space-y-2">
             {Object.entries(admins.byType).map(([type, count]) => (
-              <div key={type} className={cn("flex items-center justify-between py-2 border-b last:border-0", isRTL && "flex-row-reverse")}>
+              <div key={type} className={cn("flex items-center justify-between py-2 border-b last:border-0", )}>
                 <span className="text-sm font-medium">{type}</span>
                 <span className="text-lg font-bold text-primary">{count}</span>
               </div>

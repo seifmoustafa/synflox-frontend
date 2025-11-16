@@ -14,6 +14,7 @@ import { SubscriptionsTab } from "./subscriptions-tab";
 import { AdminsTab } from "./admins-tab";
 import { PerformanceTab } from "./performance-tab";
 import { RevenueTab } from "./revenue-tab";
+import { InsightsTab } from "./insights-tab";
 
 
 export function DashboardView() {
@@ -86,13 +87,14 @@ export function DashboardView() {
 
       {/* TABS NAVIGATION */}
       <Tabs value={vm.activeTab} onValueChange={(v) => vm.setActiveTab(v as any)} className="w-full" dir={isRTL ? "rtl" : "ltr"}>
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 h-auto gap-2">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7 h-auto gap-2">
           <TabsTrigger value="overview" className="whitespace-nowrap">{t("dashboard.tabs.overview")}</TabsTrigger>
           <TabsTrigger value="companies" className="whitespace-nowrap">{t("dashboard.tabs.companies")}</TabsTrigger>
           <TabsTrigger value="subscriptions" className="whitespace-nowrap">{t("dashboard.tabs.subscriptions")}</TabsTrigger>
           <TabsTrigger value="admins" className="whitespace-nowrap">{t("dashboard.tabs.admins")}</TabsTrigger>
           <TabsTrigger value="performance" className="whitespace-nowrap">{t("dashboard.tabs.performance")}</TabsTrigger>
           <TabsTrigger value="revenue" className="whitespace-nowrap">{t("dashboard.tabs.revenue")}</TabsTrigger>
+          <TabsTrigger value="insights" className="whitespace-nowrap">{t("dashboard.tabs.insights")}</TabsTrigger>
         </TabsList>
 
         {/* OVERVIEW TAB */}
@@ -123,6 +125,11 @@ export function DashboardView() {
         {/* REVENUE TAB */}
         <TabsContent value="revenue" className="space-y-6">
           <RevenueTab dashboard={dashboard} t={t} isRTL={isRTL} />
+        </TabsContent>
+
+        {/* INSIGHTS TAB */}
+        <TabsContent value="insights" className="space-y-6">
+          <InsightsTab dashboard={dashboard} t={t} isRTL={isRTL} />
 
           {/* System Timestamp */}
           <div className="p-4 rounded-xl border bg-card/50 text-center">

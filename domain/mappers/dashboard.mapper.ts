@@ -16,7 +16,9 @@ import {
   TimeSeries,
   TimeSeriesData,
   Revenue,
-  RevenueData
+  RevenueData,
+  Lifecycle,
+  LifecycleData
 } from '../models/dashboard.model';
 
 // Response interface from API
@@ -42,6 +44,7 @@ export class DashboardMapper {
       this.mapRecentActivity(data.recentActivity),
       this.mapTimeSeries(data.timeSeries),
       this.mapRevenue(data.revenue),
+      this.mapLifecycle(data.lifecycle),
       new Date(data.generatedAtUtc)
     );
   }
@@ -156,6 +159,18 @@ export class DashboardMapper {
       data.monthOverMonthGrowth,
       data.payingCustomers,
       data.trialSubscriptions
+    );
+  }
+
+  /**
+   * Maps lifecycle data to domain model
+   */
+  private static mapLifecycle(data: LifecycleData): Lifecycle {
+    return new Lifecycle(
+      data.stages,
+      data.churn,
+      data.healthDistribution,
+      data.transitions
     );
   }
 

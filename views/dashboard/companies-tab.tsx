@@ -61,19 +61,19 @@ export function CompaniesTab({ dashboard, t, isRTL }: CompaniesTabProps) {
         <div className="p-6 rounded-2xl border bg-card shadow-lg">
           <h3 className={cn("text-xl font-bold mb-4", isRTL && "text-right")}>{t("dashboard.companyBreakdown")}</h3>
           <div className="space-y-3">
-            <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between pb-3 border-b", )}>
               <span className="text-muted-foreground">{t("dashboard.total")}</span>
               <span className="text-2xl font-bold">{companies.total}</span>
             </div>
-            <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between", )}>
               <span className="text-sm">{t("dashboard.activeCompanies")}</span>
               <span className="font-medium text-green-500">{companies.activeLicense}</span>
             </div>
-            <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between", )}>
               <span className="text-sm">{t("dashboard.suspendedCompanies")}</span>
               <span className="font-medium text-orange-500">{companies.suspendedLicense}</span>
             </div>
-            <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+            <div className={cn("flex items-center justify-between", )}>
               <span className="text-sm">{t("dashboard.expiredCompanies")}</span>
               <span className="font-medium text-red-500">{companies.expiredLicense}</span>
             </div>

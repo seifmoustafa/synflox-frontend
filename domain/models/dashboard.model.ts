@@ -13,6 +13,7 @@ export interface DashboardData {
   recentActivity: RecentActivityData;
   timeSeries: TimeSeriesData;
   revenue: RevenueData;
+  lifecycle: LifecycleData;
   generatedAtUtc: string;
 }
 
@@ -106,6 +107,49 @@ export interface MonthlyRevenueData {
   revenue: number;
   subscriptionCount: number;
   averageRevenuePerSubscription: number;
+}
+
+export interface LifecycleData {
+  stages: LifecycleStageData;
+  churn: ChurnData;
+  healthDistribution: HealthDistributionData;
+  transitions: LifecycleTransitionData[];
+}
+
+export interface LifecycleStageData {
+  new: number;
+  active: number;
+  atRisk: number;
+  churned: number;
+  returning: number;
+}
+
+export interface ChurnData {
+  churnRate: number;
+  churnedThisMonth: number;
+  highRiskCount: number;
+  retentionRate: number;
+  averageLifetimeDays: number;
+  riskDistribution: RiskDistributionData;
+}
+
+export interface RiskDistributionData {
+  low: number;
+  medium: number;
+  high: number;
+}
+
+export interface HealthDistributionData {
+  excellent: number;
+  good: number;
+  fair: number;
+  poor: number;
+}
+
+export interface LifecycleTransitionData {
+  fromStage: string;
+  toStage: string;
+  count: number;
 }
 
 // ============================================
@@ -448,6 +492,138 @@ export class Revenue {
   }
 }
 
+export class Lifecycle {
+  constructor(
+    public readonly stages: LifecycleStageData,
+    public readonly churn: ChurnData,
+    public readonly healthDistribution: HealthDistributionData,
+    public readonly transitions: LifecycleTransitionData[]
+  ) {}
+
+  // Lifecycle stage metrics
+  get totalCompanies(): number {
+    return this.stages.new + this.stages.active + this.stages.atRisk + this.stages.churned;
+  }
+
+  get healthyCompanies(): number {
+    return this.stages.active + this.stages.new;
+  }
+
+  get unhealthyCompanies(): number {
+    return this.stages.atRisk + this.stages.churned;
+  }
+
+  get healthRate(): number {
+    const total = this.totalCompanies;
+    return total > 0 ? (this.healthyCompanies / total) * 100 : 0;
+  }
+
+  // Chart data for lifecycle stages
+  get stageLabels(): string[] {
+    return ['New', 'Active', 'At-Risk', 'Churned', 'Returning'];
+  }
+
+  get stageData(): number[] {
+    return [
+      this.stages.new,
+      this.stages.active,
+      this.stages.atRisk,
+      this.stages.churned,
+      this.stages.returning
+    ];
+  }
+
+  get stageColors(): string[] {
+    return ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+  }
+
+  // Chart data for health distribution
+  get healthLabels(): string[] {
+    return ['Excellent', 'Good', 'Fair', 'Poor'];
+  }
+
+  get healthData(): number[] {
+    return [
+      this.healthDistribution.excellent,
+      this.healthDistribution.good,
+      this.healthDistribution.fair,
+      this.healthDistribution.poor
+    ];
+  }
+
+  get healthColors(): string[] {
+    return ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'];
+  }
+
+  // Chart data for risk distribution
+  get riskLabels(): string[] {
+    return ['Low Risk', 'Medium Risk', 'High Risk'];
+  }
+
+  get riskData(): number[] {
+    return [
+      this.churn.riskDistribution.low,
+      this.churn.riskDistribution.medium,
+      this.churn.riskDistribution.high
+    ];
+  }
+
+  get riskColors(): string[] {
+    return ['#10b981', '#f59e0b', '#ef4444'];
+  }
+
+  // Churn metrics
+  get isChurning(): boolean {
+    return this.churn.churnRate > 5; // > 5% is concerning
+  }
+
+  get churnStatus(): 'healthy' | 'warning' | 'critical' {
+    if (this.churn.churnRate < 3) return 'healthy';
+    if (this.churn.churnRate < 7) return 'warning';
+    return 'critical';
+  }
+
+  get retentionStatus(): 'excellent' | 'good' | 'poor' {
+    if (this.churn.retentionRate >= 95) return 'excellent';
+    if (this.churn.retentionRate >= 85) return 'good';
+    return 'poor';
+  }
+
+  get averageLifetimeMonths(): number {
+    return this.churn.averageLifetimeDays / 30;
+  }
+
+  get averageLifetimeYears(): number {
+    return this.churn.averageLifetimeDays / 365;
+  }
+
+  // Transition insights
+  get transitionFlowData(): { from: string; to: string; value: number }[] {
+    return this.transitions.map(t => ({
+      from: t.fromStage,
+      to: t.toStage,
+      value: t.count
+    }));
+  }
+
+  get mostCommonTransition(): LifecycleTransitionData | null {
+    if (this.transitions.length === 0) return null;
+    return this.transitions.reduce((max, t) => t.count > max.count ? t : max);
+  }
+
+  // Risk insights
+  get criticalRiskPercentage(): number {
+    const total = this.churn.riskDistribution.low + 
+                  this.churn.riskDistribution.medium + 
+                  this.churn.riskDistribution.high;
+    return total > 0 ? (this.churn.riskDistribution.high / total) * 100 : 0;
+  }
+
+  get needsAttention(): boolean {
+    return this.churn.highRiskCount > 0 || this.churn.churnRate > 5;
+  }
+}
+
 export class Dashboard {
   constructor(
     public readonly overview: OverviewStats,
@@ -458,6 +634,7 @@ export class Dashboard {
     public readonly recentActivity: RecentActivity,
     public readonly timeSeries: TimeSeries,
     public readonly revenue: Revenue,
+    public readonly lifecycle: Lifecycle,
     public readonly generatedAt: Date
   ) {}
 
