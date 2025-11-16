@@ -92,7 +92,7 @@ export function DashboardView() {
   const companyStatusChartData: ChartData<'doughnut'> = {
     labels: [t("dashboard.activeCompanies"), t("dashboard.suspendedCompanies"), t("dashboard.expiredCompanies")],
     datasets: [{
-      data: [companies.active, companies.suspended, companies.expired],
+      data: [companies.activeLicense, companies.suspendedLicense, companies.expiredLicense],
       backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
       borderColor: ['#059669', '#d97706', '#dc2626'],
       borderWidth: 2,
@@ -262,12 +262,12 @@ export function DashboardView() {
                     <div className="space-y-1">
                       {alerts.hasCriticalAlerts && (
                         <div className={cn("flex items-center gap-2 text-sm", isRTL && "flex-row-reverse")}>
-                          <span className="text-red-500 font-medium">{alerts.subscriptionsExpiringToday + alerts.expiredCompanies} {t("dashboard.critical")}</span>
+                          <span className="text-red-500 font-medium">{alerts.subscriptionsExpiringToday + alerts.companiesWithExpiredLicense} {t("dashboard.critical")}</span>
                         </div>
                       )}
                       {alerts.hasWarnings && (
                         <div className={cn("flex items-center gap-2 text-sm", isRTL && "flex-row-reverse")}>
-                          <span className="text-orange-500 font-medium">{alerts.subscriptionsExpiringThisWeek + alerts.suspendedCompanies} {t("dashboard.warnings")}</span>
+                          <span className="text-orange-500 font-medium">{alerts.subscriptionsExpiringThisWeek + alerts.companiesWithSuspendedLicense} {t("dashboard.warnings")}</span>
                         </div>
                       )}
                     </div>
@@ -361,15 +361,15 @@ export function DashboardView() {
                 </div>
                 <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
                   <span className="text-sm">{t("dashboard.activeCompanies")}</span>
-                  <span className="font-medium text-green-500">{companies.active}</span>
+                  <span className="font-medium text-green-500">{companies.activeLicense}</span>
                 </div>
                 <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
                   <span className="text-sm">{t("dashboard.suspendedCompanies")}</span>
-                  <span className="font-medium text-orange-500">{companies.suspended}</span>
+                  <span className="font-medium text-orange-500">{companies.suspendedLicense}</span>
                 </div>
                 <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
                   <span className="text-sm">{t("dashboard.expiredCompanies")}</span>
-                  <span className="font-medium text-red-500">{companies.expired}</span>
+                  <span className="font-medium text-red-500">{companies.expiredLicense}</span>
                 </div>
               </div>
             </div>
@@ -520,8 +520,8 @@ export function DashboardView() {
                 labels: Object.keys(admins.byType),
                 datasets: [{
                   data: Object.values(admins.byType),
-                  backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
-                  borderColor: ['#2563eb', '#059669', '#d97706', '#7c3aed'],
+                  backgroundColor: ['rgba(59, 130, 246, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(251, 146, 60, 0.7)', 'rgba(139, 92, 246, 0.7)'],
+                  borderColor: ['#3b82f6', '#10b981', '#fb923c', '#8b5cf6'],
                   borderWidth: 2,
                 }]
               }}
@@ -772,7 +772,7 @@ export function DashboardView() {
               datasets: [
                 {
                   label: t("dashboard.active"),
-                  data: [companies.active, subscriptions.active],
+                  data: [companies.activeLicense, subscriptions.active],
                   backgroundColor: 'rgba(16, 185, 129, 0.7)',
                   borderColor: '#10b981',
                   borderWidth: 2,
@@ -780,7 +780,7 @@ export function DashboardView() {
                 },
                 {
                   label: t("dashboard.analytics.issues"),
-                  data: [companies.suspended + companies.expired, subscriptions.suspended + subscriptions.expired],
+                  data: [companies.suspendedLicense + companies.expiredLicense, subscriptions.suspended + subscriptions.expired],
                   backgroundColor: 'rgba(239, 68, 68, 0.7)',
                   borderColor: '#ef4444',
                   borderWidth: 2,
@@ -860,11 +860,11 @@ export function DashboardView() {
                 </div>
                 <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
                   <span className="text-sm">{t("dashboard.analytics.expiredCompanies")}</span>
-                  <span className="text-xl font-bold text-red-500">{alerts.expiredCompanies}</span>
+                  <span className="text-xl font-bold text-red-500">{alerts.companiesWithExpiredLicense}</span>
                 </div>
                 <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
                   <span className="text-sm">{t("dashboard.analytics.suspendedCompanies")}</span>
-                  <span className="text-xl font-bold text-orange-500">{alerts.suspendedCompanies}</span>
+                  <span className="text-xl font-bold text-orange-500">{alerts.companiesWithSuspendedLicense}</span>
                 </div>
                 <div className={cn("flex items-center justify-between p-3 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
                   <span className="text-sm">{t("dashboard.analytics.inactiveAdmins")}</span>

@@ -100,9 +100,9 @@ export const ar = {
     inactive: "غير نشط",
     // Detailed Stats
     companyBreakdown: "تفصيل الشركات",
-    activeCompanies: "نشطة",
-    suspendedCompanies: "معلقة",
-    expiredCompanies: "منتهية",
+    activeCompanies: "شركات (ترخيص نشط)",
+    suspendedCompanies: "شركات (ترخيص معلق)",
+    expiredCompanies: "شركات (ترخيص منتهي)",
     growth: "النمو",
     growthThisMonth: "النمو هذا الشهر",
     subscriptionBreakdown: "تفصيل الاشتراكات",

@@ -60,9 +60,9 @@ export class DashboardMapper {
   private static mapCompanyStats(data: CompanyStatsData): CompanyStats {
     return new CompanyStats(
       data.total,
-      data.active,
-      data.suspended,
-      data.expired,
+      data.activeLicense,
+      data.suspendedLicense,
+      data.expiredLicense,
       data.createdToday,
       data.createdThisWeek,
       data.createdThisMonth
@@ -110,8 +110,8 @@ export class DashboardMapper {
     return new Alerts(
       data.subscriptionsExpiringToday,
       data.subscriptionsExpiringThisWeek,
-      data.suspendedCompanies,
-      data.expiredCompanies,
+      data.companiesWithSuspendedLicense,
+      data.companiesWithExpiredLicense,
       data.inactiveAdmins,
       data.messages
     );

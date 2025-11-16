@@ -25,9 +25,9 @@ export interface OverviewStatsData {
 
 export interface CompanyStatsData {
   total: number;
-  active: number;
-  suspended: number;
-  expired: number;
+  activeLicense: number;  // Companies with active subscription
+  suspendedLicense: number;  // Companies with suspended subscription
+  expiredLicense: number;  // Companies with expired/no subscription
   createdToday: number;
   createdThisWeek: number;
   createdThisMonth: number;
@@ -60,8 +60,8 @@ export interface AdminStatsData {
 export interface AlertsData {
   subscriptionsExpiringToday: number;
   subscriptionsExpiringThisWeek: number;
-  suspendedCompanies: number;
-  expiredCompanies: number;
+  companiesWithSuspendedLicense: number;  // Companies that have suspended subscription
+  companiesWithExpiredLicense: number;  // Companies with expired or no subscription
   inactiveAdmins: number;
   messages: string[];
 }
@@ -114,24 +114,24 @@ export class OverviewStats {
 export class CompanyStats {
   constructor(
     public readonly total: number,
-    public readonly active: number,
-    public readonly suspended: number,
-    public readonly expired: number,
+    public readonly activeLicense: number,
+    public readonly suspendedLicense: number,
+    public readonly expiredLicense: number,
     public readonly createdToday: number,
     public readonly createdThisWeek: number,
     public readonly createdThisMonth: number
   ) {}
 
   get activePercentage(): number {
-    return this.total > 0 ? (this.active / this.total) * 100 : 0;
+    return this.total > 0 ? (this.activeLicense / this.total) * 100 : 0;
   }
 
   get suspendedPercentage(): number {
-    return this.total > 0 ? (this.suspended / this.total) * 100 : 0;
+    return this.total > 0 ? (this.suspendedLicense / this.total) * 100 : 0;
   }
 
   get expiredPercentage(): number {
-    return this.total > 0 ? (this.expired / this.total) * 100 : 0;
+    return this.total > 0 ? (this.expiredLicense / this.total) * 100 : 0;
   }
 
   get growthTrend(): 'up' | 'down' | 'stable' {
@@ -141,7 +141,7 @@ export class CompanyStats {
   }
 
   get hasIssues(): boolean {
-    return this.suspended > 0 || this.expired > 0;
+    return this.suspendedLicense > 0 || this.expiredLicense > 0;
   }
 }
 
@@ -229,8 +229,8 @@ export class Alerts {
   constructor(
     public readonly subscriptionsExpiringToday: number,
     public readonly subscriptionsExpiringThisWeek: number,
-    public readonly suspendedCompanies: number,
-    public readonly expiredCompanies: number,
+    public readonly companiesWithSuspendedLicense: number,
+    public readonly companiesWithExpiredLicense: number,
     public readonly inactiveAdmins: number,
     public readonly messages: string[]
   ) {}
@@ -239,24 +239,25 @@ export class Alerts {
     return (
       this.subscriptionsExpiringToday +
       this.subscriptionsExpiringThisWeek +
-      this.suspendedCompanies +
-      this.expiredCompanies +
+      this.companiesWithSuspendedLicense +
+      this.companiesWithExpiredLicense +
       this.inactiveAdmins
     );
   }
 
   get hasCriticalAlerts(): boolean {
-    // Only critical if more than 3 subscriptions expiring today or more than 5 expired companies
-    return this.subscriptionsExpiringToday > 3 || this.expiredCompanies > 5;
+    // Critical: subscriptions expiring today OR 4+ total, OR 6+ expired companies
+    return this.subscriptionsExpiringToday >= 4 || this.companiesWithExpiredLicense >= 6;
   }
 
   get hasWarnings(): boolean {
-    // Warning for 1-3 subscriptions expiring today, or this week, or suspended companies
+    // Warning for 1-3 subscriptions expiring today, or this week, 
     return (
-      (this.subscriptionsExpiringToday > 0 && this.subscriptionsExpiringToday <= 3) ||
-      this.subscriptionsExpiringThisWeek > 0 || 
-      this.suspendedCompanies > 0 ||
-      (this.expiredCompanies > 0 && this.expiredCompanies <= 5)
+      (this.subscriptionsExpiringToday > 0 && this.subscriptionsExpiringToday < 4) ||
+      this.subscriptionsExpiringThisWeek > 0 ||
+      this.companiesWithSuspendedLicense > 0 ||
+      (this.companiesWithExpiredLicense > 0 && this.companiesWithExpiredLicense < 6) ||
+      this.inactiveAdmins > 0
     );
   }
 

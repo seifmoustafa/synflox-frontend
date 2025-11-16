@@ -106,9 +106,9 @@ export const en = {
     
     // Detailed Stats
     companyBreakdown: "Company Breakdown",
-    activeCompanies: "Active",
-    suspendedCompanies: "Suspended",
-    expiredCompanies: "Expired",
+    activeCompanies: "Companies (Active License)",
+    suspendedCompanies: "Companies (Suspended License)",
+    expiredCompanies: "Companies (Expired License)",
     growth: "Growth",
     growthThisMonth: "Growth This Month",
     
