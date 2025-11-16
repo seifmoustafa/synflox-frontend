@@ -79,9 +79,17 @@ export function OverviewTab({ dashboard, t, isRTL, hasAnim }: OverviewTabProps) 
             <div className={cn("flex items-start justify-between", )}>
               <div className={cn("space-y-2", isRTL && "text-right")}>
                 <p className="text-sm font-medium text-muted-foreground">{t("dashboard.companies")}</p>
-                <h3 className="text-3xl font-bold tracking-tight">{overview.totalCompanies.toLocaleString()}</h3>
+                <div className="flex items-baseline gap-2">
+                  <h3 className="text-3xl font-bold tracking-tight">{overview.totalCompanies.toLocaleString()}</h3>
+                  <span className={cn("text-lg font-bold", dashboard.trends.companies.trendColor)}>
+                    {dashboard.trends.companies.trendIcon}
+                  </span>
+                </div>
                 <p className="text-sm text-green-500 font-medium">
                   {overview.activeCompanies} {t("dashboard.activeSubscriptions_plural")}
+                </p>
+                <p className={cn("text-xs font-medium", dashboard.trends.companies.trendColor)}>
+                  {dashboard.trends.companies.changeSign}{dashboard.trends.companies.changePercent.toFixed(1)}% {t("dashboard.trends.vsLastMonth")}
                 </p>
               </div>
               <div className={cn(
@@ -103,9 +111,17 @@ export function OverviewTab({ dashboard, t, isRTL, hasAnim }: OverviewTabProps) 
             <div className={cn("flex items-start justify-between", )}>
               <div className={cn("space-y-2", isRTL && "text-right")}>
                 <p className="text-sm font-medium text-muted-foreground">{t("dashboard.subscriptions")}</p>
-                <h3 className="text-3xl font-bold tracking-tight">{overview.totalSubscriptions.toLocaleString()}</h3>
+                <div className="flex items-baseline gap-2">
+                  <h3 className="text-3xl font-bold tracking-tight">{overview.totalSubscriptions.toLocaleString()}</h3>
+                  <span className={cn("text-lg font-bold", dashboard.trends.subscriptions.trendColor)}>
+                    {dashboard.trends.subscriptions.trendIcon}
+                  </span>
+                </div>
                 <p className="text-sm text-green-500 font-medium">
                   {overview.activeSubscriptions} {t("dashboard.active")}
+                </p>
+                <p className={cn("text-xs font-medium", dashboard.trends.subscriptions.trendColor)}>
+                  {dashboard.trends.subscriptions.changeSign}{dashboard.trends.subscriptions.changePercent.toFixed(1)}% {t("dashboard.trends.vsLastMonth")}
                 </p>
               </div>
               <div className={cn(
@@ -127,9 +143,17 @@ export function OverviewTab({ dashboard, t, isRTL, hasAnim }: OverviewTabProps) 
             <div className={cn("flex items-start justify-between", )}>
               <div className={cn("space-y-2", isRTL && "text-right")}>
                 <p className="text-sm font-medium text-muted-foreground">{t("dashboard.admins")}</p>
-                <h3 className="text-3xl font-bold tracking-tight">{overview.totalAdmins.toLocaleString()}</h3>
+                <div className="flex items-baseline gap-2">
+                  <h3 className="text-3xl font-bold tracking-tight">{overview.totalAdmins.toLocaleString()}</h3>
+                  <span className={cn("text-lg font-bold", dashboard.trends.admins.trendColor)}>
+                    {dashboard.trends.admins.trendIcon}
+                  </span>
+                </div>
                 <p className="text-sm text-green-500 font-medium">
                   {overview.activeAdmins} {t("dashboard.active")}
+                </p>
+                <p className={cn("text-xs font-medium", dashboard.trends.admins.trendColor)}>
+                  {dashboard.trends.admins.changeSign}{dashboard.trends.admins.changePercent.toFixed(1)}% {t("dashboard.trends.vsLastMonth")}
                 </p>
               </div>
               <div className={cn(
@@ -210,6 +234,91 @@ export function OverviewTab({ dashboard, t, isRTL, hasAnim }: OverviewTabProps) 
         height={250}
         className={cn(hasAnim && "animate-in fade-in-0 slide-in-from-bottom-4 duration-500")}
       />
+
+      {/* 30-Day Forecast Section */}
+      <div className="p-6 rounded-2xl border bg-gradient-to-br from-purple-500/10 to-pink-500/5 shadow-lg">
+        <h3 className={cn("text-xl font-bold mb-4", isRTL && "text-right")}>
+          {t("dashboard.trends.forecast30Days")}
+        </h3>
+        <p className={cn("text-sm text-muted-foreground mb-6", isRTL && "text-right")}>
+          {t("dashboard.trends.forecastDesc")}
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Companies Forecast */}
+          <div className="p-4 rounded-xl border bg-card/50">
+            <p className={cn("text-sm text-muted-foreground mb-2", isRTL && "text-right")}>
+              {t("dashboard.companies")}
+            </p>
+            <div className={cn("flex items-baseline gap-2", )}>
+              <p className="text-2xl font-bold">{dashboard.trends.companies.forecast30Days}</p>
+              <span className="text-sm text-blue-500 font-medium">
+                (+{dashboard.trends.companies.forecastGrowth})
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {t("dashboard.trends.dailyRate")}: {dashboard.trends.companies.dailyGrowthRate}
+            </p>
+          </div>
+
+          {/* Subscriptions Forecast */}
+          <div className="p-4 rounded-xl border bg-card/50">
+            <p className={cn("text-sm text-muted-foreground mb-2", isRTL && "text-right")}>
+              {t("dashboard.subscriptions")}
+            </p>
+            <div className={cn("flex items-baseline gap-2", )}>
+              <p className="text-2xl font-bold">{dashboard.trends.subscriptions.forecast30Days}</p>
+              <span className="text-sm text-purple-500 font-medium">
+                (+{dashboard.trends.subscriptions.forecastGrowth})
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {t("dashboard.trends.dailyRate")}: {dashboard.trends.subscriptions.dailyGrowthRate}
+            </p>
+          </div>
+
+          {/* Admins Forecast */}
+          <div className="p-4 rounded-xl border bg-card/50">
+            <p className={cn("text-sm text-muted-foreground mb-2", isRTL && "text-right")}>
+              {t("dashboard.admins")}
+            </p>
+            <div className={cn("flex items-baseline gap-2", )}>
+              <p className="text-2xl font-bold">{dashboard.trends.admins.forecast30Days}</p>
+              <span className="text-sm text-green-500 font-medium">
+                (+{dashboard.trends.admins.forecastGrowth})
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {t("dashboard.trends.dailyRate")}: {dashboard.trends.admins.dailyGrowthRate}
+            </p>
+          </div>
+        </div>
+
+        {/* Growth Velocity Indicator */}
+        <div className={cn(
+          "mt-6 p-4 rounded-xl border",
+          dashboard.trends.isAccelerating ? "bg-green-500/10 border-green-500/20" :
+          dashboard.trends.isDecelerating ? "bg-red-500/10 border-red-500/20" :
+          "bg-blue-500/10 border-blue-500/20"
+        )}>
+          <div className={cn("flex items-center justify-between", )}>
+            <div>
+              <p className="text-sm font-medium">{t("dashboard.trends.growthVelocity")}</p>
+              <p className={cn(
+                "text-2xl font-bold mt-1",
+                dashboard.trends.isAccelerating ? "text-green-500" :
+                dashboard.trends.isDecelerating ? "text-red-500" :
+                "text-blue-500"
+              )}>
+                {t(`dashboard.trends.velocity.${dashboard.trends.growthVelocity.toLowerCase()}`)}
+              </p>
+            </div>
+            <div className="text-4xl">
+              {dashboard.trends.isAccelerating ? '🚀' : dashboard.trends.isDecelerating ? '📉' : '📊'}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

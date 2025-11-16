@@ -290,6 +290,20 @@ export const en = {
       actionNeeded: "Immediate attention needed",
       allGood: "All systems healthy",
     },
+
+    // Trends & Forecasting
+    trends: {
+      vsLastMonth: "vs last month",
+      forecast30Days: "30-Day Forecast",
+      forecastDesc: "Projected growth based on historical trends",
+      dailyRate: "Daily Rate",
+      growthVelocity: "Growth Velocity",
+      velocity: {
+        accelerating: "Accelerating",
+        steady: "Steady",
+        decelerating: "Decelerating"
+      }
+    },
     
     // Time-Series
     timeSeries: {

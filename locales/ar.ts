@@ -280,6 +280,20 @@ export const ar = {
       actionNeeded: "يحتاج اهتمام فوري",
       allGood: "جميع الأنظمة سليمة",
     },
+
+    // الاتجاهات والتنبؤ
+    trends: {
+      vsLastMonth: "مقارنة بالشهر الماضي",
+      forecast30Days: "التنبؤ لـ 30 يوماً",
+      forecastDesc: "النمو المتوقع بناءً على الاتجاهات التاريخية",
+      dailyRate: "المعدل اليومي",
+      growthVelocity: "سرعة النمو",
+      velocity: {
+        accelerating: "في تسارع",
+        steady: "ثابت",
+        decelerating: "في تباطؤ"
+      }
+    },
     
     // Time-Series
     timeSeries: {

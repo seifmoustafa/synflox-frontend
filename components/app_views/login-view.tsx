@@ -432,7 +432,7 @@ export function LoginView() {
                     
                     <span className={cn(
                       "relative flex items-center justify-center gap-2",
-                      isRTL && "flex-row-reverse"
+                      
                     )}>
                       {vm.isLoading ? (
                         <>

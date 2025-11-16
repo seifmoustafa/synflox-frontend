@@ -14,6 +14,7 @@ export interface DashboardData {
   timeSeries: TimeSeriesData;
   revenue: RevenueData;
   lifecycle: LifecycleData;
+  trends: TrendsData;
   generatedAtUtc: string;
 }
 
@@ -150,6 +151,33 @@ export interface LifecycleTransitionData {
   fromStage: string;
   toStage: string;
   count: number;
+}
+
+export interface TrendsData {
+  companies: EntityTrendData;
+  subscriptions: EntityTrendData;
+  admins: EntityTrendData;
+  systemHealthTrend: TrendDirection;
+  growthVelocity: string;
+}
+
+export interface EntityTrendData {
+  current: number;
+  previous: number;
+  changePercent: number;
+  direction: TrendDirection;
+  weekOverWeekChange: number;
+  monthOverMonthChange: number;
+  forecast30Days: number;
+  dailyGrowthRate: number;
+}
+
+export enum TrendDirection {
+  StrongUp = 0,
+  Up = 1,
+  Stable = 2,
+  Down = 3,
+  StrongDown = 4
 }
 
 // ============================================
@@ -624,6 +652,110 @@ export class Lifecycle {
   }
 }
 
+export class Trends {
+  constructor(
+    public readonly companies: EntityTrend,
+    public readonly subscriptions: EntityTrend,
+    public readonly admins: EntityTrend,
+    public readonly systemHealthTrend: TrendDirection,
+    public readonly growthVelocity: string
+  ) {}
+
+  get overallTrendDirection(): TrendDirection {
+    const avgDirection = (this.companies.direction + this.subscriptions.direction + this.admins.direction) / 3;
+    return Math.round(avgDirection) as TrendDirection;
+  }
+
+  get isGrowing(): boolean {
+    return this.overallTrendDirection <= TrendDirection.Up;
+  }
+
+  get isDeclining(): boolean {
+    return this.overallTrendDirection >= TrendDirection.Down;
+  }
+
+  get isAccelerating(): boolean {
+    return this.growthVelocity === 'Accelerating';
+  }
+
+  get isDecelerating(): boolean {
+    return this.growthVelocity === 'Decelerating';
+  }
+
+  get averageChangePercent(): number {
+    return (this.companies.changePercent + this.subscriptions.changePercent + this.admins.changePercent) / 3;
+  }
+
+  get totalForecast30Days(): number {
+    return this.companies.forecast30Days + this.subscriptions.forecast30Days + this.admins.forecast30Days;
+  }
+}
+
+export class EntityTrend {
+  constructor(
+    public readonly current: number,
+    public readonly previous: number,
+    public readonly changePercent: number,
+    public readonly direction: TrendDirection,
+    public readonly weekOverWeekChange: number,
+    public readonly monthOverMonthChange: number,
+    public readonly forecast30Days: number,
+    public readonly dailyGrowthRate: number
+  ) {}
+
+  get isGrowing(): boolean {
+    return this.direction <= TrendDirection.Up;
+  }
+
+  get isDeclining(): boolean {
+    return this.direction >= TrendDirection.Down;
+  }
+
+  get isStable(): boolean {
+    return this.direction === TrendDirection.Stable;
+  }
+
+  get trendIcon(): string {
+    switch (this.direction) {
+      case TrendDirection.StrongUp:
+        return '↑';
+      case TrendDirection.Up:
+        return '↗';
+      case TrendDirection.Stable:
+        return '→';
+      case TrendDirection.Down:
+        return '↘';
+      case TrendDirection.StrongDown:
+        return '↓';
+      default:
+        return '→';
+    }
+  }
+
+  get trendColor(): string {
+    switch (this.direction) {
+      case TrendDirection.StrongUp:
+      case TrendDirection.Up:
+        return 'text-green-500';
+      case TrendDirection.Stable:
+        return 'text-blue-500';
+      case TrendDirection.Down:
+      case TrendDirection.StrongDown:
+        return 'text-red-500';
+      default:
+        return 'text-gray-500';
+    }
+  }
+
+  get changeSign(): string {
+    return this.changePercent > 0 ? '+' : '';
+  }
+
+  get forecastGrowth(): number {
+    return this.forecast30Days - this.current;
+  }
+}
+
 export class Dashboard {
   constructor(
     public readonly overview: OverviewStats,
@@ -635,6 +767,7 @@ export class Dashboard {
     public readonly timeSeries: TimeSeries,
     public readonly revenue: Revenue,
     public readonly lifecycle: Lifecycle,
+    public readonly trends: Trends,
     public readonly generatedAt: Date
   ) {}
 

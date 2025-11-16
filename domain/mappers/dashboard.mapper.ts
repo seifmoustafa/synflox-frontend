@@ -18,7 +18,11 @@ import {
   Revenue,
   RevenueData,
   Lifecycle,
-  LifecycleData
+  LifecycleData,
+  Trends,
+  TrendsData,
+  EntityTrend,
+  EntityTrendData
 } from '../models/dashboard.model';
 
 // Response interface from API
@@ -45,6 +49,7 @@ export class DashboardMapper {
       this.mapTimeSeries(data.timeSeries),
       this.mapRevenue(data.revenue),
       this.mapLifecycle(data.lifecycle),
+      this.mapTrends(data.trends),
       new Date(data.generatedAtUtc)
     );
   }
@@ -171,6 +176,35 @@ export class DashboardMapper {
       data.churn,
       data.healthDistribution,
       data.transitions
+    );
+  }
+
+  /**
+   * Maps trends data to domain model
+   */
+  private static mapTrends(data: TrendsData): Trends {
+    return new Trends(
+      this.mapEntityTrend(data.companies),
+      this.mapEntityTrend(data.subscriptions),
+      this.mapEntityTrend(data.admins),
+      data.systemHealthTrend,
+      data.growthVelocity
+    );
+  }
+
+  /**
+   * Maps entity trend data to domain model
+   */
+  private static mapEntityTrend(data: EntityTrendData): EntityTrend {
+    return new EntityTrend(
+      data.current,
+      data.previous,
+      data.changePercent,
+      data.direction,
+      data.weekOverWeekChange,
+      data.monthOverMonthChange,
+      data.forecast30Days,
+      data.dailyGrowthRate
     );
   }
 
