@@ -10,22 +10,19 @@ import {
   Sparkles,
   UserPlus,
   AlertTriangle,
-  Target,
-  DollarSign,
-  TrendingDown,
-  Wallet
+  Target 
 } from "lucide-react";
 import { GenericChart } from "@/components/charts/generic-chart";
 import { Dashboard } from "@/domain/models/dashboard.model";
 
-interface AnalyticsTabProps {
+interface PerformanceTabProps {
   dashboard: Dashboard;
   t: (key: string) => string;
   isRTL: boolean;
 }
 
-export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
-  const { overview, companies, subscriptions, admins, alerts, timeSeries, revenue } = dashboard;
+export function PerformanceTab({ dashboard, t, isRTL }: PerformanceTabProps) {
+  const { overview, companies, subscriptions, admins, alerts, timeSeries } = dashboard;
 
   return (
     <div className="space-y-6">
@@ -297,158 +294,6 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
         </div>
       </div>
 
-      {/* REVENUE ANALYTICS */}
-      <div className="space-y-6">
-        <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
-          <h2 className="text-2xl font-bold flex items-center gap-3">
-            <DollarSign className="w-6 h-6 text-green-500" />
-            <span>{t("dashboard.revenue.title")}</span>
-          </h2>
-        </div>
-
-        {/* Revenue KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* MRR Card */}
-          <div className="p-6 rounded-2xl border bg-gradient-to-br from-green-500/10 to-emerald-600/5 shadow-lg">
-            <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
-              <TrendingUp className="w-5 h-5 text-green-500" />
-              <h3 className="text-sm font-medium text-muted-foreground">{t("dashboard.revenue.mrr")}</h3>
-            </div>
-            <p className="text-3xl font-bold text-green-600">${revenue.mrr.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground mt-2">{t("dashboard.revenue.monthlyRecurring")}</p>
-          </div>
-
-          {/* ARR Card */}
-          <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-500/10 to-cyan-600/5 shadow-lg">
-            <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
-              <Sparkles className="w-5 h-5 text-blue-500" />
-              <h3 className="text-sm font-medium text-muted-foreground">{t("dashboard.revenue.arr")}</h3>
-            </div>
-            <p className="text-3xl font-bold text-blue-600">${revenue.arr.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground mt-2">{t("dashboard.revenue.annualRecurring")}</p>
-          </div>
-
-          {/* ARPC Card */}
-          <div className="p-6 rounded-2xl border bg-gradient-to-br from-purple-500/10 to-violet-600/5 shadow-lg">
-            <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
-              <Wallet className="w-5 h-5 text-purple-500" />
-              <h3 className="text-sm font-medium text-muted-foreground">{t("dashboard.revenue.arpc")}</h3>
-            </div>
-            <p className="text-3xl font-bold text-purple-600">${revenue.arpc.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground mt-2">{t("dashboard.revenue.avgPerCustomer")}</p>
-          </div>
-
-          {/* Growth Card */}
-          <div className={cn(
-            "p-6 rounded-2xl border shadow-lg",
-            revenue.isGrowing 
-              ? "bg-gradient-to-br from-green-500/10 to-emerald-600/5" 
-              : "bg-gradient-to-br from-orange-500/10 to-red-600/5"
-          )}>
-            <div className={cn("flex items-center gap-3 mb-2", isRTL && "flex-row-reverse")}>
-              {revenue.isGrowing ? (
-                <TrendingUp className="w-5 h-5 text-green-500" />
-              ) : (
-                <TrendingDown className="w-5 h-5 text-orange-500" />
-              )}
-              <h3 className="text-sm font-medium text-muted-foreground">{t("dashboard.revenue.momGrowth")}</h3>
-            </div>
-            <p className={cn(
-              "text-3xl font-bold",
-              revenue.isGrowing ? "text-green-600" : "text-orange-600"
-            )}>
-              {revenue.monthOverMonthGrowth > 0 ? "+" : ""}{revenue.monthOverMonthGrowth.toFixed(1)}%
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">{t("dashboard.revenue.monthOverMonth")}</p>
-          </div>
-        </div>
-
-        {/* Revenue Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Monthly Revenue Trend */}
-          <GenericChart
-            type="line"
-            title={t("dashboard.revenue.monthlyTrend")}
-            description={t("dashboard.revenue.monthlyTrendDesc")}
-            data={{
-              labels: revenue.months,
-              datasets: [{
-                label: t("dashboard.revenue.revenue"),
-                data: revenue.monthlyRevenueData,
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                fill: true,
-                tension: 0.4,
-              }]
-            }}
-            height={300}
-          />
-
-          {/* Revenue by Plan */}
-          <GenericChart
-            type="doughnut"
-            title={t("dashboard.revenue.byPlan")}
-            description={t("dashboard.revenue.byPlanDesc")}
-            data={{
-              labels: revenue.planNames,
-              datasets: [{
-                data: revenue.planRevenues,
-                backgroundColor: [
-                  '#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', 
-                  '#ef4444', '#06b6d4', '#ec4899', '#6366f1'
-                ],
-              }]
-            }}
-            height={300}
-          />
-
-          {/* Subscription Count Trend */}
-          <GenericChart
-            type="bar"
-            title={t("dashboard.revenue.subscriptionTrend")}
-            description={t("dashboard.revenue.subscriptionTrendDesc")}
-            data={{
-              labels: revenue.months,
-              datasets: [{
-                label: t("dashboard.revenue.subscriptionCount"),
-                data: revenue.monthlySubscriptionCounts,
-                backgroundColor: '#3b82f6',
-              }]
-            }}
-            height={300}
-          />
-
-          {/* Customer Metrics */}
-          <div className="p-6 rounded-2xl border bg-card shadow-lg space-y-4">
-            <h3 className={cn("text-xl font-bold mb-4", isRTL && "text-right")}>
-              {t("dashboard.revenue.customerMetrics")}
-            </h3>
-            
-            <div className="space-y-3">
-              <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
-                <span className="text-sm text-muted-foreground">{t("dashboard.revenue.payingCustomers")}</span>
-                <span className="text-2xl font-bold text-green-500">{revenue.payingCustomers}</span>
-              </div>
-              
-              <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
-                <span className="text-sm text-muted-foreground">{t("dashboard.revenue.trialCustomers")}</span>
-                <span className="text-2xl font-bold text-blue-500">{revenue.trialSubscriptions}</span>
-              </div>
-              
-              <div className={cn("flex items-center justify-between pb-3 border-b", isRTL && "flex-row-reverse")}>
-                <span className="text-sm text-muted-foreground">{t("dashboard.revenue.conversionRate")}</span>
-                <span className="text-2xl font-bold text-purple-500">{revenue.conversionRate.toFixed(1)}%</span>
-              </div>
-              
-              <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
-                <span className="text-sm text-muted-foreground">{t("dashboard.revenue.totalRevenue")}</span>
-                <span className="text-2xl font-bold">${revenue.totalRevenue.toLocaleString()}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* 30-DAY TIME-SERIES CHARTS */}
       <div className="space-y-6">
         <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
@@ -465,31 +310,25 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
             labels: timeSeries.dates,
             datasets: [
               {
-                label: t("dashboard.companies"),
+                label: t("dashboard.timeSeries.companiesGrowth"),
                 data: timeSeries.companiesCreatedData,
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 tension: 0.4,
-                fill: false,
-                borderWidth: 2,
               },
               {
-                label: t("dashboard.subscriptions"),
+                label: t("dashboard.timeSeries.subscriptionsGrowth"),
                 data: timeSeries.subscriptionsCreatedData,
                 borderColor: '#8b5cf6',
                 backgroundColor: 'rgba(139, 92, 246, 0.1)',
                 tension: 0.4,
-                fill: false,
-                borderWidth: 2,
               },
               {
-                label: t("dashboard.admins"),
+                label: t("dashboard.timeSeries.adminsGrowth"),
                 data: timeSeries.adminsCreatedData,
                 borderColor: '#10b981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
                 tension: 0.4,
-                fill: false,
-                borderWidth: 2,
               }
             ]
           }}
@@ -510,27 +349,24 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
                   data: timeSeries.companiesActiveData,
                   borderColor: '#3b82f6',
                   backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                  tension: 0.4,
                   fill: true,
-                  borderWidth: 2,
+                  tension: 0.4,
                 },
                 {
                   label: t("dashboard.subscriptions"),
                   data: timeSeries.subscriptionsActiveData,
                   borderColor: '#8b5cf6',
                   backgroundColor: 'rgba(139, 92, 246, 0.2)',
-                  tension: 0.4,
                   fill: true,
-                  borderWidth: 2,
+                  tension: 0.4,
                 },
                 {
                   label: t("dashboard.admins"),
                   data: timeSeries.adminsActiveData,
                   borderColor: '#10b981',
                   backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                  tension: 0.4,
                   fill: true,
-                  borderWidth: 2,
+                  tension: 0.4,
                 }
               ]
             }}
@@ -541,17 +377,17 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
           <div className="space-y-4">
             <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-500/10 to-purple-500/5 shadow-lg">
               <h3 className={cn("text-lg font-bold mb-4", isRTL && "text-right")}>{t("dashboard.timeSeries.growthStats")}</h3>
-              <div className="space-y-4">
-                <div className={cn("flex items-center justify-between p-4 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
-                  <span className="text-sm font-medium">{t("dashboard.timeSeries.totalGrowth")}</span>
-                  <span className="text-3xl font-bold text-blue-500">+{timeSeries.totalGrowth}</span>
+              <div className="space-y-3">
+                <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+                  <span className="text-sm text-muted-foreground">{t("dashboard.timeSeries.totalGrowth")}</span>
+                  <span className="text-2xl font-bold text-blue-500">{timeSeries.totalGrowth}</span>
                 </div>
-                <div className={cn("flex items-center justify-between p-4 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
-                  <span className="text-sm font-medium">{t("dashboard.timeSeries.avgDailyGrowth")}</span>
-                  <span className="text-3xl font-bold text-purple-500">+{timeSeries.averageDailyGrowth.toFixed(1)}</span>
+                <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+                  <span className="text-sm text-muted-foreground">{t("dashboard.timeSeries.avgDailyGrowth")}</span>
+                  <span className="text-2xl font-bold text-purple-500">{timeSeries.averageDailyGrowth.toFixed(1)}</span>
                 </div>
-                <div className={cn("flex items-center justify-between p-4 rounded-lg bg-background/50", isRTL && "flex-row-reverse")}>
-                  <span className="text-sm font-medium">{t("dashboard.timeSeries.dataPoints")}</span>
+                <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+                  <span className="text-sm text-muted-foreground">{t("dashboard.timeSeries.dataPoints")}</span>
                   <span className="text-2xl font-bold text-green-500">{timeSeries.last30Days.length}</span>
                 </div>
               </div>
@@ -563,50 +399,41 @@ export function AnalyticsTab({ dashboard, t, isRTL }: AnalyticsTabProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <GenericChart
             title={t("dashboard.timeSeries.companiesGrowth")}
-            description={t("dashboard.timeSeries.last30Days")}
             type="bar"
             data={{
               labels: timeSeries.dates,
               datasets: [{
                 label: t("dashboard.companies"),
                 data: timeSeries.companiesCreatedData,
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                borderColor: '#3b82f6',
-                borderWidth: 2,
+                backgroundColor: '#3b82f6',
               }]
             }}
             height={250}
           />
-
+          
           <GenericChart
             title={t("dashboard.timeSeries.subscriptionsGrowth")}
-            description={t("dashboard.timeSeries.last30Days")}
             type="bar"
             data={{
               labels: timeSeries.dates,
               datasets: [{
                 label: t("dashboard.subscriptions"),
                 data: timeSeries.subscriptionsCreatedData,
-                backgroundColor: 'rgba(139, 92, 246, 0.7)',
-                borderColor: '#8b5cf6',
-                borderWidth: 2,
+                backgroundColor: '#8b5cf6',
               }]
             }}
             height={250}
           />
-
+          
           <GenericChart
             title={t("dashboard.timeSeries.adminsGrowth")}
-            description={t("dashboard.timeSeries.last30Days")}
             type="bar"
             data={{
               labels: timeSeries.dates,
               datasets: [{
                 label: t("dashboard.admins"),
                 data: timeSeries.adminsCreatedData,
-                backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                borderColor: '#10b981',
-                borderWidth: 2,
+                backgroundColor: '#10b981',
               }]
             }}
             height={250}

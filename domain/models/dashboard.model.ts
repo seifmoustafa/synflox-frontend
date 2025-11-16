@@ -12,6 +12,7 @@ export interface DashboardData {
   alerts: AlertsData;
   recentActivity: RecentActivityData;
   timeSeries: TimeSeriesData;
+  revenue: RevenueData;
   generatedAtUtc: string;
 }
 
@@ -85,6 +86,26 @@ export interface DailyMetric {
   companiesActive: number;
   subscriptionsActive: number;
   adminsActive: number;
+}
+
+export interface RevenueData {
+  mrr: number;
+  arr: number;
+  totalRevenue: number;
+  arpc: number;
+  revenueByPlan: Record<string, number>;
+  revenueByCurrency: Record<string, number>;
+  monthlyRevenue: MonthlyRevenueData[];
+  monthOverMonthGrowth: number;
+  payingCustomers: number;
+  trialSubscriptions: number;
+}
+
+export interface MonthlyRevenueData {
+  month: string;
+  revenue: number;
+  subscriptionCount: number;
+  averageRevenuePerSubscription: number;
 }
 
 // ============================================
@@ -354,6 +375,79 @@ export class TimeSeries {
   }
 }
 
+export class Revenue {
+  constructor(
+    public readonly mrr: number,
+    public readonly arr: number,
+    public readonly totalRevenue: number,
+    public readonly arpc: number,
+    public readonly revenueByPlan: Record<string, number>,
+    public readonly revenueByCurrency: Record<string, number>,
+    public readonly monthlyRevenue: MonthlyRevenueData[],
+    public readonly monthOverMonthGrowth: number,
+    public readonly payingCustomers: number,
+    public readonly trialSubscriptions: number
+  ) {}
+
+  get months(): string[] {
+    return this.monthlyRevenue.map(m => m.month);
+  }
+
+  get monthlyRevenueData(): number[] {
+    return this.monthlyRevenue.map(m => m.revenue);
+  }
+
+  get monthlySubscriptionCounts(): number[] {
+    return this.monthlyRevenue.map(m => m.subscriptionCount);
+  }
+
+  get averageRevenuePerSubscription(): number[] {
+    return this.monthlyRevenue.map(m => m.averageRevenuePerSubscription);
+  }
+
+  get topPlan(): string {
+    const plans = Object.entries(this.revenueByPlan);
+    if (plans.length === 0) return 'N/A';
+    return plans.reduce((max, current) => current[1] > max[1] ? current : max)[0];
+  }
+
+  get topPlanRevenue(): number {
+    const topPlan = this.topPlan;
+    return this.revenueByPlan[topPlan] || 0;
+  }
+
+  get planNames(): string[] {
+    return Object.keys(this.revenueByPlan);
+  }
+
+  get planRevenues(): number[] {
+    return Object.values(this.revenueByPlan);
+  }
+
+  get currencyCodes(): string[] {
+    return Object.keys(this.revenueByCurrency);
+  }
+
+  get currencyRevenues(): number[] {
+    return Object.values(this.revenueByCurrency);
+  }
+
+  get isGrowing(): boolean {
+    return this.monthOverMonthGrowth > 0;
+  }
+
+  get growthDirection(): 'up' | 'down' | 'flat' {
+    if (this.monthOverMonthGrowth > 0) return 'up';
+    if (this.monthOverMonthGrowth < 0) return 'down';
+    return 'flat';
+  }
+
+  get conversionRate(): number {
+    const total = this.payingCustomers + this.trialSubscriptions;
+    return total > 0 ? (this.payingCustomers / total) * 100 : 0;
+  }
+}
+
 export class Dashboard {
   constructor(
     public readonly overview: OverviewStats,
@@ -363,6 +457,7 @@ export class Dashboard {
     public readonly alerts: Alerts,
     public readonly recentActivity: RecentActivity,
     public readonly timeSeries: TimeSeries,
+    public readonly revenue: Revenue,
     public readonly generatedAt: Date
   ) {}
 

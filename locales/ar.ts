@@ -67,7 +67,8 @@ export const ar = {
       companies: "الشركات",
       subscriptions: "الاشتراكات",
       admins: "المسؤولون",
-      analytics: "التحليلات",
+      performance: "الأداء",
+      revenue: "الإيرادات",
     },
     // Health Status
     health: {
@@ -191,6 +192,37 @@ export const ar = {
       weeklyGrowth: "النمو الأسبوعي",
       avgDailyGrowth: "متوسط النمو اليومي",
       retentionRate: "معدل الاحتفاظ",
+    },
+    
+    // Revenue
+    revenue: {
+      title: "تحليلات الإيرادات",
+      mrr: "الإيرادات الشهرية المتكررة",
+      arr: "الإيرادات السنوية المتكررة",
+      arpc: "متوسط الإيراد لكل عميل",
+      momGrowth: "النمو الشهري",
+      monthlyRecurring: "الإيرادات الشهرية المتكررة",
+      annualRecurring: "الإيرادات السنوية المتكررة",
+      avgPerCustomer: "متوسط الإيراد لكل عميل",
+      monthOverMonth: "نمو من شهر لآخر",
+      monthlyTrend: "اتجاه الإيرادات الشهرية",
+      monthlyTrendDesc: "أداء الإيرادات خلال آخر 12 شهر",
+      byPlan: "الإيرادات حسب خطة الاشتراك",
+      byPlanDesc: "توزيع الإيرادات عبر الخطط",
+      subscriptionTrend: "اتجاه عدد الاشتراكات",
+      subscriptionTrendDesc: "نمو الاشتراكات النشطة على مدار 12 شهر",
+      customerMetrics: "مقاييس العملاء",
+      payingCustomers: "العملاء المدفوعون",
+      trialCustomers: "العملاء التجريبيون",
+      conversionRate: "تحويل من تجريبي إلى مدفوع",
+      totalRevenue: "إجمالي الإيرادات",
+      revenue: "الإيرادات",
+      subscriptionCount: "عدد الاشتراكات",
+      topPlan: "الخطة الأفضل أداءً",
+      currencyBreakdown: "التوزيع حسب العملة",
+      growthStatus: "حالة النمو",
+      revenueGrowing: "الإيرادات في تزايد",
+      revenueDecreasing: "الإيرادات في تناقص",
     },
     
     // Time-Series

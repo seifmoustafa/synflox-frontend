@@ -68,7 +68,8 @@ export const en = {
       companies: "Companies",
       subscriptions: "Subscriptions",
       admins: "Admins",
-      analytics: "Analytics",
+      performance: "Performance",
+      revenue: "Revenue",
     },
     
     // Health Status
@@ -201,6 +202,37 @@ export const en = {
       weeklyGrowth: "Weekly Growth",
       avgDailyGrowth: "Avg. Daily Growth",
       retentionRate: "Retention Rate",
+    },
+    
+    // Revenue
+    revenue: {
+      title: "Revenue Analytics",
+      mrr: "MRR",
+      arr: "ARR",
+      arpc: "ARPC",
+      momGrowth: "MoM Growth",
+      monthlyRecurring: "Monthly Recurring Revenue",
+      annualRecurring: "Annual Recurring Revenue",
+      avgPerCustomer: "Average Revenue Per Customer",
+      monthOverMonth: "Month-over-Month Growth",
+      monthlyTrend: "Monthly Revenue Trend",
+      monthlyTrendDesc: "Revenue performance over last 12 months",
+      byPlan: "Revenue by Subscription Plan",
+      byPlanDesc: "Revenue distribution across plans",
+      subscriptionTrend: "Subscription Count Trend",
+      subscriptionTrendDesc: "Active subscription growth over 12 months",
+      customerMetrics: "Customer Metrics",
+      payingCustomers: "Paying Customers",
+      trialCustomers: "Trial Customers",
+      conversionRate: "Trial → Paid Conversion",
+      totalRevenue: "Total Revenue",
+      revenue: "Revenue",
+      subscriptionCount: "Subscription Count",
+      topPlan: "Top Performing Plan",
+      currencyBreakdown: "Currency Breakdown",
+      growthStatus: "Growth Status",
+      revenueGrowing: "Revenue is growing",
+      revenueDecreasing: "Revenue is declining",
     },
     
     // Time-Series

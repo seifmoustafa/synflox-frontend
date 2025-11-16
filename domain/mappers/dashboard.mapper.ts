@@ -14,7 +14,9 @@ import {
   RecentActivity,
   RecentActivityData,
   TimeSeries,
-  TimeSeriesData
+  TimeSeriesData,
+  Revenue,
+  RevenueData
 } from '../models/dashboard.model';
 
 // Response interface from API
@@ -39,6 +41,7 @@ export class DashboardMapper {
       this.mapAlerts(data.alerts),
       this.mapRecentActivity(data.recentActivity),
       this.mapTimeSeries(data.timeSeries),
+      this.mapRevenue(data.revenue),
       new Date(data.generatedAtUtc)
     );
   }
@@ -136,6 +139,24 @@ export class DashboardMapper {
    */
   private static mapTimeSeries(data: TimeSeriesData): TimeSeries {
     return new TimeSeries(data.last30Days);
+  }
+
+  /**
+   * Maps revenue data to domain model
+   */
+  private static mapRevenue(data: RevenueData): Revenue {
+    return new Revenue(
+      data.mrr,
+      data.arr,
+      data.totalRevenue,
+      data.arpc,
+      data.revenueByPlan,
+      data.revenueByCurrency,
+      data.monthlyRevenue,
+      data.monthOverMonthGrowth,
+      data.payingCustomers,
+      data.trialSubscriptions
+    );
   }
 
   /**
