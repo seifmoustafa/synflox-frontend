@@ -28,100 +28,7 @@ export class ApiService implements IApiService {
     };
   }
 
-  /**
-   * Handle token refresh and queue management
-   */
-  private async handleTokenRefresh(): Promise<string | null> {
-    if (this.isRefreshing) {
-      // If already refreshing, wait for it to complete
-      appLogger.api("⏳ Token refresh already in progress - queuing request", { queueSize: this.failedRequestsQueue.length });
-      return new Promise((resolve, reject) => {
-        this.failedRequestsQueue.push({ resolve, reject });
-      });
-    }
-
-    appLogger.api("🔄 Starting token refresh process...");
-    this.isRefreshing = true;
-
-    try {
-      const refreshToken = secureTokenService.getRefreshToken();
-      if (!refreshToken) {
-        appLogger.error("❌ No refresh token found in storage");
-        throw new Error("No refresh token available");
-      }
-      
-      appLogger.api("✅ Refresh token found, calling refresh endpoint...");
-
-      // Import AuthMapper and RefreshTokenRequest dynamically to avoid circular dependency
-      const { AuthMapper } = await import("@/domain/mappers/auth.mapper");
-      const { RefreshTokenRequest } = await import("@/domain/models/auth.model");
-
-      const refreshRequest = new RefreshTokenRequest({ refreshToken });
-      
-      // Make refresh request WITHOUT going through the interceptor to avoid infinite loop
-      const url = this.buildUrl("/admin/auth/refresh-token");
-      appLogger.api("📡 POST /admin/auth/refresh-token", { url });
-      
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(AuthMapper.refreshTokenRequestToJson(refreshRequest)),
-      });
-
-      appLogger.api("📥 Refresh endpoint response", { status: response.status, ok: response.ok });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        appLogger.error("❌ Refresh endpoint returned error", { status: response.status, errorText });
-        throw new Error(`Token refresh failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const loginData = data?.data || data;
-      const loginResponse = AuthMapper.loginResponseFromJson(loginData);
-
-      if (loginResponse.isSuccessful && loginResponse.accessToken) {
-        appLogger.api("✅ Got new access token from refresh endpoint");
-        
-        // Store tokens with automatic expiry calculation (5 minutes for access token)
-        secureTokenService.setTokens({
-          accessToken: loginResponse.accessToken,
-          refreshToken: loginResponse.refreshToken,
-        });
-        
-        appLogger.api("💾 New tokens stored in localStorage");
-
-        // Process queued requests with new token
-        appLogger.api("🔄 Processing queued requests", { queueSize: this.failedRequestsQueue.length });
-        this.failedRequestsQueue.forEach(({ resolve }) => {
-          resolve(loginResponse.accessToken);
-        });
-        this.failedRequestsQueue = [];
-
-        appLogger.api("🎉 Token refresh completed successfully!");
-        return loginResponse.accessToken;
-      }
-
-      appLogger.error("❌ Refresh response invalid", { isSuccessful: loginResponse.isSuccessful, hasAccessToken: !!loginResponse.accessToken });
-      throw new Error("Invalid refresh response");
-    } catch (error) {
-      // Reject all queued requests
-      appLogger.error("❌ Token refresh process failed", { error, queueSize: this.failedRequestsQueue.length });
-      this.failedRequestsQueue.forEach(({ reject }) => {
-        reject(error);
-      });
-      this.failedRequestsQueue = [];
-
-      appLogger.error("💥 Token refresh failed - returning null");
-      return null;
-    } finally {
-      this.isRefreshing = false;
-      appLogger.api("🏁 Token refresh process ended");
-    }
-  }
+  // Removed - using withRefreshSingleFlight from refresh-guard.ts instead
 
   private buildUrl(endpoint: string) {
     const baseUrl = this.baseUrl.startsWith("http") ? this.baseUrl : `https://${this.baseUrl}`;
@@ -235,61 +142,122 @@ export class ApiService implements IApiService {
           appLogger.api("⭐ 401 Unauthorized detected", { 
             endpoint, 
             isLoginPage, 
-            isRefreshEndpoint, 
-            isRetry,
-            hasRefreshToken: !!secureTokenService.getRefreshToken()
+            isRefreshEndpoint
           });
           
-          // ⭐ CRITICAL: ALWAYS attempt refresh if we have a refresh token (except on login page or refresh endpoint itself)
-          if (!isLoginPage && !isRefreshEndpoint && !isRetry) {
-            appLogger.api("⭐ Attempting token refresh...");
-            
-            const refreshToken = secureTokenService.getRefreshToken();
-            if (!refreshToken) {
-              appLogger.error("❗ No refresh token available - cannot refresh");
-              toast.error("Session expired. Please login again.");
-              secureTokenService.clearTokens();
-              if (typeof window !== 'undefined') {
-                window.location.href = "/login";
-              }
-              throw new Error("No refresh token available");
-            }
-            
-            // ⭐ WAIT for refresh to complete
-            const newToken = await this.handleTokenRefresh();
-            
-            if (newToken) {
-              // ✅ Refresh succeeded - retry original request
-              appLogger.api("✅ Token refreshed successfully! Retrying original request...");
-              return this.request<T>(endpoint, options, signal, true);
-            } else {
-              // ❌ Refresh failed - tokens are invalid
-              appLogger.error("❌ Token refresh failed - refresh token is invalid or expired");
-              toast.error("Session expired. Please login again.");
-              secureTokenService.clearTokens();
-              if (typeof window !== 'undefined') {
-                window.location.href = "/login";
-              }
-              throw new Error("Token refresh failed");
-            }
+          // If already on login page, let it handle the error
+          if (isLoginPage) {
+            appLogger.api("401 on login page - not refreshing");
+            throw new Error(errorMessage);
           }
           
-          // ⭐ Only redirect if we're NOT on login page and this is a retry or special endpoint
-          if (!isLoginPage) {
-            appLogger.warn("⚠️ 401 on retry or special endpoint - redirecting to login", { isRetry, isRefreshEndpoint });
-            const error = new Error(errorMessage || "Unauthorized - please login again");
-            toast.error("Session expired. Please login again.");
+          // Don't try to refresh the refresh endpoint itself
+          if (isRefreshEndpoint) {
+            appLogger.error("❌ Refresh endpoint returned 401 - refresh token expired");
             secureTokenService.clearTokens();
-            if (typeof window !== 'undefined') {
-              window.location.href = "/login";
-            }
-            throw error;
-          } else {
-            // For login page, don't show toast - let the form handle the error display
-            appLogger.api("401 on login page - not refreshing");
-            const error = new Error(errorMessage);
-            throw error;
+            if (typeof window !== 'undefined') window.location.href = "/login";
+            throw new Error("Refresh token expired");
           }
+          
+          // ⭐ Attempt token refresh using single-flight pattern
+          appLogger.api("🔄 Attempting token refresh with single-flight guard...");
+          
+          const { withRefreshSingleFlight } = await import("@/lib/refresh-guard");
+          
+          const newAccessToken = await withRefreshSingleFlight(async () => {
+            const refreshToken = secureTokenService.getRefreshToken();
+            if (!refreshToken) {
+              appLogger.error("❌ No refresh token found");
+              return null;
+            }
+            
+            appLogger.api("📡 Calling refresh endpoint...");
+            
+            // Import dynamically to avoid circular dependency
+            const { AuthMapper } = await import("@/domain/mappers/auth.mapper");
+            const { RefreshTokenRequest } = await import("@/domain/models/auth.model");
+            
+            const refreshRequest = new RefreshTokenRequest({ refreshToken });
+            const refreshUrl = this.buildUrl("/admin/auth/refresh-token");
+            
+            try {
+              const refreshResponse = await fetch(refreshUrl, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                },
+                body: JSON.stringify(AuthMapper.refreshTokenRequestToJson(refreshRequest)),
+              });
+              
+              appLogger.api("📥 Refresh response", { status: refreshResponse.status });
+              
+              if (!refreshResponse.ok) {
+                appLogger.error("❌ Refresh failed", { status: refreshResponse.status });
+                return null;
+              }
+              
+              const refreshData = await refreshResponse.json();
+              const loginData = refreshData?.data || refreshData;
+              const loginResponse = AuthMapper.loginResponseFromJson(loginData);
+              
+              if (loginResponse.isSuccessful && loginResponse.accessToken) {
+                appLogger.api("✅ Got new access token!");
+                
+                // Store new tokens
+                secureTokenService.setTokens({
+                  accessToken: loginResponse.accessToken,
+                  refreshToken: loginResponse.refreshToken,
+                });
+                
+                appLogger.api("💾 Tokens stored in localStorage");
+                return loginResponse.accessToken;
+              }
+              
+              appLogger.error("❌ Invalid refresh response");
+              return null;
+            } catch (error) {
+              appLogger.error("💥 Refresh request failed", { error });
+              return null;
+            }
+          });
+          
+          // ⭐ If refresh succeeded, retry the original request
+          if (newAccessToken) {
+            appLogger.api("🔄 Retrying original request with new token...");
+            
+            const retryHeaders: Record<string, string> = {
+              ...headers,
+              Authorization: `Bearer ${newAccessToken}`,
+            };
+            
+            const retryResponse = await fetch(url, { ...config, headers: retryHeaders });
+            
+            if (!retryResponse.ok) {
+              appLogger.error("❌ Retry failed after refresh", { status: retryResponse.status });
+              // If retry fails, logout
+              secureTokenService.clearTokens();
+              if (typeof window !== 'undefined') window.location.href = "/login";
+              const errTxt = await retryResponse.text();
+              throw new Error(errTxt || retryResponse.statusText);
+            }
+            
+            if (retryResponse.status === 204) {
+              appLogger.api("✅ Retry succeeded (204)");
+              return null as T;
+            }
+            
+            const retryJson = await retryResponse.json();
+            appLogger.api("✅ Retry succeeded!");
+            return this.unwrap<T>(retryJson);
+          }
+          
+          // ❌ Refresh failed - logout and redirect
+          appLogger.error("🚪 Refresh failed - redirecting to login");
+          toast.error("Session expired. Please login again.");
+          secureTokenService.clearTokens();
+          if (typeof window !== 'undefined') window.location.href = "/login";
+          throw new Error(errorMessage || "Unauthorized - please login again");
         }
         
         const error = new Error(errorMessage);

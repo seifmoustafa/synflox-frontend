@@ -21,12 +21,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [retryCount, setRetryCount] = useState(0);
   const router = useRouter();
   const { authService } = useServices();
 
   const isAuthenticated = !!user;
-  const MAX_RETRY_ATTEMPTS = 0; // ⭐ Disabled retries - ApiService handles token refresh automatically
 
   const checkAuth = useCallback(async () => {
     setIsLoading(true);
@@ -34,39 +32,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const currentUser = await authService.getMe();
         setUser(currentUser);
-        setRetryCount(0); // Reset retry count on success
         appLogger.info("User authenticated successfully", { userId: currentUser.id });
       } catch (error) {
         const appError = handleError(error as Error, 'AuthProvider.checkAuth');
         appLogger.error("Failed to fetch user during checkAuth", { error, appError });
         
-        // ⭐ CRITICAL FIX: Don't immediately logout - ApiService handles token refresh automatically
-        // The ApiService will:
-        // 1. Intercept 401 errors
-        // 2. Attempt token refresh if refresh token exists
-        // 3. Retry the original request with new token
-        // 4. Only redirect to login if refresh fails
+        // ⭐ ApiService handles 401 + token refresh automatically
+        // If we're here, either:
+        // 1. ApiService already refreshed tokens and retried (we have the error after retry)
+        // 2. Refresh failed and tokens were cleared
+        // 3. Network error or other non-401 error
         
-        // Check if tokens still exist after error
+        // Check if tokens were cleared by ApiService
         if (!authService.hasToken()) {
-          // Tokens were cleared by ApiService → refresh failed or no tokens
-          // ApiService already initiated redirect to login
-          appLogger.info("Tokens cleared - refresh failed, redirecting to login");
+          appLogger.info("Tokens cleared by ApiService - user logged out");
           setUser(null);
         } else {
-          // Tokens still exist → might be network error, temporary issue, or non-401 error
-          // Don't retry automatically - user can refresh manually
-          appLogger.warn("GetMe failed but tokens exist - network error or temporary issue");
+          // Tokens still exist - might be network error
+          appLogger.warn("GetMe failed but tokens exist - might be network error");
           setUser(null);
-          // Tokens remain valid for next navigation/action
         }
       }
     } else {
-      // No token found, ensure user is null
       setUser(null);
     }
     setIsLoading(false);
-  }, [authService, retryCount]);
+  }, [authService]);
 
   useEffect(() => {
     checkAuth();
