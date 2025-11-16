@@ -130,12 +130,44 @@ export class DashboardMapper {
 
   /**
    * Handles API response and maps to Dashboard domain model
+   * Supports multiple response formats from backend
    */
-  static handleApiResponse(response: DashboardResponse): Dashboard {
-    if (!response.succeeded || !response.data) {
-      throw new Error(response.message || 'Failed to load dashboard data');
+  static handleApiResponse(response: any): Dashboard {
+    // Log the response for debugging
+    console.log('[DashboardMapper] Raw API Response:', JSON.stringify(response, null, 2));
+    
+    // Handle null/undefined
+    if (!response) {
+      throw new Error('Dashboard response is null or undefined');
     }
-
-    return this.fromJson(response.data);
+    
+    // Format 1: Has 'data' property (nested response)
+    if (response.data) {
+      console.log('[DashboardMapper] Detected nested format with data property');
+      // Check if it's successful (if succeeded field exists)
+      if (response.succeeded !== undefined && !response.succeeded) {
+        throw new Error(response.message || 'Failed to load dashboard data');
+      }
+      // Use the nested data
+      return this.fromJson(response.data);
+    }
+    
+    // Format 2: Direct DashboardDto response (unwrapped)
+    if (response.overview || response.companies || response.subscriptions) {
+      console.log('[DashboardMapper] Detected direct DashboardDto format');
+      return this.fromJson(response as DashboardData);
+    }
+    
+    // Log the structure we received
+    console.error('[DashboardMapper] Unexpected response structure:', {
+      keys: Object.keys(response),
+      hasSucceeded: 'succeeded' in response,
+      hasData: 'data' in response,
+      hasOverview: 'overview' in response,
+      hasCompanies: 'companies' in response,
+      hasSubscriptions: 'subscriptions' in response,
+    });
+    
+    throw new Error('Invalid dashboard response format - see console for details');
   }
 }

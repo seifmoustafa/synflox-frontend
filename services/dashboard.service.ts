@@ -1,4 +1,4 @@
-import { Dashboard, DashboardMapper, DashboardResponse } from '@/domain';
+import { Dashboard, DashboardMapper, DashboardResponse, CompanyStatsData, SubscriptionStatsData, AdminStatsData, AlertsData, RecentActivityData } from '@/domain';
 import { IApiService } from './api.service';
 import { INotificationService } from './notification.service';
 
@@ -9,6 +9,11 @@ import { INotificationService } from './notification.service';
 export interface IDashboardService {
   getDashboard(): Promise<Dashboard>;
   refreshDashboard(): Promise<Dashboard>;
+  getCompanyAnalytics(): Promise<CompanyStatsData>;
+  getSubscriptionAnalytics(): Promise<SubscriptionStatsData>;
+  getAdminAnalytics(): Promise<AdminStatsData>;
+  getAlerts(): Promise<AlertsData>;
+  getRecentActivity(): Promise<RecentActivityData>;
 }
 
 /**
@@ -26,9 +31,14 @@ export class DashboardService implements IDashboardService {
    */
   async getDashboard(): Promise<Dashboard> {
     try {
+      console.log('[DashboardService] Fetching dashboard from /dashboard endpoint...');
       const response = await this.apiService.get<DashboardResponse>('/dashboard');
+      console.log('[DashboardService] Raw response from API:', response);
+      console.log('[DashboardService] Response type:', typeof response);
+      console.log('[DashboardService] Response keys:', response ? Object.keys(response) : 'null');
       return DashboardMapper.handleApiResponse(response);
     } catch (error) {
+      console.error('[DashboardService] Error loading dashboard:', error);
       this.notificationService.error('Failed to load dashboard data');
       throw error;
     }
@@ -45,6 +55,71 @@ export class DashboardService implements IDashboardService {
       return dashboard;
     } catch (error) {
       this.notificationService.error('Failed to refresh dashboard');
+      throw error;
+    }
+  }
+
+  /**
+   * Fetches detailed company analytics
+   */
+  async getCompanyAnalytics(): Promise<CompanyStatsData> {
+    try {
+      const response = await this.apiService.get<any>('/dashboard/companies');
+      return response.data || response;
+    } catch (error) {
+      this.notificationService.error('Failed to load company analytics');
+      throw error;
+    }
+  }
+
+  /**
+   * Fetches detailed subscription analytics
+   */
+  async getSubscriptionAnalytics(): Promise<SubscriptionStatsData> {
+    try {
+      const response = await this.apiService.get<any>('/dashboard/subscriptions');
+      return response.data || response;
+    } catch (error) {
+      this.notificationService.error('Failed to load subscription analytics');
+      throw error;
+    }
+  }
+
+  /**
+   * Fetches detailed admin analytics
+   */
+  async getAdminAnalytics(): Promise<AdminStatsData> {
+    try {
+      const response = await this.apiService.get<any>('/dashboard/admins');
+      return response.data || response;
+    } catch (error) {
+      this.notificationService.error('Failed to load admin analytics');
+      throw error;
+    }
+  }
+
+  /**
+   * Fetches system alerts
+   */
+  async getAlerts(): Promise<AlertsData> {
+    try {
+      const response = await this.apiService.get<any>('/dashboard/alerts');
+      return response.data || response;
+    } catch (error) {
+      this.notificationService.error('Failed to load alerts');
+      throw error;
+    }
+  }
+
+  /**
+   * Fetches recent activity
+   */
+  async getRecentActivity(): Promise<RecentActivityData> {
+    try {
+      const response = await this.apiService.get<any>('/dashboard/activity');
+      return response.data || response;
+    } catch (error) {
+      this.notificationService.error('Failed to load recent activity');
       throw error;
     }
   }

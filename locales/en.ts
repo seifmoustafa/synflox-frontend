@@ -54,6 +54,154 @@ export const en = {
       "If you need access to this resource, please contact your system administrator or submit a request through the proper channels. Include details about what you're trying to access and why you need it.",
   },
 
+  // Dashboard
+  dashboard: {
+    title: "Dashboard",
+    loading: "Loading dashboard...",
+    error: "Failed to load dashboard data",
+    retry: "Retry",
+    refresh: "Refresh",
+    
+    // Tabs
+    tabs: {
+      overview: "Overview",
+      companies: "Companies",
+      subscriptions: "Subscriptions",
+      admins: "Admins",
+      analytics: "Analytics",
+    },
+    
+    // Health Status
+    health: {
+      healthy: "System Healthy",
+      warning: "System Warning",
+      critical: "System Critical",
+    },
+    
+    // Alerts
+    criticalAlert: "Critical alerts require immediate attention!",
+    systemAlerts: "System Alerts",
+    noAlerts: "No alerts - All systems operational",
+    critical: "Critical",
+    warnings: "Warnings",
+    expiringToday: "expiring today",
+    expiringThisWeek: "expiring this week",
+    companiesSuspended: "companies suspended",
+    totalAlerts: "Total Alerts",
+    alerts: "Alerts",
+    
+    // Overview Cards
+    companies: "Companies",
+    subscriptions: "Subscriptions",
+    admins: "Administrators",
+    active: "Active",
+    today: "Today",
+    thisWeek: "This Week",
+    thisMonth: "This Month",
+    last24h: "Last 24 hours",
+    expiringSoon: "expiring soon",
+    total: "Total",
+    inactive: "Inactive",
+    inactiveAdmins: "Inactive Admins",
+    
+    // Detailed Stats
+    companyBreakdown: "Company Breakdown",
+    activeCompanies: "Active",
+    suspendedCompanies: "Suspended",
+    expiredCompanies: "Expired",
+    growth: "Growth",
+    growthThisMonth: "Growth This Month",
+    
+    subscriptionBreakdown: "Subscription Breakdown",
+    activeSubscriptions: "Active",
+    trialSubscriptions: "Trial",
+    expiredSubscriptions: "Expired",
+    topPlan: "Top Subscription Plan",
+    expirations: "Expirations",
+    expiring7Days: "Expiring within 7 days",
+    expiring30Days: "Expiring within 30 days",
+    
+    adminStats: "Admin Statistics",
+    adminTypes: "Admin Types",
+    adminActivity: "Admin Activity",
+    adminGrowth: "New admins created over time",
+    adminStatus: "Admin Status",
+    activeVsInactive: "Active vs Inactive administrators",
+    adminTypeDistribution: "Distribution of administrators by type",
+    
+    // Charts
+    charts: {
+      companyStatus: "Company Status Distribution",
+      companyStatusDesc: "Active, suspended, and expired companies",
+      subscriptionStatus: "Subscription Status",
+      subscriptionStatusDesc: "Distribution of subscription statuses",
+      growthTrends: "Growth Trends",
+      growthTrendsDesc: "New companies and subscriptions over time",
+      subscriptionGrowth: "Subscription Growth",
+      planDistribution: "Plan distribution by company",
+      statusBreakdown: "Status Breakdown",
+    },
+    
+    // Recent Activity
+    recentActivity: "Recent Activity",
+    newCompanies: "New Companies",
+    newSubscriptions: "New Subscriptions",
+    newAdmins: "New Administrators",
+    
+    // System Health
+    systemHealth: "System Health",
+    overallActivity: "Overall Activity Rate",
+    lastUpdated: "Last Updated",
+    viewDetails: "View Details",
+    
+    // Analytics Tab
+    analytics: {
+      companyHealth: "Company Health",
+      subscriptionHealth: "Subscription Health",
+      adminHealth: "Admin Health",
+      activeRate: "Active Rate",
+      performanceRadar: "System Performance Radar",
+      performanceRadarDesc: "Multi-dimensional system performance analysis",
+      companyActivity: "Company Activity",
+      subscriptionActivity: "Subscription Activity",
+      adminActivity: "Admin Activity",
+      growth: "Growth",
+      retention: "Retention",
+      efficiency: "Efficiency",
+      systemPerformance: "System Performance",
+      comparativeGrowth: "Comparative Growth Analysis",
+      comparativeGrowthDesc: "Compare growth across all entities",
+      activityFunnel: "Activity Funnel",
+      activityFunnelDesc: "System-wide activity progression",
+      totalEntities: "Total Entities",
+      activeEntities: "Active Entities",
+      recent24h: "Active Last 24h",
+      entities: "Entities",
+      statusDistribution: "Status Distribution",
+      statusDistributionDesc: "Comprehensive status breakdown",
+      issues: "Issues",
+      trial: "Trial",
+      companiesLast24h: "Companies (24h)",
+      subscriptionsLast24h: "Subscriptions (24h)",
+      adminsLast24h: "Admins (24h)",
+      newAdditions: "New Additions",
+      newActivations: "New Activations",
+      newTeamMembers: "New Team Members",
+      systemScore: "System Score",
+      overallHealth: "Overall Health",
+      criticalMetrics: "Critical Metrics",
+      expiringToday: "Expiring Today",
+      expiredCompanies: "Expired Companies",
+      suspendedCompanies: "Suspended Companies",
+      inactiveAdmins: "Inactive Admins",
+      growthMetrics: "Growth Metrics",
+      monthlyGrowth: "Monthly Growth",
+      weeklyGrowth: "Weekly Growth",
+      avgDailyGrowth: "Avg. Daily Growth",
+      retentionRate: "Retention Rate",
+    },
+  },
+
   // Navigation
   nav: {
     dashboard: "Dashboard",
@@ -180,54 +328,6 @@ export const en = {
     active: "Active",
     inactive: "Inactive",
     isActive: "Is Active",
-  },
-
-  // Dashboard
-  dashboard: {
-    title: "Dashboard",
-    description: "System overview and statistics",
-    loading: "Loading dashboard data...",
-    error: {
-      title: "Error Loading Dashboard",
-      loadFailed: "Failed to load dashboard data",
-      retry: "Retry",
-    },
-    tabs: {
-      statistics: "Statistics",
-      endpoints: "API Endpoints",
-    },
-    statistics: {
-      totalCompanies: "Total Companies",
-      totalAdmins: "Total Admins",
-      totalAdminTypes: "Total Admin Types",
-      activeAdmins: "Active Admins",
-      inactiveAdmins: "Inactive Admins",
-      companiesExpiringSoon: "Companies Expiring Soon",
-      recentlyCreatedCompanies: "Recently Created Companies",
-      recentlyCreatedAdmins: "Recently Created Admins",
-      expiringWarning: "Companies expiring within 30 days",
-    },
-    licenseStatus: {
-      title: "License Status Overview",
-      description: "Distribution of license statuses across all companies",
-      active: "Active",
-      expired: "Expired",
-      suspended: "Suspended",
-      total: "Total",
-    },
-    endpoints: {
-      title: "API Endpoints Explorer",
-      description:
-        "All available API endpoints grouped by controller ({count} total)",
-      endpoints: "endpoints",
-      searchPlaceholder: "Search by route, method, or controller...",
-      allMethods: "All Methods",
-      expandAll: "Expand All",
-      collapseAll: "Collapse All",
-      policy: "Policy",
-      parameters: "Parameters",
-      optional: "Optional",
-    },
   },
 
   // Layout & App
@@ -379,8 +479,7 @@ export const en = {
       },
       interactive: {
         title: "Interactive Line Chart",
-        description:
-          "Line chart with hover effects and data point interactions",
+        description: "Line chart with hover effects and data point interactions",
       },
       realtime: {
         title: "Real-time Line Chart",
@@ -501,7 +600,7 @@ export const en = {
       },
       donut: {
         title: "Donut Chart",
-        description: "Donut chart with hollow center for better readability",
+        description: "Pie chart with hollow center for better readability",
       },
       exploded: {
         title: "Exploded Pie Chart",

@@ -246,11 +246,18 @@ export class Alerts {
   }
 
   get hasCriticalAlerts(): boolean {
-    return this.subscriptionsExpiringToday > 0 || this.expiredCompanies > 0;
+    // Only critical if more than 3 subscriptions expiring today or more than 5 expired companies
+    return this.subscriptionsExpiringToday > 3 || this.expiredCompanies > 5;
   }
 
   get hasWarnings(): boolean {
-    return this.subscriptionsExpiringThisWeek > 0 || this.suspendedCompanies > 0;
+    // Warning for 1-3 subscriptions expiring today, or this week, or suspended companies
+    return (
+      (this.subscriptionsExpiringToday > 0 && this.subscriptionsExpiringToday <= 3) ||
+      this.subscriptionsExpiringThisWeek > 0 || 
+      this.suspendedCompanies > 0 ||
+      (this.expiredCompanies > 0 && this.expiredCompanies <= 5)
+    );
   }
 
   get alertLevel(): 'critical' | 'warning' | 'info' | 'none' {
