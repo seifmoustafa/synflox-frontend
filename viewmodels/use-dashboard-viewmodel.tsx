@@ -3,33 +3,69 @@ import { Dashboard, CompanyStatsData, SubscriptionStatsData, AdminStatsData } fr
 import { useServices } from '@/providers/service-provider';
 
 export type DashboardTab = 'overview' | 'companies' | 'subscriptions' | 'admins' | 'analytics';
+export type ErrorType = 'network' | 'server' | 'unknown';
 
 export function useDashboardViewModel() {
   const { dashboardService } = useServices();
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<ErrorType>('unknown');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
+  const [retryCount, setRetryCount] = useState(0);
+  const [isOnline, setIsOnline] = useState(true);
   
   // Detailed analytics data
   const [companyAnalytics, setCompanyAnalytics] = useState<CompanyStatsData | null>(null);
   const [subscriptionAnalytics, setSubscriptionAnalytics] = useState<SubscriptionStatsData | null>(null);
   const [adminAnalytics, setAdminAnalytics] = useState<AdminStatsData | null>(null);
 
+  // Detect error type from error message/object
+  const detectErrorType = (err: unknown): ErrorType => {
+    const errorMessage = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
+    
+    if (errorMessage.includes('network') || 
+        errorMessage.includes('fetch') || 
+        errorMessage.includes('connection') ||
+        errorMessage.includes('timeout') ||
+        !isOnline) {
+      return 'network';
+    }
+    
+    if (errorMessage.includes('500') || 
+        errorMessage.includes('server') ||
+        errorMessage.includes('internal')) {
+      return 'server';
+    }
+    
+    return 'unknown';
+  };
+
   const loadDashboard = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
+      setErrorType('unknown');
       const data = await dashboardService.getDashboard();
       setDashboard(data);
+      setRetryCount(0); // Reset retry count on success
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load dashboard');
-      console.error('Dashboard load error:', err);
+      const errorMsg = err instanceof Error ? err.message : 'Failed to load dashboard';
+      const type = detectErrorType(err);
+      
+      setError(errorMsg);
+      setErrorType(type);
+      console.error('[Dashboard] Load error:', {
+        error: err,
+        type,
+        message: errorMsg,
+        retryCount
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [dashboardService]);
+  }, [dashboardService, isOnline, retryCount]);
 
   const refreshDashboard = useCallback(async () => {
     try {
@@ -72,6 +108,51 @@ export function useDashboardViewModel() {
     }
   }, [dashboardService]);
 
+  // Retry with exponential backoff
+  const retryLoadDashboard = useCallback(async () => {
+    const maxRetries = 3;
+    if (retryCount >= maxRetries) {
+      console.warn('[Dashboard] Max retries reached');
+      return;
+    }
+
+    setRetryCount(prev => prev + 1);
+    
+    // Exponential backoff: 1s, 2s, 4s
+    const delay = Math.pow(2, retryCount) * 1000;
+    console.log(`[Dashboard] Retrying in ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
+    
+    setTimeout(() => {
+      loadDashboard();
+    }, delay);
+  }, [retryCount, loadDashboard]);
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('[Dashboard] Network back online');
+      setIsOnline(true);
+      if (error && errorType === 'network') {
+        loadDashboard();
+      }
+    };
+
+    const handleOffline = () => {
+      console.warn('[Dashboard] Network offline');
+      setIsOnline(false);
+      setError('No internet connection');
+      setErrorType('network');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [error, errorType, loadDashboard]);
+
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
@@ -92,8 +173,12 @@ export function useDashboardViewModel() {
     isLoading,
     isRefreshing,
     error,
+    errorType,
     refreshDashboard,
     reload: loadDashboard,
+    retry: retryLoadDashboard,
+    retryCount,
+    isOnline,
     activeTab,
     setActiveTab,
     companyAnalytics,

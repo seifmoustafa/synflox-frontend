@@ -68,6 +68,7 @@ export const en = {
       companies: "Companies",
       subscriptions: "Subscriptions",
       admins: "Admins",
+      adminPerformance: "Admin Performance",
       performance: "Performance",
       revenue: "Revenue",
       insights: "Insights",
@@ -303,6 +304,55 @@ export const en = {
         steady: "Steady",
         decelerating: "Decelerating"
       }
+    },
+
+    // Admin Performance (Phase 5)
+    adminPerformance: {
+      // System Stats
+      totalActions: "Total Actions",
+      perDay: "per day",
+      activeAdmins: "Active Admins",
+      avgOnline: "avg online",
+      avgPerformance: "Avg. Performance",
+      highPerformers: "high performers",
+      peakHour: "Peak Hour",
+      actions: "actions",
+      
+      // Leaderboard
+      leaderboard: "Performance Leaderboard",
+      top10Performers: "Top 10 performing admins by score",
+      daysActive: "days active",
+      companies: "Companies",
+      subscriptions: "Subscriptions",
+      responseTime: "Response",
+      
+      // Charts
+      typePerformance: "Admin Type Performance",
+      performanceByType: "Average performance score by admin type",
+      avgScore: "Avg. Score",
+      peakHours: "Peak Activity Hours",
+      topActivityHours: "Top 5 busiest hours of the day",
+      activityCount: "Activity Count",
+      actionsPerType: "Actions by Admin Type",
+      totalActionsByType: "Total actions distribution by type",
+      avgActionsPerAdmin: "Avg. Actions Per Admin",
+      activityRateByType: "Activity rate by admin type",
+      avgActions: "Avg. Actions",
+      
+      // Activity Heatmap
+      activityHeatmap: "Activity Heatmap",
+      last30Days: "Last 30 days of system activity",
+      heatmapComingSoon: "Visual heatmap coming soon - showing activity levels by day",
+      
+      // System Stats Summary
+      systemStats: "System Statistics",
+      overallMetrics: "Overall performance metrics",
+      totalLogins: "Total Logins",
+      actionsPerLogin: "Actions per Login",
+      efficiency: "efficiency",
+      peakDay: "Peak Activity Day",
+      utilization: "System Utilization",
+      ofPeakCapacity: "of peak capacity",
     },
     
     // Time-Series
@@ -3035,6 +3085,17 @@ export const en = {
   },
 
   errors: {
+    // Dashboard errors
+    networkError: "Network Connection Lost",
+    networkErrorDesc: "Unable to connect to the server. Please check your internet connection.",
+    serverError: "Server Error",
+    serverErrorDesc: "The server encountered an error. Please try again later.",
+    unknownError: "Something Went Wrong",
+    unknownErrorDesc: "An unexpected error occurred while loading the dashboard.",
+    checkConnection: "Please check your internet connection",
+    persistIssue: "If this issue persists, please contact support.",
+    
+    // Error boundary
     boundary: {
       title: "Something went wrong",
       description:
@@ -3043,12 +3104,16 @@ export const en = {
       retry: "Retry",
       home: "Go Home",
     },
+    
+    // Network errors
     network: {
       offline:
         "You are currently offline. Please check your internet connection.",
       timeout: "Request timed out. Please try again.",
       serverError: "Server error occurred. Please try again later.",
     },
+    
+    // Auth errors
     auth: {
       unauthorized: "You are not authorized to access this resource.",
       sessionExpired: "Your session has expired. Please log in again.",

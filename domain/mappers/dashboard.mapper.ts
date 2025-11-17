@@ -22,7 +22,19 @@ import {
   Trends,
   TrendsData,
   EntityTrend,
-  EntityTrendData
+  EntityTrendData,
+  AdminPerformance,
+  AdminPerformanceData,
+  AdminPerformanceMetric,
+  AdminPerformanceMetricData,
+  ActivityHeatmap,
+  ActivityHeatmapData,
+  AdminTypePerformance,
+  AdminTypePerformanceData,
+  SystemActivityStats,
+  SystemActivityStatsData,
+  PeakActivityHour,
+  PeakActivityHourData
 } from '../models/dashboard.model';
 
 // Response interface from API
@@ -50,6 +62,7 @@ export class DashboardMapper {
       this.mapRevenue(data.revenue),
       this.mapLifecycle(data.lifecycle),
       this.mapTrends(data.trends),
+      this.mapAdminPerformance(data.adminPerformance),
       new Date(data.generatedAtUtc)
     );
   }
@@ -249,5 +262,94 @@ export class DashboardMapper {
     });
     
     throw new Error('Invalid dashboard response format - see console for details');
+  }
+
+  // ==================== PHASE 5: ADMIN PERFORMANCE MAPPERS ====================
+
+  /**
+   * Maps admin performance data to domain model
+   */
+  private static mapAdminPerformance(data: AdminPerformanceData): AdminPerformance {
+    return new AdminPerformance(
+      data.leaderboard.map(admin => this.mapAdminPerformanceMetric(admin)),
+      data.activityHeatmap.map(heatmap => this.mapActivityHeatmap(heatmap)),
+      data.typePerformance.map(type => this.mapAdminTypePerformance(type)),
+      this.mapSystemActivityStats(data.systemActivity),
+      data.peakHours.map(hour => this.mapPeakActivityHour(hour))
+    );
+  }
+
+  /**
+   * Maps individual admin performance metric
+   */
+  private static mapAdminPerformanceMetric(data: AdminPerformanceMetricData): AdminPerformanceMetric {
+    return new AdminPerformanceMetric(
+      data.adminId,
+      data.username,
+      data.fullName,
+      data.adminType,
+      data.totalActions,
+      data.loginCount,
+      data.companiesManaged,
+      data.subscriptionsManaged,
+      data.avgResponseTime,
+      data.performanceScore,
+      data.activityLevel,
+      new Date(data.lastActiveDate),
+      data.daysActive
+    );
+  }
+
+  /**
+   * Maps activity heatmap data
+   */
+  private static mapActivityHeatmap(data: ActivityHeatmapData): ActivityHeatmap {
+    return new ActivityHeatmap(
+      new Date(data.date),
+      data.dayOfWeek,
+      data.hourlyActivity,
+      data.totalActivity,
+      data.peakHour
+    );
+  }
+
+  /**
+   * Maps admin type performance data
+   */
+  private static mapAdminTypePerformance(data: AdminTypePerformanceData): AdminTypePerformance {
+    return new AdminTypePerformance(
+      data.typeName,
+      data.adminCount,
+      data.avgPerformanceScore,
+      data.totalActions,
+      data.avgActionsPerAdmin,
+      data.activePercentage
+    );
+  }
+
+  /**
+   * Maps system activity stats data
+   */
+  private static mapSystemActivityStats(data: SystemActivityStatsData): SystemActivityStats {
+    return new SystemActivityStats(
+      data.totalActions,
+      data.totalLogins,
+      data.avgActionsPerDay,
+      data.activeAdmins,
+      new Date(data.peakActivityDate),
+      data.peakActivityCount,
+      data.avgAdminsOnline
+    );
+  }
+
+  /**
+   * Maps peak activity hour data
+   */
+  private static mapPeakActivityHour(data: PeakActivityHourData): PeakActivityHour {
+    return new PeakActivityHour(
+      data.hour,
+      data.activityCount,
+      data.percentage
+    );
   }
 }

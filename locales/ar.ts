@@ -67,6 +67,7 @@ export const ar = {
       companies: "الشركات",
       subscriptions: "الاشتراكات",
       admins: "المسؤولون",
+      adminPerformance: "أداء المسؤولين",
       performance: "الأداء",
       revenue: "الإيرادات",
       insights: "الرؤى",
@@ -293,6 +294,55 @@ export const ar = {
         steady: "ثابت",
         decelerating: "في تباطؤ"
       }
+    },
+
+    // Admin Performance (Phase 5)
+    adminPerformance: {
+      // System Stats
+      totalActions: "إجمالي الإجراءات",
+      perDay: "في اليوم",
+      activeAdmins: "المسؤولون النشطون",
+      avgOnline: "متوسط المتصلين",
+      avgPerformance: "متوسط الأداء",
+      highPerformers: "الأداء المرتفع",
+      peakHour: "ذروة النشاط",
+      actions: "إجراءات",
+      
+      // Leaderboard
+      leaderboard: "لوحة المتصدرين",
+      top10Performers: "أفضل 10 مسؤولين حسب الأداء",
+      daysActive: "يوم نشط",
+      companies: "الشركات",
+      subscriptions: "الاشتراكات",
+      responseTime: "الاستجابة",
+      
+      // Charts
+      typePerformance: "أداء حسب نوع المسؤول",
+      performanceByType: "متوسط درجة الأداء حسب نوع المسؤول",
+      avgScore: "متوسط الدرجة",
+      peakHours: "ساعات الذروة",
+      topActivityHours: "أكثر 5 ساعات نشاطاً في اليوم",
+      activityCount: "عدد الأنشطة",
+      actionsPerType: "الإجراءات حسب النوع",
+      totalActionsByType: "توزيع إجمالي الإجراءات حسب النوع",
+      avgActionsPerAdmin: "متوسط الإجراءات لكل مسؤول",
+      activityRateByType: "معدل النشاط حسب نوع المسؤول",
+      avgActions: "متوسط الإجراءات",
+      
+      // Activity Heatmap
+      activityHeatmap: "خريطة النشاط الحرارية",
+      last30Days: "آخر 30 يوماً من نشاط النظام",
+      heatmapComingSoon: "الخريطة الحرارية المرئية قريباً - تظهر مستويات النشاط حسب اليوم",
+      
+      // System Stats Summary
+      systemStats: "إحصائيات النظام",
+      overallMetrics: "مقاييس الأداء الإجمالية",
+      totalLogins: "إجمالي تسجيلات الدخول",
+      actionsPerLogin: "الإجراءات لكل تسجيل دخول",
+      efficiency: "الكفاءة",
+      peakDay: "يوم الذروة",
+      utilization: "استخدام النظام",
+      ofPeakCapacity: "من السعة القصوى",
     },
     
     // Time-Series
@@ -2938,6 +2988,17 @@ export const ar = {
   },
 
   errors: {
+    // Dashboard errors
+    networkError: "فقدان الاتصال بالشبكة",
+    networkErrorDesc: "غير قادر على الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت.",
+    serverError: "خطأ في الخادم",
+    serverErrorDesc: "واجه الخادم خطأً. يرجى المحاولة مرة أخرى لاحقاً.",
+    unknownError: "حدث خطأ ما",
+    unknownErrorDesc: "حدث خطأ غير متوقع أثناء تحميل لوحة التحكم.",
+    checkConnection: "يرجى التحقق من اتصالك بالإنترنت",
+    persistIssue: "إذا استمرت هذه المشكلة، يرجى الاتصال بالدعم.",
+    
+    // Error boundary
     boundary: {
       title: "حدث خطأ ما",
       description:
@@ -2946,12 +3007,16 @@ export const ar = {
       retry: "إعادة المحاولة",
       home: "العودة للرئيسية",
     },
+    
+    // Network errors
     network: {
       offline:
         "أنت غير متصل بالإنترنت حالياً. يرجى التحقق من اتصالك بالإنترنت.",
       timeout: "انتهت مهلة الطلب. يرجى المحاولة مرة أخرى.",
       serverError: "حدث خطأ في الخادم. يرجى المحاولة لاحقاً.",
     },
+    
+    // Auth errors
     auth: {
       unauthorized: "ليس لديك صلاحية للوصول إلى هذا المورد.",
       sessionExpired: "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",

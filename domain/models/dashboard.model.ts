@@ -15,6 +15,7 @@ export interface DashboardData {
   revenue: RevenueData;
   lifecycle: LifecycleData;
   trends: TrendsData;
+  adminPerformance: AdminPerformanceData;
   generatedAtUtc: string;
 }
 
@@ -178,6 +179,65 @@ export enum TrendDirection {
   Stable = 2,
   Down = 3,
   StrongDown = 4
+}
+
+// ==================== PHASE 5: ADMIN PERFORMANCE ====================
+
+export interface AdminPerformanceData {
+  leaderboard: AdminPerformanceMetricData[];
+  activityHeatmap: ActivityHeatmapData[];
+  typePerformance: AdminTypePerformanceData[];
+  systemActivity: SystemActivityStatsData;
+  peakHours: PeakActivityHourData[];
+}
+
+export interface AdminPerformanceMetricData {
+  adminId: string;
+  username: string;
+  fullName: string;
+  adminType: string;
+  totalActions: number;
+  loginCount: number;
+  companiesManaged: number;
+  subscriptionsManaged: number;
+  avgResponseTime: number;
+  performanceScore: number;
+  activityLevel: string;
+  lastActiveDate: string;
+  daysActive: number;
+}
+
+export interface ActivityHeatmapData {
+  date: string;
+  dayOfWeek: number;
+  hourlyActivity: number[];
+  totalActivity: number;
+  peakHour: number;
+}
+
+export interface AdminTypePerformanceData {
+  typeName: string;
+  adminCount: number;
+  avgPerformanceScore: number;
+  totalActions: number;
+  avgActionsPerAdmin: number;
+  activePercentage: number;
+}
+
+export interface SystemActivityStatsData {
+  totalActions: number;
+  totalLogins: number;
+  avgActionsPerDay: number;
+  activeAdmins: number;
+  peakActivityDate: string;
+  peakActivityCount: number;
+  avgAdminsOnline: number;
+}
+
+export interface PeakActivityHourData {
+  hour: number;
+  activityCount: number;
+  percentage: number;
 }
 
 // ============================================
@@ -756,6 +816,221 @@ export class EntityTrend {
   }
 }
 
+// ==================== PHASE 5: ADMIN PERFORMANCE DOMAIN MODELS ====================
+
+export class AdminPerformance {
+  constructor(
+    public readonly leaderboard: AdminPerformanceMetric[],
+    public readonly activityHeatmap: ActivityHeatmap[],
+    public readonly typePerformance: AdminTypePerformance[],
+    public readonly systemActivity: SystemActivityStats,
+    public readonly peakHours: PeakActivityHour[]
+  ) {}
+
+  get topPerformer(): AdminPerformanceMetric | undefined {
+    return this.leaderboard[0];
+  }
+
+  get averagePerformanceScore(): number {
+    if (this.leaderboard.length === 0) return 0;
+    return Math.round(this.leaderboard.reduce((sum, admin) => sum + admin.performanceScore, 0) / this.leaderboard.length);
+  }
+
+  get highPerformersCount(): number {
+    return this.leaderboard.filter(a => a.performanceScore >= 80).length;
+  }
+
+  get lowPerformersCount(): number {
+    return this.leaderboard.filter(a => a.performanceScore < 50).length;
+  }
+
+  get mostActiveDay(): ActivityHeatmap | undefined {
+    return this.activityHeatmap.reduce((max, day) => 
+      day.totalActivity > max.totalActivity ? day : max, 
+      this.activityHeatmap[0]
+    );
+  }
+
+  get peakActivityHour(): number {
+    return this.peakHours[0]?.hour ?? 9;
+  }
+}
+
+export class AdminPerformanceMetric {
+  constructor(
+    public readonly adminId: string,
+    public readonly username: string,
+    public readonly fullName: string,
+    public readonly adminType: string,
+    public readonly totalActions: number,
+    public readonly loginCount: number,
+    public readonly companiesManaged: number,
+    public readonly subscriptionsManaged: number,
+    public readonly avgResponseTime: number,
+    public readonly performanceScore: number,
+    public readonly activityLevel: string,
+    public readonly lastActiveDate: Date,
+    public readonly daysActive: number
+  ) {}
+
+  get performanceGrade(): string {
+    if (this.performanceScore >= 90) return 'A+';
+    if (this.performanceScore >= 80) return 'A';
+    if (this.performanceScore >= 70) return 'B';
+    if (this.performanceScore >= 60) return 'C';
+    if (this.performanceScore >= 50) return 'D';
+    return 'F';
+  }
+
+  get performanceColor(): string {
+    if (this.performanceScore >= 80) return 'text-green-600';
+    if (this.performanceScore >= 60) return 'text-blue-600';
+    if (this.performanceScore >= 40) return 'text-yellow-600';
+    return 'text-red-600';
+  }
+
+  get activityLevelColor(): string {
+    switch (this.activityLevel) {
+      case 'High':
+        return 'bg-green-100 text-green-800';
+      case 'Medium':
+        return 'bg-blue-100 text-blue-800';
+      case 'Low':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  }
+
+  get isHighPerformer(): boolean {
+    return this.performanceScore >= 80;
+  }
+
+  get isActive(): boolean {
+    const daysSinceActive = Math.floor((Date.now() - this.lastActiveDate.getTime()) / (1000 * 60 * 60 * 24));
+    return daysSinceActive <= 7;
+  }
+
+  get avgActionsPerDay(): number {
+    return Math.round(this.totalActions / Math.max(this.daysActive, 1));
+  }
+
+  get efficiencyScore(): number {
+    // Lower response time = higher efficiency
+    const maxResponseTime = 2000;
+    return Math.max(0, Math.min(100, ((maxResponseTime - this.avgResponseTime) / maxResponseTime) * 100));
+  }
+}
+
+export class ActivityHeatmap {
+  constructor(
+    public readonly date: Date,
+    public readonly dayOfWeek: number,
+    public readonly hourlyActivity: number[],
+    public readonly totalActivity: number,
+    public readonly peakHour: number
+  ) {}
+
+  get dayName(): string {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return days[this.dayOfWeek];
+  }
+
+  get isWeekend(): boolean {
+    return this.dayOfWeek === 0 || this.dayOfWeek === 6;
+  }
+
+  get businessHoursActivity(): number {
+    return this.hourlyActivity.slice(8, 18).reduce((sum, activity) => sum + activity, 0);
+  }
+
+  get afterHoursActivity(): number {
+    const morning = this.hourlyActivity.slice(0, 8).reduce((sum, activity) => sum + activity, 0);
+    const evening = this.hourlyActivity.slice(18, 24).reduce((sum, activity) => sum + activity, 0);
+    return morning + evening;
+  }
+
+  get peakPeriod(): 'morning' | 'afternoon' | 'evening' | 'night' {
+    if (this.peakHour >= 6 && this.peakHour < 12) return 'morning';
+    if (this.peakHour >= 12 && this.peakHour < 18) return 'afternoon';
+    if (this.peakHour >= 18 && this.peakHour < 22) return 'evening';
+    return 'night';
+  }
+}
+
+export class AdminTypePerformance {
+  constructor(
+    public readonly typeName: string,
+    public readonly adminCount: number,
+    public readonly avgPerformanceScore: number,
+    public readonly totalActions: number,
+    public readonly avgActionsPerAdmin: number,
+    public readonly activePercentage: number
+  ) {}
+
+  get performanceGrade(): string {
+    if (this.avgPerformanceScore >= 90) return 'A+';
+    if (this.avgPerformanceScore >= 80) return 'A';
+    if (this.avgPerformanceScore >= 70) return 'B';
+    if (this.avgPerformanceScore >= 60) return 'C';
+    return 'D';
+  }
+
+  get isHighPerforming(): boolean {
+    return this.avgPerformanceScore >= 80;
+  }
+
+  get activityRate(): string {
+    if (this.avgActionsPerAdmin >= 300) return 'Very High';
+    if (this.avgActionsPerAdmin >= 200) return 'High';
+    if (this.avgActionsPerAdmin >= 100) return 'Medium';
+    return 'Low';
+  }
+}
+
+export class SystemActivityStats {
+  constructor(
+    public readonly totalActions: number,
+    public readonly totalLogins: number,
+    public readonly avgActionsPerDay: number,
+    public readonly activeAdmins: number,
+    public readonly peakActivityDate: Date,
+    public readonly peakActivityCount: number,
+    public readonly avgAdminsOnline: number
+  ) {}
+
+  get avgLoginsPerDay(): number {
+    return Math.round(this.totalLogins / 30);
+  }
+
+  get actionsPerLogin(): number {
+    return this.totalLogins > 0 ? Math.round(this.totalActions / this.totalLogins) : 0;
+  }
+
+  get systemUtilization(): number {
+    // Percentage of peak capacity being used on average
+    return this.peakActivityCount > 0 ? Math.round((this.avgActionsPerDay / this.peakActivityCount) * 100) : 0;
+  }
+}
+
+export class PeakActivityHour {
+  constructor(
+    public readonly hour: number,
+    public readonly activityCount: number,
+    public readonly percentage: number
+  ) {}
+
+  get hourFormatted(): string {
+    const period = this.hour >= 12 ? 'PM' : 'AM';
+    const hour12 = this.hour % 12 || 12;
+    return `${hour12}:00 ${period}`;
+  }
+
+  get isPeakHour(): boolean {
+    return this.percentage >= 10; // Top 10% of activity
+  }
+}
+
 export class Dashboard {
   constructor(
     public readonly overview: OverviewStats,
@@ -768,6 +1043,7 @@ export class Dashboard {
     public readonly revenue: Revenue,
     public readonly lifecycle: Lifecycle,
     public readonly trends: Trends,
+    public readonly adminPerformance: AdminPerformance,
     public readonly generatedAt: Date
   ) {}
 
