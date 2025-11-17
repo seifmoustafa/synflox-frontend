@@ -360,64 +360,152 @@ export function LoginView() {
                   </div>
 
                   {/* Password */}
-                  <div className="space-y-2">
-                    <label 
-                      htmlFor="password"
-                      className={cn(
-                        "text-sm font-semibold block transition-colors duration-200",
-                        isRTL && "text-right",
-                        focusedField === "password" ? "text-primary" : "text-foreground"
-                      )}
-                    >
-                      {t("auth.password")}
-                    </label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={vm.showPassword ? "text" : "password"}
-                        placeholder={t("auth.passwordPlaceholder")}
-                        value={vm.formData.password}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => vm.updateField("password", e.target.value)}
-                        onFocus={() => setFocusedField("password")}
-                        onBlur={() => setFocusedField(null)}
-                        onKeyPress={handleKey}
-                        disabled={vm.isLoading}
-                        dir={isRTL ? "rtl" : "ltr"}
+                  {!vm.requires2FA && (
+                    <div className="space-y-2">
+                      <label 
+                        htmlFor="password"
                         className={cn(
-                          "h-12 text-base transition-all duration-300",
-                          "border-2 rounded-xl",
-                          isRTL ? "pl-12 pr-4" : "pr-12 pl-4",
-                          focusedField === "password"
-                            ? "border-primary shadow-lg shadow-primary/25 ring-4 ring-primary/10 scale-[1.01]"
-                            : "border-border hover:border-primary/40 hover:shadow-md"
-                        )}
-                      />
-                      <button
-                        type="button"
-                        onClick={vm.togglePasswordVisibility}
-                        disabled={vm.isLoading}
-                        className={cn(
-                          "absolute top-1/2 -translate-y-1/2 p-2.5 rounded-lg",
-                          "transition-all duration-300 hover:scale-110 active:scale-95",
-                          isRTL ? "left-2" : "right-2",
-                          focusedField === "password"
-                            ? "text-primary bg-primary/10"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                          "text-sm font-semibold block transition-colors duration-200",
+                          isRTL && "text-right",
+                          focusedField === "password" ? "text-primary" : "text-foreground"
                         )}
                       >
-                        {vm.showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                      {focusedField === "password" && (
-                        <div className="absolute inset-0 -z-10 bg-primary/5 rounded-xl blur-xl" />
-                      )}
+                        {t("auth.password")}
+                      </label>
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          type={vm.showPassword ? "text" : "password"}
+                          placeholder={t("auth.passwordPlaceholder")}
+                          value={vm.formData.password}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => vm.updateField("password", e.target.value)}
+                          onFocus={() => setFocusedField("password")}
+                          onBlur={() => setFocusedField(null)}
+                          onKeyPress={handleKey}
+                          disabled={vm.isLoading}
+                          dir={isRTL ? "rtl" : "ltr"}
+                          className={cn(
+                            "h-12 text-base transition-all duration-300",
+                            "border-2 rounded-xl",
+                            isRTL ? "pl-12 pr-4" : "pr-12 pl-4",
+                            focusedField === "password"
+                              ? "border-primary shadow-lg shadow-primary/25 ring-4 ring-primary/10 scale-[1.01]"
+                              : "border-border hover:border-primary/40 hover:shadow-md"
+                          )}
+                        />
+                        <button
+                          type="button"
+                          onClick={vm.togglePasswordVisibility}
+                          disabled={vm.isLoading}
+                          className={cn(
+                            "absolute top-1/2 -translate-y-1/2 p-2.5 rounded-lg",
+                            "transition-all duration-300 hover:scale-110 active:scale-95",
+                            isRTL ? "left-2" : "right-2",
+                            focusedField === "password"
+                              ? "text-primary bg-primary/10"
+                              : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                          )}
+                        >
+                          {vm.showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                        {focusedField === "password" && (
+                          <div className="absolute inset-0 -z-10 bg-primary/5 rounded-xl blur-xl" />
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* 2FA Verification Code */}
+                  {vm.requires2FA && (
+                    <div className={cn(
+                      "space-y-4 animate-in fade-in-0 slide-in-from-top-4 duration-500",
+                      isRTL && "text-right"
+                    )} dir={isRTL ? "rtl" : "ltr"}>
+                      {/* 2FA Header */}
+                      <div className="space-y-2 p-4 rounded-xl bg-primary/5 border border-primary/20">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-lg bg-primary/20">
+                            <Shield className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-foreground">{t("auth.twoFactorRequired")}</h3>
+                            <p className="text-sm text-muted-foreground">{t("auth.twoFactorDescription")}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Verification Code Input */}
+                      <div className="space-y-2">
+                        <label 
+                          htmlFor="verificationCode"
+                          className={cn(
+                            "text-sm font-semibold block transition-colors duration-200",
+                            isRTL && "text-right",
+                            focusedField === "verificationCode" ? "text-primary" : "text-foreground"
+                          )}
+                        >
+                          {t("auth.verificationCode")}
+                        </label>
+                        <div className="relative">
+                          <Input
+                            id="verificationCode"
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={6}
+                            placeholder={t("auth.verificationCodePlaceholder")}
+                            value={vm.formData.verificationCode || ""}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                              const value = e.target.value.replace(/\D/g, ""); // Only digits
+                              vm.updateField("verificationCode", value);
+                            }}
+                            onFocus={() => setFocusedField("verificationCode")}
+                            onBlur={() => setFocusedField(null)}
+                            onKeyPress={(e: React.KeyboardEvent) => {
+                              if (e.key === "Enter" && vm.is2FACodeValid && !vm.isLoading) {
+                                vm.handle2FAVerification();
+                              }
+                            }}
+                            disabled={vm.isLoading}
+                            autoFocus
+                            dir="ltr"
+                            className={cn(
+                              "h-14 text-2xl text-center tracking-[0.5em] font-bold transition-all duration-300",
+                              "border-2 rounded-xl",
+                              focusedField === "verificationCode"
+                                ? "border-primary shadow-lg shadow-primary/25 ring-4 ring-primary/10 scale-[1.01]"
+                                : "border-border hover:border-primary/40 hover:shadow-md"
+                            )}
+                          />
+                          {focusedField === "verificationCode" && (
+                            <div className="absolute inset-0 -z-10 bg-primary/5 rounded-xl blur-xl" />
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground text-center">
+                          {t("auth.enterCode")}
+                        </p>
+                      </div>
+
+                      {/* Back to Login */}
+                      <button
+                        type="button"
+                        onClick={vm.backToLogin}
+                        disabled={vm.isLoading}
+                        className={cn(
+                          "w-full text-sm text-muted-foreground hover:text-primary",
+                          "transition-colors duration-200 underline",
+                          isRTL && "text-right"
+                        )}
+                      >
+                        {t("auth.backToLogin")}
+                      </button>
+                    </div>
+                  )}
 
                   {/* Submit Button */}
                   <Button
                     type="button"
-                    onClick={vm.handleLogin}
-                    disabled={!vm.isFormValid || vm.isLoading}
+                    onClick={vm.requires2FA ? vm.handle2FAVerification : vm.handleLogin}
+                    disabled={vm.requires2FA ? (!vm.is2FACodeValid || vm.isLoading) : (!vm.isFormValid || vm.isLoading)}
                     className={cn(
                       "w-full h-13 mt-2 text-base font-bold relative overflow-hidden group/btn rounded-xl",
                       "bg-gradient-to-r from-primary via-primary to-primary/90",
@@ -437,16 +525,29 @@ export function LoginView() {
                       {vm.isLoading ? (
                         <>
                           <Loader2 className="w-5 h-5 animate-spin" />
-                          <span>{t("auth.loggingIn")}</span>
+                          <span>{vm.requires2FA ? t("auth.verifying") : t("auth.loggingIn")}</span>
                         </>
                       ) : (
                         <>
-                          <Lock className="w-5 h-5" />
-                          <span>{t("auth.login")}</span>
-                          <ArrowRight className={cn(
-                            "w-4 h-4 group-hover/btn:translate-x-1 transition-transform",
-                            isRTL && "rotate-180 group-hover/btn:-translate-x-1"
-                          )} />
+                          {vm.requires2FA ? (
+                            <>
+                              <Shield className="w-5 h-5" />
+                              <span>{t("auth.verify")}</span>
+                              <ArrowRight className={cn(
+                                "w-4 h-4 group-hover/btn:translate-x-1 transition-transform",
+                                isRTL && "rotate-180 group-hover/btn:-translate-x-1"
+                              )} />
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="w-5 h-5" />
+                              <span>{t("auth.login")}</span>
+                              <ArrowRight className={cn(
+                                "w-4 h-4 group-hover/btn:translate-x-1 transition-transform",
+                                isRTL && "rotate-180 group-hover/btn:-translate-x-1"
+                              )} />
+                            </>
+                          )}
                         </>
                       )}
                     </span>

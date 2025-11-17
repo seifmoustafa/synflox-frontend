@@ -1,6 +1,6 @@
 "use client";
 
-import { useDashboardViewModel } from "@/viewmodels/use-dashboard-viewmodel";
+import { useDashboardViewModel } from "@/viewmodels/dashboard-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSettings } from "@/providers/settings-provider";
 import { cn } from "@/lib/utils";

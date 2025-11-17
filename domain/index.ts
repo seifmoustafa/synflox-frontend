@@ -14,9 +14,11 @@ export {
   LoginRequest, 
   LoginResponse, 
   RefreshTokenRequest,
+  Verify2FARequest,
   type LoginRequestData,
   type LoginResponseData,
-  type RefreshTokenRequestData
+  type RefreshTokenRequestData,
+  type Verify2FARequestData
 } from './models/auth.model';
 
 // Navigation domain

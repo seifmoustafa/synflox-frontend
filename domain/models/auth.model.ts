@@ -17,6 +17,14 @@ export interface LoginResponseData {
   accessToken: string;
   refreshToken: string;
   errorMessage?: string;
+  requires2FA?: boolean;
+  message?: string;
+}
+
+export interface Verify2FARequestData {
+  username: string;
+  password: string;
+  verificationCode: string;
 }
 
 export interface RefreshTokenRequestData {
@@ -50,12 +58,16 @@ export class LoginResponse {
   public readonly accessToken: string;
   public readonly refreshToken: string;
   public readonly errorMessage?: string;
+  public readonly requires2FA?: boolean;
+  public readonly message?: string;
 
   constructor(data: LoginResponseData) {
     this.success = data.success;
     this.accessToken = data.accessToken;
     this.refreshToken = data.refreshToken;
     this.errorMessage = data.errorMessage;
+    this.requires2FA = data.requires2FA;
+    this.message = data.message;
   }
 
   /**
@@ -63,6 +75,38 @@ export class LoginResponse {
    */
   get isSuccessful(): boolean {
     return this.success && !!(this.accessToken && this.refreshToken);
+  }
+
+  /**
+   * Check if 2FA verification is required
+   */
+  get needs2FA(): boolean {
+    return this.requires2FA === true;
+  }
+
+}
+
+export class Verify2FARequest {
+  public readonly username: string;
+  public readonly password: string;
+  public readonly verificationCode: string;
+
+  constructor(data: Verify2FARequestData) {
+    this.username = data.username;
+    this.password = data.password;
+    this.verificationCode = data.verificationCode;
+  }
+
+  /**
+   * Validate 2FA request data
+   */
+  get isValid(): boolean {
+    return !!(
+      this.username?.trim() && 
+      this.password?.trim() && 
+      this.verificationCode?.trim() && 
+      this.verificationCode.length === 6
+    );
   }
 
 }

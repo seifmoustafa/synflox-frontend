@@ -36,6 +36,17 @@ export const en = {
     statUptime: "99.9% Uptime",
     statSecurity: "Bank-level Security",
     statSupport: "24/7 Support",
+    // Two-Factor Authentication
+    twoFactorRequired: "Two-Factor Authentication Required",
+    twoFactorDescription: "Enter the 6-digit code from your authenticator app",
+    verificationCode: "Verification Code",
+    verificationCodePlaceholder: "000000",
+    verify: "Verify",
+    verifying: "Verifying...",
+    invalidCode: "Invalid verification code. Please enter a valid 6-digit code.",
+    codeExpired: "Verification code expired. Please try again.",
+    backToLogin: "Back to Login",
+    enterCode: "Please enter the 6-digit code",
   },
 
   // Not Authorized Page

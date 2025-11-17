@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation";
 import { handleError } from "@/lib/error-handler";
 import { appLogger } from "@/lib/logger";
 import { useServices } from "@/providers/service-provider";
-import { User, AuthMapper } from "@/domain";
+import { User, AuthMapper, LoginResponse } from "@/domain";
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<User | LoginResponse>;
   logout: () => Promise<void>;
 }
 
@@ -63,13 +63,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, [checkAuth]);
 
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string): Promise<User | LoginResponse> => {
     try {
       // Create LoginRequest domain model using mapper
       const loginRequest = AuthMapper.loginRequestFromJson({ username, password });
-      const loggedInUser = await authService.login(loginRequest);
+      const result = await authService.login(loginRequest);
+      
+      // Check if 2FA is required
+      if (result instanceof LoginResponse && result.needs2FA) {
+        appLogger.info("2FA required for user", { username });
+        return result; // Return the LoginResponse to trigger 2FA UI
+      }
+      
+      // Standard login success - result is User
+      const loggedInUser = result as User;
       setUser(loggedInUser);
       appLogger.info("Login successful", { userId: loggedInUser.id, username: loggedInUser.username });
+      return loggedInUser;
     } catch (error) {
       const appError = handleError(error as Error, 'AuthProvider.login');
       appLogger.error("Login failed in provider:", { error, appError });

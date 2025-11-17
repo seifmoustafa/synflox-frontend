@@ -1,13 +1,24 @@
 export const API_ENDPOINTS = {
   // Authentication
   AUTH_LOGIN: "/admin/auth/login",
+  AUTH_LOGIN_2FA: "/admin/auth/verify-2fa",
   AUTH_REFRESH_TOKEN: "/admin/auth/refresh-token",
   AUTH_LOGOUT: "/admin/auth/logout",
   
-  // Admin Management
-  GET_ADMIN_ME: "/admins/me",
-  UPDATE_ADMIN_PROFILE: "/admins/me",
-  CHANGE_ADMIN_PASSWORD: "/admins/me/password",
+  // Admin Profile (Current User)
+  GET_ADMIN_ME: "/admin/profile/me",
+  UPDATE_ADMIN_PROFILE: "/admin/profile/me",
+  UPDATE_ADMIN_PREFERENCES: "/admin/profile/me/preferences",
+  UPDATE_ADMIN_NOTIFICATIONS: "/admin/profile/me/notifications",
+  UPLOAD_PROFILE_PICTURE: "/admin/profile/me/picture",
+  DELETE_PROFILE_PICTURE: "/admin/profile/me/picture",
+  CHANGE_ADMIN_PASSWORD: "/admin/profile/me/password",
+  ENABLE_2FA: "/admin/profile/me/2fa/enable",
+  VERIFY_2FA_SETUP: "/admin/profile/me/2fa/verify",
+  DISABLE_2FA: "/admin/profile/me/2fa/disable",
+  
+  // Admin Management (SuperAdmin operations)
+  GET_ADMIN_STATISTICS: "/admin/profile/me/statistics",
   ADMINS_GET_ALL: "/admins",
   ADMINS_GET_BY_ID: "/admins",
   ADMINS_CREATE: "/admins",

@@ -6,6 +6,7 @@ import {
   LoginRequest,
   LoginResponse,
   RefreshTokenRequest,
+  Verify2FARequest,
   UserMapper,
   AuthMapper,
 } from "@/domain";
@@ -14,13 +15,52 @@ import { appLogger } from "@/lib/logger";
 export class AuthService {
   constructor(private readonly apiService: IApiService) {}
 
-  async login(credentials: LoginRequest): Promise<User> {
+  async login(credentials: LoginRequest): Promise<User | LoginResponse> {
     try {
       // SYNFLOX API: POST /api/admin/auth/login
-      // Backend returns: { statusCode, message, data: { success, accessToken, refreshToken, expiresIn, admin, errorMessage? } }
+      // Backend returns: { statusCode, message, data: { success, accessToken, refreshToken, expiresIn, admin, errorMessage?, requires2FA? } }
       const response = await this.apiService.post<any>(
         API_ENDPOINTS.AUTH_LOGIN,
         AuthMapper.loginRequestToJson(credentials)
+      );
+
+      // Handle SYNFLOX response format
+      const loginData = response?.data || response;
+      const loginResponse = AuthMapper.loginResponseFromJson(loginData);
+
+      // Check if 2FA is required
+      if (loginResponse.needs2FA) {
+        appLogger.info("2FA verification required");
+        return loginResponse; // Return response with requires2FA flag
+      }
+
+      if (loginResponse.isSuccessful && loginResponse.accessToken) {
+        secureTokenService.setAccessToken(loginResponse.accessToken);
+        secureTokenService.setRefreshToken(loginResponse.refreshToken);
+        
+        // If admin data is in response, use it; otherwise fetch user
+        if (loginData?.admin) {
+          return UserMapper.fromJson(loginData.admin);
+        }
+        return this.getMe();
+      }
+
+      // Handle error message from backend
+      const errorMessage = loginResponse.errorMessage || response?.message || "Login failed: No access token received.";
+      throw new Error(errorMessage);
+    } catch (error) {
+      appLogger.error("Login failed:", error);
+      throw error;
+    }
+  }
+
+  async verify2FA(request: Verify2FARequest): Promise<User> {
+    try {
+      // SYNFLOX API: POST /api/admin/auth/verify-2fa
+      // Backend returns: { statusCode, message, data: { success, accessToken, refreshToken, expiresIn, admin, errorMessage? } }
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.AUTH_LOGIN_2FA,
+        AuthMapper.verify2FARequestToJson(request)
       );
 
       // Handle SYNFLOX response format
@@ -39,10 +79,10 @@ export class AuthService {
       }
 
       // Handle error message from backend
-      const errorMessage = loginResponse.errorMessage || response?.message || "Login failed: No access token received.";
+      const errorMessage = loginResponse.errorMessage || response?.message || "2FA verification failed.";
       throw new Error(errorMessage);
     } catch (error) {
-      appLogger.error("Login failed:", error);
+      appLogger.error("2FA verification failed:", error);
       throw error;
     }
   }
@@ -65,7 +105,7 @@ export class AuthService {
 
   async getMe(): Promise<User> {
     try {
-      // SYNFLOX API: GET /api/admins/me
+      // SYNFLOX API: GET /api/admin/profile/me
       // Backend returns: { statusCode, message, data: AdminDto }
       const response = await this.apiService.get<any>(API_ENDPOINTS.GET_ADMIN_ME);
       const adminData = response?.data || response;

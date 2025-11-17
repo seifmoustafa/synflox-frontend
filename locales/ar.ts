@@ -36,6 +36,17 @@ export const ar = {
     statUptime: "99.9% وقت تشغيل",
     statSecurity: "أمان مصرفي",
     statSupport: "دعم 24/7",
+    // Two-Factor Authentication
+    twoFactorRequired: "مطلوب المصادقة الثنائية",
+    twoFactorDescription: "أدخل الرمز المكون من 6 أرقام من تطبيق المصادقة",
+    verificationCode: "رمز التحقق",
+    verificationCodePlaceholder: "000000",
+    verify: "تحقق",
+    verifying: "جاري التحقق...",
+    invalidCode: "رمز التحقق غير صحيح. يرجى إدخال رمز صحيح مكون من 6 أرقام.",
+    codeExpired: "انتهت صلاحية رمز التحقق. يرجى المحاولة مرة أخرى.",
+    backToLogin: "العودة لتسجيل الدخول",
+    enterCode: "يرجى إدخال الرمز المكون من 6 أرقام",
   },
 
   // Not Authorized Page
