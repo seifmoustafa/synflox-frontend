@@ -1,6 +1,18 @@
 export const en = {
   // Authentication
   auth: {
+    passwordStrength: "Password strength",
+    passwordStrengthWeak: "Weak",
+    passwordStrengthMedium: "Medium",
+    passwordStrengthStrong: "Strong",
+    otpVerifiedProceed: "OTP verified. Proceeding to login...",
+    emailLocked: "Email locked",
+    enter6DigitCode: "Enter 6-digit code",
+    enterNewPassword: "Enter New Password",
+    wrongEmail: "Invalid email address",
+    magicLinkActive: "Magic link activated",
+    sendOtp: "Send OTP",
+    verifyOtp: "Verify OTP",
     login: "Login",
     username: "Username",
     password: "Password",
@@ -47,6 +59,65 @@ export const en = {
     codeExpired: "Verification code expired. Please try again.",
     backToLogin: "Back to Login",
     enterCode: "Please enter the 6-digit code",
+    
+    // Password Reset
+    forgotPassword: "Forgot Password?",
+    resetPassword: "Reset Password",
+    email: "Email Address",
+    emailPlaceholder: "admin@synflox.com",
+    otpCode: "OTP Code",
+    newPassword: "New Password",
+    confirmPassword: "Confirm Password",
+    newPasswordPlaceholder: "Enter new password",
+    confirmPasswordPlaceholder: "Re-enter password",
+    resetPasswordButton: "Reset Password",
+    resettingPassword: "Resetting Password...",
+    sendResetLink: "Send Reset Link",
+    sending: "Sending...",
+    
+    // Password Reset Messages
+    forgotPasswordInstructions: "Enter your email address and we'll send you instructions to reset your password. You'll receive both an OTP code and a magic link for one-click reset.",
+    checkYourEmail: "Check your email for password reset instructions. The link will expire in 15 minutes.",
+    emailSent: "Email Sent!",
+    resetEmailSent: "Password reset instructions sent to your email",
+    passwordResetSuccess: "Password reset successfully!",
+    redirectingToLogin: "Redirecting to login page...",
+    
+    // Magic Link
+    magicLinkDetected: "Magic link detected - enter your new password",
+    magicLinkValid: "Magic link validated successfully",
+    magicLinkExpired: "Magic link is invalid or expired",
+    magicLinkError: "Failed to validate magic link",
+    validatingMagicLink: "Validating magic link...",
+    emailAutoFilled: "Auto-filled from magic link",
+    otpAutoFilled: "Auto-filled from magic link",
+    expiresIn: "Expires in",
+    minutes: "minutes",
+    
+    // Two Methods
+    twoMethods: "Two ways to reset:",
+    twoMethodsDescription: "Use the magic link for instant reset, or manually enter the 6-digit OTP code.",
+    enterResetDetails: "Enter your email, OTP, and new password",
+    
+    // Password Strength
+    passwordWeak: "Weak",
+    passwordMedium: "Medium",
+    passwordStrong: "Strong",
+    passwordMinLength: "At least 8 characters",
+    passwordUppercase: "Contains uppercase letter",
+    passwordLowercase: "Contains lowercase letter",
+    passwordNumber: "Contains number",
+    passwordSpecialChar: "Contains special character",
+    passwordsMatch: "Passwords match",
+    passwordsDontMatch: "Passwords don't match",
+    
+    // Errors
+    invalidEmail: "Invalid email address",
+    invalidEmailFormat: "Invalid email format",
+    invalidResetData: "Invalid password reset data",
+    forgotPasswordError: "Failed to send password reset email",
+    passwordResetError: "Failed to reset password",
+    validationFailed: "Validation Failed",
   },
 
   // Not Authorized Page

@@ -7,6 +7,10 @@ import {
   LoginResponse,
   RefreshTokenRequest,
   Verify2FARequest,
+  ForgotPasswordRequest,
+  ValidateMagicLinkRequest,
+  MagicLinkValidationResponse,
+  ResetPasswordRequest,
   UserMapper,
   AuthMapper,
 } from "@/domain";
@@ -146,6 +150,119 @@ export class AuthService {
       appLogger.error("Token refresh failed:", error);
       secureTokenService.clearTokens();
       return null;
+    }
+  }
+
+  // ============================================
+  // PASSWORD RESET METHODS
+  // ============================================
+
+  /**
+   * Send password reset OTP to admin's email
+   * Also includes magic link for one-click reset
+   */
+  async forgotPassword(request: ForgotPasswordRequest): Promise<{ success: boolean; message: string }> {
+    try {
+      console.log("🔷 [AuthService] Calling API forgot-password endpoint...");
+      
+      // SYNFLOX API: POST /api/admin/auth/forgot-password
+      // Backend returns: { statusCode, message, data }
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.AUTH_FORGOT_PASSWORD,
+        AuthMapper.forgotPasswordRequestToJson(request)
+      );
+
+      console.log("🔷 [AuthService] Raw API response:", response);
+      console.log("🔷 [AuthService] response.statusCode:", response?.statusCode);
+      console.log("🔷 [AuthService] response.message:", response?.message);
+      console.log("🔷 [AuthService] response.data:", response?.data);
+
+      const result = AuthMapper.handlePasswordResetResponse(response);
+      console.log("🔷 [AuthService] Mapped result:", result);
+      console.log("🔷 [AuthService] result.success:", result.success);
+      console.log("🔷 [AuthService] result.message:", result.message);
+      
+      appLogger.info("Password reset email sent successfully");
+      return result;
+    } catch (error) {
+      console.log("🔷 [AuthService] Error:", error);
+      appLogger.error("Forgot password failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verify OTP code for password reset
+   * User enters 6-digit code from email before resetting password
+   */
+  async verifyResetOtp(request: import("@/domain").VerifyResetOtpRequest): Promise<{ success: boolean; message: string }> {
+    try {
+      // SYNFLOX API: POST /api/admin/auth/verify-reset-otp
+      // Backend returns: { statusCode, message, data }
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.AUTH_VERIFY_RESET_OTP,
+        {
+          email: request.email,
+          otpCode: request.otpCode
+        }
+      );
+
+      const result = AuthMapper.handlePasswordResetResponse(response);
+      appLogger.info("OTP verified successfully");
+      return result;
+    } catch (error) {
+      appLogger.error("OTP verification failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Validate magic link token and get email + OTP for auto-fill
+   * This enables one-click password reset flow
+   */
+  async validateMagicLink(request: ValidateMagicLinkRequest): Promise<MagicLinkValidationResponse> {
+    try {
+      // SYNFLOX API: POST /api/admin/auth/validate-magic-link
+      // Backend returns: { statusCode, message, data: { email, otpCode, isValid, expiryMinutes } }
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.AUTH_VALIDATE_MAGIC_LINK,
+        AuthMapper.validateMagicLinkRequestToJson(request)
+      );
+
+      const validationData = response?.data || response;
+      const validation = AuthMapper.magicLinkValidationResponseFromJson(validationData);
+      
+      if (!validation.isValid) {
+        throw new Error("Magic link is invalid or expired");
+      }
+
+      appLogger.info("Magic link validated successfully");
+      return validation;
+    } catch (error) {
+      appLogger.error("Magic link validation failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Reset password using email + OTP
+   * Works for both magic link flow (auto-filled) and manual OTP entry
+   */
+  async resetPassword(request: ResetPasswordRequest): Promise<{ success: boolean; message: string }> {
+    try {
+      // SYNFLOX API: POST /api/admin/auth/reset-password
+      // Backend returns: { statusCode, message, data }
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.AUTH_RESET_PASSWORD,
+        AuthMapper.resetPasswordRequestToJson(request)
+      );
+
+      const result = AuthMapper.handlePasswordResetResponse(response);
+      appLogger.info("Password reset completed successfully");
+      return result;
+    } catch (error) {
+      appLogger.error("Password reset failed:", error);
+      throw error;
     }
   }
 }

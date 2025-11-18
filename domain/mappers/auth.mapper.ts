@@ -11,10 +11,18 @@ import {
   LoginResponse, 
   RefreshTokenRequest,
   Verify2FARequest,
+  ForgotPasswordRequest,
+  ValidateMagicLinkRequest,
+  MagicLinkValidationResponse,
+  ResetPasswordRequest,
   type LoginRequestData,
   type LoginResponseData,
   type RefreshTokenRequestData,
-  type Verify2FARequestData
+  type Verify2FARequestData,
+  type ForgotPasswordRequestData,
+  type ValidateMagicLinkRequestData,
+  type MagicLinkValidationResponseData,
+  type ResetPasswordRequestData
 } from '../models/auth.model';
 
 export class AuthMapper {
@@ -103,6 +111,62 @@ export class AuthMapper {
   static refreshTokenRequestToJson(request: RefreshTokenRequest): any {
     return {
       refreshToken: request.refreshToken,
+    };
+  }
+
+  // ============================================
+  // PASSWORD RESET MAPPERS
+  // ============================================
+
+  /**
+   * Convert ForgotPasswordRequest domain model to JSON for API requests
+   */
+  static forgotPasswordRequestToJson(request: ForgotPasswordRequest): any {
+    return {
+      email: request.email,
+    };
+  }
+
+  /**
+   * Convert ValidateMagicLinkRequest domain model to JSON for API requests
+   */
+  static validateMagicLinkRequestToJson(request: ValidateMagicLinkRequest): any {
+    return {
+      token: request.token,
+    };
+  }
+
+  /**
+   * Convert JSON/API response to MagicLinkValidationResponse domain model
+   */
+  static magicLinkValidationResponseFromJson(json: any): MagicLinkValidationResponse {
+    return new MagicLinkValidationResponse({
+      email: json.email || '',
+      otpCode: json.otpCode || '',
+      isValid: json.isValid || false,
+      expiryMinutes: json.expiryMinutes || 0,
+    });
+  }
+
+  /**
+   * Convert ResetPasswordRequest domain model to JSON for API requests
+   */
+  static resetPasswordRequestToJson(request: ResetPasswordRequest): any {
+    return {
+      email: request.email,
+      otpCode: request.otpCode,
+      newPassword: request.newPassword,
+    };
+  }
+
+  /**
+   * Handle API response for password reset operations
+   * Extracts the message from the response
+   */
+  static handlePasswordResetResponse(json: any): { success: boolean; message: string } {
+    return {
+      success: json.statusCode === 200 || json.success === true,
+      message: json.message || json.data || 'Operation completed',
     };
   }
 }

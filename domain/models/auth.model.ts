@@ -126,3 +126,166 @@ export class RefreshTokenRequest {
   }
 
 }
+
+// ============================================
+// PASSWORD RESET MODELS
+// ============================================
+
+export interface ForgotPasswordRequestData {
+  email: string;
+}
+
+export class ForgotPasswordRequest {
+  public readonly email: string;
+
+  constructor(data: ForgotPasswordRequestData) {
+    this.email = data.email;
+  }
+
+  /**
+   * Validate forgot password request
+   */
+  get isValid(): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return !!(this.email && emailRegex.test(this.email.trim()));
+  }
+
+}
+
+export interface ValidateMagicLinkRequestData {
+  token: string;
+}
+
+export class ValidateMagicLinkRequest {
+  public readonly token: string;
+
+  constructor(data: ValidateMagicLinkRequestData) {
+    this.token = data.token;
+  }
+
+  /**
+   * Validate magic link request
+   */
+  get isValid(): boolean {
+    return !!(this.token && this.token.trim().length > 0);
+  }
+
+}
+
+export interface MagicLinkValidationResponseData {
+  email: string;
+  otpCode: string;
+  isValid: boolean;
+  expiryMinutes: number;
+}
+
+export class MagicLinkValidationResponse {
+  public readonly email: string;
+  public readonly otpCode: string;
+  public readonly isValid: boolean;
+  public readonly expiryMinutes: number;
+
+  constructor(data: MagicLinkValidationResponseData) {
+    this.email = data.email;
+    this.otpCode = data.otpCode;
+    this.isValid = data.isValid;
+    this.expiryMinutes = data.expiryMinutes;
+  }
+
+  /**
+   * Check if magic link is still valid
+   */
+  get isExpired(): boolean {
+    return !this.isValid;
+  }
+
+  /**
+   * Get expiry time in minutes
+   */
+  get timeRemaining(): number {
+    return this.expiryMinutes;
+  }
+
+}
+
+export interface ResetPasswordRequestData {
+  email: string;
+  otpCode: string;
+  newPassword: string;
+}
+
+export class ResetPasswordRequest {
+  public readonly email: string;
+  public readonly otpCode: string;
+  public readonly newPassword: string;
+
+  constructor(data: ResetPasswordRequestData) {
+    this.email = data.email;
+    this.otpCode = data.otpCode;
+    this.newPassword = data.newPassword;
+  }
+
+  /**
+   * Validate reset password request
+   */
+  get isValid(): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const otpRegex = /^\d{6}$/;
+    const passwordValid = this.newPassword && this.newPassword.length >= 8;
+    
+    return !!(
+      this.email && emailRegex.test(this.email.trim()) &&
+      this.otpCode && otpRegex.test(this.otpCode) &&
+      passwordValid
+    );
+  }
+
+  /**
+   * Check password strength
+   */
+  get passwordStrength(): 'weak' | 'medium' | 'strong' {
+    if (!this.newPassword) return 'weak';
+    
+    const hasUpperCase = /[A-Z]/.test(this.newPassword);
+    const hasLowerCase = /[a-z]/.test(this.newPassword);
+    const hasNumbers = /\d/.test(this.newPassword);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(this.newPassword);
+    const isLongEnough = this.newPassword.length >= 12;
+    
+    const criteriaCount = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChar, isLongEnough]
+      .filter(Boolean).length;
+    
+    if (criteriaCount >= 4) return 'strong';
+    if (criteriaCount >= 2) return 'medium';
+    return 'weak';
+  }
+
+}
+
+// ============================================================================
+// Verify Reset OTP Request
+// ============================================================================
+
+export interface VerifyResetOtpRequestData {
+  email: string;
+  otpCode: string;
+}
+
+export class VerifyResetOtpRequest {
+  readonly email: string;
+  readonly otpCode: string;
+
+  constructor(data: VerifyResetOtpRequestData) {
+    this.email = data.email;
+    this.otpCode = data.otpCode;
+  }
+
+  get isValid(): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return (
+      emailRegex.test(this.email) &&
+      this.otpCode.trim().length === 6 &&
+      /^\d{6}$/.test(this.otpCode.trim())
+    );
+  }
+}

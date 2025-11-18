@@ -15,10 +15,20 @@ export {
   LoginResponse, 
   RefreshTokenRequest,
   Verify2FARequest,
+  ForgotPasswordRequest,
+  VerifyResetOtpRequest,
+  ValidateMagicLinkRequest,
+  MagicLinkValidationResponse,
+  ResetPasswordRequest,
   type LoginRequestData,
   type LoginResponseData,
   type RefreshTokenRequestData,
-  type Verify2FARequestData
+  type Verify2FARequestData,
+  type ForgotPasswordRequestData,
+  type VerifyResetOtpRequestData,
+  type ValidateMagicLinkRequestData,
+  type MagicLinkValidationResponseData,
+  type ResetPasswordRequestData
 } from './models/auth.model';
 
 // Navigation domain

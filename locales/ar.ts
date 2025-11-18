@@ -1,6 +1,18 @@
 export const ar = {
   // Authentication
   auth: {
+    passwordStrength: "قوة كلمة المرور",
+    passwordStrengthWeak: "ضعيف",
+    passwordStrengthMedium: "متوسط",
+    passwordStrengthStrong: "قوي",
+    otpVerifiedProceed: "تم التحقق من رمز OTP بنجاح",
+    emailLocked: "البريد الإلكتروني مغلق",
+    enter6DigitCode: "أدخل رمز 6 أرقام",
+    enterNewPassword: "أدخل كلمة المرور الجديدة",
+    wrongEmail: "البريد الإلكتروني غير صحيح",
+    magicLinkActive: "تم تفعيل الرابط السحري",
+    sendOtp: "إرسال رمز OTP",
+    verifyOtp: "تحقق من رمز OTP",
     login: "تسجيل الدخول",
     username: "اسم المستخدم",
     password: "كلمة المرور",
@@ -47,6 +59,65 @@ export const ar = {
     codeExpired: "انتهت صلاحية رمز التحقق. يرجى المحاولة مرة أخرى.",
     backToLogin: "العودة لتسجيل الدخول",
     enterCode: "يرجى إدخال الرمز المكون من 6 أرقام",
+    
+    // Password Reset
+    forgotPassword: "نسيت كلمة المرور؟",
+    resetPassword: "إعادة تعيين كلمة المرور",
+    email: "البريد الإلكتروني",
+    emailPlaceholder: "admin@synflox.com",
+    otpCode: "رمز OTP",
+    newPassword: "كلمة المرور الجديدة",
+    confirmPassword: "تأكيد كلمة المرور",
+    newPasswordPlaceholder: "أدخل كلمة المرور الجديدة",
+    confirmPasswordPlaceholder: "أعد إدخال كلمة المرور",
+    resetPasswordButton: "إعادة تعيين كلمة المرور",
+    resettingPassword: "جاري إعادة التعيين...",
+    sendResetLink: "إرسال رابط إعادة التعيين",
+    sending: "جاري الإرسال...",
+    
+    // Password Reset Messages
+    forgotPasswordInstructions: "أدخل عنوان بريدك الإلكتروني وسنرسل لك تعليمات لإعادة تعيين كلمة المرور. ستتلقى رمز OTP ورابط سحري لإعادة التعيين بنقرة واحدة.",
+    checkYourEmail: "تحقق من بريدك الإلكتروني للحصول على تعليمات إعادة تعيين كلمة المرور. سينتهي صلاحية الرابط خلال 15 دقيقة.",
+    emailSent: "تم إرسال البريد الإلكتروني!",
+    resetEmailSent: "تم إرسال تعليمات إعادة تعيين كلمة المرور إلى بريدك",
+    passwordResetSuccess: "تم إعادة تعيين كلمة المرور بنجاح!",
+    redirectingToLogin: "جاري التحويل إلى صفحة تسجيل الدخول...",
+    
+    // Magic Link
+    magicLinkDetected: "تم اكتشاف الرابط السحري - أدخل كلمة المرور الجديدة",
+    magicLinkValid: "تم التحقق من الرابط السحري بنجاح",
+    magicLinkExpired: "الرابط السحري غير صالح أو منتهي الصلاحية",
+    magicLinkError: "فشل التحقق من الرابط السحري",
+    validatingMagicLink: "جاري التحقق من الرابط السحري...",
+    emailAutoFilled: "تم التعبئة تلقائياً من الرابط السحري",
+    otpAutoFilled: "تم التعبئة تلقائياً من الرابط السحري",
+    expiresIn: "تنتهي الصلاحية خلال",
+    minutes: "دقائق",
+    
+    // Two Methods
+    twoMethods: "طريقتان لإعادة التعيين:",
+    twoMethodsDescription: "استخدم الرابط السحري لإعادة التعيين الفوري، أو أدخل رمز OTP المكون من 6 أرقام يدوياً.",
+    enterResetDetails: "أدخل بريدك الإلكتروني ورمز OTP وكلمة المرور الجديدة",
+    
+    // Password Strength
+    passwordWeak: "ضعيفة",
+    passwordMedium: "متوسطة",
+    passwordStrong: "قوية",
+    passwordMinLength: "8 أحرف على الأقل",
+    passwordUppercase: "تحتوي على حرف كبير",
+    passwordLowercase: "تحتوي على حرف صغير",
+    passwordNumber: "تحتوي على رقم",
+    passwordSpecialChar: "تحتوي على رمز خاص",
+    passwordsMatch: "كلمات المرور متطابقة",
+    passwordsDontMatch: "كلمات المرور غير متطابقة",
+    
+    // Errors
+    invalidEmail: "البريد الإلكتروني غير صحيح",
+    invalidEmailFormat: "تنسيق البريد الإلكتروني غير صحيح",
+    invalidResetData: "بيانات إعادة تعيين كلمة المرور غير صحيحة",
+    forgotPasswordError: "فشل إرسال بريد إعادة تعيين كلمة المرور",
+    passwordResetError: "فشل إعادة تعيين كلمة المرور",
+    validationFailed: "فشل التحقق",
   },
 
   // Not Authorized Page

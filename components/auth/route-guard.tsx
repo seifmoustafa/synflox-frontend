@@ -15,6 +15,8 @@ interface RouteGuardProps {
 // Define public pages that don't require authentication or authorization
 const PUBLIC_PAGES = [
   "/login",
+  "/forgot-password",
+  "/reset-password",
   "/not-authorized",
   "/not-found",
   "/global-error",

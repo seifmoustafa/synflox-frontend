@@ -31,12 +31,31 @@ export class ApiService implements IApiService {
   }
 
   private unwrap<T>(json: any): T {
+    appLogger.debug("🔶 [ApiService.unwrap] Input json:", json);
+    appLogger.debug("🔶 [ApiService.unwrap] json.data:", json?.data);
+    appLogger.debug("🔶 [ApiService.unwrap] json.statusCode:", json?.statusCode);
+    appLogger.debug("🔶 [ApiService.unwrap] json.message:", json?.message);
+    
     if (json && typeof json === "object" && "data" in json) {
-      if ("pagination" in json) {
+      appLogger.debug("🔶 [ApiService.unwrap] Has 'data' field");
+      
+      // CRITICAL: Check password reset case FIRST (before pagination check)
+      // For password reset endpoints, if data is null but we have statusCode/message, return whole response
+      if (json.data === null && (json.statusCode || json.message)) {
+        appLogger.debug("🔶 [ApiService.unwrap] data is null but statusCode/message exist - returning WHOLE json");
+        return json as T;
+      }
+      
+      if ("pagination" in json && json.pagination !== null) {
+        appLogger.debug("🔶 [ApiService.unwrap] Returning with pagination");
         return { data: json.data, pagination: json.pagination } as T;
       }
+      
+      appLogger.debug("🔶 [ApiService.unwrap] Returning json.data only");
       return json.data as T;
     }
+    
+    appLogger.debug("🔶 [ApiService.unwrap] Returning json as-is");
     return json as T;
   }
 
@@ -62,13 +81,25 @@ export class ApiService implements IApiService {
    * - 5xx server errors: YES
    * - 4xx client errors: NO (except 401 which has special handling)
    */
-  private isRetryableError(error: Error): boolean {
+  private isRetryableError(error: Error & { statusCode?: number }): boolean {
     // Network errors (TypeError from fetch)
     if (error instanceof TypeError) {
       return true;
     }
     
-    // Check error message for retryable status codes
+    // Check if error has statusCode property (our custom errors)
+    if (error.statusCode) {
+      // 4xx = client error, don't retry
+      if (error.statusCode >= 400 && error.statusCode < 500) {
+        return false;
+      }
+      // 5xx = server error, retry
+      if (error.statusCode >= 500) {
+        return true;
+      }
+    }
+    
+    // Check error message for retryable status codes (fallback)
     if (error.message.includes("Server error:") || error.message.includes("500")) {
       return true;
     }
@@ -276,7 +307,8 @@ export class ApiService implements IApiService {
         // 4xx Client errors (except 401) - DO NOT RETRY
         if (response.status >= 400 && response.status < 500) {
           appLogger.error("Client error - not retrying", { status: response.status, statusText: response.statusText });
-          const error = new Error(errorMessage);
+          const error = new Error(errorMessage) as Error & { statusCode: number };
+          error.statusCode = response.status;  // Mark with status code so retry logic knows not to retry
           const appError = handleError(error, `API Request: ${url}`);
           toast.error(errorMessage || getUserFriendlyErrorMessage(appError));
           throw error;

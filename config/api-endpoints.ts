@@ -5,6 +5,12 @@ export const API_ENDPOINTS = {
   AUTH_REFRESH_TOKEN: "/admin/auth/refresh-token",
   AUTH_LOGOUT: "/admin/auth/logout",
   
+  // Password Reset
+  AUTH_FORGOT_PASSWORD: "/admin/auth/forgot-password",
+  AUTH_VERIFY_RESET_OTP: "/admin/auth/verify-reset-otp",
+  AUTH_VALIDATE_MAGIC_LINK: "/admin/auth/validate-magic-link",
+  AUTH_RESET_PASSWORD: "/admin/auth/reset-password",
+  
   // Admin Profile (Current User)
   GET_ADMIN_ME: "/admin/profile/me",
   UPDATE_ADMIN_PROFILE: "/admin/profile/me",
