@@ -163,8 +163,6 @@ export class AuthService {
    */
   async forgotPassword(request: ForgotPasswordRequest): Promise<{ success: boolean; message: string }> {
     try {
-      console.log("🔷 [AuthService] Calling API forgot-password endpoint...");
-      
       // SYNFLOX API: POST /api/admin/auth/forgot-password
       // Backend returns: { statusCode, message, data }
       const response = await this.apiService.post<any>(
@@ -172,20 +170,10 @@ export class AuthService {
         AuthMapper.forgotPasswordRequestToJson(request)
       );
 
-      console.log("🔷 [AuthService] Raw API response:", response);
-      console.log("🔷 [AuthService] response.statusCode:", response?.statusCode);
-      console.log("🔷 [AuthService] response.message:", response?.message);
-      console.log("🔷 [AuthService] response.data:", response?.data);
-
       const result = AuthMapper.handlePasswordResetResponse(response);
-      console.log("🔷 [AuthService] Mapped result:", result);
-      console.log("🔷 [AuthService] result.success:", result.success);
-      console.log("🔷 [AuthService] result.message:", result.message);
-      
       appLogger.info("Password reset email sent successfully");
       return result;
     } catch (error) {
-      console.log("🔷 [AuthService] Error:", error);
       appLogger.error("Forgot password failed:", error);
       throw error;
     }

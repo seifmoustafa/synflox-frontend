@@ -301,18 +301,6 @@ export function ResetPasswordFormView() {
                       {focusedField === "newPassword" && (
                         <div className="absolute inset-0 -z-10 bg-primary/5 rounded-xl blur-xl" />
                       )}
-                      {/* Typing indicator dots */}
-                      {/* {focusedField === "newPassword" && vm.formData.newPassword && (
-                        <div className="absolute bottom-3 left-4 flex gap-1">
-                          {[0, 1, 2].map(i => (
-                            <div
-                              key={i}
-                              className="w-1 h-1 bg-primary/60 rounded-full animate-bounce"
-                              style={{ animationDelay: `${i * 0.15}s` }}
-                            />
-                          ))}
-                        </div>
-                      )} */}
                     </div>
                     {vm.formData.newPassword && (
                       <PasswordStrengthIndicator password={vm.formData.newPassword} strength={vm.passwordStrength} t={t} />

@@ -261,21 +261,6 @@ export function LoginFormView() {
                     {focusedField === "password" && (
                       <div className="absolute inset-0 -z-10 bg-primary/5 rounded-xl blur-xl" />
                     )}
-                    {/* Typing indicator dots */}
-                    {/* {focusedField === "password" && vm.formData.password && (
-                      <div className={cn(
-                        "absolute bottom-3 flex gap-1",
-                        isRTL ? "right-14" : "left-4"
-                      )}>
-                        {[0, 1, 2].map(i => (
-                          <div
-                            key={i}
-                            className="w-1 h-1 bg-primary/60 rounded-full animate-bounce"
-                            style={{ animationDelay: `${i * 0.15}s` }}
-                          />
-                        ))}
-                      </div>
-                    )} */}
                   </div>
                 </div>
               )}

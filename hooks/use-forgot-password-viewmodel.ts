@@ -89,14 +89,8 @@ export function useForgotPasswordViewModel(): ForgotPasswordViewModelReturn {
    * Handle send OTP to email
    */
   const handleSendOtp = async () => {
-    if (!canSendEmail) {
-      console.log("❌ [ForgotPassword] Cannot send email - validation failed");
-      return;
-    }
+    if (!canSendEmail) return;
 
-    console.log("🔵 [ForgotPassword] Starting OTP send process...");
-    console.log("📧 [ForgotPassword] Email:", email);
-    
     setIsLoading(true);
     setError(null);
 
@@ -107,29 +101,18 @@ export function useForgotPasswordViewModel(): ForgotPasswordViewModelReturn {
         throw new Error(t("auth.invalidEmail") || "Invalid email address");
       }
 
-      console.log("📤 [ForgotPassword] Calling authService.forgotPassword...");
       const result = await authService.forgotPassword(request);
-      
-      console.log("📥 [ForgotPassword] Result received:");
-      console.log("   - result:", result);
-      console.log("   - result.success:", result.success);
-      console.log("   - result.message:", result.message);
 
       if (result.success) {
-        console.log("✅ [ForgotPassword] SUCCESS! Setting isEmailSent = true");
         setIsEmailSent(true);
-        setSuccessMessage(result.message); // Store backend message
+        setSuccessMessage(result.message);
         notificationService.success(
           result.message || 
           t("auth.otpSentToEmail") || 
           "OTP code sent to your email. Check your inbox!"
         );
-        console.log("✅ [ForgotPassword] State updated, notification shown");
-      } else {
-        console.log("❌ [ForgotPassword] result.success is FALSE!");
       }
     } catch (err: any) {
-      console.log("❌ [ForgotPassword] Error caught:", err);
       const errorMessage = 
         err?.message || 
         t("auth.forgotPasswordError") || 
@@ -138,7 +121,6 @@ export function useForgotPasswordViewModel(): ForgotPasswordViewModelReturn {
       notificationService.error(errorMessage);
     } finally {
       setIsLoading(false);
-      console.log("🏁 [ForgotPassword] Process complete");
     }
   };
 

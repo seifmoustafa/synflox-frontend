@@ -29,17 +29,6 @@ export function ForgotPasswordFormView() {
   const hasAnim = settings.animationLevel !== "none";
   const isHigh = settings.animationLevel === "high";
 
-  // Debug: Log ViewModel state changes
-  useEffect(() => {
-    console.log("🟢 [ForgotPasswordView] ViewModel state changed:");
-    console.log("   - isEmailSent:", vm.isEmailSent);
-    console.log("   - isLoading:", vm.isLoading);
-    console.log("   - error:", vm.error);
-    console.log("   - successMessage:", vm.successMessage);
-    console.log("   - email:", vm.email);
-    console.log("   - otpCode:", vm.otpCode);
-  }, [vm.isEmailSent, vm.isLoading, vm.error, vm.successMessage, vm.email, vm.otpCode]);
-
   // Advanced mouse tracking
   useEffect(() => {
     if (!isHigh) return;

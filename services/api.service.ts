@@ -31,31 +31,20 @@ export class ApiService implements IApiService {
   }
 
   private unwrap<T>(json: any): T {
-    appLogger.debug("🔶 [ApiService.unwrap] Input json:", json);
-    appLogger.debug("🔶 [ApiService.unwrap] json.data:", json?.data);
-    appLogger.debug("🔶 [ApiService.unwrap] json.statusCode:", json?.statusCode);
-    appLogger.debug("🔶 [ApiService.unwrap] json.message:", json?.message);
-    
     if (json && typeof json === "object" && "data" in json) {
-      appLogger.debug("🔶 [ApiService.unwrap] Has 'data' field");
-      
       // CRITICAL: Check password reset case FIRST (before pagination check)
       // For password reset endpoints, if data is null but we have statusCode/message, return whole response
       if (json.data === null && (json.statusCode || json.message)) {
-        appLogger.debug("🔶 [ApiService.unwrap] data is null but statusCode/message exist - returning WHOLE json");
         return json as T;
       }
       
       if ("pagination" in json && json.pagination !== null) {
-        appLogger.debug("🔶 [ApiService.unwrap] Returning with pagination");
         return { data: json.data, pagination: json.pagination } as T;
       }
       
-      appLogger.debug("🔶 [ApiService.unwrap] Returning json.data only");
       return json.data as T;
     }
     
-    appLogger.debug("🔶 [ApiService.unwrap] Returning json as-is");
     return json as T;
   }
 
