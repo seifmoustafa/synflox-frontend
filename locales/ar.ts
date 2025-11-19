@@ -1566,6 +1566,147 @@ export const ar = {
     },
   },
 
+  // Account Pages
+  account: {
+    title: "إعدادات الحساب",
+    overview: "نظرة عامة على الحساب",
+    profile: "الملف الشخصي",
+    security: "الأمان",
+    emails: "البريد الإلكتروني والإشعارات",
+    activity: "سجل النشاط",
+    
+    // Overview Page
+    welcomeBack: "مرحباً بعودتك",
+    lastLogin: "آخر تسجيل دخول",
+    editProfile: "تعديل الملف الشخصي",
+    updateProfilePicture: "تحديث صورة الملف الشخصي",
+    uploadNewPhoto: "تحميل صورة جديدة",
+    removePhoto: "إزالة الصورة",
+    photoUploadSuccess: "تم تحديث صورة الملف الشخصي بنجاح",
+    photoRemoveSuccess: "تم إزالة صورة الملف الشخصي بنجاح",
+    
+    // Security Overview
+    securityOverview: "نظرة عامة على الأمان",
+    securityStatus: "حالة أمان حسابك والتوصيات",
+    securityScore: "درجة الأمان",
+    excellentSecurity: "أمان ممتاز!",
+    goodSecurity: "جيد، ولكن يمكن التحسين",
+    needsAttention: "يحتاج إلى اهتمام",
+    
+    // 2FA
+    twoFactorAuth: "المصادقة الثنائية",
+    enabled: "مفعّل ",
+    disabled: "معطّل",
+    enableNow: "تفعيل الآن",
+    
+    // Backup Codes
+    backupCodes: "أكواد الاحتياطية",
+    backupCodesRemaining: "أكواد الاحتياطية المتبقية",
+    codesRemaining: "متبقي",
+    codesLow: "الأكواد على وشك النفاد",
+    
+    // Recommendations
+    securityRecommendations: "توصيات الأمان:",
+    
+    // Quick Stats
+    passwordAge: "عمر كلمة المرور",
+    sincePasswordChange: "منذ تغيير كلمة المرور",
+    never: "أبداً",
+    considerChanging: "ينصح بالتغيير",
+    failedLogins: "محاولات تسجيل دخول فاشلة",
+    failedLoginsWeek: "محاولات فاشلة (7 أيام)",
+    suspicious: "مشبوه",
+    accountAge: "عمر الحساب",
+    months: "شهر",
+    daysUntilExpire: "أيام حتى انتهاء الأكواد",
+    
+    // Navigation Cards
+    navigationCards: "إجراءات سريعة",
+    profileCard: {
+      title: "إعدادات الملف الشخصي",
+      description: "إدارة معلوماتك الشخصية"
+    },
+    securityCard: {
+      title: "مركز الأمان",
+      description: "المصادقة الثنائية وكلمات المرور والمزيد"
+    },
+    emailsCard: {
+      title: "تفضيلات البريد الإلكتروني",
+      description: "إدارة إعدادات الإشعارات"
+    },
+    activityCard: {
+      title: "سجل النشاط",
+      description: "عرض نشاط حسابك"
+    },
+    
+    // Recent Activity
+    recentSecurityActivity: "النشاط الأمني الأخير",
+    latestSecurityEvents: "أحدث أحداث الأمان من حسابك",
+    viewAll: "عرض الكل",
+    twoFactorAuthentication: "المصادقة الثنائية",
+    enable2FA: "تفعيل المصادقة الثنائية",
+    disable2FA: "تعطيل المصادقة الثنائية",
+    reset2FA: "إعادة تعيين المصادقة الثنائية",
+    scan2FACode: "مسح رمز QR",
+    manualEntry: "الإدخال اليدوي",
+    verificationCode: "رمز التحقق",
+    enter6DigitCode: "أدخل الرمز المكون من 6 أرقام من تطبيق المصادقة",
+    generateBackupCodes: "إنشاء رموز النسخ الاحتياطي",
+    regenerateBackupCodes: "إعادة إنشاء الرموز",
+    exportBackupCodes: "تصدير الرموز",
+    downloadAsPDF: "تنزيل كـ PDF",
+    downloadAsText: "تنزيل كنص",
+    codesNone: "لا توجد رموز نسخ احتياطي. قم بإنشائها الآن لاستعادة الحساب.",
+    recentSecurityEvents: "الأحداث الأمنية الأخيرة",
+    viewAllEvents: "عرض جميع الأحداث",
+    advancedAnalytics: "التحليلات المتقدمة",
+    exportSecurityReport: "تصدير تقرير الأمان",
+    
+    // Activity Page
+    activityLog: "سجل النشاط",
+    securityEvents: "الأحداث الأمنية",
+    loginHistory: "سجل تسجيل الدخول",
+    eventType: "نوع الحدث",
+    timestamp: "الوقت",
+    ipAddress: "عنوان IP",
+    location: "الموقع",
+    device: "الجهاز",
+    status: "الحالة",
+    success: "نجح",
+    failed: "فشل",
+    filterByType: "تصفية حسب النوع",
+    filterByDate: "تصفية حسب التاريخ",
+    searchEvents: "البحث في الأحداث...",
+    exportActivity: "تصدير النشاط",
+    last24Hours: "آخر 24 ساعة",
+    last7Days: "آخر 7 أيام",
+    last30Days: "آخر 30 يوماً",
+    customRange: "نطاق مخصص",
+    
+    // Notifications
+    profile2FAEnabled: "تم تفعيل المصادقة الثنائية بنجاح",
+    profile2FADisabled: "تم تعطيل المصادقة الثنائية",
+    profile2FAReset: "تمت إعادة تعيين المصادقة الثنائية بنجاح - امسح رمز QR الجديد",
+    profileBackupCodesGenerated: "تم إنشاء رموز النسخ الاحتياطي بنجاح",
+    profilePasswordChanged: "تم تغيير كلمة المرور بنجاح",
+    profileUpdated: "تم تحديث الملف الشخصي بنجاح",
+    profilePictureUploaded: "تم تحديث صورة الملف الشخصي",
+    profilePictureDeleted: "تمت إزالة صورة الملف الشخصي",
+    preferencesUpdated: "تم تحديث التفضيلات",
+    notificationsUpdated: "تم تحديث إعدادات الإشعارات",
+    
+    // Errors
+    errors: {
+      loadProfile: "فشل في تحميل الملف الشخصي",
+      loadSecurity: "فشل في تحميل لوحة الأمان",
+      loadActivity: "فشل في تحميل سجل النشاط",
+      update2FA: "فشل في تحديث إعدادات المصادقة الثنائية",
+      generateCodes: "فشل في إنشاء رموز النسخ الاحتياطي",
+      invalidCode: "رمز التحقق غير صالح",
+      passwordRequired: "كلمة المرور مطلوبة",
+    }
+  },
+
   // Settings
   settings: {
     devices: {

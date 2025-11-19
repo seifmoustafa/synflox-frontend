@@ -13,18 +13,33 @@ export const API_ENDPOINTS = {
   
   // Admin Profile (Current User)
   GET_ADMIN_ME: "/admin/profile/me",
+  GET_ADMIN_STATISTICS: "/admin/profile/me/statistics",
   UPDATE_ADMIN_PROFILE: "/admin/profile/me",
   UPDATE_ADMIN_PREFERENCES: "/admin/profile/me/preferences",
   UPDATE_ADMIN_NOTIFICATIONS: "/admin/profile/me/notifications",
   UPLOAD_PROFILE_PICTURE: "/admin/profile/me/picture",
   DELETE_PROFILE_PICTURE: "/admin/profile/me/picture",
   CHANGE_ADMIN_PASSWORD: "/admin/profile/me/password",
+  DELETE_ADMIN_ACCOUNT: "/admin/profile/me",
+  
+  // Two-Factor Authentication
   ENABLE_2FA: "/admin/profile/me/2fa/enable",
   VERIFY_2FA_SETUP: "/admin/profile/me/2fa/verify",
   DISABLE_2FA: "/admin/profile/me/2fa/disable",
+  RESET_2FA: "/admin/profile/me/2fa/reset",
+  
+  // Backup Codes
+  GENERATE_BACKUP_CODES: "/admin/profile/me/backup-codes/generate",
+  GET_BACKUP_CODES_STATUS: "/admin/profile/me/backup-codes/status",
+  DELETE_BACKUP_CODES: "/admin/profile/me/backup-codes",
+  EXPORT_BACKUP_CODES: "/admin/profile/me/backup-codes/export",
+  
+  // Security Analytics
+  GET_SECURITY_DASHBOARD: "/admin/profile/me/security/dashboard",
+  GET_ADVANCED_ANALYTICS: "/admin/profile/me/security/analytics",
+  EXPORT_SECURITY_REPORT: "/admin/profile/me/security/report/export",
   
   // Admin Management (SuperAdmin operations)
-  GET_ADMIN_STATISTICS: "/admin/profile/me/statistics",
   ADMINS_GET_ALL: "/admins",
   ADMINS_GET_BY_ID: "/admins",
   ADMINS_CREATE: "/admins",

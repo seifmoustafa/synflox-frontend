@@ -23,7 +23,8 @@ const PUBLIC_PAGES = [
   "/error",
   "/404",
   "/500",
-  "/settings"
+  "/settings",
+  "/account"
 ];
 
 export function RouteGuard({ children }: RouteGuardProps) {

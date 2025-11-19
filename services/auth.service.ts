@@ -2,7 +2,7 @@ import { type IApiService } from "./api.service";
 import { API_ENDPOINTS } from "@/config/api-endpoints";
 import { secureTokenService } from "@/lib/secure-token-service";
 import {
-  User,
+  Profile,
   LoginRequest,
   LoginResponse,
   RefreshTokenRequest,
@@ -11,15 +11,15 @@ import {
   ValidateMagicLinkRequest,
   MagicLinkValidationResponse,
   ResetPasswordRequest,
-  UserMapper,
   AuthMapper,
+  AccountMapper,
 } from "@/domain";
 import { appLogger } from "@/lib/logger";
 
 export class AuthService {
   constructor(private readonly apiService: IApiService) {}
 
-  async login(credentials: LoginRequest): Promise<User | LoginResponse> {
+  async login(credentials: LoginRequest): Promise<Profile | LoginResponse> {
     try {
       // SYNFLOX API: POST /api/admin/auth/login
       // Backend returns: { statusCode, message, data: { success, accessToken, refreshToken, expiresIn, admin, errorMessage?, requires2FA? } }
@@ -44,7 +44,7 @@ export class AuthService {
         
         // If admin data is in response, use it; otherwise fetch user
         if (loginData?.admin) {
-          return UserMapper.fromJson(loginData.admin);
+          return AccountMapper.fromJson(loginData.admin);
         }
         return this.getMe();
       }
@@ -58,7 +58,7 @@ export class AuthService {
     }
   }
 
-  async verify2FA(request: Verify2FARequest): Promise<User> {
+  async verify2FA(request: Verify2FARequest): Promise<Profile> {
     try {
       // SYNFLOX API: POST /api/admin/auth/verify-2fa
       // Backend returns: { statusCode, message, data: { success, accessToken, refreshToken, expiresIn, admin, errorMessage? } }
@@ -77,7 +77,7 @@ export class AuthService {
         
         // If admin data is in response, use it; otherwise fetch user
         if (loginData?.admin) {
-          return UserMapper.fromJson(loginData.admin);
+          return AccountMapper.fromJson(loginData.admin);
         }
         return this.getMe();
       }
@@ -107,13 +107,13 @@ export class AuthService {
     }
   }
 
-  async getMe(): Promise<User> {
+  async getMe(): Promise<Profile> {
     try {
       // SYNFLOX API: GET /api/admin/profile/me
       // Backend returns: { statusCode, message, data: AdminDto }
       const response = await this.apiService.get<any>(API_ENDPOINTS.GET_ADMIN_ME);
       const adminData = response?.data || response;
-      return UserMapper.fromJson(adminData);
+      return AccountMapper.fromJson(adminData);
     } catch (error) {
       appLogger.error("Failed to fetch current user:", error);
       throw error;
@@ -126,12 +126,16 @@ export class AuthService {
 
   async refreshToken(): Promise<LoginResponse | null> {
     const refreshToken = secureTokenService.getRefreshToken();
-    if (!refreshToken) return null;
+    if (!refreshToken) {
+      appLogger.warn("No refresh token available");
+      return null;
+    }
 
     try {
       const refreshRequest = new RefreshTokenRequest({ refreshToken });
       // SYNFLOX API: POST /api/admin/auth/refresh-token
       // Backend returns: { statusCode, message, data: { success, accessToken, refreshToken, expiresIn, errorMessage? } }
+      // NOTE: If this returns 401, ApiService will handle logout automatically
       const response = await this.apiService.post<any>(
         API_ENDPOINTS.AUTH_REFRESH_TOKEN,
         AuthMapper.refreshTokenRequestToJson(refreshRequest)
@@ -144,9 +148,16 @@ export class AuthService {
         if (loginResponse.refreshToken) {
           secureTokenService.setRefreshToken(loginResponse.refreshToken);
         }
+        appLogger.info("Token refresh successful");
+      } else {
+        appLogger.error("Token refresh returned unsuccessful response");
+        secureTokenService.clearTokens();
+        return null;
       }
       return loginResponse;
     } catch (error) {
+      // ApiService already handled 401 errors and logged out
+      // This catch handles other errors (network, etc.)
       appLogger.error("Token refresh failed:", error);
       secureTokenService.clearTokens();
       return null;

@@ -11,8 +11,7 @@ import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import { handleError, getUserFriendlyErrorMessage } from "@/lib/error-handler";
 import { appLogger } from "@/lib/logger";
-import { User, UserMapper } from "@/domain";
-import type { UpdateProfileRequest, ChangePasswordRequest } from "@/services/user.service";
+import { Profile, UpdateProfileRequest, ChangePasswordRequest } from "@/domain";
 import { validateForm, VALIDATION_SETS, passwordConfirmation, isFormValid } from "@/lib/validation";
 
 export interface ProfileFormData {
@@ -29,7 +28,7 @@ export interface PasswordFormData {
 
 export function useProfileViewModel() {
   // State
-  const [profile, setProfile] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState("");
 
@@ -59,7 +58,7 @@ export function useProfileViewModel() {
   });
 
   // Services
-  const { userService } = useServices();
+  const { accountService } = useServices();
   const { t } = useI18n();
 
   // Fetch profile data
@@ -68,7 +67,7 @@ export function useProfileViewModel() {
       setProfileLoading(true);
       setProfileError("");
 
-      const user = await userService.getCurrentUser();
+      const user = await accountService.getProfile();
       setProfile(user);
       
       // Update form data with user data
@@ -87,7 +86,7 @@ export function useProfileViewModel() {
     } finally {
       setProfileLoading(false);
     }
-  }, [userService]);
+  }, [accountService]);
 
   // Update profile
   const updateProfile = useCallback(async () => {
@@ -96,20 +95,13 @@ export function useProfileViewModel() {
       setProfileUpdateError("");
       setProfileSuccess(false);
 
-      // Validate profile data
-      const validation = userService.validateProfileData(profileFormData);
-      if (!validation.isValid) {
-        setProfileUpdateError(validation.message || "Invalid profile data");
-        return;
-      }
-
-      const updateRequest: UpdateProfileRequest = {
+      const updateRequest = new UpdateProfileRequest({
         firstName: profileFormData.firstName.trim(),
         lastName: profileFormData.lastName.trim(),
         phoneNumber: profileFormData.phoneNumber.trim(),
-      };
+      });
 
-      const updatedUser = await userService.updateProfile(updateRequest);
+      const updatedUser = await accountService.updateProfile(updateRequest);
       setProfile(updatedUser);
       setProfileSuccess(true);
       
@@ -125,7 +117,7 @@ export function useProfileViewModel() {
     } finally {
       setProfileUpdateLoading(false);
     }
-  }, [profileFormData, userService]);
+  }, [profileFormData, accountService]);
 
   // Change password
   const changePassword = useCallback(async () => {
@@ -152,12 +144,12 @@ export function useProfileViewModel() {
         return;
       }
 
-      const passwordRequest: ChangePasswordRequest = {
+      const passwordRequest = new ChangePasswordRequest({
         currentPassword: passwordFormData.currentPassword,
         newPassword: passwordFormData.newPassword,
-      };
+      });
 
-      await userService.changePassword(passwordRequest);
+      await accountService.changePassword(passwordRequest);
       
       // Reset form on success
       setPasswordFormData({
@@ -178,7 +170,7 @@ export function useProfileViewModel() {
     } finally {
       setPasswordUpdateLoading(false);
     }
-  }, [passwordFormData, userService]);
+  }, [passwordFormData, accountService]);
 
   // Form field handlers
   const updateProfileField = useCallback((field: keyof ProfileFormData, value: string) => {

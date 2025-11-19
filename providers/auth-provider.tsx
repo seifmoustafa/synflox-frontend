@@ -6,20 +6,20 @@ import { useRouter } from "next/navigation";
 import { handleError } from "@/lib/error-handler";
 import { appLogger } from "@/lib/logger";
 import { useServices } from "@/providers/service-provider";
-import { User, AuthMapper, LoginResponse } from "@/domain";
+import { Profile, AuthMapper, LoginResponse } from "@/domain";
 
 interface AuthContextType {
-  user: User | null;
+  user: Profile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<User | LoginResponse>;
+  login: (username: string, password: string) => Promise<Profile | LoginResponse>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { authService } = useServices();
@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, [checkAuth]);
 
-  const login = async (username: string, password: string): Promise<User | LoginResponse> => {
+  const login = async (username: string, password: string): Promise<Profile | LoginResponse> => {
     try {
       // Create LoginRequest domain model using mapper
       const loginRequest = AuthMapper.loginRequestFromJson({ username, password });
@@ -75,8 +75,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return result; // Return the LoginResponse to trigger 2FA UI
       }
       
-      // Standard login success - result is User
-      const loggedInUser = result as User;
+      // Standard login success - result is Profile
+      const loggedInUser = result as Profile;
       setUser(loggedInUser);
       appLogger.info("Login successful", { userId: loggedInUser.id, username: loggedInUser.username });
       return loggedInUser;

@@ -16,6 +16,7 @@ export class ApiService implements IApiService {
   private defaultHeaders: Record<string, string>;
   private readonly MAX_RETRIES = 3;
   private readonly RETRY_DELAY_MS = 1000; // 1 second base delay
+  private static isRefreshing = false; // Prevent recursive refresh attempts
 
   constructor(baseUrl: string = process.env.NEXT_PUBLIC_API_URL || "/api") {
     this.baseUrl = baseUrl;
@@ -241,50 +242,79 @@ export class ApiService implements IApiService {
             throw new Error(errorMessage);
           }
 
-          appLogger.api("401 Unauthorized - attempting token refresh...");
-
-          // Attempt token refresh using single-flight guard
-          const { withRefreshSingleFlight } = await import("@/lib/refresh-guard");
-          const { AuthService } = await import("@/services/auth.service");
-          const auth = new AuthService(this);
-
-          const newAccess = await withRefreshSingleFlight(async () => {
-            const refreshResp = await auth.refreshToken();
-            return refreshResp?.accessToken ?? null;
-          });
-
-          if (newAccess) {
-            appLogger.api("Token refresh successful - retrying original request");
-            
-            // Retry original request ONCE with new token
-            const retryHeaders: Record<string, string> = {
-              ...(config.headers as Record<string, string>),
-              Authorization: `Bearer ${newAccess}`,
-            };
-            const retryResponse = await fetch(url, { ...config, headers: retryHeaders });
-
-            if (!retryResponse.ok) {
-              appLogger.error("Request failed after token refresh");
-              // If retry fails, log out
-              const { secureTokenService } = await import("@/lib/secure-token-service");
-              secureTokenService.clearTokens();
-              if (typeof window !== "undefined") window.location.href = "/login";
-              throw new Error(await retryResponse.text() || retryResponse.statusText);
+          // Check if this IS the refresh token endpoint - prevent recursive refresh
+          const isRefreshEndpoint = endpoint.includes("/refresh-token");
+          
+          if (isRefreshEndpoint) {
+            // Refresh endpoint itself returned 401 - logout immediately
+            appLogger.error("Refresh token endpoint returned 401 - session expired, logging out");
+            const { secureTokenService } = await import("@/lib/secure-token-service");
+            secureTokenService.clearTokens();
+            if (typeof window !== "undefined") {
+              window.location.href = "/login";
             }
-
-            if (retryResponse.status === 204) {
-              return null as T;
-            }
-
-            return this.unwrap<T>(await retryResponse.json());
+            throw new Error("Session expired - please login again");
           }
 
-          // Refresh failed → logout
-          appLogger.error("Token refresh failed - logging out");
-          const { secureTokenService } = await import("@/lib/secure-token-service");
-          secureTokenService.clearTokens();
-          if (typeof window !== "undefined") window.location.href = "/login";
-          throw new Error(errorMessage || "Session expired - please login again");
+          // Prevent recursive refresh attempts
+          if (ApiService.isRefreshing) {
+            appLogger.warn("Already refreshing token - waiting...");
+            throw new Error("Token refresh in progress");
+          }
+
+          appLogger.api("401 Unauthorized - attempting token refresh...");
+          ApiService.isRefreshing = true;
+
+          try {
+            // Attempt token refresh using single-flight guard
+            const { withRefreshSingleFlight } = await import("@/lib/refresh-guard");
+            const { AuthService } = await import("@/services/auth.service");
+            const auth = new AuthService(this);
+
+            const newAccess = await withRefreshSingleFlight(async () => {
+              const refreshResp = await auth.refreshToken();
+              return refreshResp?.accessToken ?? null;
+            });
+
+            if (newAccess) {
+              appLogger.api("Token refresh successful - retrying original request");
+              
+              // Retry original request ONCE with new token
+              const retryHeaders: Record<string, string> = {
+                ...(config.headers as Record<string, string>),
+                Authorization: `Bearer ${newAccess}`,
+              };
+              const retryResponse = await fetch(url, { ...config, headers: retryHeaders });
+
+              if (!retryResponse.ok) {
+                appLogger.error("Request failed after token refresh - logging out");
+                // If retry fails, log out
+                const { secureTokenService } = await import("@/lib/secure-token-service");
+                secureTokenService.clearTokens();
+                if (typeof window !== "undefined") {
+                  window.location.href = "/login";
+                }
+                throw new Error(await retryResponse.text() || retryResponse.statusText);
+              }
+
+              if (retryResponse.status === 204) {
+                return null as T;
+              }
+
+              return this.unwrap<T>(await retryResponse.json());
+            }
+
+            // Refresh failed → logout
+            appLogger.error("Token refresh failed - logging out");
+            const { secureTokenService } = await import("@/lib/secure-token-service");
+            secureTokenService.clearTokens();
+            if (typeof window !== "undefined") {
+              window.location.href = "/login";
+            }
+            throw new Error(errorMessage || "Session expired - please login again");
+          } finally {
+            ApiService.isRefreshing = false;
+          }
         }
         
         // 5xx Server errors - WILL BE RETRIED by retry loop

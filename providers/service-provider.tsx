@@ -6,7 +6,7 @@ import { ApiService } from "@/services/api.service";
 import { NotificationService } from "@/services/notification.service";
 import { NavigationService } from "@/services/navigation.service";
 import { AuthService } from "@/services/auth.service";
-import { UserService } from "@/services/user.service";
+import { AccountService } from "@/services/account.service";
 import { AdminService } from "@/services/admin.service";
 import { AdminTypeService } from "@/services/admin-type.service";
 import { DashboardService } from "@/services/dashboard.service";
@@ -16,7 +16,7 @@ interface Services {
   notificationService: NotificationService;
   navigationService: NavigationService;
   authService: AuthService;
-  userService: UserService;
+  accountService: AccountService;
   adminService: AdminService;
   adminTypeService: AdminTypeService;
   dashboardService: DashboardService;
@@ -29,7 +29,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
     const notificationService = new NotificationService();
     const apiService = new ApiService(process.env.NEXT_PUBLIC_API_URL || "");
     const authService = new AuthService(apiService);
-    const userService = new UserService(apiService);
+    const accountService = new AccountService(apiService, notificationService);
     const navigationService = new NavigationService(apiService);
     const adminService = new AdminService(apiService, notificationService);
     const adminTypeService = new AdminTypeService(apiService, notificationService);
@@ -40,7 +40,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
       notificationService,
       navigationService,
       authService,
-      userService,
+      accountService,
       adminService,
       adminTypeService,
       dashboardService,

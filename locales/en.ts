@@ -1320,6 +1320,143 @@ export const en = {
     },
   },
 
+  // Account Pages
+  account: {
+    title: "Account Settings",
+    overview: "Account Overview",
+    profile: "Profile",
+    security: "Security",
+    emails: "Emails & Notifications",
+    activity: "Activity Log",
+    
+    // Overview Page
+    welcomeBack: "Welcome back",
+    lastLogin: "Last login",
+    editProfile: "Edit Profile",
+    updateProfilePicture: "Update Profile Picture",
+    uploadNewPhoto: "Upload New Photo",
+    removePhoto: "Remove Photo",
+    photoUploadSuccess: "Profile picture updated successfully",
+    photoRemoveSuccess: "Profile picture removed successfully",
+    
+    // Security Overview
+    securityOverview: "Security Overview",
+    securityStatus: "Your account security status and recommendations",
+    securityScore: "Security Score",
+    excellentSecurity: "Excellent security!",
+    goodSecurity: "Good, but can improve",
+    needsAttention: "Needs attention",
+    
+    // 2FA
+    twoFactorAuth: "Two-Factor Auth",
+    enabled: "Enabled ",
+    disabled: "Disabled",
+    enableNow: "Enable Now",
+    
+    // Backup Codes
+    backupCodes: "Backup Codes",
+    backupCodesRemaining: "Backup Codes Remaining",
+    codesRemaining: "remaining",
+    codesLow: "Codes are running low",
+    
+    // Recommendations
+    securityRecommendations: "Security Recommendations:",
+    
+    // Quick Stats
+    passwordAge: "Password Age",
+    sincePasswordChange: "Since password change",
+    never: "Never",
+    considerChanging: "Consider changing",
+    failedLogins: "Failed Logins",
+    failedLoginsWeek: "Failed logins (7 days)",
+    suspicious: "Suspicious",
+    accountAge: "Account age",
+    months: "mo",
+    daysUntilExpire: "Days until codes expire",
+    
+    // Navigation Cards
+    navigationCards: "Quick Actions",
+    profileCard: {
+      title: "Profile Settings",
+      description: "Manage your personal information"
+    },
+    securityCard: {
+      title: "Security Center",
+      description: "Two-factor auth, passwords, and more"
+    },
+    emailsCard: {
+      title: "Email Preferences",
+      description: "Manage notification settings"
+    },
+    activityCard: {
+      title: "Activity Log",
+      description: "View your account activity"
+    },
+    
+    // Recent Activity
+    recentSecurityActivity: "Recent Security Activity",
+    latestSecurityEvents: "Latest security events from your account",
+    viewAll: "View All",
+    scan2FACode: "Scan QR Code",
+    manualEntry: "Manual Entry",
+    verificationCode: "Verification Code",
+    enter6DigitCode: "Enter 6-digit code from your authenticator app",
+    generateBackupCodes: "Generate Backup Codes",
+    regenerateBackupCodes: "Regenerate Codes",
+    exportBackupCodes: "Export Codes",
+    downloadAsPDF: "Download as PDF",
+    downloadAsText: "Download as Text",
+    codesNone: "No backup codes. Generate them now for account recovery.",
+    recentSecurityEvents: "Recent Security Events",
+    viewAllEvents: "View All Events",
+    advancedAnalytics: "Advanced Analytics",
+    exportSecurityReport: "Export Security Report",
+    
+    // Activity Page
+    activityLog: "Activity Log",
+    securityEvents: "Security Events",
+    loginHistory: "Login History",
+    eventType: "Event Type",
+    timestamp: "Timestamp",
+    ipAddress: "IP Address",
+    location: "Location",
+    device: "Device",
+    status: "Status",
+    success: "Success",
+    failed: "Failed",
+    filterByType: "Filter by Type",
+    filterByDate: "Filter by Date",
+    searchEvents: "Search events...",
+    exportActivity: "Export Activity",
+    last24Hours: "Last 24 Hours",
+    last7Days: "Last 7 Days",
+    last30Days: "Last 30 Days",
+    customRange: "Custom Range",
+    
+    // Notifications
+    profile2FAEnabled: "Two-factor authentication enabled successfully",
+    profile2FADisabled: "Two-factor authentication disabled",
+    profile2FAReset: "2FA reset successfully - scan the new QR code",
+    profileBackupCodesGenerated: "Backup codes generated successfully",
+    profilePasswordChanged: "Password changed successfully",
+    profileUpdated: "Profile updated successfully",
+    profilePictureUploaded: "Profile picture updated",
+    profilePictureDeleted: "Profile picture removed",
+    preferencesUpdated: "Preferences updated",
+    notificationsUpdated: "Notification settings updated",
+    
+    // Errors
+    errors: {
+      loadProfile: "Failed to load profile",
+      loadSecurity: "Failed to load security dashboard",
+      loadActivity: "Failed to load activity log",
+      update2FA: "Failed to update 2FA settings",
+      generateCodes: "Failed to generate backup codes",
+      invalidCode: "Invalid verification code",
+      passwordRequired: "Password is required",
+    }
+  },
+
   // Settings
   settings: {
     appearance: "Appearance",

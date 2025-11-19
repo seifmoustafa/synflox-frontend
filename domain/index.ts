@@ -6,8 +6,8 @@
  * throughout the application.
  */
 
-// User domain
-export { User, type UserData } from './models/user.model';
+// Account domain (Profile, Security, etc.)
+export * from './models/account';
 
 // Authentication domain
 export { 
@@ -98,4 +98,4 @@ export {
 export type { DashboardResponse } from './mappers/dashboard.mapper';
 
 // Mappers
-export { UserMapper, AuthMapper, NavigationMapper, NotificationMapper, AdminMapper, AdminTypeMapper, DashboardMapper } from './mappers';
+export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, DashboardMapper } from './mappers';
