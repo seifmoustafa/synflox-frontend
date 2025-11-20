@@ -633,6 +633,7 @@ export const ar = {
     security:"الأمان",
     dashboard: "لوحة التحكم",
     companies: "الشركات",
+    notifications: "الإشعارات",
     admins: "المسؤولون",
     AdminTypes: "أنواع المسؤولين",
     profile: "الملف الشخصي",
@@ -3119,9 +3120,35 @@ export const ar = {
     english: "الإنجليزية",
   },
 
+  // Notifications Preferences
+  notifications: {
+    title: "تفضيلات الإشعارات",
+    subtitle: "إدارة كيفية تلقي الإشعارات والتنبيهات",
+    loadError: "فشل تحميل تفضيلات الإشعارات",
+    enabledCount: "لديك {count} أنواع من الإشعارات المفعلة",
+    unsavedChanges: "لديك تغييرات غير محفوظة",
+    channels: "قنوات الإشعارات",
+    channelsDesc: "اختر كيف تريد تلقي الإشعارات",
+    email: "إشعارات البريد الإلكتروني",
+    emailDesc: "تلقي الإشعارات عبر البريد الإلكتروني",
+    push: "الإشعارات الفورية",
+    pushDesc: "تلقي الإشعارات الفورية في المتصفح",
+    alertTypes: "أنواع التنبيهات",
+    alertTypesDesc: "اختر أنواع التنبيهات التي تريد تلقيها",
+    companyExpiry: "انتهاء صلاحية رخصة الشركة",
+    companyExpiryDesc: "احصل على إشعار عند اقتراب انتهاء صلاحية رخص الشركات",
+    subscriptionExpiry: "انتهاء صلاحية الاشتراك",
+    subscriptionExpiryDesc: "احصل على إشعار عند اقتراب انتهاء صلاحية الاشتراكات",
+    systemAlerts: "تنبيهات النظام",
+    systemAlertsDesc: "احصل على إشعارات حول التحديثات والمشاكل الهامة للنظام",
+    info: "ستصبح التغييرات سارية فورًا بعد الحفظ. يمكنك تحديث هذه التفضيلات في أي وقت.",
+  },
+
   // Common
   common: {
     reset:"إعادة ضبط",
+    saving:"جاري الحفظ...",
+    saveChanges:"حفظ التغييرات",
     generating:"توليد",
     email:"البريد الإلكتروني",
     description: "الوصف",

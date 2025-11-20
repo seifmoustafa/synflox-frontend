@@ -6,6 +6,7 @@
 import { IApiService } from './api.service';
 import { INotificationService } from './notification.service';
 import { SecurityMapper } from '@/domain/mappers/security.mapper';
+import { NotificationMapper } from '@/domain/mappers/notification.mapper';
 import {
   ChangePasswordRequest,
   ChangePasswordWith2FARequest,
@@ -19,6 +20,8 @@ import {
   ExportBackupCodesRequest,
   ExportBackupCodesResponse,
   SecurityDashboard,
+  NotificationPreferences,
+  UpdateNotificationPreferencesRequest,
 } from '@/domain';
 
 export interface IProfileService {
@@ -40,6 +43,10 @@ export interface IProfileService {
 
   // Security Dashboard
   getSecurityDashboard(): Promise<SecurityDashboard>;
+
+  // Notification Preferences
+  getNotificationPreferences(): Promise<NotificationPreferences>;
+  updateNotificationPreferences(request: UpdateNotificationPreferencesRequest): Promise<NotificationPreferences>;
 }
 
 export class ProfileService implements IProfileService {
@@ -208,6 +215,37 @@ export class ProfileService implements IProfileService {
       return SecurityMapper.handleSecurityDashboardResponse(response);
     } catch (error: any) {
       const errorMessage = error?.message || 'Failed to load security dashboard';
+      this.notificationService.error(errorMessage);
+      throw error;
+    }
+  }
+
+  // ==================== NOTIFICATION PREFERENCES ====================
+
+  async getNotificationPreferences(): Promise<NotificationPreferences> {
+    try {
+      // Note: This endpoint returns the user's profile which includes notification preferences
+      // Backend endpoint: GET /admin/profile/me
+      const response = await this.apiService.get('/admin/profile/me');
+      
+      return NotificationMapper.handleNotificationPreferencesResponse(response);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to load notification preferences';
+      this.notificationService.error(errorMessage);
+      throw error;
+    }
+  }
+
+  async updateNotificationPreferences(request: UpdateNotificationPreferencesRequest): Promise<NotificationPreferences> {
+    try {
+      const requestData = NotificationMapper.updateNotificationPreferencesToJson(request);
+      const response = await this.apiService.put('/admin/profile/me/notifications', requestData);
+      
+      const result = NotificationMapper.handleNotificationPreferencesResponse(response);
+      this.notificationService.success('Notification preferences updated successfully');
+      return result;
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to update notification preferences';
       this.notificationService.error(errorMessage);
       throw error;
     }

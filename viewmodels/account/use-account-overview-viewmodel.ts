@@ -77,7 +77,7 @@ export function useAccountOverviewViewModel(): AccountOverviewViewModelReturn {
   }, [router]);
 
   const navigateToEmails = useCallback(() => {
-    router.push("/account/emails");
+    router.push("/account/notifications");
   }, [router]);
 
   const navigateToActivity = useCallback(() => {

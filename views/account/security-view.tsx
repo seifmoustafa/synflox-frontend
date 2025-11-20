@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Shield, Key, Lock, BarChart3, AlertCircle, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useI18n } from '@/providers/i18n-provider';
+import { useServices } from '@/providers/service-provider';
+import { SecurityDashboard } from '@/domain';
 import { cn } from '@/lib/utils';
 import { SecurityOverviewTab } from './security-tabs/security-overview-tab';
 import { PasswordChangeTab } from './security-tabs/password-change-tab';
@@ -17,15 +19,30 @@ type SecurityTab = 'overview' | 'password' | '2fa' | 'backup-codes' | 'delete-ac
 
 export function SecurityView() {
   const { t, direction } = useI18n();
+  const { accountService } = useServices();
   const [activeTab, setActiveTab] = useState<SecurityTab>('overview');
+  const [securityDashboard, setSecurityDashboard] = useState<SecurityDashboard | null>(null);
   const isRTL = direction === 'rtl';
+
+  // Load security dashboard data
+  useEffect(() => {
+    const loadSecurityData = async () => {
+      try {
+        const data = await accountService.getSecurityDashboard();
+        setSecurityDashboard(data);
+      } catch (error) {
+        console.error('Failed to load security dashboard:', error);
+      }
+    };
+    loadSecurityData();
+  }, [accountService]);
 
   const renderTabContent = () => {
     switch (activeTab) {
       case 'overview':
         return <SecurityOverviewTab />;
       case '2fa':
-        return <TwoFactorAuthTab />;
+        return <TwoFactorAuthTab initialIs2FAEnabled={securityDashboard?.is2FAEnabled || false} />;
       case 'backup-codes':
         return <BackupCodesTab />;
       case 'password':
@@ -50,16 +67,16 @@ export function SecurityView() {
       id: '2fa' as SecurityTab,
       icon: Shield,
       label: t('security.twoFactor') || 'Two-Factor Auth',
-      isEnabled: false,
-      needsAction: true,
+      isEnabled: securityDashboard?.is2FAEnabled || false,
+      needsAction: !securityDashboard?.is2FAEnabled,
       isDanger: false,
     },
     {
       id: 'backup-codes' as SecurityTab,
       icon: Key,
       label: t('security.backupCodes') || 'Backup Codes',
-      isEnabled: true,
-      needsAction: false,
+      isEnabled: securityDashboard?.hasBackupCodes || false,
+      needsAction: !securityDashboard?.hasBackupCodes && securityDashboard?.is2FAEnabled || false,
       isDanger: false,
     },
     {
@@ -67,7 +84,7 @@ export function SecurityView() {
       icon: Lock,
       label: t('security.password') || 'Change Password',
       isEnabled: true,
-      needsAction: true,
+      needsAction: securityDashboard?.passwordChangeNeeded || false,
       isDanger: false,
     },
     {

@@ -11,6 +11,8 @@ import {
   NotificationConfig,
   NotificationType,
   NotificationPosition,
+  NotificationPreferences,
+  UpdateNotificationPreferencesRequest,
   type NotificationData,
   type NotificationConfigData
 } from '../models/notification.model';
@@ -245,5 +247,43 @@ export class NotificationMapper {
    */
   private static generateId(): string {
     return `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  // ===== Notification Preferences Mappers =====
+
+  /**
+   * Convert JSON/API response to NotificationPreferences domain model
+   */
+  static notificationPreferencesFromJson(json: any): NotificationPreferences {
+    return new NotificationPreferences({
+      emailNotificationsEnabled: json.emailNotificationsEnabled ?? false,
+      pushNotificationsEnabled: json.pushNotificationsEnabled ?? false,
+      companyExpiryNotifications: json.companyExpiryNotifications ?? false,
+      subscriptionExpiryNotifications: json.subscriptionExpiryNotifications ?? false,
+      systemAlertsNotifications: json.systemAlertsNotifications ?? false,
+    });
+  }
+
+  /**
+   * Convert UpdateNotificationPreferencesRequest to JSON for API
+   */
+  static updateNotificationPreferencesToJson(request: UpdateNotificationPreferencesRequest): any {
+    return {
+      emailNotificationsEnabled: request.emailNotificationsEnabled,
+      pushNotificationsEnabled: request.pushNotificationsEnabled,
+      companyExpiryNotifications: request.companyExpiryNotifications,
+      subscriptionExpiryNotifications: request.subscriptionExpiryNotifications,
+      systemAlertsNotifications: request.systemAlertsNotifications,
+    };
+  }
+
+  /**
+   * Handle API response for notification preferences
+   */
+  static handleNotificationPreferencesResponse(response: any): NotificationPreferences {
+    if (response && typeof response === 'object') {
+      return this.notificationPreferencesFromJson(response);
+    }
+    throw new Error('Invalid notification preferences response');
   }
 }

@@ -269,3 +269,124 @@ export class NotificationQueue {
     return this.config;
   }
 }
+
+// ===== User Notification Preferences =====
+
+/**
+ * User notification preferences data from API
+ */
+export interface NotificationPreferencesData {
+  emailNotificationsEnabled: boolean;
+  pushNotificationsEnabled: boolean;
+  companyExpiryNotifications: boolean;
+  subscriptionExpiryNotifications: boolean;
+  systemAlertsNotifications: boolean;
+}
+
+/**
+ * Request to update notification preferences
+ */
+export interface UpdateNotificationPreferencesData {
+  emailNotificationsEnabled: boolean;
+  pushNotificationsEnabled: boolean;
+  companyExpiryNotifications: boolean;
+  subscriptionExpiryNotifications: boolean;
+  systemAlertsNotifications: boolean;
+}
+
+/**
+ * User Notification Preferences Domain Model
+ * Manages user's notification settings for different channels and types
+ */
+export class NotificationPreferences {
+  public readonly emailNotificationsEnabled: boolean;
+  public readonly pushNotificationsEnabled: boolean;
+  public readonly companyExpiryNotifications: boolean;
+  public readonly subscriptionExpiryNotifications: boolean;
+  public readonly systemAlertsNotifications: boolean;
+
+  constructor(data: NotificationPreferencesData) {
+    this.emailNotificationsEnabled = data.emailNotificationsEnabled;
+    this.pushNotificationsEnabled = data.pushNotificationsEnabled;
+    this.companyExpiryNotifications = data.companyExpiryNotifications;
+    this.subscriptionExpiryNotifications = data.subscriptionExpiryNotifications;
+    this.systemAlertsNotifications = data.systemAlertsNotifications;
+  }
+
+  /**
+   * Check if any notifications are enabled
+   */
+  get hasAnyEnabled(): boolean {
+    return this.emailNotificationsEnabled ||
+           this.pushNotificationsEnabled ||
+           this.companyExpiryNotifications ||
+           this.subscriptionExpiryNotifications ||
+           this.systemAlertsNotifications;
+  }
+
+  /**
+   * Count total enabled notifications
+   */
+  get enabledCount(): number {
+    let count = 0;
+    if (this.emailNotificationsEnabled) count++;
+    if (this.pushNotificationsEnabled) count++;
+    if (this.companyExpiryNotifications) count++;
+    if (this.subscriptionExpiryNotifications) count++;
+    if (this.systemAlertsNotifications) count++;
+    return count;
+  }
+
+  /**
+   * Create update request from current state
+   */
+  toUpdateRequest(): UpdateNotificationPreferencesRequest {
+    return new UpdateNotificationPreferencesRequest({
+      emailNotificationsEnabled: this.emailNotificationsEnabled,
+      pushNotificationsEnabled: this.pushNotificationsEnabled,
+      companyExpiryNotifications: this.companyExpiryNotifications,
+      subscriptionExpiryNotifications: this.subscriptionExpiryNotifications,
+      systemAlertsNotifications: this.systemAlertsNotifications,
+    });
+  }
+
+  /**
+   * Create a copy with updated values (immutability)
+   */
+  update(updates: Partial<NotificationPreferencesData>): NotificationPreferences {
+    return new NotificationPreferences({
+      emailNotificationsEnabled: updates.emailNotificationsEnabled ?? this.emailNotificationsEnabled,
+      pushNotificationsEnabled: updates.pushNotificationsEnabled ?? this.pushNotificationsEnabled,
+      companyExpiryNotifications: updates.companyExpiryNotifications ?? this.companyExpiryNotifications,
+      subscriptionExpiryNotifications: updates.subscriptionExpiryNotifications ?? this.subscriptionExpiryNotifications,
+      systemAlertsNotifications: updates.systemAlertsNotifications ?? this.systemAlertsNotifications,
+    });
+  }
+}
+
+/**
+ * Request to update notification preferences
+ */
+export class UpdateNotificationPreferencesRequest {
+  public readonly emailNotificationsEnabled: boolean;
+  public readonly pushNotificationsEnabled: boolean;
+  public readonly companyExpiryNotifications: boolean;
+  public readonly subscriptionExpiryNotifications: boolean;
+  public readonly systemAlertsNotifications: boolean;
+
+  constructor(data: UpdateNotificationPreferencesData) {
+    this.emailNotificationsEnabled = data.emailNotificationsEnabled;
+    this.pushNotificationsEnabled = data.pushNotificationsEnabled;
+    this.companyExpiryNotifications = data.companyExpiryNotifications;
+    this.subscriptionExpiryNotifications = data.subscriptionExpiryNotifications;
+    this.systemAlertsNotifications = data.systemAlertsNotifications;
+  }
+
+  /**
+   * Check if request is valid
+   */
+  get isValid(): boolean {
+    // All fields are boolean, so always valid
+    return true;
+  }
+}

@@ -205,6 +205,14 @@ export class SecurityEvent {
     if (minutes > 0) return `${minutes}m ago`;
     return 'Just now';
   }
+
+  get location(): string {
+    return this.ipAddress || 'Unknown';
+  }
+
+  get relativeTime(): string {
+    return this.timeAgo;
+  }
 }
 
 export interface FailedLoginStatsData {
@@ -282,5 +290,40 @@ export class SecurityDashboard {
     if (this.securityScore >= 80) return 'green';
     if (this.securityScore >= 60) return 'yellow';
     return 'red';
+  }
+
+  // Convenience getters for UI
+  get is2FAEnabled(): boolean {
+    return this.twoFactorStats.isEnabled;
+  }
+
+  get hasBackupCodes(): boolean {
+    return this.backupCodesStats.remainingCodes > 0;
+  }
+
+  get backupCodesRemaining(): number {
+    return this.backupCodesStats.remainingCodes;
+  }
+
+  get scoreLevel(): string {
+    return this.securityLevel;
+  }
+
+  get failedLoginAttempts(): number {
+    return this.failedLoginStats.last24Hours;
+  }
+
+  get daysSincePasswordChange(): number {
+    // This should come from profile, not security dashboard
+    // Return 0 as placeholder
+    return 0;
+  }
+
+  get passwordChangeNeeded(): boolean {
+    return this.recommendations.some(r => r.toLowerCase().includes('password'));
+  }
+
+  get highPriorityRecommendations(): string[] {
+    return this.recommendations;
   }
 }

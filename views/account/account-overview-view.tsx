@@ -264,7 +264,7 @@ export function AccountOverviewView() {
                       {securityDashboard.recommendations.map((rec, idx) => (
                         <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
                           <span className="text-yellow-500">•</span>
-                          <span>{rec.title}: {rec.action}</span>
+                          <span>{rec}</span>
                         </li>
                       ))}
                     </ul>

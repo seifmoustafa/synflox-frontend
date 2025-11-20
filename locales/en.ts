@@ -639,9 +639,11 @@ export const en = {
 
   // Navigation
   nav: {
+    account:"Account",
+    security:"Security",
     dashboard: "Dashboard",
     companies: "Companies",
-
+    notifications: "Notifications",
     profile: "Profile",
     settings: "Settings",
     logout: "Logout",
@@ -1594,6 +1596,9 @@ export const en = {
     viewAllEvents: "View All Events",
     advancedAnalytics: "Advanced Analytics",
     exportSecurityReport: "Export Security Report",
+    
+    // Notifications Page
+    notifications: "Notifications",
     
     // Activity Page
     activityLog: "Activity Log",
@@ -3118,8 +3123,35 @@ export const en = {
       readFailed: "Failed to read file.",
     },
   },
+  // Notifications Preferences
+  notifications: {
+    title: "Notification Preferences",
+    subtitle: "Manage how you receive notifications and alerts",
+    loadError: "Failed to load notification preferences",
+    enabledCount: "You have {count} notification types enabled",
+    unsavedChanges: "You have unsaved changes",
+    channels: "Notification Channels",
+    channelsDesc: "Choose how you want to receive notifications",
+    email: "Email Notifications",
+    emailDesc: "Receive notifications via email",
+    push: "Push Notifications",
+    pushDesc: "Receive push notifications in browser",
+    alertTypes: "Alert Types",
+    alertTypesDesc: "Select which types of alerts you want to receive",
+    companyExpiry: "Company License Expiry",
+    companyExpiryDesc: "Get notified when company licenses are about to expire",
+    subscriptionExpiry: "Subscription Expiry",
+    subscriptionExpiryDesc: "Get notified when subscriptions are about to expire",
+    systemAlerts: "System Alerts",
+    systemAlertsDesc: "Get notified about important system updates and issues",
+    info: "Changes will take effect immediately after saving. You can update these preferences at any time.",
+  },
+
   // Common
   common: {
+    reset:"Reset",
+    saving:"Saving...",
+    saveChanges:"Save Changes",
     generating:"Generating",
     email:"Email",
     description: "Description",

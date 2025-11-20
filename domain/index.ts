@@ -54,9 +54,13 @@ export {
   NotificationQueue,
   NotificationType,
   NotificationPosition,
+  NotificationPreferences,
+  UpdateNotificationPreferencesRequest,
   type NotificationData,
   type NotificationAction,
-  type NotificationConfigData
+  type NotificationConfigData,
+  type NotificationPreferencesData,
+  type UpdateNotificationPreferencesData
 } from './models/notification.model';
 
 
@@ -116,9 +120,6 @@ export {
   BackupCodesStatus,
   ExportBackupCodesRequest,
   ExportBackupCodesResponse,
-  SecurityEvent,
-  SecurityRecommendation,
-  SecurityDashboard,
   type ChangePasswordRequestData,
   type ChangePasswordWith2FARequestData,
   type TwoFactorSetupData,
