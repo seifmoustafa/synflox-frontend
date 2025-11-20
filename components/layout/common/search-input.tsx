@@ -33,6 +33,9 @@ export function HeaderSearch({
         )}
       />
       <Input
+        type="search"
+        name="search"
+        autoComplete="off"
         placeholder={t(placeholderKey)}
         className={cn(
           isRTL ? "pr-9 text-right" : "pl-9",

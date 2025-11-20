@@ -13,3 +13,4 @@ export { AccountMapper } from './account.mapper';
 export { AdminMapper } from './admin.mapper';
 export { AdminTypeMapper } from './admin-type.mapper';
 export { DashboardMapper } from './dashboard.mapper';
+export { SecurityMapper } from './security.mapper';

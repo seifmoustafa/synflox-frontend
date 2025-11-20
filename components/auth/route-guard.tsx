@@ -25,7 +25,8 @@ const PUBLIC_PAGES = [
   "/500",
   "/settings",
   "/account",
-  "/account/profile"
+  "/account/profile",
+  "/account/security"
 ];
 
 export function RouteGuard({ children }: RouteGuardProps) {

@@ -103,5 +103,37 @@ export {
 } from './models/dashboard.model';
 export type { DashboardResponse } from './mappers/dashboard.mapper';
 
+// Security domain
+export {
+  ChangePasswordRequest,
+  ChangePasswordWith2FARequest,
+  TwoFactorSetup,
+  Enable2FARequest,
+  Disable2FARequest,
+  Reset2FARequest,
+  GenerateBackupCodesRequest,
+  GenerateBackupCodesResponse,
+  BackupCodesStatus,
+  ExportBackupCodesRequest,
+  ExportBackupCodesResponse,
+  SecurityEvent,
+  SecurityRecommendation,
+  SecurityDashboard,
+  type ChangePasswordRequestData,
+  type ChangePasswordWith2FARequestData,
+  type TwoFactorSetupData,
+  type Enable2FARequestData,
+  type Disable2FARequestData,
+  type Reset2FARequestData,
+  type GenerateBackupCodesRequestData,
+  type GenerateBackupCodesResponseData,
+  type BackupCodesStatusData,
+  type ExportBackupCodesRequestData,
+  type ExportBackupCodesResponseData,
+  type SecurityEventData,
+  type SecurityRecommendationData,
+  type SecurityDashboardData
+} from './models/security.model';
+
 // Mappers
-export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, DashboardMapper } from './mappers';
+export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, DashboardMapper, SecurityMapper } from './mappers';

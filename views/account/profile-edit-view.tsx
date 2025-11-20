@@ -33,6 +33,8 @@ import {
   Building2,
   ArrowRight
 } from "lucide-react";
+import NextLink from "next/link";
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Gender } from "@/domain";
 
 export function ProfileEditView() {
@@ -76,8 +78,29 @@ export function ProfileEditView() {
 
   return (
     <div className="min-h-screen pb-12" dir={isRTL ? "rtl" : "ltr"}>
+      {/* Breadcrumbs */}
+      <div className="mx-6 mt-6 mb-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <NextLink href="/account">
+                  {t('nav.account') || 'Account'}
+                </NextLink>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="font-semibold">
+                {t('account.editProfile') || 'Edit Profile'}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-background rounded-3xl p-6 mb-8 mx-6 mt-6">
+      <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-background rounded-3xl p-6 mb-8 mx-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <Button

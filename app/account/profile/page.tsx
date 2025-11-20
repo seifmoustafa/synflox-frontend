@@ -3,8 +3,6 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 export default function ProfileEditPage() {
   return (
-    <DashboardLayout>
       <ProfileEditView />
-    </DashboardLayout>
   );
 }

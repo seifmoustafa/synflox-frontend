@@ -169,7 +169,7 @@ export function AccountOverviewView() {
                 </CardDescription>
               </div>
               <Badge variant={securityScore >= 80 ? "default" : securityScore >= 60 ? "secondary" : "destructive"} className="text-lg px-4 py-2">
-                {securityDashboard.securityLevel}
+                {securityDashboard.scoreLevel.toUpperCase()}
               </Badge>
             </div>
           </CardHeader>
@@ -216,18 +216,18 @@ export function AccountOverviewView() {
               <div className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-primary/20">
                 <div className={cn(
                   "w-16 h-16 rounded-full flex items-center justify-center mb-4",
-                  securityDashboard.twoFactorStats.isEnabled ? "bg-green-500/10" : "bg-yellow-500/10"
+                  securityDashboard.is2FAEnabled ? "bg-green-500/10" : "bg-yellow-500/10"
                 )}>
                   <Key className={cn(
                     "w-8 h-8",
-                    securityDashboard.twoFactorStats.isEnabled ? "text-green-500" : "text-yellow-500"
+                    securityDashboard.is2FAEnabled ? "text-green-500" : "text-yellow-500"
                   )} />
                 </div>
                 <p className="font-semibold text-center">{t("account.twoFactorAuth")}</p>
-                <Badge variant={securityDashboard.twoFactorStats.isEnabled ? "default" : "secondary"} className="mt-2">
-                  {securityDashboard.twoFactorStats.isEnabled ? t("account.enabled") : t("account.disabled")}
+                <Badge variant={securityDashboard.is2FAEnabled ? "default" : "secondary"} className="mt-2">
+                  {securityDashboard.is2FAEnabled ? t("account.enabled") : t("account.disabled")}
                 </Badge>
-                {!securityDashboard.twoFactorStats.isEnabled && (
+                {!securityDashboard.is2FAEnabled && (
                   <Button size="sm" variant="ghost" onClick={vm.navigateToSecurity} className="mt-3">
                     {t("account.enableNow")}
                   </Button>
@@ -241,13 +241,13 @@ export function AccountOverviewView() {
                 </div>
                 <p className="font-semibold text-center">{t("account.backupCodes")}</p>
                 <div className="text-3xl font-bold text-blue-500 mt-2">
-                  {securityDashboard.backupCodesStats.remainingCodes}
+                  {securityDashboard.backupCodesRemaining}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  of {securityDashboard.backupCodesStats.totalGenerated} {t("account.codesRemaining")}
+                  {securityDashboard.hasBackupCodes ? t("account.codesRemaining") : t("account.noCodes")}
                 </p>
                 <Progress 
-                  value={(securityDashboard.backupCodesStats.remainingCodes / securityDashboard.backupCodesStats.totalGenerated) * 100} 
+                  value={securityDashboard.hasBackupCodes ? (securityDashboard.backupCodesRemaining / 10) * 100 : 0} 
                   className="h-2 mt-3 w-full"
                 />
               </div>
@@ -264,7 +264,7 @@ export function AccountOverviewView() {
                       {securityDashboard.recommendations.map((rec, idx) => (
                         <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
                           <span className="text-yellow-500">•</span>
-                          <span>{rec}</span>
+                          <span>{rec.title}: {rec.action}</span>
                         </li>
                       ))}
                     </ul>
@@ -301,9 +301,9 @@ export function AccountOverviewView() {
                 <AlertTriangle className="w-5 h-5 text-red-500" />
                 <Activity className="w-4 h-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold">{securityDashboard.failedLoginStats.last7Days}</div>
+              <div className="text-2xl font-bold">{securityDashboard.failedLoginAttempts}</div>
               <p className="text-xs text-muted-foreground mt-1">{t("account.failedLoginsWeek")}</p>
-              {securityDashboard.failedLoginStats.suspiciousActivity && (
+              {securityDashboard.failedLoginAttempts > 5 && (
                 <Badge variant="destructive" className="mt-2 text-xs">{t("account.suspicious")}</Badge>
               )}
             </CardContent>
@@ -328,8 +328,8 @@ export function AccountOverviewView() {
                 <Key className="w-5 h-5 text-blue-500" />
                 <Clock className="w-4 h-4 text-muted-foreground" />
               </div>
-              <div className="text-2xl font-bold">{securityDashboard.backupCodesStats.daysUntilExpiry}</div>
-              <p className="text-xs text-muted-foreground mt-1">{t("account.daysUntilExpire")}</p>
+              <div className="text-2xl font-bold">{securityDashboard.daysSincePasswordChange}</div>
+              <p className="text-xs text-muted-foreground mt-1">{t("account.daysSincePasswordChange")}</p>
             </CardContent>
           </Card>
         </div>
@@ -438,9 +438,9 @@ export function AccountOverviewView() {
                     <div className="flex flex-col items-center">
                       <div className={cn(
                         "w-10 h-10 rounded-full flex items-center justify-center",
-                        event.success ? "bg-green-500/10" : "bg-red-500/10"
+                        event.severity === 'low' ? "bg-green-500/10" : "bg-red-500/10"
                       )}>
-                        {event.success ? (
+                        {event.severity === 'low' ? (
                           <CheckCircle2 className="w-5 h-5 text-green-500" />
                         ) : (
                           <AlertTriangle className="w-5 h-5 text-red-500" />
@@ -468,10 +468,10 @@ export function AccountOverviewView() {
                         </div>
                         {event.severity && (
                           <Badge 
-                            variant={event.severity === "Critical" ? "destructive" : "secondary"}
+                            variant={event.severity === "high" ? "destructive" : event.severity === "medium" ? "secondary" : "default"}
                             className="text-xs"
                           >
-                            {event.severity}
+                            {event.severity.toUpperCase()}
                           </Badge>
                         )}
                       </div>
