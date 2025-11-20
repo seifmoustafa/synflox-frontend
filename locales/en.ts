@@ -644,6 +644,7 @@ export const en = {
     dashboard: "Dashboard",
     companies: "Companies",
     notifications: "Notifications",
+    activity: "Activity",
     profile: "Profile",
     settings: "Settings",
     logout: "Logout",
@@ -3145,6 +3146,33 @@ export const en = {
     systemAlerts: "System Alerts",
     systemAlertsDesc: "Get notified about important system updates and issues",
     info: "Changes will take effect immediately after saving. You can update these preferences at any time.",
+  },
+
+  // Activity & Security Analytics
+  activity: {
+    title: "Security Activity",
+    subtitle: "Monitor your account security and recent activities",
+    securityScore: "Security Score",
+    twoFactor: "Two-Factor Auth",
+    backupCodes: "Backup Codes",
+    failedLogins: "Failed Logins",
+    last24Hours: "Last 24 hours",
+    last7Days: "Last 7 days",
+    last30Days: "Last 30 days",
+    verifications: "verifications",
+    recentEvents: "Recent Security Events",
+    recentEventsDesc: "Latest security activities on your account",
+    events: "events",
+    noEvents: "No recent security events",
+    failedLoginStats: "Failed Login Attempts",
+    failedLoginStatsDesc: "Track suspicious login activities",
+    suspiciousActivity: "Suspicious Activity Detected",
+    suspiciousActivityDesc: "We detected unusual login attempts on your account",
+    recommendations: "Security Recommendations",
+    lastUpdated: "Last updated",
+    errors: {
+      loadData: "Failed to load activity data",
+    },
   },
 
   // Common

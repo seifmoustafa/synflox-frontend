@@ -634,6 +634,7 @@ export const ar = {
     dashboard: "لوحة التحكم",
     companies: "الشركات",
     notifications: "الإشعارات",
+    activity: "النشاط",
     admins: "المسؤولون",
     AdminTypes: "أنواع المسؤولين",
     profile: "الملف الشخصي",
@@ -3144,8 +3145,36 @@ export const ar = {
     info: "ستصبح التغييرات سارية فورًا بعد الحفظ. يمكنك تحديث هذه التفضيلات في أي وقت.",
   },
 
+  // Activity & Security Analytics
+  activity: {
+    title: "النشاط الأمني",
+    subtitle: "راقب أمان حسابك والأنشطة الأخيرة",
+    securityScore: "درجة الأمان",
+    twoFactor: "المصادقة الثنائية",
+    backupCodes: "رموز الاحتياطية",
+    failedLogins: "محاولات تسجيل فاشلة",
+    last24Hours: "آخر 24 ساعة",
+    last7Days: "آخر 7 أيام",
+    last30Days: "آخر 30 يوم",
+    verifications: "عمليات تحقق",
+    recentEvents: "الأحداث الأمنية الأخيرة",
+    recentEventsDesc: "آخر الأنشطة الأمنية على حسابك",
+    events: "أحداث",
+    noEvents: "لا توجد أحداث أمنية حديثة",
+    failedLoginStats: "محاولات تسجيل الدخول الفاشلة",
+    failedLoginStatsDesc: "تتبع أنشطة تسجيل الدخول المشبوهة",
+    suspiciousActivity: "تم اكتشاف نشاط مشبوه",
+    suspiciousActivityDesc: "اكتشفنا محاولات تسجيل دخول غير عادية على حسابك",
+    recommendations: "التوصيات الأمنية",
+    lastUpdated: "آخر تحديث",
+    errors: {
+      loadData: "فشل تحميل بيانات النشاط",
+    },
+  },
+
   // Common
   common: {
+    enabled:"مفعل",
     reset:"إعادة ضبط",
     saving:"جاري الحفظ...",
     saveChanges:"حفظ التغييرات",
