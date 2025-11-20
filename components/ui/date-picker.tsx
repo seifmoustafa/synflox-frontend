@@ -77,110 +77,44 @@ function getViewport(): { viewport: Viewport; actualHeight: number } {
   return { viewport, actualHeight };
 }
 
-// Helper: Calculate calendar position
+// Helper: Calculate calendar position (SIMPLIFIED like GenericSelect)
 function calculateCalendarPosition(params: PositionCalcParams): PositionResult {
   const {
     triggerRect,
-    calendarRect,
     calendarHeight = MAX_CALENDAR_HEIGHT,
-    calendarContent,
   } = params;
-  const { viewport, actualHeight } = getViewport();
+  
+  const viewportHeight = window.innerHeight;
 
-  const isNearBottom =
-    triggerRect.bottom > actualHeight * NEAR_BOTTOM_THRESHOLD;
-  const bottomMargin = isNearBottom
-    ? BOTTOM_MARGIN_NEAR_EDGE
-    : BOTTOM_MARGIN_NORMAL;
-
-  // Calculate natural width
-  let naturalWidth = MIN_CALENDAR_WIDTH;
-  if (calendarContent) {
-    const contentRect = calendarContent.getBoundingClientRect();
-    naturalWidth = Math.max(
-      contentRect.width || MIN_CALENDAR_WIDTH,
-      MIN_CALENDAR_WIDTH
-    );
-  }
-  const preferredWidth = Math.max(
-    naturalWidth,
-    triggerRect.width >= MIN_CALENDAR_WIDTH
-      ? triggerRect.width
-      : MIN_CALENDAR_WIDTH
-  );
-
-  // Calculate available space
-  const spaceBelow = actualHeight - triggerRect.bottom - 1;
+  // Calculate available space above and below
+  const spaceBelow = viewportHeight - triggerRect.bottom - 1;
   const spaceAbove = triggerRect.top - 1;
-  const estimatedHeight = calendarRect?.height || calendarHeight;
 
-  // Determine if should show above
-  const hasEnoughSpaceBelow = spaceBelow >= estimatedHeight + bottomMargin;
-  const hasEnoughSpaceAbove = spaceAbove >= estimatedHeight + TOP_MARGIN;
+  // Prefer showing below unless there's very little space
   const shouldShowAbove =
-    !hasEnoughSpaceBelow &&
-    (hasEnoughSpaceAbove || spaceAbove > spaceBelow + 30);
+    spaceBelow < MIN_CALENDAR_HEIGHT && spaceAbove > spaceBelow + 50;
 
-  // Calculate vertical position
   let top: number;
   let maxHeight: number;
 
   if (shouldShowAbove) {
-    const availableAbove = Math.max(0, spaceAbove - TOP_MARGIN);
+    // Position above the field
+    const availableAbove = spaceAbove - 10; // 10px margin from viewport top
     maxHeight = Math.min(MAX_CALENDAR_HEIGHT, availableAbove);
     maxHeight = Math.max(maxHeight, MIN_CALENDAR_HEIGHT);
-    const calendarTop =
-      triggerRect.top + viewport.scrollY - estimatedHeight - 1;
-    const safeTop = viewport.scrollY + TOP_MARGIN;
-    top = Math.max(calendarTop, safeTop);
+    top = triggerRect.top - maxHeight - 1; // NO scrollY!
   } else {
-    const availableBelow = Math.max(0, spaceBelow - bottomMargin);
+    // Position below the field
+    const availableBelow = spaceBelow - 10; // 10px margin from viewport bottom
     maxHeight = Math.min(MAX_CALENDAR_HEIGHT, availableBelow);
     maxHeight = Math.max(maxHeight, MIN_CALENDAR_HEIGHT);
-    const calendarBottom =
-      triggerRect.bottom + viewport.scrollY + estimatedHeight;
-    const safeBottom = actualHeight + viewport.scrollY - bottomMargin;
-
-    if (calendarBottom > safeBottom) {
-      // Force open above
-      const availableAbove = Math.max(0, spaceAbove - TOP_MARGIN);
-      maxHeight = Math.min(MAX_CALENDAR_HEIGHT, availableAbove);
-      maxHeight = Math.max(maxHeight, MIN_CALENDAR_HEIGHT);
-      const calendarTop =
-        triggerRect.top + viewport.scrollY - estimatedHeight - 1;
-      const safeTop = viewport.scrollY + TOP_MARGIN;
-      top = Math.max(calendarTop, safeTop);
-      return {
-        top,
-        left: 0,
-        width: preferredWidth,
-        maxHeight,
-        shouldShowAbove: true,
-      };
-    } else {
-      top = triggerRect.bottom + viewport.scrollY + 1;
-    }
-  }
-
-  // Calculate horizontal position
-  let left = triggerRect.left + viewport.scrollX;
-  const rightEdge = viewport.scrollX + viewport.width;
-  const calendarRightEdge = left + preferredWidth;
-
-  if (calendarRightEdge > rightEdge) {
-    const rightAlignLeft =
-      triggerRect.right + viewport.scrollX - preferredWidth;
-    const leftEdge = viewport.scrollX + 8;
-    left = rightAlignLeft >= leftEdge ? rightAlignLeft : leftEdge;
-  }
-  if (left < viewport.scrollX) {
-    left = viewport.scrollX + 8;
+    top = triggerRect.bottom + 1; // NO scrollY!
   }
 
   return {
-    top: Math.max(top, viewport.scrollY + 1),
-    left,
-    width: preferredWidth,
+    top: Math.max(top, 1),
+    left: triggerRect.left, // NO scrollX!
+    width: Math.max(triggerRect.width, MIN_CALENDAR_WIDTH),
     maxHeight: Math.floor(maxHeight),
     shouldShowAbove,
   };
@@ -262,19 +196,19 @@ export function DatePicker({
 
       setCalendarPosition({
         top: position.top,
-        left: rect.left + window.scrollX,
+        left: position.left,
         width: position.width,
         maxHeight: position.maxHeight,
         placement: position.shouldShowAbove ? "top-start" : "bottom-start",
       });
 
-      scrollIntoViewIfNeeded(containerRef.current);
+      setShowCalendar(true);
       setAnimateOpen(false);
       setTimeout(() => setAnimateOpen(true), 10);
     } else {
       setAnimateOpen(false);
+      setShowCalendar(false);
     }
-    setShowCalendar(!showCalendar);
   }, [showCalendar, disabled]);
 
   // Keyboard handler for trigger
@@ -378,36 +312,25 @@ export function DatePicker({
 
     const handleWindowScroll = () => {
       if (!showCalendar || !containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const threshold = 10;
-      const isFieldStartingToHide =
-        rect.top < threshold ||
-        rect.bottom > window.innerHeight - threshold ||
-        rect.left < threshold ||
-        rect.right > window.innerWidth - threshold;
+      
+      // Just reposition, NEVER auto-close on scroll
+      requestAnimationFrame(() => {
+        if (!containerRef.current || !calendarRef.current) return;
+        const triggerRect = containerRef.current.getBoundingClientRect();
+        const calendarRect = calendarRef.current.getBoundingClientRect();
+        const calendarContent = calendarRef.current.querySelector(
+          "[data-calendar-content]"
+        ) as HTMLElement;
 
-      if (isFieldStartingToHide) {
-        setShowCalendar(false);
-        triggerRef.current?.focus();
-      } else {
-        requestAnimationFrame(() => {
-          if (!containerRef.current || !calendarRef.current) return;
-          const triggerRect = containerRef.current.getBoundingClientRect();
-          const calendarRect = calendarRef.current.getBoundingClientRect();
-          const calendarContent = calendarRef.current.querySelector(
-            "[data-calendar-content]"
-          ) as HTMLElement;
-
-          const position = calculateCalendarPosition({
-            triggerRect,
-            calendarRect,
-            calendarContent,
-          });
-
-          shouldShowAboveRef.current = position.shouldShowAbove;
-          setCalendarPosition((pos) => ({ ...pos, ...position }));
+        const position = calculateCalendarPosition({
+          triggerRect,
+          calendarRect,
+          calendarContent,
         });
-      }
+
+        shouldShowAboveRef.current = position.shouldShowAbove;
+        setCalendarPosition((pos) => ({ ...pos, ...position }));
+      });
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {

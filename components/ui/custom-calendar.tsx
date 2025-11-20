@@ -667,6 +667,9 @@ export function CustomCalendar({
       tabIndex={-1}
       role="application"
       aria-label={t("common.calendar") || "Calendar"}
+      onWheel={(e) => e.stopPropagation()}
+      onScroll={(e) => e.stopPropagation()}
+      onTouchMove={(e) => e.stopPropagation()}
     >
       {/* Header */}
       <div className={headerStyles}>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import { useAccountOverviewViewModel } from "@/viewmodels/account/use-account-overview-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSettings } from "@/providers/settings-provider";
@@ -24,11 +23,7 @@ import {
   Download,
   TrendingUp,
   Calendar,
-  MapPin,
-  Sparkles,
-  Camera,
-  X,
-  Loader2
+  MapPin
 } from "lucide-react";
 
 /**
@@ -50,19 +45,9 @@ export function AccountOverviewView() {
   const vm = useAccountOverviewViewModel();
   const { t, direction } = useI18n();
   const settings = useSettings();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isRTL = direction === "rtl";
   const hasAnim = settings.animationLevel !== "none";
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      vm.handlePhotoUpload(file);
-    }
-    // Reset input so same file can be selected again
-    e.target.value = "";
-  };
 
   // Loading state
   if (vm.isLoading) {
@@ -122,63 +107,25 @@ export function AccountOverviewView() {
         <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           {/* Profile Section */}
           <div className="flex items-center gap-6">
-            {/* Hidden File Input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileSelect}
-            />
-            
-            <div className="relative group">
-              <div 
-                className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center shadow-lg cursor-pointer relative overflow-hidden"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {vm.isUploadingPhoto ? (
-                  <Loader2 className="w-10 h-10 text-white animate-spin" />
-                ) : profile.hasProfilePicture ? (
-                  <>
-                    <img 
-                      src={profile.fullProfilePictureUrl!} 
-                      alt={profile.displayName}
-                      className="w-full h-full rounded-2xl object-cover"
-                    />
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                      <Camera className="w-6 h-6 text-white" />
-                    </div>
-                  </>
+            <div className="relative">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center shadow-lg">
+                {profile.hasProfilePicture ? (
+                  <img 
+                    src={profile.fullProfilePictureUrl!} 
+                    alt={profile.displayName}
+                    className="w-full h-full rounded-2xl object-cover"
+                  />
                 ) : (
-                  <div className="flex flex-col items-center">
-                    <User className="w-10 h-10 text-white mb-1" />
-                    <Camera className="w-4 h-4 text-white/70" />
-                  </div>
+                  <User className="w-10 h-10 text-white" />
                 )}
               </div>
-              
-              {/* Remove Button */}
-              {profile.hasProfilePicture && !vm.isUploadingPhoto && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    vm.handlePhotoRemove();
-                  }}
-                  className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 transition-colors flex items-center justify-center shadow-lg"
-                  title={t("account.removePhoto")}
-                >
-                  <X className="w-4 h-4 text-white" />
-                </button>
-              )}
-              
               <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-green-500 border-4 border-background flex items-center justify-center">
                 <CheckCircle2 className="w-4 h-4 text-white" />
               </div>
             </div>
             <div>
               <h1 className="text-3xl font-bold mb-1">
-                {t("account.welcomeBack")}, {profile.displayName}! <Sparkles className="inline w-6 h-6 text-yellow-500" />
+                {t("account.welcomeBack")}, {profile.displayName}!
               </h1>
               <p className="text-muted-foreground flex items-center gap-2">
                 <Mail className="w-4 h-4" />
