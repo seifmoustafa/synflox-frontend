@@ -60,6 +60,17 @@ export const en = {
     backToLogin: "Back to Login",
     enterCode: "Please enter the 6-digit code",
     
+    // Backup Codes (2FA Recovery)
+    backupCode: "Backup Code",
+    backupCodeRequired: "Backup Code Recovery",
+    backupCodeDescription: "Enter one of your 8-character backup codes",
+    enterBackupCode: "Enter your backup code (ABCD-1234)",
+    invalidBackupCode: "Invalid backup code. Please enter a valid 8-character code.",
+    lostTwoFactor: "Lost 2FA Device?",
+    backTo2FA: "Back to 2FA Code",
+    verifyBackupCode: "Verify Backup Code",
+    verifyingBackupCode: "Verifying...",
+    
     // Password Reset
     forgotPassword: "Forgot Password?",
     resetPassword: "Reset Password",
@@ -74,6 +85,11 @@ export const en = {
     resettingPassword: "Resetting Password...",
     sendResetLink: "Send Reset Link",
     sending: "Sending...",
+    twoFactorRequiredForReset: "This account has 2FA enabled. Please verify your identity.",
+    emailCheckError: "Failed to check email status",
+    otpSentToEmail: "OTP code sent to your email. Check your inbox!",
+    invalidOtpCode: "Invalid or expired OTP code",
+    otpVerifiedSuccess: "OTP verified! Redirecting to reset password...",
     
     // Password Reset Messages
     forgotPasswordInstructions: "Enter your email address and we'll send you instructions to reset your password. You'll receive both an OTP code and a magic link for one-click reset.",

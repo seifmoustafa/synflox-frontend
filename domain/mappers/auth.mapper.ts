@@ -11,7 +11,10 @@ import {
   LoginResponse, 
   RefreshTokenRequest,
   Verify2FARequest,
+  VerifyBackupCodeRequest,
   ForgotPasswordRequest,
+  ForgotPasswordWith2FARequest,
+  Check2FAStatusResponse,
   ValidateMagicLinkRequest,
   MagicLinkValidationResponse,
   ResetPasswordRequest,
@@ -19,7 +22,10 @@ import {
   type LoginResponseData,
   type RefreshTokenRequestData,
   type Verify2FARequestData,
+  type VerifyBackupCodeRequestData,
   type ForgotPasswordRequestData,
+  type ForgotPasswordWith2FARequestData,
+  type Check2FAStatusResponseData,
   type ValidateMagicLinkRequestData,
   type MagicLinkValidationResponseData,
   type ResetPasswordRequestData
@@ -96,6 +102,20 @@ export class AuthMapper {
     };
   }
 
+  // ============================================
+  // BACKUP CODE VERIFICATION MAPPERS
+  // ============================================
+
+  /**
+   * Convert VerifyBackupCodeRequest domain model to JSON for API requests
+   */
+  static verifyBackupCodeRequestToJson(request: VerifyBackupCodeRequest): any {
+    return {
+      username: request.username,
+      backupCode: request.backupCode, // Already formatted as uppercase, no spaces
+    };
+  }
+
   /**
    * Convert JSON/API response to RefreshTokenRequest domain model
    */
@@ -125,6 +145,27 @@ export class AuthMapper {
     return {
       email: request.email,
     };
+  }
+
+  /**
+   * Convert ForgotPasswordWith2FARequest domain model to JSON for API requests
+   */
+  static forgotPasswordWith2FARequestToJson(request: ForgotPasswordWith2FARequest): any {
+    return {
+      email: request.email,
+      twoFactorCode: request.twoFactorCode || null,
+      backupCode: request.backupCode || null,
+    };
+  }
+
+  /**
+   * Convert JSON/API response to Check2FAStatusResponse domain model
+   */
+  static check2FAStatusResponseFromJson(json: any): Check2FAStatusResponse {
+    return new Check2FAStatusResponse({
+      has2FA: json.has2FA || json.data?.has2FA || false,
+      emailExists: json.emailExists || json.data?.emailExists || true,
+    });
   }
 
   /**

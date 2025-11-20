@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Mail, Key, Lock, Loader2, Send, CheckCircle2, AlertCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import { Mail, Key, Lock, Loader2, Send, CheckCircle2, AlertCircle, ArrowLeft, ArrowRight, Shield, KeyRound } from "lucide-react";
 import { useForgotPasswordViewModel } from "@/hooks/use-forgot-password-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSettings } from "@/providers/settings-provider";
@@ -90,8 +90,10 @@ export function ForgotPasswordFormView() {
     if (e.key === "Enter" && !vm.isLoading) {
       if (vm.isEmailSent && vm.canVerifyOtp) {
         vm.handleVerifyOtp();
-      } else if (!vm.isEmailSent && vm.canSendEmail) {
+      } else if (vm.requires2FA && vm.canSendOtp) {
         vm.handleSendOtp();
+      } else if (!vm.requires2FA && vm.canCheckEmail) {
+        vm.handleCheckEmail();
       }
     }
   };
@@ -257,6 +259,170 @@ export function ForgotPasswordFormView() {
                 )}
               </div>
 
+              {/* 2FA Verification OR Backup Code - Only shown if email requires 2FA */}
+              {vm.requires2FA && !vm.isEmailSent && (
+                <div className={cn(
+                  "space-y-4 animate-in fade-in-0 slide-in-from-top-4 duration-500",
+                  isRTL && "text-right"
+                )} dir={isRTL ? "rtl" : "ltr"}>
+                  {/* 2FA/Backup Code Header */}
+                  <div className="space-y-2 p-4 rounded-xl bg-primary/5 border border-primary/20">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/20">
+                        {vm.useBackupCode ? (
+                          <KeyRound className="w-5 h-5 text-primary" />
+                        ) : (
+                          <Shield className="w-5 h-5 text-primary" />
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-foreground">
+                          {vm.useBackupCode ? t("auth.backupCodeRequired") : t("auth.twoFactorRequiredForReset")}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {vm.useBackupCode 
+                            ? t("auth.backupCodeDescription") 
+                            : t("auth.twoFactorDescription")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2FA Code Input */}
+                  {!vm.useBackupCode && (
+                    <div className="space-y-2">
+                      <label 
+                        htmlFor="twoFactorCode"
+                        className={cn(
+                          "text-sm font-semibold block transition-colors duration-200",
+                          isRTL && "text-right",
+                          focusedField === "2fa" ? "text-primary" : "text-foreground"
+                        )}
+                      >
+                        {t("auth.verificationCode")}
+                      </label>
+                      <div className="relative">
+                        <Input
+                          id="twoFactorCode"
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          placeholder={t("auth.verificationCodePlaceholder")}
+                          value={vm.twoFactorCode}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            const value = e.target.value.replace(/\D/g, "");
+                            vm.handle2FACodeChange(value);
+                          }}
+                          onFocus={() => setFocusedField("2fa")}
+                          onBlur={() => setFocusedField(null)}
+                          onKeyPress={handleKey}
+                          disabled={vm.isLoading}
+                          autoFocus
+                          dir="ltr"
+                          className={cn(
+                            "h-14 text-2xl text-center tracking-[0.5em] font-bold transition-all duration-300 border-2 rounded-xl",
+                            focusedField === "2fa"
+                              ? "border-primary shadow-lg shadow-primary/25 ring-4 ring-primary/10 scale-[1.01]"
+                              : "border-border hover:border-primary/40 hover:shadow-md"
+                          )}
+                        />
+                        {focusedField === "2fa" && (
+                          <div className="absolute inset-0 -z-10 bg-primary/5 rounded-xl blur-xl" />
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground text-center">
+                        {t("auth.enterCode")}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Backup Code Input */}
+                  {vm.useBackupCode && (
+                    <div className="space-y-2 animate-in fade-in-0 slide-in-from-top-2 duration-300">
+                      <label 
+                        htmlFor="backupCode"
+                        className={cn(
+                          "text-sm font-semibold block transition-colors duration-200",
+                          isRTL && "text-right",
+                          focusedField === "backup" ? "text-primary" : "text-foreground"
+                        )}
+                      >
+                        {t("auth.backupCode")}
+                      </label>
+                      <div className="relative">
+                        <Input
+                          id="backupCode"
+                          type="text"
+                          maxLength={9}
+                          placeholder="ABCD-1234"
+                          value={vm.backupCode}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                            // Auto-format: ABCD-1234
+                            if (value.length > 4) {
+                              value = value.slice(0, 4) + "-" + value.slice(4, 8);
+                            }
+                            vm.handleBackupCodeChange(value);
+                          }}
+                          onFocus={() => setFocusedField("backup")}
+                          onBlur={() => setFocusedField(null)}
+                          onKeyPress={handleKey}
+                          disabled={vm.isLoading}
+                          autoFocus
+                          dir="ltr"
+                          className={cn(
+                            "h-14 text-2xl text-center tracking-[0.25em] font-bold uppercase transition-all duration-300 border-2 rounded-xl",
+                            focusedField === "backup"
+                              ? "border-primary shadow-lg shadow-primary/25 ring-4 ring-primary/10 scale-[1.01]"
+                              : "border-border hover:border-primary/40 hover:shadow-md"
+                          )}
+                        />
+                        {focusedField === "backup" && (
+                          <div className="absolute inset-0 -z-10 bg-primary/5 rounded-xl blur-xl" />
+                        )}
+                      </div>
+                      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                        <KeyRound className="w-3 h-3" />
+                        <span>{t("auth.enterBackupCode")}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Switch between 2FA and Backup Code */}
+                  <div className="flex items-center justify-center gap-2 pt-2">
+                    {!vm.useBackupCode ? (
+                      <button
+                        type="button"
+                        onClick={vm.switchToBackupCode}
+                        disabled={vm.isLoading}
+                        className={cn(
+                          "text-sm font-medium text-primary hover:text-primary/80 transition-all duration-200",
+                          "flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-primary/10",
+                          "disabled:opacity-50 disabled:cursor-not-allowed"
+                        )}
+                      >
+                        <KeyRound className="w-4 h-4" />
+                        <span>{t("auth.lostTwoFactor")}</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={vm.switchTo2FA}
+                        disabled={vm.isLoading}
+                        className={cn(
+                          "text-sm font-medium text-primary hover:text-primary/80 transition-all duration-200",
+                          "flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-primary/10",
+                          "disabled:opacity-50 disabled:cursor-not-allowed"
+                        )}
+                      >
+                        <Shield className="w-4 h-4" />
+                        <span>{t("auth.backTo2FA")}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* OTP Code Field - Only shown after email sent */}
               {vm.isEmailSent && (
                 <div className={cn(
@@ -318,8 +484,22 @@ export function ForgotPasswordFormView() {
               {/* Submit Button */}
               <Button
                 type="button"
-                onClick={vm.isEmailSent ? vm.handleVerifyOtp : vm.handleSendOtp}
-                disabled={vm.isEmailSent ? !vm.canVerifyOtp : !vm.canSendEmail}
+                onClick={() => {
+                  if (vm.isEmailSent) {
+                    vm.handleVerifyOtp();
+                  } else if (vm.requires2FA) {
+                    vm.handleSendOtp();
+                  } else {
+                    vm.handleCheckEmail();
+                  }
+                }}
+                disabled={
+                  vm.isEmailSent 
+                    ? !vm.canVerifyOtp 
+                    : vm.requires2FA 
+                      ? !vm.canSendOtp 
+                      : !vm.canCheckEmail
+                }
                 className={cn(
                   "w-full h-13 mt-2 text-base font-bold relative overflow-hidden group/btn rounded-xl",
                   "bg-gradient-to-r from-primary via-primary to-primary/90",
@@ -336,7 +516,13 @@ export function ForgotPasswordFormView() {
                   {vm.isLoading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>{vm.isEmailSent ? t("auth.verifying") : t("auth.sending")}</span>
+                      <span>
+                        {vm.isEmailSent 
+                          ? t("auth.verifying") 
+                          : vm.requires2FA
+                            ? (vm.useBackupCode ? t("auth.verifyingBackupCode") : t("auth.verifying"))
+                            : t("auth.sending")}
+                      </span>
                     </>
                   ) : (
                     <>
@@ -349,10 +535,28 @@ export function ForgotPasswordFormView() {
                             isRTL && "rotate-180 group-hover/btn:-translate-x-1"
                           )} />
                         </>
+                      ) : vm.requires2FA ? (
+                        <>
+                          {vm.useBackupCode ? (
+                            <>
+                              <KeyRound className="w-5 h-5" />
+                              <span>{t("auth.verifyBackupCode")}</span>
+                            </>
+                          ) : (
+                            <>
+                              <Shield className="w-5 h-5" />
+                              <span>{t("auth.verify")}</span>
+                            </>
+                          )}
+                          <ArrowRight className={cn(
+                            "w-4 h-4 group-hover/btn:translate-x-1 transition-transform",
+                            isRTL && "rotate-180 group-hover/btn:-translate-x-1"
+                          )} />
+                        </>
                       ) : (
                         <>
                           <Send className="w-5 h-5" />
-                          <span>{t("auth.sendOtp") || "Send OTP Code"}</span>
+                          <span>{t("auth.sendOtp") || "Send Reset Code"}</span>
                           <ArrowRight className={cn(
                             "w-4 h-4 group-hover/btn:translate-x-1 transition-transform",
                             isRTL && "rotate-180 group-hover/btn:-translate-x-1"

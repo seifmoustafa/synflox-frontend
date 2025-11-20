@@ -2,11 +2,14 @@ export const API_ENDPOINTS = {
   // Authentication
   AUTH_LOGIN: "/admin/auth/login",
   AUTH_LOGIN_2FA: "/admin/auth/verify-2fa",
+  AUTH_VERIFY_BACKUP_CODE: "/admin/auth/verify-backup-code",
   AUTH_REFRESH_TOKEN: "/admin/auth/refresh-token",
   AUTH_LOGOUT: "/admin/auth/logout",
   
   // Password Reset
   AUTH_FORGOT_PASSWORD: "/admin/auth/forgot-password",
+  AUTH_FORGOT_PASSWORD_WITH_2FA: "/admin/auth/forgot-password-with-2fa",
+  AUTH_CHECK_2FA_STATUS: "/admin/auth/check-2fa-status",
   AUTH_VERIFY_RESET_OTP: "/admin/auth/verify-reset-otp",
   AUTH_VALIDATE_MAGIC_LINK: "/admin/auth/validate-magic-link",
   AUTH_RESET_PASSWORD: "/admin/auth/reset-password",

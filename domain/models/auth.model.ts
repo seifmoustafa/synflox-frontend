@@ -111,6 +111,48 @@ export class Verify2FARequest {
 
 }
 
+// ============================================
+// BACKUP CODE VERIFICATION (Login Recovery)
+// ============================================
+
+export interface VerifyBackupCodeRequestData {
+  username: string;
+  backupCode: string;
+}
+
+export class VerifyBackupCodeRequest {
+  public readonly username: string;
+  public readonly backupCode: string;
+
+  constructor(data: VerifyBackupCodeRequestData) {
+    this.username = data.username;
+    this.backupCode = data.backupCode.toUpperCase().replace(/\s/g, '');
+  }
+
+  /**
+   * Validate backup code request
+   * Backup codes are 8 characters (e.g., ABCD1234)
+   */
+  get isValid(): boolean {
+    return !!(
+      this.username?.trim() && 
+      this.backupCode?.trim() && 
+      this.backupCode.length === 8
+    );
+  }
+
+  /**
+   * Format backup code for display (e.g., ABCD-1234)
+   */
+  get formattedCode(): string {
+    if (this.backupCode.length === 8) {
+      return `${this.backupCode.substring(0, 4)}-${this.backupCode.substring(4)}`;
+    }
+    return this.backupCode;
+  }
+
+}
+
 export class RefreshTokenRequest {
   public readonly refreshToken: string;
 
@@ -148,6 +190,75 @@ export class ForgotPasswordRequest {
   get isValid(): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return !!(this.email && emailRegex.test(this.email.trim()));
+  }
+
+}
+
+// ============================================
+// FORGOT PASSWORD WITH 2FA
+// ============================================
+
+export interface Check2FAStatusResponseData {
+  has2FA: boolean;
+  emailExists: boolean;
+}
+
+export class Check2FAStatusResponse {
+  public readonly has2FA: boolean;
+  public readonly emailExists: boolean;
+
+  constructor(data: Check2FAStatusResponseData) {
+    this.has2FA = data.has2FA;
+    this.emailExists = data.emailExists;
+  }
+
+  /**
+   * Check if 2FA verification is required for password reset
+   */
+  get requires2FAForReset(): boolean {
+    return this.has2FA && this.emailExists;
+  }
+
+}
+
+export interface ForgotPasswordWith2FARequestData {
+  email: string;
+  twoFactorCode?: string;
+  backupCode?: string;
+}
+
+export class ForgotPasswordWith2FARequest {
+  public readonly email: string;
+  public readonly twoFactorCode?: string;
+  public readonly backupCode?: string;
+
+  constructor(data: ForgotPasswordWith2FARequestData) {
+    this.email = data.email;
+    this.twoFactorCode = data.twoFactorCode;
+    this.backupCode = data.backupCode?.toUpperCase().replace(/\s/g, '');
+  }
+
+  /**
+   * Validate forgot password with 2FA request
+   * Must have email and either 2FA code OR backup code
+   */
+  get isValid(): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailValid = !!(this.email && emailRegex.test(this.email.trim()));
+    
+    const has2FACode = !!(this.twoFactorCode?.trim() && this.twoFactorCode.length === 6);
+    const hasBackupCode = !!(this.backupCode?.trim() && this.backupCode.length === 8);
+    
+    return emailValid && (has2FACode || hasBackupCode);
+  }
+
+  /**
+   * Check which verification method is being used
+   */
+  get verificationType(): '2fa' | 'backup' | 'none' {
+    if (this.twoFactorCode?.trim()) return '2fa';
+    if (this.backupCode?.trim()) return 'backup';
+    return 'none';
   }
 
 }

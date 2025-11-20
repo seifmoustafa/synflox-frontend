@@ -7,7 +7,10 @@ import {
   LoginResponse,
   RefreshTokenRequest,
   Verify2FARequest,
+  VerifyBackupCodeRequest,
   ForgotPasswordRequest,
+  ForgotPasswordWith2FARequest,
+  Check2FAStatusResponse,
   ValidateMagicLinkRequest,
   MagicLinkValidationResponse,
   ResetPasswordRequest,
@@ -87,6 +90,43 @@ export class AuthService {
       throw new Error(errorMessage);
     } catch (error) {
       appLogger.error("2FA verification failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verify backup code for login recovery (when 2FA device is lost)
+   * Backup codes are one-time use codes for 2FA recovery
+   */
+  async verifyBackupCode(request: VerifyBackupCodeRequest): Promise<Profile> {
+    try {
+      // SYNFLOX API: POST /api/admin/auth/verify-backup-code
+      // Backend returns same format as login: { statusCode, message, data: { success, accessToken, refreshToken, admin } }
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.AUTH_VERIFY_BACKUP_CODE,
+        AuthMapper.verifyBackupCodeRequestToJson(request)
+      );
+
+      // Handle SYNFLOX response format
+      const loginData = response?.data || response;
+      const loginResponse = AuthMapper.loginResponseFromJson(loginData);
+
+      if (loginResponse.isSuccessful && loginResponse.accessToken) {
+        secureTokenService.setAccessToken(loginResponse.accessToken);
+        secureTokenService.setRefreshToken(loginResponse.refreshToken);
+        
+        // If admin data is in response, use it; otherwise fetch user
+        if (loginData?.admin) {
+          return AccountMapper.fromJson(loginData.admin);
+        }
+        return this.getMe();
+      }
+
+      // Handle error message from backend
+      const errorMessage = loginResponse.errorMessage || response?.message || "Backup code verification failed.";
+      throw new Error(errorMessage);
+    } catch (error) {
+      appLogger.error("Backup code verification failed:", error);
       throw error;
     }
   }
@@ -186,6 +226,50 @@ export class AuthService {
       return result;
     } catch (error) {
       appLogger.error("Forgot password failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if an email has 2FA enabled (for forgot password flow)
+   * Does NOT leak user existence for security
+   */
+  async check2FAStatus(email: string): Promise<Check2FAStatusResponse> {
+    try {
+      // SYNFLOX API: GET /api/admin/auth/check-2fa-status?email={email}
+      // Backend returns: { statusCode, message, data: { has2FA, emailExists } }
+      const response = await this.apiService.get<any>(
+        `${API_ENDPOINTS.AUTH_CHECK_2FA_STATUS}?email=${encodeURIComponent(email)}`
+      );
+
+      const data = response?.data || response;
+      const status = AuthMapper.check2FAStatusResponseFromJson(data);
+      appLogger.info("2FA status checked for email");
+      return status;
+    } catch (error) {
+      appLogger.error("Check 2FA status failed:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Send password reset OTP with 2FA verification (if 2FA enabled)
+   * User must verify 2FA code or backup code before receiving reset email
+   */
+  async forgotPasswordWith2FA(request: ForgotPasswordWith2FARequest): Promise<{ success: boolean; message: string }> {
+    try {
+      // SYNFLOX API: POST /api/admin/auth/forgot-password-with-2fa
+      // Backend returns: { statusCode, message, data }
+      const response = await this.apiService.post<any>(
+        API_ENDPOINTS.AUTH_FORGOT_PASSWORD_WITH_2FA,
+        AuthMapper.forgotPasswordWith2FARequestToJson(request)
+      );
+
+      const result = AuthMapper.handlePasswordResetResponse(response);
+      appLogger.info("Password reset email sent after 2FA verification");
+      return result;
+    } catch (error) {
+      appLogger.error("Forgot password with 2FA failed:", error);
       throw error;
     }
   }

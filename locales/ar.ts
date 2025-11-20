@@ -60,6 +60,17 @@ export const ar = {
     backToLogin: "العودة لتسجيل الدخول",
     enterCode: "يرجى إدخال الرمز المكون من 6 أرقام",
     
+    // Backup Codes (2FA Recovery)
+    backupCode: "رمز النسخ الاحتياطي",
+    backupCodeRequired: "استرجاع بواسطة رمز النسخ الاحتياطي",
+    backupCodeDescription: "أدخل أحد رموز النسخ الاحتياطي المكونة من 8 أحرف",
+    enterBackupCode: "أدخل رمز النسخ الاحتياطي (ABCD-1234)",
+    invalidBackupCode: "رمز النسخ الاحتياطي غير صحيح. يرجى إدخال رمز صحيح مكون من 8 أحرف.",
+    lostTwoFactor: "فقدت جهاز المصادقة؟",
+    backTo2FA: "العودة لرمز المصادقة الثنائية",
+    verifyBackupCode: "تحقق من رمز النسخ الاحتياطي",
+    verifyingBackupCode: "جاري التحقق...",
+    
     // Password Reset
     forgotPassword: "نسيت كلمة المرور؟",
     resetPassword: "إعادة تعيين كلمة المرور",
@@ -74,6 +85,11 @@ export const ar = {
     resettingPassword: "جاري إعادة التعيين...",
     sendResetLink: "إرسال رابط إعادة التعيين",
     sending: "جاري الإرسال...",
+    twoFactorRequiredForReset: "هذا الحساب لديه مصادقة ثنائية مفعلة. يرجى التحقق من هويتك.",
+    emailCheckError: "فشل في التحقق من حالة البريد الإلكتروني",
+    otpSentToEmail: "تم إرسال رمز OTP إلى بريدك الإلكتروني. تحقق من صندوق الوارد!",
+    invalidOtpCode: "رمز OTP غير صحيح أو منتهي الصلاحية",
+    otpVerifiedSuccess: "تم التحقق من OTP! جاري التوجيه لإعادة تعيين كلمة المرور...",
     
     // Password Reset Messages
     forgotPasswordInstructions: "أدخل عنوان بريدك الإلكتروني وسنرسل لك تعليمات لإعادة تعيين كلمة المرور. ستتلقى رمز OTP ورابط سحري لإعادة التعيين بنقرة واحدة.",

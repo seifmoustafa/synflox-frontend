@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Lock, Loader2, Shield, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Lock, Loader2, Shield, ArrowRight, KeyRound } from "lucide-react";
 import { useLoginViewModel } from "@/hooks/use-login-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
 import { useSettings } from "@/providers/settings-provider";
@@ -265,73 +265,172 @@ export function LoginFormView() {
                 </div>
               )}
 
-              {/* 2FA Verification Code */}
+              {/* 2FA Verification Code OR Backup Code */}
               {vm.requires2FA && (
                 <div className={cn(
                   "space-y-4 animate-in fade-in-0 slide-in-from-top-4 duration-500",
                   isRTL && "text-right"
                 )} dir={isRTL ? "rtl" : "ltr"}>
-                  {/* 2FA Header */}
+                  {/* 2FA/Backup Code Header */}
                   <div className="space-y-2 p-4 rounded-xl bg-primary/5 border border-primary/20">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-primary/20">
-                        <Shield className="w-5 h-5 text-primary" />
+                        {vm.useBackupCode ? (
+                          <KeyRound className="w-5 h-5 text-primary" />
+                        ) : (
+                          <Shield className="w-5 h-5 text-primary" />
+                        )}
                       </div>
                       <div>
-                        <h3 className="font-bold text-foreground">{t("auth.twoFactorRequired")}</h3>
-                        <p className="text-sm text-muted-foreground">{t("auth.twoFactorDescription")}</p>
+                        <h3 className="font-bold text-foreground">
+                          {vm.useBackupCode ? t("auth.backupCodeRequired") : t("auth.twoFactorRequired")}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {vm.useBackupCode ? t("auth.backupCodeDescription") : t("auth.twoFactorDescription")}
+                        </p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Verification Code Input */}
-                  <div className="space-y-2">
-                    <label 
-                      htmlFor="verificationCode"
-                      className={cn(
-                        "text-sm font-semibold block transition-colors duration-200",
-                        isRTL && "text-right",
-                        focusedField === "verificationCode" ? "text-primary" : "text-foreground"
-                      )}
-                    >
-                      {t("auth.verificationCode")}
-                    </label>
-                    <div className="relative">
-                      <Input
-                        id="verificationCode"
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={6}
-                        placeholder={t("auth.verificationCodePlaceholder")}
-                        value={vm.formData.verificationCode || ""}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                          const value = e.target.value.replace(/\D/g, "");
-                          vm.updateField("verificationCode", value);
-                        }}
-                        onFocus={() => setFocusedField("verificationCode")}
-                        onBlur={() => setFocusedField(null)}
-                        onKeyPress={(e: React.KeyboardEvent) => {
-                          if (e.key === "Enter" && vm.is2FACodeValid && !vm.isLoading) {
-                            vm.handle2FAVerification();
-                          }
-                        }}
-                        disabled={vm.isLoading}
-                        autoFocus
-                        dir="ltr"
+                  {/* 2FA Code Input */}
+                  {!vm.useBackupCode && (
+                    <div className="space-y-2">
+                      <label 
+                        htmlFor="verificationCode"
                         className={cn(
-                          "h-14 text-2xl text-center tracking-[0.5em] font-bold transition-all duration-300 border-2 rounded-xl",
-                          focusedField === "verificationCode"
-                            ? "border-primary shadow-lg shadow-primary/25 ring-4 ring-primary/10 scale-[1.01]"
-                            : "border-border hover:border-primary/40 hover:shadow-md"
+                          "text-sm font-semibold block transition-colors duration-200",
+                          isRTL && "text-right",
+                          focusedField === "verificationCode" ? "text-primary" : "text-foreground"
                         )}
-                      />
-                      {focusedField === "verificationCode" && (
-                        <div className="absolute inset-0 -z-10 bg-primary/5 rounded-xl blur-xl" />
-                      )}
+                      >
+                        {t("auth.verificationCode")}
+                      </label>
+                      <div className="relative">
+                        <Input
+                          id="verificationCode"
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={6}
+                          placeholder={t("auth.verificationCodePlaceholder")}
+                          value={vm.formData.verificationCode || ""}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            const value = e.target.value.replace(/\D/g, "");
+                            vm.updateField("verificationCode", value);
+                          }}
+                          onFocus={() => setFocusedField("verificationCode")}
+                          onBlur={() => setFocusedField(null)}
+                          onKeyPress={(e: React.KeyboardEvent) => {
+                            if (e.key === "Enter" && vm.is2FACodeValid && !vm.isLoading) {
+                              vm.handle2FAVerification();
+                            }
+                          }}
+                          disabled={vm.isLoading}
+                          autoFocus
+                          dir="ltr"
+                          className={cn(
+                            "h-14 text-2xl text-center tracking-[0.5em] font-bold transition-all duration-300 border-2 rounded-xl",
+                            focusedField === "verificationCode"
+                              ? "border-primary shadow-lg shadow-primary/25 ring-4 ring-primary/10 scale-[1.01]"
+                              : "border-border hover:border-primary/40 hover:shadow-md"
+                          )}
+                        />
+                        {focusedField === "verificationCode" && (
+                          <div className="absolute inset-0 -z-10 bg-primary/5 rounded-xl blur-xl" />
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground text-center">
+                        {t("auth.enterCode")}
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground text-center">
-                      {t("auth.enterCode")}
-                    </p>
+                  )}
+
+                  {/* Backup Code Input */}
+                  {vm.useBackupCode && (
+                    <div className="space-y-2 animate-in fade-in-0 slide-in-from-top-2 duration-300">
+                      <label 
+                        htmlFor="backupCode"
+                        className={cn(
+                          "text-sm font-semibold block transition-colors duration-200",
+                          isRTL && "text-right",
+                          focusedField === "backupCode" ? "text-primary" : "text-foreground"
+                        )}
+                      >
+                        {t("auth.backupCode")}
+                      </label>
+                      <div className="relative">
+                        <Input
+                          id="backupCode"
+                          type="text"
+                          maxLength={9}
+                          placeholder="ABCD-1234"
+                          value={vm.formData.backupCode || ""}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+                            // Auto-format: ABCD-1234
+                            if (value.length > 4) {
+                              value = value.slice(0, 4) + "-" + value.slice(4, 8);
+                            }
+                            vm.updateField("backupCode", value);
+                          }}
+                          onFocus={() => setFocusedField("backupCode")}
+                          onBlur={() => setFocusedField(null)}
+                          onKeyPress={(e: React.KeyboardEvent) => {
+                            if (e.key === "Enter" && vm.isBackupCodeValid && !vm.isLoading) {
+                              vm.handleBackupCodeVerification();
+                            }
+                          }}
+                          disabled={vm.isLoading}
+                          autoFocus
+                          dir="ltr"
+                          className={cn(
+                            "h-14 text-2xl text-center tracking-[0.25em] font-bold uppercase transition-all duration-300 border-2 rounded-xl",
+                            focusedField === "backupCode"
+                              ? "border-primary shadow-lg shadow-primary/25 ring-4 ring-primary/10 scale-[1.01]"
+                              : "border-border hover:border-primary/40 hover:shadow-md"
+                          )}
+                        />
+                        {focusedField === "backupCode" && (
+                          <div className="absolute inset-0 -z-10 bg-primary/5 rounded-xl blur-xl" />
+                        )}
+                      </div>
+                      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                        <KeyRound className="w-3 h-3" />
+                        <span>{t("auth.enterBackupCode")}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Switch between 2FA and Backup Code */}
+                  <div className="flex items-center justify-center gap-2 pt-2">
+                    {!vm.useBackupCode ? (
+                      <button
+                        type="button"
+                        onClick={vm.switchToBackupCode}
+                        disabled={vm.isLoading}
+                        className={cn(
+                          "text-sm font-medium text-primary hover:text-primary/80 transition-all duration-200",
+                          "flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-primary/10",
+                          "disabled:opacity-50 disabled:cursor-not-allowed"
+                        )}
+                      >
+                        <KeyRound className="w-4 h-4" />
+                        <span>{t("auth.lostTwoFactor")}</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={vm.switchTo2FA}
+                        disabled={vm.isLoading}
+                        className={cn(
+                          "text-sm font-medium text-primary hover:text-primary/80 transition-all duration-200",
+                          "flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-primary/10",
+                          "disabled:opacity-50 disabled:cursor-not-allowed"
+                        )}
+                      >
+                        <Shield className="w-4 h-4" />
+                        <span>{t("auth.backTo2FA")}</span>
+                      </button>
+                    )}
                   </div>
 
                   {/* Back to Login */}
@@ -364,8 +463,18 @@ export function LoginFormView() {
               {/* Submit Button */}
               <Button
                 type="button"
-                onClick={vm.requires2FA ? vm.handle2FAVerification : vm.handleLogin}
-                disabled={vm.requires2FA ? (!vm.is2FACodeValid || vm.isLoading) : (!vm.isFormValid || vm.isLoading)}
+                onClick={() => {
+                  if (vm.requires2FA) {
+                    vm.useBackupCode ? vm.handleBackupCodeVerification() : vm.handle2FAVerification();
+                  } else {
+                    vm.handleLogin();
+                  }
+                }}
+                disabled={
+                  vm.requires2FA 
+                    ? (vm.useBackupCode ? (!vm.isBackupCodeValid || vm.isLoading) : (!vm.is2FACodeValid || vm.isLoading))
+                    : (!vm.isFormValid || vm.isLoading)
+                }
                 className={cn(
                   "w-full h-13 mt-2 text-base font-bold relative overflow-hidden group/btn rounded-xl",
                   "bg-gradient-to-r from-primary via-primary to-primary/90",
@@ -382,14 +491,28 @@ export function LoginFormView() {
                   {vm.isLoading ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>{vm.requires2FA ? t("auth.verifying") : t("auth.loggingIn")}</span>
+                      <span>
+                        {vm.requires2FA 
+                          ? (vm.useBackupCode ? t("auth.verifyingBackupCode") : t("auth.verifying"))
+                          : t("auth.loggingIn")
+                        }
+                      </span>
                     </>
                   ) : (
                     <>
                       {vm.requires2FA ? (
                         <>
-                          <Shield className="w-5 h-5" />
-                          <span>{t("auth.verify")}</span>
+                          {vm.useBackupCode ? (
+                            <>
+                              <KeyRound className="w-5 h-5" />
+                              <span>{t("auth.verifyBackupCode")}</span>
+                            </>
+                          ) : (
+                            <>
+                              <Shield className="w-5 h-5" />
+                              <span>{t("auth.verify")}</span>
+                            </>
+                          )}
                           <ArrowRight className={cn(
                             "w-4 h-4 group-hover/btn:translate-x-1 transition-transform",
                             isRTL && "rotate-180 group-hover/btn:-translate-x-1"

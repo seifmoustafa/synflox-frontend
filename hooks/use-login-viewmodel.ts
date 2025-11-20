@@ -7,13 +7,14 @@ import { useI18n } from "@/providers/i18n-provider";
 import { useServices } from "@/providers/service-provider";
 import { handleError, getUserFriendlyErrorMessage } from "@/lib/error-handler";
 import { appLogger } from "@/lib/logger";
-import { AuthMapper, LoginResponse, Verify2FARequest } from "@/domain";
+import { AuthMapper, LoginResponse, Verify2FARequest, VerifyBackupCodeRequest } from "@/domain";
 import { validateForm, VALIDATION_SETS, isFormValid } from "@/lib/validation";
 
 export interface LoginFormData {
   username: string;
   password: string;
   verificationCode?: string;
+  backupCode?: string;
 }
 
 export function useLoginViewModel() {
@@ -21,11 +22,13 @@ export function useLoginViewModel() {
     username: "",
     password: "",
     verificationCode: "",
+    backupCode: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [requires2FA, setRequires2FA] = useState(false);
+  const [useBackupCode, setUseBackupCode] = useState(false);
   const [savedCredentials, setSavedCredentials] = useState({ username: "", password: "" });
 
   const { login, isAuthenticated } = useAuth();
@@ -128,10 +131,61 @@ export function useLoginViewModel() {
     }
   }, [formData.verificationCode, savedCredentials, authService, router, t]);
 
+  // Switch to backup code mode
+  const switchToBackupCode = useCallback(() => {
+    setUseBackupCode(true);
+    setFormData(prev => ({ ...prev, verificationCode: "", backupCode: "" }));
+    setError("");
+  }, []);
+
+  // Switch back to 2FA code mode
+  const switchTo2FA = useCallback(() => {
+    setUseBackupCode(false);
+    setFormData(prev => ({ ...prev, verificationCode: "", backupCode: "" }));
+    setError("");
+  }, []);
+
+  // Backup code verification handler
+  const handleBackupCodeVerification = useCallback(async () => {
+    // Validate backup code (8 characters: ABCD1234)
+    if (!formData.backupCode || formData.backupCode.trim().replace(/[-\s]/g, '').length !== 8) {
+      setError(t("auth.invalidBackupCode"));
+      return;
+    }
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Create backup code verification request
+      const verifyBackupCodeRequest = new VerifyBackupCodeRequest({
+        username: savedCredentials.username,
+        backupCode: formData.backupCode.trim().replace(/[-\s]/g, ''), // Remove dashes/spaces
+      });
+      
+      appLogger.info("Verifying backup code for login recovery");
+      const user = await authService.verifyBackupCode(verifyBackupCodeRequest);
+      
+      // Verification successful
+      appLogger.info("Backup code verification successful", { userId: user.id });
+      
+      // Force full page reload to trigger AuthProvider.checkAuth
+      window.location.href = "/";
+    } catch (error) {
+      const appError = handleError(error as Error, 'Backup Code Verification');
+      appLogger.error("Backup code verification failed:", { error, appError });
+      const errorMessage = getUserFriendlyErrorMessage(appError);
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [formData.backupCode, savedCredentials, authService, router, t]);
+
   // Back to login (cancel 2FA)
   const backToLogin = useCallback(() => {
     setRequires2FA(false);
-    setFormData(prev => ({ ...prev, verificationCode: "" }));
+    setUseBackupCode(false);
+    setFormData(prev => ({ ...prev, verificationCode: "", backupCode: "" }));
     setSavedCredentials({ username: "", password: "" });
     setError("");
   }, []);
@@ -158,12 +212,16 @@ export function useLoginViewModel() {
     error,
     isAuthenticated,
     requires2FA,
+    useBackupCode,
 
     // Actions
     updateField,
     togglePasswordVisibility,
     handleLogin,
     handle2FAVerification,
+    handleBackupCodeVerification,
+    switchToBackupCode,
+    switchTo2FA,
     backToLogin,
     redirectIfAuthenticated,
     resetForm,
@@ -171,5 +229,6 @@ export function useLoginViewModel() {
     // Computed
     isFormValid: isFormValid(validateForm(formData, VALIDATION_SETS.LOGIN_FORM)),
     is2FACodeValid: formData.verificationCode?.trim().length === 6,
+    isBackupCodeValid: formData.backupCode?.trim().replace(/[-\s]/g, '').length === 8,
   };
 }
