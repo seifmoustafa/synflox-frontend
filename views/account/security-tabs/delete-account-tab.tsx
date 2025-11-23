@@ -178,7 +178,6 @@ export function DeleteAccountTab() {
                   variant="destructive"
                   onClick={() => {
                     // TODO: Implement actual delete
-                    console.log('Account deleted');
                     setShowConfirmDialog(false);
                   }}
                   className="flex-1"

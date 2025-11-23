@@ -31,11 +31,7 @@ export class DashboardService implements IDashboardService {
    */
   async getDashboard(): Promise<Dashboard> {
     try {
-      console.log('[DashboardService] Fetching dashboard from /dashboard endpoint...');
       const response = await this.apiService.get<DashboardResponse>('/dashboard');
-      console.log('[DashboardService] Raw response from API:', response);
-      console.log('[DashboardService] Response type:', typeof response);
-      console.log('[DashboardService] Response keys:', response ? Object.keys(response) : 'null');
       return DashboardMapper.handleApiResponse(response);
     } catch (error) {
       console.error('[DashboardService] Error loading dashboard:', error);

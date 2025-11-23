@@ -211,15 +211,6 @@ export function GenericTable<T extends Record<string, any>>({
 
   // Debug sticky actions and handle scroll shadows
   useEffect(() => {
-    if (stickyActions && actions && actions.length > 0) {
-      console.log("Sticky Actions Debug:", {
-        stickyActions,
-        actionsCount: actions.length,
-        direction,
-        hasActionsColumn: !!actionsColumnRef.current,
-      });
-    }
-
     // Handle scroll shadows
     const handleScrollShadows = () => {
       const tableContainer = tableRef.current;

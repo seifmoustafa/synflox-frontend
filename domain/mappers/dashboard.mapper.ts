@@ -227,7 +227,6 @@ export class DashboardMapper {
    */
   static handleApiResponse(response: any): Dashboard {
     // Log the response for debugging
-    console.log('[DashboardMapper] Raw API Response:', JSON.stringify(response, null, 2));
     
     // Handle null/undefined
     if (!response) {
@@ -236,7 +235,6 @@ export class DashboardMapper {
     
     // Format 1: Has 'data' property (nested response)
     if (response.data) {
-      console.log('[DashboardMapper] Detected nested format with data property');
       // Check if it's successful (if succeeded field exists)
       if (response.succeeded !== undefined && !response.succeeded) {
         throw new Error(response.message || 'Failed to load dashboard data');
@@ -247,7 +245,6 @@ export class DashboardMapper {
     
     // Format 2: Direct DashboardDto response (unwrapped)
     if (response.overview || response.companies || response.subscriptions) {
-      console.log('[DashboardMapper] Detected direct DashboardDto format');
       return this.fromJson(response as DashboardData);
     }
     

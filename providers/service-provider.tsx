@@ -13,6 +13,7 @@ import { AdminTypeService } from "@/services/admin-type.service";
 import { CompanyService } from "@/services/company.service";
 import { ProjectService } from "@/services/project.service";
 import { ModuleService } from "@/services/module.service";
+import { SubscriptionPlanService } from "@/services/subscription-plan.service";
 import { DashboardService } from "@/services/dashboard.service";
 
 interface Services {
@@ -27,6 +28,7 @@ interface Services {
   companyService: CompanyService;
   projectService: ProjectService;
   moduleService: ModuleService;
+  subscriptionPlanService: SubscriptionPlanService;
   dashboardService: DashboardService;
 }
 
@@ -45,6 +47,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
     const companyService = new CompanyService(apiService, notificationService);
     const projectService = new ProjectService(apiService, notificationService);
     const moduleService = new ModuleService(apiService, notificationService);
+    const subscriptionPlanService = new SubscriptionPlanService(apiService, notificationService);
     const dashboardService = new DashboardService(apiService, notificationService);
 
     return {
@@ -59,6 +62,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
       companyService,
       projectService,
       moduleService,
+      subscriptionPlanService,
       dashboardService,
     };
   }, []);

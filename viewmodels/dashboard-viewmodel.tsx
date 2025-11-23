@@ -120,7 +120,6 @@ export function useDashboardViewModel() {
     
     // Exponential backoff: 1s, 2s, 4s
     const delay = Math.pow(2, retryCount) * 1000;
-    console.log(`[Dashboard] Retrying in ${delay}ms (attempt ${retryCount + 1}/${maxRetries})`);
     
     setTimeout(() => {
       loadDashboard();
@@ -130,7 +129,6 @@ export function useDashboardViewModel() {
   // Monitor online/offline status
   useEffect(() => {
     const handleOnline = () => {
-      console.log('[Dashboard] Network back online');
       setIsOnline(true);
       if (error && errorType === 'network') {
         loadDashboard();

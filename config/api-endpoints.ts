@@ -99,6 +99,13 @@ export const API_ENDPOINTS = {
     BY_ID: (id: string) => `/modules/${id}`,
   },
   
+  // Subscription Plans Management
+  PLANS: {
+    GET_ALL: "/plans",
+    BY_ID: (id: string) => `/plans/${id}`,
+    CREATE: "/plans",
+  },
+  
   // Licensing Operations
   LICENSING_ACTIVATE: "/licensing",
   LICENSING_SUSPEND: "/licensing",

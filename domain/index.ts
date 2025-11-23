@@ -119,6 +119,21 @@ export {
 } from './models/module.model';
 export type { ModulesResponse } from './mappers/module.mapper';
 
+// Subscription Plan domain
+export {
+  SubscriptionPlan,
+  CreatePlanRequest,
+  UpdatePlanRequest,
+  PlanDurationType,
+  UpgradePolicy,
+  Currency,
+  type SubscriptionPlanData,
+  type CreatePlanRequestData,
+  type UpdatePlanRequestData,
+  type PlanPriceData,
+} from './models/subscription-plan.model';
+export type { SubscriptionPlansResponse } from './mappers/subscription-plan.mapper';
+
 // Dashboard domain
 export {
   Dashboard,
@@ -168,4 +183,4 @@ export {
 } from './models/security.model';
 
 // Mappers
-export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, DashboardMapper, SecurityMapper } from './mappers';
+export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, DashboardMapper, SecurityMapper } from './mappers';
