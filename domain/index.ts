@@ -88,6 +88,17 @@ export {
 } from './models/admin-type.model';
 export type { AdminTypesResponse } from './mappers/admin-type.mapper';
 
+// Company domain
+export {
+  Company,
+  CreateCompanyRequest,
+  UpdateCompanyRequest,
+  type CompanyData,
+  type CreateCompanyRequestData,
+  type UpdateCompanyRequestData,
+  type CompaniesResponse
+} from './models/company.model';
+
 // Dashboard domain
 export {
   Dashboard,
@@ -137,4 +148,4 @@ export {
 } from './models/security.model';
 
 // Mappers
-export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, DashboardMapper, SecurityMapper } from './mappers';
+export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, DashboardMapper, SecurityMapper } from './mappers';

@@ -78,6 +78,15 @@ export const API_ENDPOINTS = {
   COMPANIES_UPDATE: "/companies",
   COMPANIES_DELETE: "/companies",
   
+  // Company Individual Actions
+  COMPANIES_ACTIVATE: "/companies",
+  COMPANIES_DEACTIVATE: "/companies",
+  
+  // Company Bulk Actions
+  COMPANIES_BULK_ACTIVATE: "/companies/bulk/activate",
+  COMPANIES_BULK_DEACTIVATE: "/companies/bulk/deactivate",
+  COMPANIES_BULK_DELETE: "/companies/bulk/delete",
+  
   // Licensing Operations
   LICENSING_ACTIVATE: "/licensing",
   LICENSING_SUSPEND: "/licensing",

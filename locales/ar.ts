@@ -701,6 +701,29 @@ export const ar = {
     },
     active: "نشط",
     inactive: "غير نشط",
+    
+    // Actions
+    activate: "تفعيل",
+    deactivate: "إلغاء التفعيل",
+    activateSelected: "تفعيل المحدد",
+    deactivateSelected: "إلغاء تفعيل المحدد",
+    deleteSelected: "حذف المحدد",
+    
+    // Confirmations
+    confirmActivate: "تأكيد التفعيل",
+    confirmDeactivate: "تأكيد إلغاء التفعيل",
+    activateConfirmation: "هل أنت متأكد من رغبتك في تفعيل {count} شركة/شركات؟",
+    deactivateConfirmation: "هل أنت متأكد من رغبتك في إلغاء تفعيل {count} شركة/شركات؟",
+    deleteSelectedConfirmation: "هل أنت متأكد من رغبتك في حذف {count} شركة/شركات؟",
+    activateSingleConfirmation: "هل أنت متأكد من رغبتك في تفعيل هذه الشركة؟",
+    deactivateSingleConfirmation: "هل أنت متأكد من رغبتك في إلغاء تفعيل هذه الشركة؟",
+    
+    // Success messages
+    activatedSuccess: "تم تفعيل {count} شركة/شركات بنجاح",
+    deactivatedSuccess: "تم إلغاء تفعيل {count} شركة/شركات بنجاح",
+    deletedSuccess: "تم حذف {count} شركة/شركات بنجاح",
+    companyActivated: "تم تفعيل الشركة بنجاح",
+    companyDeactivated: "تم إلغاء تفعيل الشركة بنجاح",
   },
 
   // Licensing

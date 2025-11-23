@@ -710,6 +710,29 @@ export const en = {
     },
     active: "Active",
     inactive: "Inactive",
+    
+    // Actions
+    activate: "Activate",
+    deactivate: "Deactivate",
+    activateSelected: "Activate Selected",
+    deactivateSelected: "Deactivate Selected",
+    deleteSelected: "Delete Selected",
+    
+    // Confirmations
+    confirmActivate: "Confirm Activation",
+    confirmDeactivate: "Confirm Deactivation",
+    activateConfirmation: "Are you sure you want to activate {count} company(ies)?",
+    deactivateConfirmation: "Are you sure you want to deactivate {count} company(ies)?",
+    deleteSelectedConfirmation: "Are you sure you want to delete {count} company(ies)?",
+    activateSingleConfirmation: "Are you sure you want to activate this company?",
+    deactivateSingleConfirmation: "Are you sure you want to deactivate this company?",
+    
+    // Success messages
+    activatedSuccess: "Successfully activated {count} company(ies)",
+    deactivatedSuccess: "Successfully deactivated {count} company(ies)",
+    deletedSuccess: "Successfully deleted {count} company(ies)",
+    companyActivated: "Company activated successfully",
+    companyDeactivated: "Company deactivated successfully",
   },
 
   // Licensing
