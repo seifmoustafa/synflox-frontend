@@ -629,21 +629,30 @@ export const ar = {
 
   // Navigation
   nav: {
-    account:"الحساب الشخصي",
-    security:"الأمان",
+    account: "الحساب الشخصي",
+    security: "الأمان",
     dashboard: "لوحة التحكم",
-    companies: "الشركات",
     notifications: "الإشعارات",
     activity: "النشاط",
-    admins: "المسؤولون",
-    AdminTypes: "أنواع المسؤولين",
     profile: "الملف الشخصي",
     settings: "الإعدادات",
     logout: "تسجيل خروج",
-    System: "النظام",
-    Admins:"المسؤولون",
-    Subscribers: "المشتركون",
-    Companies: "الشركات",
+    
+    // Parent Menu Items
+    system: "النظام",
+    productCatalog: "كتالوج المنتجات",
+    
+    // System Menu Items
+    admins: "المسؤولون",
+    adminTypes: "أنواع المسؤولين",
+    companies: "الشركات",
+    
+    // Product Catalog Menu Items
+    projects: "المشاريع",
+    modules: "الوحدات",
+    plans: "الخطط",
+    subscriptions: "الاشتراكات",
+    licenses: "مفاتيح الترخيص",
   },
 
   // Company
@@ -724,6 +733,29 @@ export const ar = {
     deletedSuccess: "تم حذف {count} شركة/شركات بنجاح",
     companyActivated: "تم تفعيل الشركة بنجاح",
     companyDeactivated: "تم إلغاء تفعيل الشركة بنجاح",
+  },
+
+  // Project
+  project: {
+    title: "إدارة المشاريع",
+    description: "إدارة المنتجات والتطبيقات",
+    item: "مشروع",
+    items: "المشاريع",
+    name: "اسم المشروع",
+    namePlaceholder: "أدخل اسم المشروع",
+    projectDescription: "الوصف",
+    descriptionPlaceholder: "أدخل وصف المشروع",
+    features: "الميزات",
+    feature: "ميزة",
+    featuresPlaceholder: "أضف ميزة",
+    featuresHelper: "اضغط Enter لإضافة كل ميزة",
+    modules: "الوحدات",
+    module: "وحدة",
+    moduleCount: "عدد الوحدات",
+    featureCount: "عدد الميزات",
+    noModules: "لا توجد وحدات بعد",
+    noModulesDescription: "ستظهر الوحدات هنا عند إضافتها إلى هذا المشروع",
+    notFound: "المشروع غير موجود",
   },
 
   // Licensing
@@ -3263,7 +3295,10 @@ export const ar = {
     delete: "حذف",
     edit: "تعديل",
     view: "عرض",
+    details: "التفاصيل",
     add: "إضافة",
+    overview: "نظرة عامة",
+    created: "تم الإنشاء",
     add_child: "إضافة فرع",
     will_add_under: "سيتم إضافته تحت",
     edit_location_under: "تعديل الموقع تحت",

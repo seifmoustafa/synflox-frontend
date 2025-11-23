@@ -11,6 +11,7 @@ import { ProfileService } from "@/services/profile.service";
 import { AdminService } from "@/services/admin.service";
 import { AdminTypeService } from "@/services/admin-type.service";
 import { CompanyService } from "@/services/company.service";
+import { ProjectService } from "@/services/project.service";
 import { DashboardService } from "@/services/dashboard.service";
 
 interface Services {
@@ -23,6 +24,7 @@ interface Services {
   adminService: AdminService;
   adminTypeService: AdminTypeService;
   companyService: CompanyService;
+  projectService: ProjectService;
   dashboardService: DashboardService;
 }
 
@@ -39,6 +41,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
     const adminService = new AdminService(apiService, notificationService);
     const adminTypeService = new AdminTypeService(apiService, notificationService);
     const companyService = new CompanyService(apiService, notificationService);
+    const projectService = new ProjectService(apiService, notificationService);
     const dashboardService = new DashboardService(apiService, notificationService);
 
     return {
@@ -51,6 +54,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
       adminService,
       adminTypeService,
       companyService,
+      projectService,
       dashboardService,
     };
   }, []);

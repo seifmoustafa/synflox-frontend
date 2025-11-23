@@ -16,6 +16,7 @@ import {
   MapPin,
   Store,
   Building,
+  Building2,
   ContrastIcon,
   HardHat,
   Move3D,
@@ -35,6 +36,8 @@ import {
   Ticket,
   ShieldUser,
   Tag,
+  FolderKanban,
+  Boxes,
 } from "lucide-react";
 
 export interface NavigationItem {
@@ -54,43 +57,85 @@ export interface NavigationItem {
  * 
  * For menu items, use these icon names in your backend response:
  * 
- * - Admins: "Users2" (recommended) or "Users" or "UserShield"
- * - Admin Types: "ShieldCheck" (recommended) or "Shield" or "UserShield"
- * - Companies: "Building"
- * - Settings: "Settings" or "Cog"
- * - Dashboard: "LayoutDashboard"
+ * SYSTEM MENU:
+ * - System Parent: "settings" or "Settings"
+ * - Admins: "users" or "Users"
+ * - Admin Types: "shield-check" or "ShieldCheck"
+ * - Companies: "building-2" or "Building2"
  * 
- * The system supports case-insensitive matching, so "users2", "Users2", or "USERS2" all work.
+ * PRODUCT CATALOG MENU:
+ * - Product Catalog Parent: "package" or "Package"
+ * - Projects: "folder-kanban" or "FolderKanban"
+ * - Modules: "boxes" or "Boxes"
+ * - Plans: "package" or "Package" (future)
+ * - Subscriptions: "calendar-check" (future)
+ * - License Keys: "key" (future)
+ * 
+ * OTHER:
+ * - Dashboard: "LayoutDashboard"
+ * - Settings: "Settings" or "Cog"
+ * 
+ * ✅ The system supports:
+ * - Case-insensitive matching: "users2", "Users2", or "USERS2" all work
+ * - Kebab-case: "shield-check", "building-2", "folder-kanban"
+ * - PascalCase: "ShieldCheck", "Building2", "FolderKanban"
  */
 export const iconMap: Record<string, any> = {
-  MapPin: MapPin,
-  ShieldCheck: ShieldCheck,
-  ArrowRightLeft: ArrowRightLeft,
-  HardHat: HardHat,
-  Users2: Users2,
-  Shield: Shield,
-  Truck: Truck,
-  ScrollText: ScrollText,
-  Package2: Package2,
-  FolderTree: FolderTree,
-  Grid3X3: Grid3X3,
-  Package: Package,
-  Warehouse: Warehouse,
-  Store: Store,
+  // Dashboard & Layout
   LayoutDashboard: LayoutDashboard,
-  Users: Users,
-  BarChart3: BarChart3,
   Settings: Settings,
-  User: User,
-  Building: Building,
   Cog: Cog,
-  FileText: FileText,
+  
+  // Users & Admin
+  Users: Users,
+  Users2: Users2,
+  User: User,
+  UserShield: ShieldUser,
+  UserTag: Tag,
+  Shield: Shield,
+  ShieldCheck: ShieldCheck,
+  
+  // Buildings & Companies
+  Building: Building,
+  Building2: Building2,
+  Store: Store,
+  Warehouse: Warehouse,
+  
+  // Projects & Organization
+  FolderTree: FolderTree,
+  FolderKanban: FolderKanban,
+  Boxes: Boxes,
+  Package: Package,
+  Package2: Package2,
+  
+  // Charts & Analytics
+  BarChart3: BarChart3,
   TrendingUp: TrendingUp,
   PieChart: PieChart,
   BarChart: BarChart,
+  
+  // Other
+  MapPin: MapPin,
+  ArrowRightLeft: ArrowRightLeft,
+  HardHat: HardHat,
+  Truck: Truck,
+  ScrollText: ScrollText,
+  Grid3X3: Grid3X3,
+  FileText: FileText,
   Type: Type,
-  UserShield: ShieldUser,
-  UserTag: Tag,
+  Palette: Palette,
+  Map: Map,
+  Ticket: Ticket,
+  Move3D: Move3D,
+  
+  // Kebab-case aliases (for backend compatibility)
+  'settings': Settings,
+  'package': Package,
+  'users': Users,
+  'shield-check': ShieldCheck,
+  'building-2': Building2,
+  'folder-kanban': FolderKanban,
+  'boxes': Boxes,
 };
 
 /**
@@ -130,19 +175,43 @@ export const USE_DYNAMIC_NAVIGATION = true;
 // STATIC NAVIGATION - Used when USE_DYNAMIC_NAVIGATION is false
 export const navigation: NavigationItem[] = [
   {
-    name: "nav.companies",
-    href: "/companies",
-    icon: Building,
+    name: "nav.system",
+    href: undefined,
+    icon: Settings,
+    children: [
+      {
+        name: "nav.admins",
+        href: "/admins",
+        icon: Users,
+      },
+      {
+        name: "nav.adminTypes",
+        href: "/admin-types",
+        icon: ShieldCheck,
+      },
+      {
+        name: "nav.companies",
+        href: "/companies",
+        icon: Building2,
+      },
+    ],
   },
   {
-    name: "nav.admins",
-    href: "/admins",
-    icon: Users2, // Better icon for admins (multiple users)
-  },
-  {
-    name: "nav.adminTypes",
-    href: "/admin-types",
-    icon: ShieldCheck, // Better icon for admin types (shield with checkmark)
+    name: "nav.productCatalog",
+    href: undefined,
+    icon: Package,
+    children: [
+      {
+        name: "nav.projects",
+        href: "/projects",
+        icon: FolderKanban,
+      },
+      {
+        name: "nav.modules",
+        href: "/modules",
+        icon: Boxes,
+      },
+    ],
   },
 ];
 

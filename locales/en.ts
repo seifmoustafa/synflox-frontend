@@ -639,20 +639,30 @@ export const en = {
 
   // Navigation
   nav: {
-    account:"Account",
-    security:"Security",
+    account: "Account",
+    security: "Security",
     dashboard: "Dashboard",
-    companies: "Companies",
     notifications: "Notifications",
     activity: "Activity",
     profile: "Profile",
     settings: "Settings",
     logout: "Logout",
-    System: "System",
-    Subscribers: "Subscribers",
-    Companies: "Companies",
-    Admins: "Admins",
-    AdminTypes: "Admin Types",
+    
+    // Parent Menu Items
+    system: "System",
+    productCatalog: "Product Catalog",
+    
+    // System Menu Items
+    admins: "Admins",
+    adminTypes: "Admin Types",
+    companies: "Companies",
+    
+    // Product Catalog Menu Items
+    projects: "Projects",
+    modules: "Modules",
+    plans: "Plans",
+    subscriptions: "Subscriptions",
+    licenses: "License Keys",
   },
 
   // Company
@@ -733,6 +743,29 @@ export const en = {
     deletedSuccess: "Successfully deleted {count} company(ies)",
     companyActivated: "Company activated successfully",
     companyDeactivated: "Company deactivated successfully",
+  },
+
+  // Project
+  project: {
+    title: "Projects Management",
+    description: "Manage products and applications",
+    item: "Project",
+    items: "Projects",
+    name: "Project Name",
+    namePlaceholder: "Enter project name",
+    projectDescription: "Description",
+    descriptionPlaceholder: "Enter project description",
+    features: "Features",
+    feature: "Feature",
+    featuresPlaceholder: "Add a feature",
+    featuresHelper: "Press Enter to add each feature",
+    modules: "Modules",
+    module: "Module",
+    moduleCount: "Module Count",
+    featureCount: "Feature Count",
+    noModules: "No modules yet",
+    noModulesDescription: "Modules will appear here when added to this project",
+    notFound: "Project not found",
   },
 
   // Licensing
@@ -3261,7 +3294,12 @@ export const en = {
     delete: "Delete",
     edit: "Edit",
     view: "View",
+    details: "Details",
     add: "Add",
+    active: "Active",
+    inactive: "Inactive",
+    overview: "Overview",
+    created: "Created",
     add_child: "Add child",
     will_add_under: "Will be added under",
     edit_location_under: "Edit location under",

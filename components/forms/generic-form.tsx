@@ -55,6 +55,7 @@ import { cn, toDateInputValue, fromDateInputValue } from "@/lib/utils";
 import { DatePicker } from "@/components/ui/date-picker";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { ImageUploader } from "@/components/ui/image-uploader";
+import { TagsInput } from "@/components/ui/tags-input";
 
 /**
  * Field option for select, radio, and other choice-based inputs
@@ -105,7 +106,8 @@ export interface FieldConfig {
     | "week"
     | "color"
     | "file"
-    | "image";
+    | "image"
+    | "array";
   placeholder?: string;
   searchPlaceholder?: string; // For searchable selects
   required?: boolean;
@@ -145,6 +147,9 @@ export interface FieldConfig {
   pattern?: string; // For text inputs
   minLength?: number; // For text inputs
   maxLength?: number; // For text inputs
+  // Array field specific
+  maxItems?: number; // For array type (tags input)
+  helperText?: string; // Helper text for any field type
 }
 
 /**
@@ -796,6 +801,15 @@ export function GenericForm({
                     maxSize={field.maxSize}
                     showPreview={field.showPreview !== false}
                     aspectRatio={field.aspectRatio}
+                  />
+                ) : field.type === "array" ? (
+                  <TagsInput
+                    value={formData[field.name] || []}
+                    onChange={(tags) => handleChange(field.name, tags)}
+                    placeholder={field.placeholder}
+                    helperText={field.helperText}
+                    maxTags={field.maxItems}
+                    disabled={field.disabled || readOnly}
                   />
                 ) : field.type === "file" ? (
                   <Input
