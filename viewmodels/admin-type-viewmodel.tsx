@@ -96,6 +96,7 @@ export function useAdminTypeViewModel() {
           className: "text-red-600 hover:text-red-700",
           confirmTitle: t("common.confirmDelete"),
           confirmDescription: t("common.deleteConfirmation", { name: "{name}" }),
+          requiresConfirmation: true,
         },
       ],
     }),

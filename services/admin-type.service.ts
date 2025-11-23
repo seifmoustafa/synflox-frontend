@@ -22,6 +22,7 @@ export interface IAdminTypeService {
     pageSize?: number;
     search?: string;
   }): Promise<AdminTypesResponse>;
+  getAllAdminTypesNoPagination(): Promise<AdminTypesResponse>;
   getAdminTypeById(id: string): Promise<AdminType>;
   createAdminType(data: CreateAdminTypeRequest): Promise<AdminType>;
   updateAdminType(id: string, data: UpdateAdminTypeRequest): Promise<AdminType>;
@@ -98,6 +99,28 @@ export class AdminTypeService implements IAdminTypeService {
     }
   }
 
+  async getAllAdminTypesNoPagination(): Promise<AdminTypesResponse> {
+    try {
+      const response = await this.apiService.get<any>(
+        API_ENDPOINTS.ADMIN_TYPES_GET_ALL_NO_PAGINATION
+      );
+      // Backend returns array directly, not wrapped
+      const data = Array.isArray(response) ? response : (response?.data || []);
+      const adminTypes = data.map((item: any) => AdminTypeMapper.fromJson(item));
+      return {
+        data: adminTypes,
+        pagination: {
+          itemsCount: adminTypes.length,
+          page: 1,
+          pageSize: adminTypes.length,
+          pagesCount: 1,
+        },
+      };
+    } catch (e) {
+      throw e;
+    }
+  }
+
   async deleteAdminType(id: string): Promise<void> {
     try {
       const response = await this.apiService.delete<any>(
@@ -110,15 +133,5 @@ export class AdminTypeService implements IAdminTypeService {
       throw e;
     }
   }
-
-  // async toggleActive(id: string, isActive: boolean): Promise<AdminType> {
-  //   try {
-  //     const updateRequest = new UpdateAdminTypeRequest({ id, isActive });
-  //     return await this.updateAdminType(id, updateRequest);
-  //   } catch (e) {
-  //     // Error message already shown by API service with backend message
-  //     throw e;
-  //   }
-  // }
 }
 

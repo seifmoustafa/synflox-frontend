@@ -1,19 +1,21 @@
 "use client";
 
+import React from "react";
 import { GenericCrudView } from "@/components/ui/generic-crud-view";
 import { useAdminTypeViewModel } from "@/viewmodels/admin-type-viewmodel";
 
 export function AdminTypeView() {
-  const { vm, config, handleDelete } = useAdminTypeViewModel();
+  const { vm, config } = useAdminTypeViewModel();
+
+  if (!vm || !config) {
+    return <div>Loading...</div>;
+  }
 
   return (
-      <GenericCrudView 
-        viewModel={vm} 
-        config={{
-          ...config,
-          getActions: (vm: any, t: any) => config.getActions?.(vm, t, handleDelete) || [],
-        }} 
-      />
+    <GenericCrudView 
+      viewModel={vm} 
+      config={config as any}
+    />
   );
 }
 

@@ -8,6 +8,7 @@ export interface IApiService {
   post<T>(endpoint: string, data?: any, signal?: AbortSignal): Promise<T>;
   put<T>(endpoint: string, data?: any, signal?: AbortSignal): Promise<T>;
   delete<T>(endpoint: string, signal?: AbortSignal): Promise<T>;
+  deleteWithBody<T>(endpoint: string, data?: any, signal?: AbortSignal): Promise<T>;
   putWithRefresh<T>(endpoint: string, data?: any, refreshEndpoint?: string, signal?: AbortSignal): Promise<T>;
 }
 
@@ -375,6 +376,13 @@ export class ApiService implements IApiService {
 
   async delete<T>(endpoint: string, signal?: AbortSignal): Promise<T> {
     return this.request<T>(endpoint, { method: "DELETE" }, signal);
+  }
+
+  async deleteWithBody<T>(endpoint: string, data?: any, signal?: AbortSignal): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: "DELETE",
+      body: data ? JSON.stringify(data) : undefined,
+    }, signal);
   }
 
   /**

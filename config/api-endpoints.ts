@@ -49,8 +49,23 @@ export const API_ENDPOINTS = {
   ADMINS_UPDATE: "/admins",
   ADMINS_DELETE: "/admins",
   
+  // Admin Individual Actions
+  ADMINS_ACTIVATE: "/admins",
+  ADMINS_DEACTIVATE: "/admins",
+  ADMINS_CHANGE_PASSWORD_BY_ID: "/admins",
+  ADMINS_RESET_PASSWORD: "/admins",
+  
+  // Admin Bulk Actions
+  ADMINS_ACTIVATE_SELECTED: "/admins/activate-selected",
+  ADMINS_DEACTIVATE_SELECTED: "/admins/deactivate-selected",
+  ADMINS_ACTIVATE_ALL: "/admins/activate-all",
+  ADMINS_DEACTIVATE_ALL: "/admins/deactivate-all",
+  ADMINS_DELETE_SELECTED: "/admins/selected",
+  ADMINS_DELETE_ALL: "/admins/all",
+  
   // Admin Type Management
   ADMIN_TYPES_GET_ALL: "/admin-types",
+  ADMIN_TYPES_GET_ALL_NO_PAGINATION: "/admin-types/all",
   ADMIN_TYPES_GET_BY_ID: "/admin-types",
   ADMIN_TYPES_CREATE: "/admin-types",
   ADMIN_TYPES_UPDATE: "/admin-types",

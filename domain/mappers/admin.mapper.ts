@@ -32,6 +32,7 @@ export class AdminMapper {
       phoneNumber: json.phoneNumber || null,
       adminTypeId: json.adminTypeId || '',
       adminTypeName: json.adminTypeName || null,
+      isActive: json.isActive ?? true,
     });
   }
 

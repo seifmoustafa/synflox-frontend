@@ -751,10 +751,46 @@ export const en = {
     active: "Active",
     inactive: "Inactive",
     isActive: "Is Active",
+    
+    // Individual actions
+    activate: "Activate",
+    deactivate: "Deactivate",
+    resetPassword: "Reset Password",
+    changePassword: "Change Password",
+    passwordResetSuccess: "Password reset successfully. Temporary password: {password}",
+    resetPasswordConfirmation: "Are you sure you want to reset this admin's password? A temporary password will be generated.",
+    
+    // Bulk actions
+    activateSelected: "Activate Selected",
+    deactivateSelected: "Deactivate Selected",
+    activateAll: "Activate All",
+    deactivateAll: "Deactivate All",
+    deleteSelected: "Delete Selected",
+    deleteAll: "Delete All",
+    
+    // Confirmations
+    confirmActivate: "Confirm Activation",
+    confirmDeactivate: "Confirm Deactivation",
+    confirmDeleteAll: "Confirm Delete All",
+    activateConfirmation: "Are you sure you want to activate {count} admin(s)?",
+    deactivateConfirmation: "Are you sure you want to deactivate {count} admin(s)?",
+    deleteSelectedConfirmation: "Are you sure you want to delete {count} admin(s)?",
+    deleteAllConfirmation: "Type 'DELETE_ALL_ADMINS' to confirm deletion of all admins",
+    deleteAllConfirmationPlaceholder: "Type DELETE_ALL_ADMINS to confirm",
+    activateAllConfirmation: "Are you sure you want to activate all admins?",
+    deactivateAllConfirmation: "Are you sure you want to deactivate all admins?",
+    
+    // Success messages
+    activatedSuccess: "Successfully activated {count} admin(s)",
+    deactivatedSuccess: "Successfully deactivated {count} admin(s)",
+    deletedSuccess: "Successfully deleted {count} admin(s)",
+    adminActivated: "Admin activated successfully",
+    adminDeactivated: "Admin deactivated successfully",
   },
 
   // Admin Type
   adminType: {
+    adminTypeName:"Admin type name",
     title: "Admin Types Management",
     description: "Manage administrator types and roles",
     item: "Admin Type",
@@ -3177,6 +3213,7 @@ export const en = {
 
   // Common
   common: {
+    clearSelection:"Clear Selection",
     reset:"Reset",
     saving:"Saving...",
     saveChanges:"Save Changes",

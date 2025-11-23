@@ -14,6 +14,7 @@ export interface AdminData {
   phoneNumber?: string | null;
   adminTypeId: string;
   adminTypeName?: string | null; // For display purposes
+  isActive?: boolean;
 }
 
 export class Admin {
@@ -24,6 +25,7 @@ export class Admin {
   public readonly phoneNumber?: string | null;
   public readonly adminTypeId: string;
   public readonly adminTypeName?: string | null;
+  public readonly isActive?: boolean;
 
   constructor(data: AdminData) {
     this.id = data.id;
@@ -33,6 +35,7 @@ export class Admin {
     this.phoneNumber = data.phoneNumber;
     this.adminTypeId = data.adminTypeId;
     this.adminTypeName = data.adminTypeName;
+    this.isActive = data.isActive ?? true; // Default to true if not provided
   }
 
   /**

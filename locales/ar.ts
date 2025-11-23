@@ -740,10 +740,46 @@ export const ar = {
     active: "نشط",
     inactive: "غير نشط",
     isActive: "نشط",
+    
+    // Individual actions
+    activate: "تفعيل",
+    deactivate: "إلغاء التفعيل",
+    resetPassword: "إعادة تعيين كلمة المرور",
+    changePassword: "تغيير كلمة المرور",
+    passwordResetSuccess: "تم إعادة تعيين كلمة المرور بنجاح. كلمة المرور المؤقتة: {password}",
+    resetPasswordConfirmation: "هل أنت متأكد من رغبتك في إعادة تعيين كلمة مرور هذا المسؤول؟ سيتم إنشاء كلمة مرور مؤقتة.",
+    
+    // Bulk actions
+    activateSelected: "تفعيل المحدد",
+    deactivateSelected: "إلغاء تفعيل المحدد",
+    activateAll: "تفعيل الكل",
+    deactivateAll: "إلغاء تفعيل الكل",
+    deleteSelected: "حذف المحدد",
+    deleteAll: "حذف الكل",
+    
+    // Confirmations
+    confirmActivate: "تأكيد التفعيل",
+    confirmDeactivate: "تأكيد إلغاء التفعيل",
+    confirmDeleteAll: "تأكيد حذف الكل",
+    activateConfirmation: "هل أنت متأكد من رغبتك في تفعيل {count} مسؤول؟",
+    deactivateConfirmation: "هل أنت متأكد من رغبتك في إلغاء تفعيل {count} مسؤول؟",
+    deleteSelectedConfirmation: "هل أنت متأكد من رغبتك في حذف {count} مسؤول؟",
+    deleteAllConfirmation: "اكتب 'DELETE_ALL_ADMINS' لتأكيد حذف جميع المسؤولين",
+    deleteAllConfirmationPlaceholder: "اكتب DELETE_ALL_ADMINS للتأكيد",
+    activateAllConfirmation: "هل أنت متأكد من رغبتك في تفعيل جميع المسؤولين؟",
+    deactivateAllConfirmation: "هل أنت متأكد من رغبتك في إلغاء تفعيل جميع المسؤولين؟",
+    
+    // Success messages
+    activatedSuccess: "تم تفعيل {count} مسؤول بنجاح",
+    deactivatedSuccess: "تم إلغاء تفعيل {count} مسؤول بنجاح",
+    deletedSuccess: "تم حذف {count} مسؤول بنجاح",
+    adminActivated: "تم تفعيل المسؤول بنجاح",
+    adminDeactivated: "تم إلغاء تفعيل المسؤول بنجاح",
   },
 
   // Admin Type
   adminType: {
+    adminTypeName:"اسم نوع المسؤول",
     title: "إدارة أنواع المسؤولين",
     description: "إدارة أنواع وأدوار المسؤولين",
     item: "نوع مسؤول",
@@ -3174,6 +3210,7 @@ export const ar = {
 
   // Common
   common: {
+    clearSelection: "إلغاء تحديد",
     enabled:"مفعل",
     reset:"إعادة ضبط",
     saving:"جاري الحفظ...",
