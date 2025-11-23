@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 
 export function useProjectViewModel() {
   const router = useRouter();
-  const { projectService } = useServices();
+  const { projectService, moduleService } = useServices();
   const { t } = useI18n();
 
   const vm = useGenericCrudViewModel<
@@ -34,11 +34,87 @@ export function useProjectViewModel() {
       itemTypeNamePlural: t("project.items"),
       getItemDisplayName: (project: Project) => project.displayName,
       searchParamName: "search",
+      dropdownService: {
+        getData: async (params: { page: number; pageSize: number; search?: string }) => {
+          const result = await moduleService.getAllModules(params.page, params.pageSize, params.search);
+          return { data: result.modules };
+        },
+        getLabel: (module: any) => module.name,
+        getValue: (module: any) => module.id,
+      },
+      dropdownSearchParamName: "search",
     }
   );
 
   const config = useMemo(
-    () => ({
+    () => {
+      // Create fields with dropdown options injected
+      const createFieldsWithOptions = [
+        {
+          name: "name",
+          label: t("project.name"),
+          type: "text" as const,
+          placeholder: t("project.namePlaceholder"),
+          required: true,
+        },
+        {
+          name: "description",
+          label: t("project.projectDescription"),
+          type: "textarea" as const,
+          placeholder: t("project.descriptionPlaceholder"),
+        },
+        {
+          name: "features",
+          label: t("project.features"),
+          type: "array" as const,
+          placeholder: t("project.featuresPlaceholder"),
+          helperText: t("project.featuresHelper"),
+          maxItems: 200,
+        },
+        {
+          name: "moduleIds",
+          label: t("project.modules"),
+          type: "multi-select" as const,
+          placeholder: t("project.selectModules"),
+          helperText: t("project.modulesHelper"),
+          options: vm.dropdownOptions || [], // Use dropdown options from viewModel
+        },
+      ];
+
+      const editFieldsWithOptions = [
+        {
+          name: "name",
+          label: t("project.name"),
+          type: "text" as const,
+          placeholder: t("project.namePlaceholder"),
+          required: true,
+        },
+        {
+          name: "description",
+          label: t("project.projectDescription"),
+          type: "textarea" as const,
+          placeholder: t("project.descriptionPlaceholder"),
+        },
+        {
+          name: "features",
+          label: t("project.features"),
+          type: "array" as const,
+          placeholder: t("project.featuresPlaceholder"),
+          helperText: t("project.featuresHelper"),
+          maxItems: 200,
+        },
+        {
+          name: "moduleIds",
+          label: t("project.modules"),
+          type: "multi-select" as const,
+          placeholder: t("project.selectModules"),
+          helperText: t("project.modulesHelper"),
+          options: vm.dropdownOptions || [], // Use dropdown options from viewModel
+        },
+        { name: "id", type: "hidden" as const, required: true },
+      ];
+
+      return {
       titleKey: "project.title",
       subtitleKey: "project.description",
       columns: [
@@ -79,60 +155,17 @@ export function useProjectViewModel() {
           ),
         },
       ],
-      createFields: [
-        {
-          name: "name",
-          label: t("project.name"),
-          type: "text" as const,
-          placeholder: t("project.namePlaceholder"),
-          required: true,
-        },
-        {
-          name: "description",
-          label: t("project.projectDescription"),
-          type: "textarea" as const,
-          placeholder: t("project.descriptionPlaceholder"),
-        },
-        {
-          name: "features",
-          label: t("project.features"),
-          type: "array" as const,
-          placeholder: t("project.featuresPlaceholder"),
-          helperText: t("project.featuresHelper"),
-          maxItems: 200, // Max 200 features per project
-        },
-      ],
-      editFields: [
-        {
-          name: "name",
-          label: t("project.name"),
-          type: "text" as const,
-          placeholder: t("project.namePlaceholder"),
-          required: true,
-        },
-        {
-          name: "description",
-          label: t("project.projectDescription"),
-          type: "textarea" as const,
-          placeholder: t("project.descriptionPlaceholder"),
-        },
-        {
-          name: "features",
-          label: t("project.features"),
-          type: "array" as const,
-          placeholder: t("project.featuresPlaceholder"),
-          helperText: t("project.featuresHelper"),
-          maxItems: 200, // Max 200 features per project
-        },
-        { name: "id", type: "hidden" as const, required: true },
-      ],
+      createFields: createFieldsWithOptions,
+      editFields: editFieldsWithOptions,
       createInitialValues: {
         features: [], // Initialize as empty array
+        moduleIds: [], // Initialize as empty array
       },
       editInitialValues: (project: Project) => ({
         name: project.name,
         description: project.description,
         features: project.features,
+        moduleIds: project.modules.map((m) => m.id), // Extract module IDs from modules
         id: project.id,
       }),
       getActions: (vm: any, t: any, handleDelete?: (item: Project) => void) => [
@@ -156,7 +189,8 @@ export function useProjectViewModel() {
           requiresConfirmation: true,
         },
       ],
-    }),
+    };
+    },
     [t, projectService, vm]
   );
 

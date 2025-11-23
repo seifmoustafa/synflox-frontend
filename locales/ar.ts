@@ -737,6 +737,7 @@ export const ar = {
 
   // Project
   project: {
+    selectModules:"اختار وحدات",
     title: "إدارة المشاريع",
     description: "إدارة المنتجات والتطبيقات",
     item: "مشروع",
@@ -753,9 +754,40 @@ export const ar = {
     module: "وحدة",
     moduleCount: "عدد الوحدات",
     featureCount: "عدد الميزات",
+    modulesHelper: "اختر الوحدات المضمنة في هذا المشروع",
     noModules: "لا توجد وحدات بعد",
     noModulesDescription: "ستظهر الوحدات هنا عند إضافتها إلى هذا المشروع",
     notFound: "المشروع غير موجود",
+  },
+
+  // Module
+  module: {
+    tableDescription:"الوصف" ,
+    title: "إدارة الوحدات",
+    description: "إدارة وحدات الميزات",
+    item: "وحدة",
+    items: "الوحدات",
+    name: "اسم الوحدة",
+    namePlaceholder: "أدخل اسم الوحدة",
+    moduleDescription: "الوصف",
+    descriptionPlaceholder: "أدخل وصف الوحدة",
+    isActive: "نشط",
+    add: "إضافة وحدة",
+    searchPlaceholder: "البحث عن وحدات...",
+    noModules: "لم يتم العثور على وحدات",
+    notFound: "الوحدة غير موجودة",
+    toggleStatus: "تبديل الحالة",
+    confirmToggleStatus: "تبديل حالة الوحدة",
+    toggleStatusWarning: "هل أنت متأكد من تغيير حالة هذه الوحدة؟",
+    activate: "تفعيل",
+    deactivate: "إلغاء التفعيل",
+    projects: "المشاريع",
+    projectCount: "عدد المشاريع",
+    noProjects: "غير مسند إلى أي مشروع",
+    noProjectsDescription: "ستظهر هذه الوحدة في المشاريع عند تعيينها",
+    features: "الميزات",
+    featuresPlaceholder: "أضف ميزة (اضغط Enter)",
+    featuresHelper: "قائمة الميزات المضمنة في هذه الوحدة",
   },
 
   // Licensing
@@ -3265,6 +3297,8 @@ export const ar = {
 
   // Common
   common: {
+    items:"الميزات",
+    inactive:"غير نشط",
     clearSelection: "إلغاء تحديد",
     enabled:"مفعل",
     reset:"إعادة ضبط",

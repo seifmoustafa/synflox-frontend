@@ -39,10 +39,16 @@ export class ProjectService implements IProjectService {
     search?: string;
   }): Promise<ProjectsResponse> {
     try {
-      const response = await this.apiService.get<any>(
-        API_ENDPOINTS.PROJECTS_GET_ALL,
-        params
-      );
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append("page", params.page.toString());
+      if (params?.pageSize) queryParams.append("pageSize", params.pageSize.toString());
+      if (params?.search) queryParams.append("search", params.search);
+
+      const url = queryParams.toString() 
+        ? `${API_ENDPOINTS.PROJECTS.BASE}?${queryParams.toString()}`
+        : API_ENDPOINTS.PROJECTS.BASE;
+
+      const response = await this.apiService.get<any>(url);
       return ProjectMapper.handleApiResponse(response);
     } catch (e) {
       throw e;
@@ -52,7 +58,7 @@ export class ProjectService implements IProjectService {
   async getProjectById(id: string): Promise<Project> {
     try {
       const response = await this.apiService.get<any>(
-        `${API_ENDPOINTS.PROJECTS_GET_BY_ID}/${id}`
+        API_ENDPOINTS.PROJECTS.BY_ID(id)
       );
       const projectData = response?.data || response;
       return ProjectMapper.fromJson(projectData);
@@ -65,7 +71,7 @@ export class ProjectService implements IProjectService {
     try {
       const json = ProjectMapper.createRequestToJson(data);
       const response = await this.apiService.post<any>(
-        API_ENDPOINTS.PROJECTS_CREATE,
+        API_ENDPOINTS.PROJECTS.BASE,
         json
       );
       const projectData = response?.data || response;
@@ -81,7 +87,7 @@ export class ProjectService implements IProjectService {
     try {
       const json = ProjectMapper.updateRequestToJson(data);
       const response = await this.apiService.put<any>(
-        `${API_ENDPOINTS.PROJECTS_UPDATE}/${id}`,
+        API_ENDPOINTS.PROJECTS.BY_ID(id),
         json
       );
       const projectData = response?.data || response;
@@ -96,7 +102,7 @@ export class ProjectService implements IProjectService {
   async deleteProject(id: string): Promise<void> {
     try {
       const response = await this.apiService.delete<any>(
-        `${API_ENDPOINTS.PROJECTS_DELETE}/${id}`
+        API_ENDPOINTS.PROJECTS.BY_ID(id)
       );
       const message = response?.message || "Project deleted successfully";
       this.notificationService.success(message);

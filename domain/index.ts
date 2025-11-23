@@ -108,8 +108,16 @@ export {
   type CreateProjectRequestData,
   type UpdateProjectRequestData,
   type ProjectsResponse,
-  type ModuleData
 } from './models/project.model';
+
+// Module domain
+export {
+  Module,
+  CreateModuleRequest,
+  UpdateModuleRequest,
+  type ModuleData,
+} from './models/module.model';
+export type { ModulesResponse } from './mappers/module.mapper';
 
 // Dashboard domain
 export {
@@ -160,4 +168,4 @@ export {
 } from './models/security.model';
 
 // Mappers
-export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, DashboardMapper, SecurityMapper } from './mappers';
+export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, DashboardMapper, SecurityMapper } from './mappers';

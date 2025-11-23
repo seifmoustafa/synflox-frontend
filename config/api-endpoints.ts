@@ -88,11 +88,16 @@ export const API_ENDPOINTS = {
   COMPANIES_BULK_DELETE: "/companies/bulk/delete",
   
   // Project Management
-  PROJECTS_GET_ALL: "/projects",
-  PROJECTS_GET_BY_ID: "/projects",
-  PROJECTS_CREATE: "/projects",
-  PROJECTS_UPDATE: "/projects",
-  PROJECTS_DELETE: "/projects",
+  PROJECTS: {
+    BASE: "/projects",
+    BY_ID: (id: string) => `/projects/${id}`,
+  },
+
+  // Module Management
+  MODULES: {
+    BASE: "/modules",
+    BY_ID: (id: string) => `/modules/${id}`,
+  },
   
   // Licensing Operations
   LICENSING_ACTIVATE: "/licensing",
