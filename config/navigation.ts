@@ -38,6 +38,9 @@ import {
   Tag,
   FolderKanban,
   Boxes,
+  CalendarCheck,
+  FileKey,
+  Key,
 } from "lucide-react";
 
 export interface NavigationItem {
@@ -107,6 +110,10 @@ export const iconMap: Record<string, any> = {
   Boxes: Boxes,
   Package: Package,
   Package2: Package2,
+  Tag: Tag, // For Plans/Pricing
+  CalendarCheck: CalendarCheck, // For Subscriptions
+  FileKey: FileKey, // For License Management parent
+  Key: Key, // For License Keys (Phase 4)
   
   // Charts & Analytics
   BarChart3: BarChart3,
@@ -136,6 +143,10 @@ export const iconMap: Record<string, any> = {
   'building-2': Building2,
   'folder-kanban': FolderKanban,
   'boxes': Boxes,
+  'tag': Tag, // For Plans menu item
+  'calendar-check': CalendarCheck, // For Subscriptions menu item
+  'file-key': FileKey, // For License Management parent
+  'key': Key, // For License Keys menu item (Phase 4)
 };
 
 /**

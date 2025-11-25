@@ -651,6 +651,7 @@ export const en = {
     // Parent Menu Items
     system: "System",
     productCatalog: "Product Catalog",
+    licenseManagement: "License Management",
     
     // System Menu Items
     admins: "Admins",
@@ -661,6 +662,8 @@ export const en = {
     projects: "Projects",
     modules: "Modules",
     plans: "Plans",
+    
+    // License Management Menu Items
     subscriptions: "Subscriptions",
     licenses: "License Keys",
   },

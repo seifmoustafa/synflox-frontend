@@ -641,6 +641,7 @@ export const ar = {
     // Parent Menu Items
     system: "النظام",
     productCatalog: "كتالوج المنتجات",
+    licenseManagement: "إدارة التراخيص",
     
     // System Menu Items
     admins: "المسؤولون",
@@ -651,6 +652,8 @@ export const ar = {
     projects: "المشاريع",
     modules: "الوحدات",
     plans: "الخطط",
+    
+    // License Management Menu Items
     subscriptions: "الاشتراكات",
     licenses: "مفاتيح الترخيص",
   },
