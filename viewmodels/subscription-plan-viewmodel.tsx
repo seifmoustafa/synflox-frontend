@@ -41,7 +41,25 @@ export function useSubscriptionPlanViewModel() {
     });
   }, [projectService, moduleService]);
 
+  // ⭐ CUSTOM VALIDATION: At least one project or module required
+  const validatePlanContent = (formData: any): string | null => {
+    const hasProjects = formData.projectIds && formData.projectIds.length > 0;
+    const hasModules = formData.moduleIds && formData.moduleIds.length > 0;
+    
+    if (!hasProjects && !hasModules) {
+      return t("plan.mustIncludeContent");
+    }
+    
+    return null;
+  };
+
   const createPlan = async (data: any) => {
+    // ⭐ Validate content before submission
+    const contentError = validatePlanContent(data);
+    if (contentError) {
+      throw new Error(contentError);
+    }
+
     // Convert currency and amount fields into prices array
     const prices = data.currency && data.amount ? [{
       currency: parseInt(data.currency),
@@ -66,6 +84,12 @@ export function useSubscriptionPlanViewModel() {
   };
 
   const updatePlan = async (id: string, data: any) => {
+    // ⭐ Validate content before submission
+    const contentError = validatePlanContent(data);
+    if (contentError) {
+      throw new Error(contentError);
+    }
+
     // Convert currency and amount fields into prices array
     const prices = data.currency && data.amount ? [{
       currency: parseInt(data.currency),
@@ -170,12 +194,17 @@ export function useSubscriptionPlanViewModel() {
           type: "text" as const,
           placeholder: t("plan.namePlaceholder"),
           required: true,
+          minLength: 2,
+          maxLength: 150,
+          helperText: t("plan.nameHelper"),
         },
         {
           name: "description",
           label: t("plan.planDescription"),
           type: "textarea" as const,
           placeholder: t("plan.descriptionPlaceholder"),
+          maxLength: 2000,
+          helperText: t("plan.descriptionHelper"),
         },
         {
           name: "durationType",
@@ -221,19 +250,25 @@ export function useSubscriptionPlanViewModel() {
           label: t("plan.allowTrial"),
           type: "checkbox" as const,
           helperText: t("plan.trialHelper"),
+          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime plans
         },
         {
           name: "trialDurationDays",
           label: t("plan.trialDuration"),
           type: "number" as const,
           placeholder: "14",
-          helperText: t("plan.trialHelper"),
+          required: true,
+          min: 1,
+          max: 60,
+          helperText: t("plan.trialDurationHelper"),
+          isVisible: (formData: any) => formData.durationType !== "99" && formData.allowTrial === true, // Show only if not Lifetime AND trial enabled
         },
         {
           name: "autoRenew",
           label: t("plan.autoRenew"),
           type: "checkbox" as const,
           helperText: t("plan.autoRenewHelper"),
+          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime plans
         },
         {
           name: "upgradePolicy",
@@ -245,13 +280,17 @@ export function useSubscriptionPlanViewModel() {
             { value: "1", label: t("plan.upgradePolicies.prorated") },
             { value: "2", label: t("plan.upgradePolicies.deferred") },
           ],
+          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime (forced to FullReplace)
         },
         {
           name: "gracePeriodDays",
           label: t("plan.gracePeriod"),
           type: "number" as const,
           placeholder: "7",
-          helperText: t("plan.gracePeriodHelper"),
+          min: 0,
+          max: 30,
+          helperText: t("plan.gracePeriodRangeHelper"),
+          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime (forced to 0)
         },
         {
           name: "customFeatures",
@@ -282,12 +321,17 @@ export function useSubscriptionPlanViewModel() {
           type: "text" as const,
           placeholder: t("plan.namePlaceholder"),
           required: true,
+          minLength: 2,
+          maxLength: 150,
+          helperText: t("plan.nameHelper"),
         },
         {
           name: "description",
           label: t("plan.planDescription"),
           type: "textarea" as const,
           placeholder: t("plan.descriptionPlaceholder"),
+          maxLength: 2000,
+          helperText: t("plan.descriptionHelper"),
         },
         {
           name: "durationType",
@@ -333,19 +377,25 @@ export function useSubscriptionPlanViewModel() {
           label: t("plan.allowTrial"),
           type: "checkbox" as const,
           helperText: t("plan.trialHelper"),
+          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime plans
         },
         {
           name: "trialDurationDays",
           label: t("plan.trialDuration"),
           type: "number" as const,
           placeholder: "14",
-          helperText: t("plan.trialHelper"),
+          required: true,
+          min: 1,
+          max: 60,
+          helperText: t("plan.trialDurationHelper"),
+          isVisible: (formData: any) => formData.durationType !== "99" && formData.allowTrial === true, // Show only if not Lifetime AND trial enabled
         },
         {
           name: "autoRenew",
           label: t("plan.autoRenew"),
           type: "checkbox" as const,
           helperText: t("plan.autoRenewHelper"),
+          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime plans
         },
         {
           name: "upgradePolicy",
@@ -357,13 +407,17 @@ export function useSubscriptionPlanViewModel() {
             { value: "1", label: t("plan.upgradePolicies.prorated") },
             { value: "2", label: t("plan.upgradePolicies.deferred") },
           ],
+          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime (forced to FullReplace)
         },
         {
           name: "gracePeriodDays",
           label: t("plan.gracePeriod"),
           type: "number" as const,
           placeholder: "7",
-          helperText: t("plan.gracePeriodHelper"),
+          min: 0,
+          max: 30,
+          helperText: t("plan.gracePeriodRangeHelper"),
+          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime (forced to 0)
         },
         {
           name: "customFeatures",

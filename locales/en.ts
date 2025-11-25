@@ -862,6 +862,11 @@ export const en = {
     },
     gracePeriod: "Grace Period (days)",
     gracePeriodHelper: "Days after expiry before termination (0-30)",
+    gracePeriodRangeHelper: "0-30 days",
+    nameHelper: "2-150 characters",
+    descriptionHelper: "Max 2000 characters",
+    trialDurationHelper: "1-60 days (required when trial enabled)",
+    mustIncludeContent: "Plan must include at least one project or module",
     notFound: "Plan not found",
   },
 

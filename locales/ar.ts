@@ -852,6 +852,11 @@ export const ar = {
     },
     gracePeriod: "فترة السماح (بالأيام)",
     gracePeriodHelper: "الأيام بعد انتهاء الصلاحية قبل الإنهاء (0-30)",
+    gracePeriodRangeHelper: "0-30 يوماً",
+    nameHelper: "2-150 حرفاً",
+    descriptionHelper: "بحد أقصى 2000 حرف",
+    trialDurationHelper: "1-60 يوماً (مطلوب عند تفعيل التجربة)",
+    mustIncludeContent: "يجب أن تتضمن الخطة مشروعاً واحداً أو وحدة واحدة على الأقل",
     notFound: "الخطة غير موجودة",
   },
 
