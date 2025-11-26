@@ -929,6 +929,19 @@ export const en = {
       cancelConfirmation: "Are you sure you want to cancel this subscription? This action cannot be undone.",
     },
     
+    // Upgrade Dialog
+    upgradeDescription: "Select a new plan to upgrade this subscription to:",
+    newPlan: "New Plan",
+    selectNewPlan: "Select a plan to upgrade to",
+    upgradeMode: "Upgrade Mode",
+    selectUpgradeMode: "Select upgrade mode",
+    upgradeModes: {
+      default: "Default from Policy",
+      fullReplace: "Full Replace",
+      prorated: "Prorated",
+      deferred: "Deferred",
+    },
+    
     // Messages
     notFound: "Subscription not found",
     loadError: "Failed to load subscription details",
@@ -1029,6 +1042,7 @@ export const en = {
     customFeaturesDescription: "Additional features included in this plan",
     noFeatures: "No features available for this plan",
     modules: "Modules",
+    viewPlanDetails: "View Plan Details",
     planDescriptionLabel: "Description",
     planFeaturesSummary: "Features Included",
     projectsIncluded: "Projects",

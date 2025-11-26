@@ -34,12 +34,12 @@ export interface CompanySubscriptionsResponse {
  * Upgrade response from API
  */
 export interface UpgradeResponse {
-  newSubscription: Subscription;
-  oldSubscription: Subscription;
+  newSubscription: Subscription | null;
+  oldSubscription: Subscription | null;
   summary: {
     proratedCredit?: number;
     additionalCharge?: number;
-    effectiveDate: string;
+    effectiveDate?: string;
     message: string;
   };
 }
@@ -65,6 +65,7 @@ export class SubscriptionMapper {
       companyName: json.companyName || "Unknown Company",
       planId: json.planId,
       planName: json.planName || "Unknown Plan",
+      planDescription: json.planDescription || null,
       startDateUtc: json.startDateUtc,
       expiryDateUtc: json.expiryDateUtc,
       isActive: json.isActive ?? false,
@@ -91,6 +92,10 @@ export class SubscriptionMapper {
       canUpgrade: json.canUpgrade,
       canExtend: json.canExtend,
       canReactivate: json.canReactivate,
+      // Plan features - handle both camelCase and PascalCase
+      projects: json.projects || json.Projects || [],
+      modules: json.modules || json.Modules || [],
+      customFeatures: json.customFeatures || json.CustomFeatures || [],
     };
 
     const subscription = new Subscription(data);
@@ -219,14 +224,19 @@ export class SubscriptionMapper {
       throw new Error("Invalid upgrade response");
     }
 
+    // Handle both camelCase and PascalCase from backend
+    const data = response.data || response;
+    
     return {
-      newSubscription: this.fromJson(response.newSubscription),
-      oldSubscription: this.fromJson(response.oldSubscription),
+      newSubscription: data.newSubscription || data.NewSubscription 
+        ? this.fromJson(data.newSubscription || data.NewSubscription) 
+        : null,
+      oldSubscription: null, // Not returned by backend
       summary: {
-        proratedCredit: response.summary?.proratedCredit,
-        additionalCharge: response.summary?.additionalCharge,
-        effectiveDate: response.summary?.effectiveDate,
-        message: response.summary?.message || "Upgrade completed",
+        proratedCredit: data.prorationSuggestion?.suggestedCredit || data.ProrationSuggestion?.SuggestedCredit,
+        additionalCharge: data.prorationSuggestion?.netDue || data.ProrationSuggestion?.NetDue,
+        effectiveDate: data.newWindow?.startDateUtc || data.NewWindow?.StartDateUtc,
+        message: data.message || data.Message || "Upgrade completed",
       },
     };
   }

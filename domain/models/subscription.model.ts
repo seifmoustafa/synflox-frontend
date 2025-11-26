@@ -443,7 +443,7 @@ export class SubscriptionStatus {
 export class CreateSubscriptionRequest {
   readonly companyId: string;
   readonly planId: string;
-  readonly currency: Currency;
+  readonly currency?: Currency | null; // Optional - backend will auto-select from plan
   readonly startWithTrial: boolean;
   readonly autoRenew?: boolean | null;
   readonly nextPlanId?: string | null;
@@ -452,7 +452,7 @@ export class CreateSubscriptionRequest {
   constructor(data: {
     companyId: string;
     planId: string;
-    currency: Currency;
+    currency?: Currency | null; // Optional - backend will auto-select from plan
     startWithTrial?: boolean;
     autoRenew?: boolean | null;
     nextPlanId?: string | null;
@@ -473,8 +473,7 @@ export class CreateSubscriptionRequest {
   get isValid(): boolean {
     return (
       !!this.companyId &&
-      !!this.planId &&
-      this.currency !== undefined
+      !!this.planId
     );
   }
 

@@ -33,24 +33,43 @@ export function useSubscriptionViewModel() {
   const [companyOptions, setCompanyOptions] = useState<Array<{ value: string; label: string }>>([]);
   const [planOptions, setPlanOptions] = useState<Array<{ value: string; label: string }>>([]);
   const [dropdownsLoaded, setDropdownsLoaded] = useState(false);
+  const [isLoadingDropdowns, setIsLoadingDropdowns] = useState(false);
 
   // Load companies and plans for dropdowns
   const loadDropdownData = useCallback(async () => {
-    if (dropdownsLoaded) return;
+    if (dropdownsLoaded || isLoadingDropdowns) return;
     
+    setIsLoadingDropdowns(true);
     try {
+      console.log("📥 Loading dropdown data...");
       const [companies, plans] = await Promise.all([
         companyService.getCompanies({ page: 1, pageSize: 100 }),
         subscriptionPlanService.getAllPlans(1, 100)
       ]);
       
-      setCompanyOptions(companies.data.map((c: any) => ({ value: c.id, label: c.name })));
-      setPlanOptions(plans.plans.map((p: any) => ({ value: p.id, label: p.name })));
+      console.log("📦 Companies loaded:", companies);
+      console.log("📦 Plans loaded:", plans);
+      
+      const companyOpts = companies.data.map((c: any) => ({ value: c.id, label: c.name }));
+      const planOpts = plans.plans.map((p: any) => ({ value: p.id, label: p.name }));
+      
+      console.log("✅ Company options:", companyOpts);
+      console.log("✅ Plan options:", planOpts);
+      
+      setCompanyOptions(companyOpts);
+      setPlanOptions(planOpts);
       setDropdownsLoaded(true);
     } catch (error) {
-      console.error("Failed to load dropdown data:", error);
+      console.error("❌ Failed to load dropdown data:", error);
+    } finally {
+      setIsLoadingDropdowns(false);
     }
-  }, [companyService, subscriptionPlanService, dropdownsLoaded]);
+  }, [companyService, subscriptionPlanService, dropdownsLoaded, isLoadingDropdowns]);
+
+  // Load dropdown data on mount
+  useEffect(() => {
+    loadDropdownData();
+  }, [loadDropdownData]);
 
   // Lifecycle operations handlers with ActionFormDialog
   const handleRenew = useCallback((subscription: Subscription) => {
@@ -131,29 +150,29 @@ export function useSubscriptionViewModel() {
 
   const handleUpgrade = useCallback((subscription: Subscription) => {
     showActionForm({
-      title: "Upgrade Subscription",
-      description: "Select a new plan to upgrade this subscription to:",
+      title: t("subscription.operations.upgrade"),
+      description: t("subscription.upgradeDescription"),
       fields: [
         ...getActionFormFields(t, { reason: false, notes: false, emailLanguage: true, sendEmail: false }),
         {
           name: "newPlanId",
-          label: "New Plan",
+          label: t("subscription.newPlan"),
           type: "select",
-          placeholder: "Select a plan to upgrade to",
+          placeholder: t("subscription.selectNewPlan"),
           required: true,
           options: planOptions || [],
         },
         {
           name: "mode",
-          label: "Upgrade Mode",
+          label: t("subscription.upgradeMode"),
           type: "select",
-          placeholder: "Select upgrade mode",
+          placeholder: t("subscription.selectUpgradeMode"),
           required: true,
           options: [
-            { value: "DefaultFromPolicy", label: "Default from Policy" },
-            { value: "FullReplace", label: "Full Replace" },
-            { value: "Prorated", label: "Prorated" },
-            { value: "Deferred", label: "Deferred" },
+            { value: "DefaultFromPolicy", label: t("subscription.upgradeModes.default") },
+            { value: "FullReplace", label: t("subscription.upgradeModes.fullReplace") },
+            { value: "Prorated", label: t("subscription.upgradeModes.prorated") },
+            { value: "Deferred", label: t("subscription.upgradeModes.deferred") },
           ],
         }
       ],
@@ -161,13 +180,20 @@ export function useSubscriptionViewModel() {
       confirmText: t("subscription.operations.upgrade"),
       itemCount: 1,
       onSubmit: async (values) => {
-        const request = new UpgradeSubscriptionRequest({
-          id: subscription.id,
-          newPlanId: values.newPlanId as string,
-          mode: values.mode as "FullReplace" | "Prorated" | "Deferred" | "DefaultFromPolicy",
-        });
-        await subscriptionService.upgradeSubscription(request);
-        router.refresh();
+        try {
+          const request = new UpgradeSubscriptionRequest({
+            id: subscription.id,
+            newPlanId: values.newPlanId as string,
+            mode: values.mode as "FullReplace" | "Prorated" | "Deferred" | "DefaultFromPolicy",
+          });
+          await subscriptionService.upgradeSubscription(request);
+          // Refresh data after dialog closes
+          setTimeout(() => router.refresh(), 100);
+        } catch (error) {
+          // Error already handled by service notification, don't re-throw
+          // to allow dialog to close
+          console.error("Upgrade failed:", error);
+        }
       },
     });
   }, [subscriptionService, router, showActionForm, t, planOptions]);
@@ -304,11 +330,9 @@ export function useSubscriptionViewModel() {
       return response;
     },
     create: async (data: any) => {
-      await loadDropdownData();
       const request = new CreateSubscriptionRequest({
         companyId: data.companyId,
         planId: data.planId,
-        currency: parseInt(data.currency) as Currency,
         startWithTrial: data.startWithTrial || false,
         autoRenew: data.autoRenew || false,
       });
@@ -442,7 +466,6 @@ export function useSubscriptionViewModel() {
         required: true,
         options: companyOptions,
         helperText: t("subscription.companyHelper"),
-        onFocus: loadDropdownData,
       },
       {
         name: "planId",
@@ -451,24 +474,6 @@ export function useSubscriptionViewModel() {
         required: true,
         options: planOptions,
         helperText: t("subscription.planHelper"),
-        onFocus: loadDropdownData,
-      },
-      {
-        name: "currency",
-        label: t("subscription.currency"),
-        type: "select" as const,
-        required: true,
-        options: [
-          { value: "1", label: t("plan.currencies.usd") },
-          { value: "2", label: t("plan.currencies.eur") },
-          { value: "3", label: t("plan.currencies.egp") },
-          { value: "4", label: t("plan.currencies.sar") },
-          { value: "5", label: t("plan.currencies.aed") },
-          { value: "6", label: t("plan.currencies.gbp") },
-          { value: "7", label: t("plan.currencies.jpy") },
-          { value: "8", label: t("plan.currencies.cny") },
-        ],
-        helperText: t("subscription.selectCurrency"),
       },
       {
         name: "startWithTrial",
@@ -485,7 +490,7 @@ export function useSubscriptionViewModel() {
     ],
     editFields: [],
     
-    // Actions configuration (like other viewmodels)
+    // Actions configuration - show only relevant actions based on subscription state
     getActions: (vm: any, t: any, handleDelete?: (item: Subscription) => void) => [
       {
         label: t("subscription.operations.view"),
@@ -496,61 +501,61 @@ export function useSubscriptionViewModel() {
         label: t("subscription.operations.renew"),
         onClick: (item: Subscription) => handleRenew(item),
         variant: "outline" as const,
-        disabled: (item: Subscription) => !item.canRenew,
+        show: (item: Subscription) => item.canRenew,
       },
       {
         label: t("subscription.operations.suspend"),
         onClick: (item: Subscription) => handleSuspend(item),
         variant: "outline" as const,
-        disabled: (item: Subscription) => !item.canSuspend,
+        show: (item: Subscription) => item.canSuspend, // Only show if active (not suspended)
       },
       {
         label: t("subscription.operations.resume"),
         onClick: (item: Subscription) => handleResume(item),
         variant: "outline" as const,
-        disabled: (item: Subscription) => !item.canResume,
+        show: (item: Subscription) => item.canResume, // Only show if suspended
       },
       {
         label: t("subscription.operations.cancel"),
         onClick: (item: Subscription) => handleCancel(item),
         variant: "destructive" as const,
-        disabled: (item: Subscription) => !item.canCancel,
+        show: (item: Subscription) => item.canCancel,
       },
       {
         label: t("subscription.operations.upgrade"),
         onClick: (item: Subscription) => handleUpgrade(item),
         variant: "outline" as const,
-        disabled: (item: Subscription) => !item.canUpgrade,
+        show: (item: Subscription) => item.canUpgrade,
       },
       {
         label: t("subscription.operations.extend"),
         onClick: (item: Subscription) => handleExtend(item),
         variant: "outline" as const,
-        disabled: (item: Subscription) => !item.canExtend,
+        show: (item: Subscription) => item.canExtend,
       },
       {
         label: t("subscription.operations.pause"),
         onClick: (item: Subscription) => handlePause(item),
         variant: "outline" as const,
-        show: (item: Subscription) => item.isActive && !item.isTrial,
+        show: (item: Subscription) => item.isActive && !item.isTrial && item.status !== "Suspended",
       },
       {
         label: t("subscription.operations.unpause"),
         onClick: (item: Subscription) => handleUnpause(item),
         variant: "outline" as const,
-        show: (item: Subscription) => !item.isActive && !item.isExpired,
+        show: (item: Subscription) => item.status === "Paused",
       },
       {
         label: t("subscription.operations.stopTrial"),
         onClick: (item: Subscription) => handleStopTrial(item),
         variant: "outline" as const,
-        show: (item: Subscription) => item.isTrial,
+        show: (item: Subscription) => item.isTrial && item.isActive,
       },
       {
         label: t("subscription.operations.reactivate"),
         onClick: (item: Subscription) => handleReactivate(item),
         variant: "outline" as const,
-        disabled: (item: Subscription) => !item.canReactivate,
+        show: (item: Subscription) => item.canReactivate,
       },
     ],
   };

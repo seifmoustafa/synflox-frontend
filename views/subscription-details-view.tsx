@@ -304,12 +304,23 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
       </Card>
 
       {/* Detailed Information Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">{t("subscription.tabs.overview")}</TabsTrigger>
-          <TabsTrigger value="billing">{t("subscription.tabs.billing")}</TabsTrigger>
-          <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
-          <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4" dir={t("dir") as "ltr" | "rtl"}>
+        <TabsList className={`grid w-full grid-cols-4 ${t("dir") === "rtl" ? "direction-rtl" : ""}`}>
+          {t("dir") === "rtl" ? (
+            <>
+              <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
+              <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
+              <TabsTrigger value="billing">{t("subscription.tabs.billing")}</TabsTrigger>
+              <TabsTrigger value="overview">{t("subscription.tabs.overview")}</TabsTrigger>
+            </>
+          ) : (
+            <>
+              <TabsTrigger value="overview">{t("subscription.tabs.overview")}</TabsTrigger>
+              <TabsTrigger value="billing">{t("subscription.tabs.billing")}</TabsTrigger>
+              <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
+              <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
+            </>
+          )}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -492,6 +503,17 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
         </TabsContent>
 
         <TabsContent value="features" className="space-y-4">
+          {/* View Plan Button */}
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/plans/${subscription.planId}`)}
+            >
+              <Package className="h-4 w-4 me-2" />
+              {t("subscription.viewPlanDetails")}
+            </Button>
+          </div>
+
           {/* Projects */}
           {subscription.projects && subscription.projects.length > 0 && (
             <Card>
@@ -507,10 +529,17 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {subscription.projects.map((project: any) => (
-                    <div key={project.id} className="p-4 rounded-lg border">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Box className="h-5 w-5 text-primary" />
-                        <h4 className="font-medium">{project.name}</h4>
+                    <div 
+                      key={project.id} 
+                      className="p-4 rounded-lg border hover:border-primary hover:bg-accent/50 cursor-pointer transition-colors"
+                      onClick={() => router.push(`/projects/${project.id}`)}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Box className="h-5 w-5 text-primary" />
+                          <h4 className="font-medium">{project.name}</h4>
+                        </div>
+                        <ArrowLeft className="h-4 w-4 text-muted-foreground rotate-180 rtl:rotate-0" />
                       </div>
                       {project.description && (
                         <p className="text-sm text-muted-foreground mb-2">{project.description}</p>
@@ -520,7 +549,15 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
                           <p className="text-xs font-medium text-muted-foreground mb-1">{t("subscription.modules")}:</p>
                           <div className="flex flex-wrap gap-1">
                             {project.modules.map((module: any) => (
-                              <Badge key={module.id} variant="secondary" className="text-xs">
+                              <Badge 
+                                key={module.id} 
+                                variant="secondary" 
+                                className="text-xs hover:bg-primary hover:text-primary-foreground cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  router.push(`/modules/${module.id}`);
+                                }}
+                              >
                                 {module.name}
                               </Badge>
                             ))}
@@ -549,10 +586,17 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {subscription.modules.map((module: any) => (
-                    <div key={module.id} className="p-4 rounded-lg border">
-                      <div className="flex items-center gap-2">
-                        <Box className="h-4 w-4 text-primary" />
-                        <h4 className="font-medium">{module.name}</h4>
+                    <div 
+                      key={module.id} 
+                      className="p-4 rounded-lg border hover:border-primary hover:bg-accent/50 cursor-pointer transition-colors"
+                      onClick={() => router.push(`/modules/${module.id}`)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Box className="h-4 w-4 text-primary" />
+                          <h4 className="font-medium">{module.name}</h4>
+                        </div>
+                        <ArrowLeft className="h-4 w-4 text-muted-foreground rotate-180 rtl:rotate-0" />
                       </div>
                       {module.description && (
                         <p className="text-sm text-muted-foreground mt-1">{module.description}</p>

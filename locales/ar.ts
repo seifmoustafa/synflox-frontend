@@ -920,6 +920,19 @@ export const ar = {
       cancelConfirmation: "هل أنت متأكد من إلغاء هذا الاشتراك؟ لا يمكن التراجع عن هذا الإجراء.",
     },
     
+    // Upgrade Dialog
+    upgradeDescription: "اختر خطة جديدة للترقية إليها:",
+    newPlan: "الخطة الجديدة",
+    selectNewPlan: "اختر خطة للترقية",
+    upgradeMode: "وضع الترقية",
+    selectUpgradeMode: "اختر وضع الترقية",
+    upgradeModes: {
+      default: "افتراضي من السياسة",
+      fullReplace: "استبدال كامل",
+      prorated: "حسب النسبة",
+      deferred: "مؤجل",
+    },
+    
     // Messages
     notFound: "الاشتراك غير موجود",
     loadError: "فشل في تحميل تفاصيل الاشتراك",
@@ -1020,6 +1033,7 @@ export const ar = {
     customFeaturesDescription: "ميزات إضافية متضمنة في هذه الخطة",
     noFeatures: "لا تتوفر ميزات لهذه الخطة",
     modules: "الوحدات",
+    viewPlanDetails: "عرض تفاصيل الخطة",
     planDescriptionLabel: "الوصف",
     planFeaturesSummary: "الميزات المتضمنة",
     projectsIncluded: "مشاريع",
