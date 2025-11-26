@@ -20,13 +20,49 @@ interface AnalyticsData {
     isActive: boolean;
     isExpired: boolean;
     isTrial: boolean;
+    isLifetime: boolean;
     daysRemaining: number;
+    statusLabel: string;
   };
   usage: {
     totalDays: number;
     activeDays: number;
     utilizationPercentage: number;
+    totalLogins: number;
+    uniqueUsers: number;
+    apiCalls: number;
   };
+  monthlyTrends: Array<{
+    month: string;
+    year: number;
+    usage: number;
+    revenue: number;
+    activeDays: number;
+  }>;
+  statusDistribution: Array<{
+    name: string;
+    value: number;
+    color: string;
+  }>;
+  featureUsage: Array<{
+    feature: string;
+    usage: number;
+    isEnabled: boolean;
+  }>;
+  performance: {
+    uptimePercentage: number;
+    responseTimeMs: number;
+    errorRate: number;
+    ticketResolutionRate: number;
+    avgResponseTimeHours: number;
+    satisfactionScore: number;
+  };
+  recentHistory: Array<{
+    action: string;
+    reason: string | null;
+    timestamp: string;
+    performedBy: string | null;
+  }>;
 }
 
 /**

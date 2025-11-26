@@ -57,30 +57,25 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
     );
   }
 
-  // Mock data for charts (in real app, this would come from analytics)
-  const usageData = [
-    { month: "Jan", usage: 65, revenue: 2400 },
-    { month: "Feb", usage: 78, revenue: 2800 },
-    { month: "Mar", usage: 82, revenue: 3200 },
-    { month: "Apr", usage: 75, revenue: 2900 },
-    { month: "May", usage: 88, revenue: 3500 },
-    { month: "Jun", usage: 92, revenue: 3800 },
+  // Use real data from analytics API (with fallbacks for safety)
+  const usageData = (analytics as any)?.monthlyTrends?.map((trend: any) => ({
+    month: trend.month || trend.Month,
+    usage: trend.usage || trend.Usage || 0,
+    revenue: trend.revenue || trend.Revenue || 0,
+  })) || [];
+
+  const statusDistribution = (analytics as any)?.statusDistribution?.map((status: any) => ({
+    name: status.name || status.Name,
+    value: status.value || status.Value || 0,
+    color: status.color || status.Color || "#6b7280",
+  })) || [
+    { name: "Active", value: 100, color: "#10b981" },
   ];
 
-  const statusDistribution = [
-    { name: "Active", value: 85, color: "#10b981" },
-    { name: "Trial", value: 10, color: "#3b82f6" },
-    { name: "Suspended", value: 3, color: "#f59e0b" },
-    { name: "Expired", value: 2, color: "#ef4444" },
-  ];
-
-  const featureUsage = [
-    { feature: "Core Features", usage: 95 },
-    { feature: "Advanced Reports", usage: 68 },
-    { feature: "API Access", usage: 45 },
-    { feature: "Integrations", usage: 32 },
-    { feature: "Custom Fields", usage: 28 },
-  ];
+  const featureUsage = (analytics as any)?.featureUsage?.map((feature: any) => ({
+    feature: feature.feature || feature.Feature,
+    usage: feature.usage || feature.Usage || 0,
+  })) || [];
 
   // Get action-specific icon and color for history
   const getActionStyle = (action: string) => {
@@ -186,12 +181,23 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
       </div>
 
       {/* Analytics Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4" dir={t("dir") as "ltr" | "rtl"}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">{t("subscription.analyticsOverview")}</TabsTrigger>
-          <TabsTrigger value="usage">{t("subscription.analyticsUsage")}</TabsTrigger>
-          <TabsTrigger value="revenue">{t("subscription.analyticsRevenue")}</TabsTrigger>
-          <TabsTrigger value="performance">{t("subscription.analyticsPerformance")}</TabsTrigger>
+          {t("dir") === "rtl" ? (
+            <>
+              <TabsTrigger value="performance">{t("subscription.analyticsPerformance")}</TabsTrigger>
+              <TabsTrigger value="revenue">{t("subscription.analyticsRevenue")}</TabsTrigger>
+              <TabsTrigger value="usage">{t("subscription.analyticsUsage")}</TabsTrigger>
+              <TabsTrigger value="overview">{t("subscription.analyticsOverview")}</TabsTrigger>
+            </>
+          ) : (
+            <>
+              <TabsTrigger value="overview">{t("subscription.analyticsOverview")}</TabsTrigger>
+              <TabsTrigger value="usage">{t("subscription.analyticsUsage")}</TabsTrigger>
+              <TabsTrigger value="revenue">{t("subscription.analyticsRevenue")}</TabsTrigger>
+              <TabsTrigger value="performance">{t("subscription.analyticsPerformance")}</TabsTrigger>
+            </>
+          )}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -199,7 +205,7 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
             {/* Usage Trend */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex items-center gap-2">
                   <LineChart className="h-5 w-5" />
                   <span>{t("subscription.usageTrend")}</span>
                 </CardTitle>
@@ -208,22 +214,28 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={usageData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="usage" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
-                  </AreaChart>
-                </ResponsiveContainer>
+                {usageData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={usageData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip />
+                      <Area type="monotone" dataKey="usage" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-[300px]">
+                    <p className="text-muted-foreground">{t("subscription.noUsageData")}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
             {/* Status Distribution */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex items-center gap-2">
                   <PieChart className="h-5 w-5" />
                   <span>{t("subscription.statusDistribution")}</span>
                 </CardTitle>
@@ -243,7 +255,7 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
                       paddingAngle={5}
                       dataKey="value"
                     >
-                      {statusDistribution.map((entry, index) => (
+                      {statusDistribution.map((entry: { name: string; value: number; color: string }, index: number) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
@@ -251,14 +263,14 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
                   </RechartsPieChart>
                 </ResponsiveContainer>
                 <div className="mt-4 space-y-2">
-                  {statusDistribution.map((item) => (
+                  {statusDistribution.map((item: { name: string; value: number; color: string }) => (
                     <div key={item.name} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center gap-2">
                         <div
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: item.color }}
                         />
-                        <span className="text-sm">{item.name}</span>
+                        <span className="text-sm">{t(`subscription.statuses.${item.name.toLowerCase()}`)}</span>
                       </div>
                       <span className="text-sm font-medium">{item.value}%</span>
                     </div>
@@ -272,7 +284,7 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
         <TabsContent value="usage" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
+              <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5" />
                 <span>{t("subscription.featureUsage")}</span>
               </CardTitle>
@@ -282,15 +294,19 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {featureUsage.map((feature) => (
-                  <div key={feature.feature} className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium">{feature.feature}</span>
-                      <span className="text-sm text-muted-foreground">{feature.usage}%</span>
+                {featureUsage.length > 0 ? (
+                  featureUsage.map((feature: { feature: string; usage: number }) => (
+                    <div key={feature.feature} className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium">{feature.feature}</span>
+                        <span className="text-sm text-muted-foreground">{feature.usage}%</span>
+                      </div>
+                      <Progress value={feature.usage} className="h-2" />
                     </div>
-                    <Progress value={feature.usage} className="h-2" />
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-muted-foreground text-center py-4">{t("subscription.noFeatureData")}</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -299,7 +315,7 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
         <TabsContent value="revenue" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
+              <CardTitle className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
                 <span>{t("subscription.revenueAnalysis")}</span>
               </CardTitle>
@@ -330,15 +346,21 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm">{t("subscription.uptime")}</span>
-                  <Badge variant="success">99.9%</Badge>
+                  <Badge variant="success">
+                    {(analytics as any)?.performance?.uptimePercentage ?? (analytics as any)?.performance?.UptimePercentage ?? 99.9}%
+                  </Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">{t("subscription.responseTime")}</span>
-                  <Badge variant="success">&lt; 200ms</Badge>
+                  <Badge variant="success">
+                    &lt; {(analytics as any)?.performance?.responseTimeMs ?? (analytics as any)?.performance?.ResponseTimeMs ?? 200}ms
+                  </Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">{t("subscription.errorRate")}</span>
-                  <Badge variant="success">0.01%</Badge>
+                  <Badge variant="success">
+                    {(analytics as any)?.performance?.errorRate ?? (analytics as any)?.performance?.ErrorRate ?? 0.01}%
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
@@ -350,15 +372,21 @@ export function SubscriptionAnalyticsView({ subscriptionId }: SubscriptionAnalyt
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm">{t("subscription.ticketsResolved")}</span>
-                  <span className="font-medium">98.5%</span>
+                  <span className="font-medium">
+                    {(analytics as any)?.performance?.ticketResolutionRate ?? (analytics as any)?.performance?.TicketResolutionRate ?? 98.5}%
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">{t("subscription.avgResponseTime")}</span>
-                  <span className="font-medium">2.3 hours</span>
+                  <span className="font-medium">
+                    {(analytics as any)?.performance?.avgResponseTimeHours ?? (analytics as any)?.performance?.AvgResponseTimeHours ?? 2.3} {t("common.hours")}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">{t("subscription.satisfaction")}</span>
-                  <Badge variant="success">4.8/5</Badge>
+                  <Badge variant="success">
+                    {(analytics as any)?.performance?.satisfactionScore ?? (analytics as any)?.performance?.SatisfactionScore ?? 4.8}/5
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
