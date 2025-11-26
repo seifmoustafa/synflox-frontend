@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import { useGenericCrudViewModel } from "@/hooks/use-generic-crud-viewmodel";
-import { 
-  Subscription, 
+import {
+  Subscription,
   CreateSubscriptionRequest,
   RenewSubscriptionRequest,
+  UpgradeSubscriptionRequest,
   SubscriptionActionRequest,
-} from "@/domain/models/subscription.model";
+  ExtendSubscriptionRequest,
+} from "@/domain";
 import { Currency } from "@/domain/models/subscription-plan.model";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,18 +53,24 @@ export function useSubscriptionViewModel() {
   }, [companyService, subscriptionPlanService, dropdownsLoaded]);
 
   // Lifecycle operations handlers with ActionFormDialog
-  const handleRenew = useCallback(async (subscription: Subscription) => {
-    try {
-      const request = new RenewSubscriptionRequest({
-        id: subscription.id,
-        renewStrategy: "CreateFollowUp"
-      });
-      await subscriptionService.renewSubscription(request);
-      router.refresh();
-    } catch (error) {
-      console.error("Renew failed:", error);
-    }
-  }, [subscriptionService, router]);
+  const handleRenew = useCallback((subscription: Subscription) => {
+    showActionForm({
+      title: "Renew Subscription",
+      description: "Are you sure you want to renew this subscription?",
+      fields: getActionFormFields(t, { reason: false, notes: false, emailLanguage: true, sendEmail: false }),
+      variant: "default",
+      confirmText: t("subscription.operations.renew"),
+      itemCount: 1,
+      onSubmit: async (values) => {
+        const request = new RenewSubscriptionRequest({
+          id: subscription.id,
+          renewStrategy: "CreateFollowUp"
+        });
+        await subscriptionService.renewSubscription(request);
+        router.refresh();
+      },
+    });
+  }, [subscriptionService, router, showActionForm, t]);
 
   const handleSuspend = useCallback((subscription: Subscription) => {
     showActionForm({
@@ -116,6 +124,156 @@ export function useSubscriptionViewModel() {
           reason: values.reason as string
         });
         await subscriptionService.cancelSubscription(request, (values.lang as string) || undefined);
+        router.refresh();
+      },
+    });
+  }, [subscriptionService, router, showActionForm, t]);
+
+  const handleUpgrade = useCallback((subscription: Subscription) => {
+    showActionForm({
+      title: "Upgrade Subscription",
+      description: "Select a new plan to upgrade this subscription to:",
+      fields: [
+        ...getActionFormFields(t, { reason: false, notes: false, emailLanguage: true, sendEmail: false }),
+        {
+          name: "newPlanId",
+          label: "New Plan",
+          type: "select",
+          placeholder: "Select a plan to upgrade to",
+          required: true,
+          options: planOptions || [],
+        },
+        {
+          name: "mode",
+          label: "Upgrade Mode",
+          type: "select",
+          placeholder: "Select upgrade mode",
+          required: true,
+          options: [
+            { value: "DefaultFromPolicy", label: "Default from Policy" },
+            { value: "FullReplace", label: "Full Replace" },
+            { value: "Prorated", label: "Prorated" },
+            { value: "Deferred", label: "Deferred" },
+          ],
+        }
+      ],
+      variant: "default",
+      confirmText: t("subscription.operations.upgrade"),
+      itemCount: 1,
+      onSubmit: async (values) => {
+        const request = new UpgradeSubscriptionRequest({
+          id: subscription.id,
+          newPlanId: values.newPlanId as string,
+          mode: values.mode as "FullReplace" | "Prorated" | "Deferred" | "DefaultFromPolicy",
+        });
+        await subscriptionService.upgradeSubscription(request);
+        router.refresh();
+      },
+    });
+  }, [subscriptionService, router, showActionForm, t, planOptions]);
+
+  const handleExtend = useCallback((subscription: Subscription) => {
+    showActionForm({
+      title: "Extend Subscription",
+      description: "Are you sure you want to extend this subscription?",
+      fields: [
+        ...getActionFormFields(t, { reason: true, notes: true, emailLanguage: true, sendEmail: true }),
+        {
+          name: "extensionDays",
+          label: "Extension Days",
+          type: "text",
+          placeholder: "Enter number of days (1-3650)",
+          required: true,
+        }
+      ],
+      variant: "default",
+      confirmText: t("subscription.operations.extend"),
+      itemCount: 1,
+      onSubmit: async (values) => {
+        const request = new ExtendSubscriptionRequest({
+          id: subscription.id,
+          extensionDays: parseInt(values.extensionDays as string),
+          reason: values.reason as string,
+          notes: values.notes as string,
+          sendEmailNotification: values.sendEmailNotification as boolean,
+        });
+        await subscriptionService.extendSubscription(request, (values.lang as string) || undefined);
+        router.refresh();
+      },
+    });
+  }, [subscriptionService, router, showActionForm, t]);
+
+  const handlePause = useCallback((subscription: Subscription) => {
+    showActionForm({
+      title: "Pause Subscription",
+      description: "Are you sure you want to pause this subscription?",
+      fields: getActionFormFields(t, { reason: true, notes: false, emailLanguage: true, sendEmail: false }),
+      variant: "warning",
+      confirmText: t("subscription.operations.pause"),
+      itemCount: 1,
+      onSubmit: async (values) => {
+        const request = new SubscriptionActionRequest({
+          id: subscription.id,
+          reason: values.reason as string
+        });
+        await subscriptionService.pauseSubscription(request, (values.lang as string) || undefined);
+        router.refresh();
+      },
+    });
+  }, [subscriptionService, router, showActionForm, t]);
+
+  const handleUnpause = useCallback((subscription: Subscription) => {
+    showActionForm({
+      title: "Unpause Subscription",
+      description: "Are you sure you want to unpause this subscription?",
+      fields: getActionFormFields(t, { reason: true, notes: false, emailLanguage: true, sendEmail: false }),
+      variant: "default",
+      confirmText: t("subscription.operations.unpause"),
+      itemCount: 1,
+      onSubmit: async (values) => {
+        const request = new SubscriptionActionRequest({
+          id: subscription.id,
+          reason: values.reason as string
+        });
+        await subscriptionService.unpauseSubscription(request, (values.lang as string) || undefined);
+        router.refresh();
+      },
+    });
+  }, [subscriptionService, router, showActionForm, t]);
+
+  const handleStopTrial = useCallback((subscription: Subscription) => {
+    showActionForm({
+      title: "Stop Trial",
+      description: "Are you sure you want to convert this trial to a paid subscription?",
+      fields: getActionFormFields(t, { reason: true, notes: false, emailLanguage: true, sendEmail: false }),
+      variant: "warning",
+      confirmText: t("subscription.operations.stopTrial"),
+      itemCount: 1,
+      onSubmit: async (values) => {
+        const request = new SubscriptionActionRequest({
+          id: subscription.id,
+          reason: values.reason as string
+        });
+        await subscriptionService.stopTrial(request, (values.lang as string) || undefined);
+        router.refresh();
+      },
+    });
+  }, [subscriptionService, router, showActionForm, t]);
+
+  const handleReactivate = useCallback((subscription: Subscription) => {
+    showActionForm({
+      title: "Reactivate Subscription",
+      description: "Are you sure you want to reactivate this expired subscription?",
+      fields: getActionFormFields(t, { reason: true, notes: false, emailLanguage: true, sendEmail: false }),
+      variant: "default",
+      confirmText: t("subscription.operations.reactivate"),
+      itemCount: 1,
+      onSubmit: async (values) => {
+        const request = new SubscriptionActionRequest({
+          id: subscription.id,
+          reason: values.reason as string
+        });
+        await subscriptionService.reactivateSubscription(request, (values.lang as string) || undefined);
         router.refresh();
       },
     });
@@ -357,6 +515,42 @@ export function useSubscriptionViewModel() {
         onClick: (item: Subscription) => handleCancel(item),
         variant: "destructive" as const,
         disabled: (item: Subscription) => !item.canCancel,
+      },
+      {
+        label: t("subscription.operations.upgrade"),
+        onClick: (item: Subscription) => handleUpgrade(item),
+        variant: "outline" as const,
+        disabled: (item: Subscription) => !item.canUpgrade,
+      },
+      {
+        label: t("subscription.operations.extend"),
+        onClick: (item: Subscription) => handleExtend(item),
+        variant: "outline" as const,
+        disabled: (item: Subscription) => !item.canExtend,
+      },
+      {
+        label: t("subscription.operations.pause"),
+        onClick: (item: Subscription) => handlePause(item),
+        variant: "outline" as const,
+        show: (item: Subscription) => item.isActive && !item.isTrial,
+      },
+      {
+        label: t("subscription.operations.unpause"),
+        onClick: (item: Subscription) => handleUnpause(item),
+        variant: "outline" as const,
+        show: (item: Subscription) => !item.isActive && !item.isExpired,
+      },
+      {
+        label: t("subscription.operations.stopTrial"),
+        onClick: (item: Subscription) => handleStopTrial(item),
+        variant: "outline" as const,
+        show: (item: Subscription) => item.isTrial,
+      },
+      {
+        label: t("subscription.operations.reactivate"),
+        onClick: (item: Subscription) => handleReactivate(item),
+        variant: "outline" as const,
+        disabled: (item: Subscription) => !item.canReactivate,
       },
     ],
   };
