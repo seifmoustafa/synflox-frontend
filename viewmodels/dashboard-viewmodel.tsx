@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Dashboard, CompanyStatsData, SubscriptionStatsData, AdminStatsData } from '@/domain';
 import { useServices } from '@/providers/service-provider';
+import { appLogger } from '@/lib/logger';
 
 export type DashboardTab = 'overview' | 'companies' | 'subscriptions' | 'admins' | 'analytics';
 export type ErrorType = 'network' | 'server' | 'unknown';
@@ -56,7 +57,7 @@ export function useDashboardViewModel() {
       
       setError(errorMsg);
       setErrorType(type);
-      console.error('[Dashboard] Load error:', {
+      appLogger.error('[Dashboard] Load error:', {
         error: err,
         type,
         message: errorMsg,
@@ -75,7 +76,7 @@ export function useDashboardViewModel() {
       setDashboard(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to refresh dashboard');
-      console.error('Dashboard refresh error:', err);
+      appLogger.error('Dashboard refresh error:', err);
     } finally {
       setIsRefreshing(false);
     }
@@ -86,7 +87,7 @@ export function useDashboardViewModel() {
       const data = await dashboardService.getCompanyAnalytics();
       setCompanyAnalytics(data);
     } catch (err) {
-      console.error('Company analytics load error:', err);
+      appLogger.error('Company analytics load error:', err);
     }
   }, [dashboardService]);
 
@@ -95,7 +96,7 @@ export function useDashboardViewModel() {
       const data = await dashboardService.getSubscriptionAnalytics();
       setSubscriptionAnalytics(data);
     } catch (err) {
-      console.error('Subscription analytics load error:', err);
+      appLogger.error('Subscription analytics load error:', err);
     }
   }, [dashboardService]);
 
@@ -104,7 +105,7 @@ export function useDashboardViewModel() {
       const data = await dashboardService.getAdminAnalytics();
       setAdminAnalytics(data);
     } catch (err) {
-      console.error('Admin analytics load error:', err);
+      appLogger.error('Admin analytics load error:', err);
     }
   }, [dashboardService]);
 
@@ -112,7 +113,7 @@ export function useDashboardViewModel() {
   const retryLoadDashboard = useCallback(async () => {
     const maxRetries = 3;
     if (retryCount >= maxRetries) {
-      console.warn('[Dashboard] Max retries reached');
+      appLogger.warn('[Dashboard] Max retries reached');
       return;
     }
 
@@ -136,7 +137,7 @@ export function useDashboardViewModel() {
     };
 
     const handleOffline = () => {
-      console.warn('[Dashboard] Network offline');
+      appLogger.warn('[Dashboard] Network offline');
       setIsOnline(false);
       setError('No internet connection');
       setErrorType('network');

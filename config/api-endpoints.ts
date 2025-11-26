@@ -106,6 +106,28 @@ export const API_ENDPOINTS = {
     CREATE: "/plans",
   },
   
+  // Subscriptions Management
+  SUBSCRIPTIONS: {
+    BASE: "/subscriptions",
+    BY_ID: (id: string) => `/subscriptions/${id}`,
+    CREATE: "/subscriptions",
+    GET_ACTIVE_BY_COMPANY: (companyId: string) => `/subscriptions/company/${companyId}/active`,
+    GET_ALL_BY_COMPANY: (companyId: string) => `/subscriptions/company/${companyId}/all`,
+    GET_STATUS: (id: string) => `/subscriptions/${id}/status`,
+    GET_HISTORY: (id: string) => `/subscriptions/${id}/history`,
+    GET_ANALYTICS: (id: string) => `/subscriptions/${id}/analytics`,
+    RENEW: (id: string) => `/subscriptions/${id}/renew`,
+    UPGRADE: (id: string) => `/subscriptions/${id}/upgrade`,
+    CANCEL: (id: string) => `/subscriptions/${id}/cancel`,
+    SUSPEND: (id: string) => `/subscriptions/${id}/suspend`,
+    RESUME: (id: string) => `/subscriptions/${id}/resume`,
+    PAUSE: (id: string) => `/subscriptions/${id}/pause`,
+    UNPAUSE: (id: string) => `/subscriptions/${id}/unpause`,
+    STOP_TRIAL: (id: string) => `/subscriptions/${id}/stop-trial`,
+    EXTEND: (id: string) => `/subscriptions/${id}/extend`,
+    REACTIVATE: (id: string) => `/subscriptions/${id}/reactivate`,
+  },
+  
   // Licensing Operations
   LICENSING_ACTIVATE: "/licensing",
   LICENSING_SUSPEND: "/licensing",

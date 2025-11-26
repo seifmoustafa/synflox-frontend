@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Edit, Trash2, ExternalLink } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageBreadcrumbs } from "@/components/ui/page-breadcrumbs";
+import { appLogger } from "@/lib/logger";
 
 interface PlanDetailsViewProps {
   planId: string;
@@ -33,7 +34,7 @@ export function PlanDetailsView({ planId }: PlanDetailsViewProps) {
       const result = await subscriptionPlanService.getPlanById(planId);
       setPlan(result);
     } catch (error) {
-      console.error("Failed to load plan:", error);
+      appLogger.error("Failed to load plan:", error);
     } finally {
       setLoading(false);
     }
@@ -50,7 +51,7 @@ export function PlanDetailsView({ planId }: PlanDetailsViewProps) {
       await subscriptionPlanService.deletePlan(planId);
       router.push("/plans");
     } catch (error) {
-      console.error("Failed to delete plan:", error);
+      appLogger.error("Failed to delete plan:", error);
     }
   };
 

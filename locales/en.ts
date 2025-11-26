@@ -632,8 +632,11 @@ export const en = {
       dataPoints: "Data Points",
       last30Days: "Last 30 days",
       companiesGrowth: "Companies Created",
+      companiesGrowthDesc: "Daily company registrations over time",
       subscriptionsGrowth: "Subscriptions Created",
+      subscriptionsGrowthDesc: "Daily subscription activations over time",
       adminsGrowth: "Admins Created",
+      adminsGrowthDesc: "Daily admin registrations over time",
     },
   },
 
@@ -871,6 +874,258 @@ export const en = {
     trialDurationHelper: "1-60 days (required when trial enabled)",
     mustIncludeContent: "Plan must include at least one project or module",
     notFound: "Plan not found",
+  },
+
+  // Subscriptions
+  subscription: {
+    status:"Subscription Status",
+    title: "Subscriptions Management",
+    description: "Manage customer subscriptions and lifecycle operations",
+    item: "Subscription",
+    items: "Subscriptions",
+    company: "Company",
+    companyHelper: "Select the company for this subscription",
+    plan: "Plan",
+    planHelper: "Select the subscription plan",
+    currency: "Currency",
+    selectCurrency: "Select payment currency",
+    startWithTrial: "Start with Trial",
+    trialHelper: "Start subscription in trial mode (if plan allows)",
+    autoRenew: "Auto-Renew",
+    autoRenewHelper: "Automatically renew when subscription expires",
+    startDate: "Start Date",
+    expiryDate: "Expiry Date",
+    daysRemaining: "Days Remaining",
+    amount: "Amount",
+    dateUnknown: "Unknown Date",
+    lifetime: "Lifetime",
+    
+    // Status badges
+    statuses: {
+      trial: "Trial",
+      active: "Active",
+      expiring: "Expiring Soon",
+      expired: "Expired",
+      suspended: "Suspended",
+      cancelled: "Cancelled",
+      lifetime: "Lifetime",
+      unknown: "Unknown",
+    },
+    
+    // Operations
+    operations: {
+      view: "View Details",
+      renew: "Renew",
+      upgrade: "Upgrade",
+      cancel: "Cancel",
+      suspend: "Suspend",
+      resume: "Resume",
+      pause: "Pause",
+      unpause: "Unpause",
+      stopTrial: "Stop Trial",
+      extend: "Extend",
+      reactivate: "Reactivate",
+      confirmCancel: "Confirm Cancellation",
+      cancelConfirmation: "Are you sure you want to cancel this subscription? This action cannot be undone.",
+    },
+    
+    // Messages
+    notFound: "Subscription not found",
+    loadError: "Failed to load subscription details",
+    customer: "Customer",
+    quickActions: "Quick Actions",
+    quickActionsDescription: "Perform common subscription operations",
+    subscriptionDetails: "Subscription Details",
+    planDetails: "Plan Details",
+    currentPlan: "Current Plan",
+    pricing: "Pricing",
+    billingInformation: "Billing Information",
+    billingDescription: "Manage billing and payment information",
+    billingComingSoon: "Billing features coming soon",
+    planFeatures: "Plan Features",
+    featuresDescription: "Features included in this subscription plan",
+    featuresComingSoon: "Feature management coming soon",
+    subscriptionHistory: "Subscription History",
+    historyDescription: "View subscription changes and events",
+    historyComingSoon: "History tracking coming soon",
+    analytics: "Analytics",
+    viewDetailedAnalytics: "View Detailed Analytics",
+    licenseKeys: "License Keys",
+    expires: "Expires on",
+    autoRenewEnabled: "Auto-renewal enabled",
+    autoRenewDisabled: "Auto-renewal disabled",
+    
+    // Tabs
+    tabs: {
+      overview: "Overview",
+      billing: "Billing",
+      features: "Features",
+      history: "History",
+    },
+    
+    // Edit page
+    editSubscription: "Edit Subscription",
+    editWarning: "Modifying subscription settings may affect billing and access. Please review changes carefully.",
+    currentStatus: "Current Status",
+    basicInformation: "Basic Information",
+    basicInformationDescription: "Update company, plan, and pricing information",
+    subscriptionSettings: "Subscription Settings",
+    subscriptionSettingsDescription: "Configure subscription behavior and status",
+    dateSettings: "Date Settings",
+    dateSettingsDescription: "Manage subscription start and expiry dates",
+    statusReason: "Status Reason",
+    statusReasonDescription: "Optional reason for current subscription status",
+    selectCompany: "Select a company",
+    selectPlan: "Select a plan",
+    enterAmount: "Enter amount",
+    enterStatusReason: "Enter status reason",
+    autoRenewDescription: "Automatically renew subscription when it expires",
+    isActiveDescription: "Whether the subscription is currently active",
+    isTrialDescription: "Mark this subscription as a trial period",
+    isLifetimeDescription: "This subscription never expires",
+    lifetimeNoExpiry: "Lifetime subscriptions do not have an expiry date",
+    saveError: "Failed to save subscription changes",
+    
+    // Analytics
+    exportReport: "Export Report",
+    totalRevenue: "Total Revenue",
+    usageRate: "Usage Rate",
+    activeUsers: "Active Users",
+    uptime: "Uptime",
+    analyticsOverview: "Overview",
+    analyticsUsage: "Usage",
+    analyticsRevenue: "Revenue",
+    analyticsPerformance: "Performance",
+    usageTrend: "Usage Trend",
+    usageTrendDescription: "Monthly usage patterns and trends",
+    statusDistribution: "Status Distribution",
+    statusDistributionDescription: "Breakdown of subscription statuses",
+    featureUsage: "Feature Usage",
+    featureUsageDescription: "Most used features and adoption rates",
+    revenueAnalysis: "Revenue Analysis",
+    revenueAnalysisDescription: "Monthly revenue trends and forecasts",
+    systemHealth: "System Health",
+    responseTime: "Response Time",
+    errorRate: "Error Rate",
+    supportMetrics: "Support Metrics",
+    ticketsResolved: "Tickets Resolved",
+    avgResponseTime: "Avg Response Time",
+    satisfaction: "Satisfaction",
+    analyticsLoadError: "Failed to load analytics data",
+    noHistory: "No history available for this subscription",
+    noAnalytics: "No analytics data available",
+    usageStatistics: "Usage Statistics",
+    usageStatisticsDescription: "Subscription usage and performance metrics",
+    activeDays: "Active Days",
+    totalDays: "Total Days",
+    utilizationRate: "Utilization Rate",
+    
+    // Features
+    includedProjects: "Included Projects",
+    includedProjectsDescription: "Projects included in this subscription plan",
+    includedModules: "Included Modules", 
+    includedModulesDescription: "Standalone modules included in this subscription",
+    customFeatures: "Custom Features",
+    customFeaturesDescription: "Additional features included in this plan",
+    noFeatures: "No features available for this plan",
+    modules: "Modules",
+    planDescriptionLabel: "Description",
+    planFeaturesSummary: "Features Included",
+    projectsIncluded: "Projects",
+    modulesIncluded: "Modules",
+    customFeaturesIncluded: "Custom Features",
+    
+    // Action Dialog
+    dialog: {
+      reason: "Reason",
+      reasonRequired: "Please provide a reason for this action",
+      notes: "Additional Notes",
+      notesPlaceholder: "Enter any additional notes or comments...",
+      sendEmailNotification: "Send email notification to the company",
+      responseLanguage: "Response Language",
+      
+      // Suspend
+      suspend: {
+        title: "Suspend Subscription",
+        description: "Suspending this subscription will temporarily disable access for the company. The subscription can be resumed later.",
+        warning: "This will immediately disable access for the company. All active sessions will be terminated.",
+        confirm: "Suspend Subscription",
+      },
+      
+      // Resume
+      resume: {
+        title: "Resume Subscription",
+        description: "Resuming this subscription will restore access for the company.",
+        confirm: "Resume Subscription",
+      },
+      
+      // Cancel
+      cancel: {
+        title: "Cancel Subscription",
+        description: "Cancelling this subscription will permanently end it. This action cannot be undone.",
+        warning: "This action is permanent. The subscription will be terminated immediately and cannot be restored.",
+        confirm: "Cancel Subscription",
+      },
+      
+      // Pause
+      pause: {
+        title: "Pause Subscription",
+        description: "Pausing this subscription will temporarily suspend it while preserving trial time if applicable.",
+        confirm: "Pause Subscription",
+      },
+      
+      // Unpause
+      unpause: {
+        title: "Unpause Subscription",
+        description: "Unpausing this subscription will restore it from paused state.",
+        confirm: "Unpause Subscription",
+      },
+      
+      // Reactivate
+      reactivate: {
+        title: "Reactivate Subscription",
+        description: "Reactivating this subscription will restore access for an expired subscription.",
+        confirm: "Reactivate Subscription",
+      },
+      
+      // Stop Trial
+      stopTrial: {
+        title: "Stop Trial",
+        description: "Stopping the trial will convert this subscription to a paid subscription immediately.",
+        confirm: "Stop Trial",
+      },
+      
+      // Renew
+      renew: {
+        title: "Renew Subscription",
+        description: "Renewing this subscription will extend it for another billing period.",
+        confirm: "Renew Subscription",
+      },
+      
+      // Reason placeholders
+      reasonPlaceholder: {
+        suspend: "e.g., Payment overdue, Policy violation, Customer request...",
+        resume: "e.g., Payment received, Issue resolved...",
+        cancel: "e.g., Customer requested cancellation, Contract ended...",
+        pause: "e.g., Customer on vacation, Temporary suspension...",
+        unpause: "e.g., Customer returned, Issue resolved...",
+        reactivate: "e.g., Customer renewed contract, Payment received...",
+        stopTrial: "e.g., Customer wants to start paid plan early...",
+        renew: "e.g., Contract renewal, Customer request...",
+      },
+      
+      // Default reasons
+      defaultReason: {
+        suspend: "Subscription suspended by administrator",
+        resume: "Subscription resumed by administrator",
+        cancel: "Subscription cancelled by administrator",
+        pause: "Subscription paused by administrator",
+        unpause: "Subscription unpaused by administrator",
+        reactivate: "Subscription reactivated by administrator",
+        stopTrial: "Trial converted to paid subscription",
+        renew: "Subscription renewed by administrator",
+      },
+    },
   },
 
   // Licensing
@@ -3374,6 +3629,8 @@ export const en = {
 
   // Common
   common: {
+    optional:"Optional",
+    processing:"Processing...",
     clearSelection:"Clear Selection",
     reset:"Reset",
     saving:"Saving...",
@@ -3500,6 +3757,33 @@ export const en = {
     patent: "Patent",
     intellectual_property: "Intellectual Property",
     all_rights_reserved: "All Rights Reserved",
+  },
+
+  // Action Form Dialog
+  action: {
+    reason: "Reason",
+    reasonPlaceholder: "Enter the reason for this action...",
+    notes: "Additional Notes",
+    notesPlaceholder: "Enter any additional notes (optional)...",
+    emailLanguage: "Email Language",
+    selectLanguage: "Select email language",
+    useDefault: "Use Default (from user settings)",
+    sendEmail: "Send Email Notification",
+    sendEmailHelp: "Notify affected parties via email",
+    // Company Actions
+    activateCompany: "Activate Company",
+    activateCompanyDesc: "Are you sure you want to activate {count} company(ies)?",
+    deactivateCompany: "Deactivate Company",
+    deactivateCompanyDesc: "Are you sure you want to deactivate {count} company(ies)?",
+    deleteCompany: "Delete Company",
+    deleteCompanyDesc: "Are you sure you want to delete {count} company(ies)? This action cannot be undone.",
+    // Subscription Actions
+    cancelSubscription: "Cancel Subscription",
+    cancelSubscriptionDesc: "Are you sure you want to cancel this subscription?",
+    suspendSubscription: "Suspend Subscription",
+    suspendSubscriptionDesc: "Are you sure you want to suspend this subscription?",
+    resumeSubscription: "Resume Subscription",
+    resumeSubscriptionDesc: "Are you sure you want to resume this subscription?",
   },
 
   // Toast Messages

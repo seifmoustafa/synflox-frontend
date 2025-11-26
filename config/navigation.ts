@@ -1,3 +1,4 @@
+import { appLogger } from "@/lib/logger";
 import {
   LayoutDashboard,
   Users,
@@ -453,7 +454,7 @@ const getIconFromMap = (iconName: string | null | undefined): any => {
 
   // Log warning for missing icons (helpful for debugging)
   if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    console.warn(`[Navigation] Icon "${iconName}" not found in iconMap. Available icons:`, Object.keys(iconMap));
+    appLogger.warn(`[Navigation] Icon "${iconName}" not found in iconMap. Available icons:`, Object.keys(iconMap));
   }
 
   return iconMap["Package"]; // Default fallback

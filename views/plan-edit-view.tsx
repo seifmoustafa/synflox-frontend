@@ -12,6 +12,7 @@ import { ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageBreadcrumbs } from "@/components/ui/page-breadcrumbs";
 import React from "react";
+import { appLogger } from "@/lib/logger";
 
 interface PlanEditViewProps {
   planId: string;
@@ -52,7 +53,7 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
         label: m.name
       })));
     } catch (error) {
-      console.error("Failed to load data:", error);
+      appLogger.error("Failed to load data:", error);
     } finally {
       setLoading(false);
     }
@@ -85,7 +86,7 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
       await subscriptionPlanService.updatePlan(request);
       router.push(`/plans/${planId}`);
     } catch (error) {
-      console.error("Failed to update plan:", error);
+      appLogger.error("Failed to update plan:", error);
     }
   };
 

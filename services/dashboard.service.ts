@@ -1,6 +1,7 @@
 import { Dashboard, DashboardMapper, DashboardResponse, CompanyStatsData, SubscriptionStatsData, AdminStatsData, AlertsData, RecentActivityData } from '@/domain';
 import { IApiService } from './api.service';
 import { INotificationService } from './notification.service';
+import { appLogger } from '@/lib/logger';
 
 /**
  * Dashboard Service Interface
@@ -34,7 +35,7 @@ export class DashboardService implements IDashboardService {
       const response = await this.apiService.get<DashboardResponse>('/dashboard');
       return DashboardMapper.handleApiResponse(response);
     } catch (error) {
-      console.error('[DashboardService] Error loading dashboard:', error);
+      appLogger.error('[DashboardService] Error loading dashboard:', error);
       this.notificationService.error('Failed to load dashboard data');
       throw error;
     }

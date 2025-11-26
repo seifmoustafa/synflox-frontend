@@ -4,6 +4,7 @@ import React from "react";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { appLogger } from "@/lib/logger";
 
 interface DashboardErrorBoundaryProps {
   children: React.ReactNode;
@@ -34,7 +35,7 @@ export class DashboardErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("[DashboardErrorBoundary] Error caught:", error, errorInfo);
+    appLogger.error("[DashboardErrorBoundary] Error caught:", error, errorInfo);
     this.setState({
       error,
       errorInfo,

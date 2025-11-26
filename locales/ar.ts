@@ -622,8 +622,11 @@ export const ar = {
       dataPoints: "نقاط البيانات",
       last30Days: "آخر 30 يوم",
       companiesGrowth: "الشركات المُنشأة",
+      companiesGrowthDesc: "تسجيلات الشركات اليومية عبر الوقت",
       subscriptionsGrowth: "الاشتراكات المُنشأة",
+      subscriptionsGrowthDesc: "تفعيل الاشتراكات اليومية عبر الوقت",
       adminsGrowth: "المسؤولون المُنشأون",
+      adminsGrowthDesc: "تسجيلات المسؤولين اليومية عبر الوقت",
     },
   },
 
@@ -861,6 +864,259 @@ export const ar = {
     trialDurationHelper: "1-60 يوماً (مطلوب عند تفعيل التجربة)",
     mustIncludeContent: "يجب أن تتضمن الخطة مشروعاً واحداً أو وحدة واحدة على الأقل",
     notFound: "الخطة غير موجودة",
+  },
+
+  // Subscriptions
+  subscription: {
+    trial:"تجريبي",
+    status:"حالة الاشتراك",
+    title: "إدارة الاشتراكات",
+    description: "إدارة اشتراكات العملاء وعمليات دورة الحياة",
+    item: "اشتراك",
+    items: "الاشتراكات",
+    company: "الشركة",
+    companyHelper: "اختر الشركة لهذا الاشتراك",
+    plan: "الخطة",
+    planHelper: "اختر خطة الاشتراك",
+    currency: "العملة",
+    selectCurrency: "اختر عملة الدفع",
+    startWithTrial: "البدء بفترة تجريبية",
+    trialHelper: "بدء الاشتراك في وضع التجربة (إذا كانت الخطة تسمح)",
+    autoRenew: "التجديد التلقائي",
+    autoRenewHelper: "تجديد تلقائي عند انتهاء الاشتراك",
+    startDate: "تاريخ البداية",
+    expiryDate: "تاريخ الانتهاء",
+    daysRemaining: "الأيام المتبقية",
+    amount: "المبلغ",
+    dateUnknown: "تاريخ غير معروف",
+    lifetime: "مدى الحياة",
+    
+    // Status badges
+    statuses: {
+      trial: "تجريبي",
+      active: "نشط",
+      expiring: "ينتهي قريباً",
+      expired: "منتهي",
+      suspended: "معلق",
+      cancelled: "ملغي",
+      lifetime: "مدى الحياة",
+      unknown: "غير معروف",
+    },
+    
+    // Operations
+    operations: {
+      view: "عرض التفاصيل",
+      renew: "تجديد",
+      upgrade: "ترقية",
+      cancel: "إلغاء",
+      suspend: "تعليق",
+      resume: "استئناف",
+      pause: "إيقاف مؤقت",
+      unpause: "استئناف",
+      stopTrial: "إيقاف التجربة",
+      extend: "تمديد",
+      reactivate: "إعادة تفعيل",
+      confirmCancel: "تأكيد الإلغاء",
+      cancelConfirmation: "هل أنت متأكد من إلغاء هذا الاشتراك؟ لا يمكن التراجع عن هذا الإجراء.",
+    },
+    
+    // Messages
+    notFound: "الاشتراك غير موجود",
+    loadError: "فشل في تحميل تفاصيل الاشتراك",
+    customer: "العميل",
+    quickActions: "الإجراءات السريعة",
+    quickActionsDescription: "تنفيذ العمليات الشائعة للاشتراك",
+    subscriptionDetails: "تفاصيل الاشتراك",
+    planDetails: "تفاصيل الخطة",
+    currentPlan: "الخطة الحالية",
+    pricing: "التسعير",
+    billingInformation: "معلومات الفوترة",
+    billingDescription: "إدارة معلومات الفوترة والدفع",
+    billingComingSoon: "ميزات الفوترة قادمة قريباً",
+    planFeatures: "ميزات الخطة",
+    featuresDescription: "الميزات المتضمنة في خطة الاشتراك هذه",
+    featuresComingSoon: "إدارة الميزات قادمة قريباً",
+    subscriptionHistory: "تاريخ الاشتراك",
+    historyDescription: "عرض تغييرات وأحداث الاشتراك",
+    historyComingSoon: "تتبع التاريخ قادم قريباً",
+    analytics: "التحليلات",
+    viewDetailedAnalytics: "عرض التحليلات التفصيلية",
+    licenseKeys: "مفاتيح الترخيص",
+    expires: "ينتهي في",
+    autoRenewEnabled: "التجديد التلقائي مفعل",
+    autoRenewDisabled: "التجديد التلقائي معطل",
+    
+    // Tabs
+    tabs: {
+      overview: "نظرة عامة",
+      billing: "الفوترة",
+      features: "الميزات",
+      history: "التاريخ",
+    },
+    
+    // Edit page
+    editSubscription: "تعديل الاشتراك",
+    editWarning: "قد يؤثر تعديل إعدادات الاشتراك على الفوترة والوصول. يرجى مراجعة التغييرات بعناية.",
+    currentStatus: "الحالة الحالية",
+    basicInformation: "المعلومات الأساسية",
+    basicInformationDescription: "تحديث معلومات الشركة والخطة والتسعير",
+    subscriptionSettings: "إعدادات الاشتراك",
+    subscriptionSettingsDescription: "تكوين سلوك الاشتراك والحالة",
+    dateSettings: "إعدادات التاريخ",
+    dateSettingsDescription: "إدارة تاريخ بداية ونهاية الاشتراك",
+    statusReason: "سبب الحالة",
+    statusReasonDescription: "سبب اختياري لحالة الاشتراك الحالية",
+    selectCompany: "اختر شركة",
+    selectPlan: "اختر خطة",
+    enterAmount: "أدخل المبلغ",
+    enterStatusReason: "أدخل سبب الحالة",
+    autoRenewDescription: "تجديد الاشتراك تلقائياً عند انتهائه",
+    isActiveDescription: "ما إذا كان الاشتراك نشطاً حالياً",
+    isTrialDescription: "تحديد هذا الاشتراك كفترة تجريبية",
+    isLifetimeDescription: "هذا الاشتراك لا ينتهي أبداً",
+    lifetimeNoExpiry: "اشتراكات مدى الحياة ليس لها تاريخ انتهاء",
+    saveError: "فشل في حفظ تغييرات الاشتراك",
+    
+    // Analytics
+    exportReport: "تصدير التقرير",
+    totalRevenue: "إجمالي الإيرادات",
+    usageRate: "معدل الاستخدام",
+    activeUsers: "المستخدمون النشطون",
+    uptime: "وقت التشغيل",
+    analyticsOverview: "نظرة عامة",
+    analyticsUsage: "الاستخدام",
+    analyticsRevenue: "الإيرادات",
+    analyticsPerformance: "الأداء",
+    usageTrend: "اتجاه الاستخدام",
+    usageTrendDescription: "أنماط واتجاهات الاستخدام الشهرية",
+    statusDistribution: "توزيع الحالة",
+    statusDistributionDescription: "تفصيل حالات الاشتراك",
+    featureUsage: "استخدام الميزات",
+    featureUsageDescription: "الميزات الأكثر استخداماً ومعدلات التبني",
+    revenueAnalysis: "تحليل الإيرادات",
+    revenueAnalysisDescription: "اتجاهات الإيرادات الشهرية والتوقعات",
+    systemHealth: "صحة النظام",
+    responseTime: "وقت الاستجابة",
+    errorRate: "معدل الأخطاء",
+    supportMetrics: "مقاييس الدعم",
+    ticketsResolved: "التذاكر المحلولة",
+    avgResponseTime: "متوسط وقت الاستجابة",
+    satisfaction: "الرضا",
+    analyticsLoadError: "فشل في تحميل بيانات التحليلات",
+    noHistory: "لا يوجد تاريخ متاح لهذا الاشتراك",
+    noAnalytics: "لا تتوفر بيانات تحليلية",
+    usageStatistics: "إحصائيات الاستخدام",
+    usageStatisticsDescription: "مقاييس استخدام وأداء الاشتراك",
+    activeDays: "الأيام النشطة",
+    totalDays: "إجمالي الأيام",
+    utilizationRate: "معدل الاستفادة",
+    
+    // Features
+    includedProjects: "المشاريع المتضمنة",
+    includedProjectsDescription: "المشاريع المتضمنة في خطة الاشتراك هذه",
+    includedModules: "الوحدات المتضمنة",
+    includedModulesDescription: "الوحدات المستقلة المتضمنة في هذا الاشتراك",
+    customFeatures: "الميزات المخصصة",
+    customFeaturesDescription: "ميزات إضافية متضمنة في هذه الخطة",
+    noFeatures: "لا تتوفر ميزات لهذه الخطة",
+    modules: "الوحدات",
+    planDescriptionLabel: "الوصف",
+    planFeaturesSummary: "الميزات المتضمنة",
+    projectsIncluded: "مشاريع",
+    modulesIncluded: "وحدات",
+    customFeaturesIncluded: "ميزات مخصصة",
+    
+    // Action Dialog
+    dialog: {
+      reason: "السبب",
+      reasonRequired: "يرجى تقديم سبب لهذا الإجراء",
+      notes: "ملاحظات إضافية",
+      notesPlaceholder: "أدخل أي ملاحظات أو تعليقات إضافية...",
+      sendEmailNotification: "إرسال إشعار بالبريد الإلكتروني للشركة",
+      responseLanguage: "لغة الاستجابة",
+      
+      // Suspend
+      suspend: {
+        title: "تعليق الاشتراك",
+        description: "تعليق هذا الاشتراك سيؤدي إلى تعطيل الوصول مؤقتاً للشركة. يمكن استئناف الاشتراك لاحقاً.",
+        warning: "سيؤدي هذا إلى تعطيل الوصول للشركة فوراً. سيتم إنهاء جميع الجلسات النشطة.",
+        confirm: "تعليق الاشتراك",
+      },
+      
+      // Resume
+      resume: {
+        title: "استئناف الاشتراك",
+        description: "استئناف هذا الاشتراك سيعيد الوصول للشركة.",
+        confirm: "استئناف الاشتراك",
+      },
+      
+      // Cancel
+      cancel: {
+        title: "إلغاء الاشتراك",
+        description: "إلغاء هذا الاشتراك سينهيه بشكل دائم. لا يمكن التراجع عن هذا الإجراء.",
+        warning: "هذا الإجراء دائم. سيتم إنهاء الاشتراك فوراً ولا يمكن استعادته.",
+        confirm: "إلغاء الاشتراك",
+      },
+      
+      // Pause
+      pause: {
+        title: "إيقاف الاشتراك مؤقتاً",
+        description: "إيقاف هذا الاشتراك مؤقتاً سيعلقه مع الحفاظ على وقت التجربة إن وجد.",
+        confirm: "إيقاف مؤقت",
+      },
+      
+      // Unpause
+      unpause: {
+        title: "إلغاء الإيقاف المؤقت",
+        description: "إلغاء الإيقاف المؤقت سيعيد الاشتراك من حالة الإيقاف.",
+        confirm: "إلغاء الإيقاف",
+      },
+      
+      // Reactivate
+      reactivate: {
+        title: "إعادة تفعيل الاشتراك",
+        description: "إعادة تفعيل هذا الاشتراك ستعيد الوصول للاشتراك المنتهي.",
+        confirm: "إعادة التفعيل",
+      },
+      
+      // Stop Trial
+      stopTrial: {
+        title: "إيقاف التجربة",
+        description: "إيقاف التجربة سيحول هذا الاشتراك إلى اشتراك مدفوع فوراً.",
+        confirm: "إيقاف التجربة",
+      },
+      
+      // Renew
+      renew: {
+        title: "تجديد الاشتراك",
+        description: "تجديد هذا الاشتراك سيمدده لفترة فوترة أخرى.",
+        confirm: "تجديد الاشتراك",
+      },
+      
+      // Reason placeholders
+      reasonPlaceholder: {
+        suspend: "مثال: تأخر الدفع، مخالفة السياسة، طلب العميل...",
+        resume: "مثال: تم استلام الدفع، تم حل المشكلة...",
+        cancel: "مثال: طلب العميل الإلغاء، انتهاء العقد...",
+        pause: "مثال: العميل في إجازة، تعليق مؤقت...",
+        unpause: "مثال: عودة العميل، تم حل المشكلة...",
+        reactivate: "مثال: تجديد العقد، استلام الدفع...",
+        stopTrial: "مثال: العميل يريد بدء الخطة المدفوعة مبكراً...",
+        renew: "مثال: تجديد العقد، طلب العميل...",
+      },
+      
+      // Default reasons
+      defaultReason: {
+        suspend: "تم تعليق الاشتراك بواسطة المسؤول",
+        resume: "تم استئناف الاشتراك بواسطة المسؤول",
+        cancel: "تم إلغاء الاشتراك بواسطة المسؤول",
+        pause: "تم إيقاف الاشتراك مؤقتاً بواسطة المسؤول",
+        unpause: "تم إلغاء الإيقاف المؤقت بواسطة المسؤول",
+        reactivate: "تم إعادة تفعيل الاشتراك بواسطة المسؤول",
+        stopTrial: "تم تحويل التجربة إلى اشتراك مدفوع",
+        renew: "تم تجديد الاشتراك بواسطة المسؤول",
+      },
+    },
   },
 
   // Licensing
@@ -2275,6 +2531,32 @@ export const ar = {
         },
       },
     },
+    // Action Form Dialog
+    action: {
+      reason: "السبب",
+      reasonPlaceholder: "أدخل سبب هذا الإجراء...",
+      notes: "ملاحظات إضافية",
+      notesPlaceholder: "أدخل أي ملاحظات إضافية (اختياري)...",
+      emailLanguage: "لغة البريد الإلكتروني",
+      selectLanguage: "اختر لغة البريد",
+      useDefault: "استخدم الافتراضي (من إعدادات المستخدم)",
+      sendEmail: "إرسال إشعار بالبريد",
+      sendEmailHelp: "إخطار الأطراف المتأثرة عبر البريد الإلكتروني",
+      // Company Actions
+      activateCompany: "تفعيل الشركة",
+      activateCompanyDesc: "هل أنت متأكد أنك تريد تفعيل {count} شركة؟",
+      deactivateCompany: "إلغاء تفعيل الشركة",
+      deactivateCompanyDesc: "هل أنت متأكد أنك تريد إلغاء تفعيل {count} شركة؟",
+      deleteCompany: "حذف الشركة",
+      deleteCompanyDesc: "هل أنت متأكد أنك تريد حذف {count} شركة؟ لا يمكن التراجع عن هذا الإجراء.",
+      // Subscription Actions
+      cancelSubscription: "إلغاء الاشتراك",
+      cancelSubscriptionDesc: "هل أنت متأكد أنك تريد إلغاء هذا الاشتراك؟",
+      suspendSubscription: "تعليق الاشتراك",
+      suspendSubscriptionDesc: "هل أنت متأكد أنك تريد تعليق هذا الاشتراك؟",
+      resumeSubscription: "استئناف الاشتراك",
+      resumeSubscriptionDesc: "هل أنت متأكد أنك تريد استئناف هذا الاشتراك؟",
+    },
     toast: {
       title: "إشعارات التوست",
       description: "خصص مظهر وسلوك إشعارات التوست",
@@ -3370,6 +3652,8 @@ export const ar = {
 
   // Common
   common: {
+    optional:"إختياري",
+    processing:"جاري معالجة...",
     items:"الميزات",
     inactive:"غير نشط",
     clearSelection: "إلغاء تحديد",

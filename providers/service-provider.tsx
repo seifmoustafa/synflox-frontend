@@ -14,6 +14,7 @@ import { CompanyService } from "@/services/company.service";
 import { ProjectService } from "@/services/project.service";
 import { ModuleService } from "@/services/module.service";
 import { SubscriptionPlanService } from "@/services/subscription-plan.service";
+import { SubscriptionService } from "@/services/subscription.service";
 import { DashboardService } from "@/services/dashboard.service";
 
 interface Services {
@@ -29,6 +30,7 @@ interface Services {
   projectService: ProjectService;
   moduleService: ModuleService;
   subscriptionPlanService: SubscriptionPlanService;
+  subscriptionService: SubscriptionService;
   dashboardService: DashboardService;
 }
 
@@ -48,6 +50,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
     const projectService = new ProjectService(apiService, notificationService);
     const moduleService = new ModuleService(apiService, notificationService);
     const subscriptionPlanService = new SubscriptionPlanService(apiService, notificationService);
+    const subscriptionService = new SubscriptionService(apiService, notificationService);
     const dashboardService = new DashboardService(apiService, notificationService);
 
     return {
@@ -63,6 +66,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
       projectService,
       moduleService,
       subscriptionPlanService,
+      subscriptionService,
       dashboardService,
     };
   }, []);

@@ -12,10 +12,12 @@ import type {
 import type { BulkAction } from "@/components/ui/generic-crud-view";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { useActionFormDialog, getActionFormFields } from "@/components/ui/action-form-dialog";
 
 export function useCompanyViewModel() {
   const { companyService } = useServices();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
+  const { showActionForm, ActionFormDialog } = useActionFormDialog();
 
   const vm = useGenericCrudViewModel<
     Company,
@@ -148,37 +150,74 @@ export function useCompanyViewModel() {
         {
           label: t("company.activateSelected"),
           onClick: async (selectedIds: string[]) => {
-            await companyService.bulkActivate(selectedIds);
-            await vm.refreshItems();
+            showActionForm({
+              title: t("action.activateCompany"),
+              description: t("action.activateCompanyDesc"),
+              fields: getActionFormFields(t, { reason: true, notes: false, emailLanguage: true, sendEmail: true }),
+              variant: "default",
+              confirmText: t("company.activate"),
+              itemCount: selectedIds.length,
+              onSubmit: async (values) => {
+                await companyService.bulkActivate(
+                  selectedIds,
+                  values.reason as string,
+                  values.sendEmailNotification as boolean,
+                  (values.lang as string) || undefined
+                );
+                await vm.refreshItems();
+              },
+            });
           },
           variant: "default" as const,
           icon: CheckCircle2,
-          confirmTitle: t("company.confirmActivate"),
-          confirmDescription: t("company.activateConfirmation").replace("{count}", "{count}"),
-          requiresConfirmation: true,
         },
         {
           label: t("company.deactivateSelected"),
           onClick: async (selectedIds: string[]) => {
-            await companyService.bulkDeactivate(selectedIds);
-            await vm.refreshItems();
+            showActionForm({
+              title: t("action.deactivateCompany"),
+              description: t("action.deactivateCompanyDesc"),
+              fields: getActionFormFields(t, { reason: true, notes: true, emailLanguage: true, sendEmail: true }),
+              variant: "warning",
+              confirmText: t("company.deactivate"),
+              itemCount: selectedIds.length,
+              onSubmit: async (values) => {
+                await companyService.bulkDeactivate(
+                  selectedIds,
+                  values.reason as string,
+                  values.notes as string,
+                  values.sendEmailNotification as boolean,
+                  (values.lang as string) || undefined
+                );
+                await vm.refreshItems();
+              },
+            });
           },
           variant: "outline" as const,
           icon: XCircle,
-          confirmTitle: t("company.confirmDeactivate"),
-          confirmDescription: t("company.deactivateConfirmation").replace("{count}", "{count}"),
-          requiresConfirmation: true,
         },
         {
           label: t("company.deleteSelected"),
           onClick: async (selectedIds: string[]) => {
-            await companyService.bulkDelete(selectedIds);
-            await vm.refreshItems();
+            showActionForm({
+              title: t("action.deleteCompany"),
+              description: t("action.deleteCompanyDesc"),
+              fields: getActionFormFields(t, { reason: true, notes: false, emailLanguage: true, sendEmail: true }),
+              variant: "destructive",
+              confirmText: t("common.delete"),
+              itemCount: selectedIds.length,
+              onSubmit: async (values) => {
+                await companyService.bulkDelete(
+                  selectedIds,
+                  values.reason as string,
+                  values.sendEmailNotification as boolean,
+                  (values.lang as string) || undefined
+                );
+                await vm.refreshItems();
+              },
+            });
           },
           variant: "destructive" as const,
-          confirmTitle: t("common.confirmDelete"),
-          confirmDescription: t("company.deleteSelectedConfirmation").replace("{count}", "{count}"),
-          requiresConfirmation: true,
         },
       ] as BulkAction[],
       getActions: (vm: any, t: any, handleDelete?: (item: Company) => void) => [
@@ -195,28 +234,51 @@ export function useCompanyViewModel() {
         {
           label: t("company.activate"),
           onClick: async (item: Company) => {
-            await companyService.activateCompany(item.id);
-            await vm.refreshItems();
+            showActionForm({
+              title: t("action.activateCompany"),
+              description: t("company.activateSingleConfirmation"),
+              fields: getActionFormFields(t, { reason: true, notes: false, emailLanguage: true, sendEmail: false }),
+              variant: "default",
+              confirmText: t("company.activate"),
+              itemCount: 1,
+              onSubmit: async (values) => {
+                await companyService.activateCompany(
+                  item.id,
+                  values.reason as string,
+                  (values.lang as string) || undefined
+                );
+                await vm.refreshItems();
+              },
+            });
           },
           variant: "ghost" as const,
           icon: CheckCircle2,
           show: (item: Company) => !item.isActive,
-          confirmTitle: t("company.confirmActivate"),
-          confirmDescription: t("company.activateSingleConfirmation"),
-          requiresConfirmation: true,
         },
         {
           label: t("company.deactivate"),
           onClick: async (item: Company) => {
-            await companyService.deactivateCompany(item.id);
-            await vm.refreshItems();
+            showActionForm({
+              title: t("action.deactivateCompany"),
+              description: t("company.deactivateSingleConfirmation"),
+              fields: getActionFormFields(t, { reason: true, notes: true, emailLanguage: true, sendEmail: false }),
+              variant: "warning",
+              confirmText: t("company.deactivate"),
+              itemCount: 1,
+              onSubmit: async (values) => {
+                await companyService.deactivateCompany(
+                  item.id,
+                  values.reason as string,
+                  values.notes as string,
+                  (values.lang as string) || undefined
+                );
+                await vm.refreshItems();
+              },
+            });
           },
           variant: "ghost" as const,
           icon: XCircle,
           show: (item: Company) => item.isActive === true,
-          confirmTitle: t("company.confirmDeactivate"),
-          confirmDescription: t("company.deactivateSingleConfirmation"),
-          requiresConfirmation: true,
         },
         {
           label: t("common.delete"),
@@ -229,7 +291,7 @@ export function useCompanyViewModel() {
         },
       ],
     }),
-    [t, companyService, vm]
+    [t, companyService, vm, showActionForm]
   );
 
   const handleDelete = useCallback(
@@ -240,5 +302,5 @@ export function useCompanyViewModel() {
     [companyService, vm]
   );
 
-  return { vm, config, handleDelete };
+  return { vm, config, handleDelete, ActionFormDialog };
 }

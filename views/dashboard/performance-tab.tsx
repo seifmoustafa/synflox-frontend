@@ -399,6 +399,7 @@ export function PerformanceTab({ dashboard, t, isRTL }: PerformanceTabProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <GenericChart
             title={t("dashboard.timeSeries.companiesGrowth")}
+            description={t("dashboard.timeSeries.companiesGrowthDesc")}
             type="bar"
             data={{
               labels: timeSeries.dates,
@@ -413,6 +414,7 @@ export function PerformanceTab({ dashboard, t, isRTL }: PerformanceTabProps) {
           
           <GenericChart
             title={t("dashboard.timeSeries.subscriptionsGrowth")}
+            description={t("dashboard.timeSeries.subscriptionsGrowthDesc")}
             type="bar"
             data={{
               labels: timeSeries.dates,
@@ -427,6 +429,7 @@ export function PerformanceTab({ dashboard, t, isRTL }: PerformanceTabProps) {
           
           <GenericChart
             title={t("dashboard.timeSeries.adminsGrowth")}
+            description={t("dashboard.timeSeries.adminsGrowthDesc")}
             type="bar"
             data={{
               labels: timeSeries.dates,

@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useServices } from '@/providers/service-provider';
 import { useI18n } from '@/providers/i18n-provider';
 import { NotificationPreferences, UpdateNotificationPreferencesRequest } from '@/domain';
+import { appLogger } from '@/lib/logger';
 
 export interface INotificationPreferencesViewModel {
   // State
@@ -56,7 +57,7 @@ export function useNotificationPreferencesViewModel(): INotificationPreferencesV
       setPreferences(data);
       setOriginalPreferences(data);
     } catch (error) {
-      console.error('Failed to load notification preferences:', error);
+      appLogger.error('Failed to load notification preferences:', error);
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +108,7 @@ export function useNotificationPreferencesViewModel(): INotificationPreferencesV
       setPreferences(updated);
       setOriginalPreferences(updated);
     } catch (error) {
-      console.error('Failed to save notification preferences:', error);
+      appLogger.error('Failed to save notification preferences:', error);
       throw error;
     } finally {
       setIsSaving(false);

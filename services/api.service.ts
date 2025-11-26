@@ -190,7 +190,15 @@ export class ApiService implements IApiService {
         appLogger.api("Request authenticated");
       }
     } else {
-      appLogger.warn("No access token found");
+      appLogger.warn("No access token found - request will be unauthenticated");
+      // In development, log more details about the missing token
+      if (process.env.NODE_ENV === 'development') {
+        appLogger.debug("Token check details:", {
+          hasToken: !!token,
+          endpoint,
+          pathname: typeof window !== 'undefined' ? window.location.pathname : 'SSR'
+        });
+      }
     }
 
     const config: RequestInit = {
@@ -357,7 +365,21 @@ export class ApiService implements IApiService {
 
   async get<T>(endpoint: string, params?: Record<string, any>, signal?: AbortSignal): Promise<T> {
     const queryString = params ? "?" + new URLSearchParams(params).toString() : "";
-    return this.request<T>(`${endpoint}${queryString}`, { method: "GET" }, signal);
+    
+    // Add cache control headers for development (more reliable than query params)
+    const headers = process.env.NODE_ENV === 'development' 
+      ? { 
+          ...this.defaultHeaders,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      : this.defaultHeaders;
+    
+    return this.request<T>(`${endpoint}${queryString}`, { 
+      method: "GET",
+      headers 
+    }, signal);
   }
 
   async post<T>(endpoint: string, data?: any, signal?: AbortSignal): Promise<T> {

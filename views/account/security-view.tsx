@@ -14,6 +14,7 @@ import { BackupCodesTab } from './security-tabs/backup-codes-tab';
 import { DeleteAccountTab } from './security-tabs/delete-account-tab';
 import { Card, CardContent } from '@/components/ui/card';
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { appLogger } from '@/lib/logger';
 
 type SecurityTab = 'overview' | 'password' | '2fa' | 'backup-codes' | 'delete-account';
 
@@ -31,7 +32,7 @@ export function SecurityView() {
         const data = await accountService.getSecurityDashboard();
         setSecurityDashboard(data);
       } catch (error) {
-        console.error('Failed to load security dashboard:', error);
+        appLogger.error('Failed to load security dashboard:', error);
       }
     };
     loadSecurityData();

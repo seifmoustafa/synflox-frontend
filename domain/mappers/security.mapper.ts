@@ -26,9 +26,11 @@ import {
   ExportBackupCodesRequestData,
   ExportBackupCodesResponse,
   ExportBackupCodesResponseData,
+} from '../models/security.model';
+import {
   SecurityDashboard,
   SecurityDashboardData,
-} from '../models/security.model';
+} from '../models/account/security.model';
 
 export class SecurityMapper {
   // ==================== PASSWORD MANAGEMENT ====================
@@ -136,16 +138,35 @@ export class SecurityMapper {
   static securityDashboardFromJson(json: any): SecurityDashboard {
     const data: SecurityDashboardData = {
       securityScore: json.securityScore || 0,
-      is2FAEnabled: json.is2FAEnabled || json.isTwoFactorEnabled || false,
-      hasBackupCodes: json.hasBackupCodes || false,
-      backupCodesRemaining: json.backupCodesRemaining || 0,
-      lastPasswordChange: json.lastPasswordChange || null,
-      daysSincePasswordChange: json.daysSincePasswordChange || 0,
+      securityLevel: json.securityLevel || 'Unknown',
+      twoFactorStats: {
+        isEnabled: json.twoFactorStats?.isEnabled || json.is2FAEnabled || false,
+        enabledDate: json.twoFactorStats?.enabledDate || null,
+        lastVerification: json.twoFactorStats?.lastVerification || null,
+        totalVerifications: json.twoFactorStats?.totalVerifications || 0,
+        failedAttemptsLast30Days: json.twoFactorStats?.failedAttemptsLast30Days || 0,
+      },
+      backupCodesStats: {
+        totalGenerated: json.backupCodesStats?.totalGenerated || 0,
+        remainingCodes: json.backupCodesStats?.remainingCodes || json.backupCodesRemaining || 0,
+        usedCodes: json.backupCodesStats?.usedCodes || 0,
+        expiredCodes: json.backupCodesStats?.expiredCodes || 0,
+        lastGenerationDate: json.backupCodesStats?.lastGenerationDate || null,
+        nextExpiryDate: json.backupCodesStats?.nextExpiryDate || null,
+        daysUntilExpiry: json.backupCodesStats?.daysUntilExpiry || null,
+        needsRegeneration: json.backupCodesStats?.needsRegeneration || false,
+      },
       recentEvents: json.recentEvents || [],
-      failedLoginAttempts: json.failedLoginAttempts || 0,
+      failedLoginStats: {
+        last24Hours: json.failedLoginStats?.last24Hours || json.failedLoginAttempts || 0,
+        last7Days: json.failedLoginStats?.last7Days || 0,
+        last30Days: json.failedLoginStats?.last30Days || 0,
+        mostRecentAttempt: json.failedLoginStats?.mostRecentAttempt || null,
+        suspiciousActivity: json.failedLoginStats?.suspiciousActivity || false,
+        suspiciousIps: json.failedLoginStats?.suspiciousIps || [],
+      },
       recommendations: json.recommendations || [],
-      trustedDevicesCount: json.trustedDevicesCount || 0,
-      activeSessionsCount: json.activeSessionsCount || 0,
+      lastAuditDate: json.lastAuditDate || new Date().toISOString(),
     };
     return new SecurityDashboard(data);
   }

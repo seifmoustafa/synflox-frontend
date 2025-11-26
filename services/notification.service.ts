@@ -1,4 +1,5 @@
 import { appLogger } from "@/lib/logger";
+import { toast } from "@/hooks/use-enhanced-toast";
 import {
   Notification,
   NotificationConfig,
@@ -34,36 +35,72 @@ export class NotificationService implements INotificationService {
   }
 
   /**
-   * Show success notification
+   * Show success notification using the toast system
    */
   success(message: string, title: string = 'Success', options: Partial<NotificationData> = {}): void {
+    // Use the global toast system for UI display
+    toast({
+      title,
+      description: message,
+      variant: "success",
+      duration: options.duration || 4000,
+    });
+    
+    // Also add to queue for tracking
     const notification = NotificationMapper.createSuccessNotification(message, title, options);
     this.add(notification);
     appLogger.info("Success notification:", { title, message });
   }
 
   /**
-   * Show error notification
+   * Show error notification using the toast system
    */
   error(message: string, title: string = 'Error', options: Partial<NotificationData> = {}): void {
+    // Use the global toast system for UI display
+    toast({
+      title,
+      description: message,
+      variant: "destructive",
+      duration: options.duration || 6000,
+    });
+    
+    // Also add to queue for tracking
     const notification = NotificationMapper.createErrorNotification(message, title, options);
     this.add(notification);
     appLogger.error("Error notification:", { title, message });
   }
 
   /**
-   * Show info notification
+   * Show info notification using the toast system
    */
   info(message: string, title: string = 'Information', options: Partial<NotificationData> = {}): void {
+    // Use the global toast system for UI display
+    toast({
+      title,
+      description: message,
+      variant: "info",
+      duration: options.duration || 4000,
+    });
+    
+    // Also add to queue for tracking
     const notification = NotificationMapper.createInfoNotification(message, title, options);
     this.add(notification);
     appLogger.info("Info notification:", { title, message });
   }
 
   /**
-   * Show warning notification
+   * Show warning notification using the toast system
    */
   warning(message: string, title: string = 'Warning', options: Partial<NotificationData> = {}): void {
+    // Use the global toast system for UI display
+    toast({
+      title,
+      description: message,
+      variant: "warning",
+      duration: options.duration || 5000,
+    });
+    
+    // Also add to queue for tracking
     const notification = NotificationMapper.createWarningNotification(message, title, options);
     this.add(notification);
     appLogger.warn("Warning notification:", { title, message });

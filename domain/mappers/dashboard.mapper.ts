@@ -1,3 +1,4 @@
+import { appLogger } from '@/lib/logger';
 import {
   Dashboard,
   DashboardData,
@@ -249,7 +250,7 @@ export class DashboardMapper {
     }
     
     // Log the structure we received
-    console.error('[DashboardMapper] Unexpected response structure:', {
+    appLogger.error('[DashboardMapper] Unexpected response structure:', {
       keys: Object.keys(response),
       hasSucceeded: 'succeeded' in response,
       hasData: 'data' in response,

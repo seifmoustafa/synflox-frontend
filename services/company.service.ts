@@ -22,18 +22,18 @@ export interface ICompanyService {
     search?: string;
   }): Promise<CompaniesResponse>;
   getCompanyById(id: string): Promise<Company>;
-  createCompany(data: CreateCompanyRequest): Promise<Company>;
-  updateCompany(id: string, data: UpdateCompanyRequest): Promise<Company>;
-  deleteCompany(id: string): Promise<void>;
+  createCompany(data: CreateCompanyRequest, lang?: string): Promise<Company>;
+  updateCompany(id: string, data: UpdateCompanyRequest, lang?: string): Promise<Company>;
+  deleteCompany(id: string, lang?: string): Promise<void>;
   
   // Individual Actions
-  activateCompany(id: string): Promise<void>;
-  deactivateCompany(id: string): Promise<void>;
+  activateCompany(id: string, reason?: string, lang?: string): Promise<void>;
+  deactivateCompany(id: string, reason?: string, notes?: string, lang?: string): Promise<void>;
   
   // Bulk Actions
-  bulkActivate(companyIds: string[]): Promise<{ count: number; message: string }>;
-  bulkDeactivate(companyIds: string[]): Promise<{ count: number; message: string }>;
-  bulkDelete(companyIds: string[]): Promise<{ count: number; message: string }>;
+  bulkActivate(companyIds: string[], reason?: string, sendEmailNotifications?: boolean, lang?: string): Promise<{ count: number; message: string }>;
+  bulkDeactivate(companyIds: string[], reason?: string, notes?: string, sendEmailNotifications?: boolean, lang?: string): Promise<{ count: number; message: string }>;
+  bulkDelete(companyIds: string[], reason?: string, sendEmailNotifications?: boolean, lang?: string): Promise<{ count: number; message: string }>;
 }
 
 export class CompanyService implements ICompanyService {
@@ -70,13 +70,13 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async createCompany(data: CreateCompanyRequest): Promise<Company> {
+  async createCompany(data: CreateCompanyRequest, lang?: string): Promise<Company> {
     try {
       const json = CompanyMapper.createRequestToJson(data);
-      const response = await this.apiService.post<any>(
-        API_ENDPOINTS.COMPANIES_CREATE,
-        json
-      );
+      const url = lang 
+        ? `${API_ENDPOINTS.COMPANIES_CREATE}?lang=${lang}` 
+        : API_ENDPOINTS.COMPANIES_CREATE;
+      const response = await this.apiService.post<any>(url, json);
       const companyData = response?.data || response;
       const message = response?.message || "Company created successfully";
       this.notificationService.success(message);
@@ -86,13 +86,12 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async updateCompany(id: string, data: UpdateCompanyRequest): Promise<Company> {
+  async updateCompany(id: string, data: UpdateCompanyRequest, lang?: string): Promise<Company> {
     try {
       const json = CompanyMapper.updateRequestToJson(data);
-      const response = await this.apiService.put<any>(
-        `${API_ENDPOINTS.COMPANIES_UPDATE}/${id}`,
-        json
-      );
+      const baseUrl = `${API_ENDPOINTS.COMPANIES_UPDATE}/${id}`;
+      const url = lang ? `${baseUrl}?lang=${lang}` : baseUrl;
+      const response = await this.apiService.put<any>(url, json);
       const companyData = response?.data || response;
       const message = response?.message || "Company updated successfully";
       this.notificationService.success(message);
@@ -102,11 +101,11 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async deleteCompany(id: string): Promise<void> {
+  async deleteCompany(id: string, lang?: string): Promise<void> {
     try {
-      const response = await this.apiService.delete<any>(
-        `${API_ENDPOINTS.COMPANIES_DELETE}/${id}`
-      );
+      const baseUrl = `${API_ENDPOINTS.COMPANIES_DELETE}/${id}`;
+      const url = lang ? `${baseUrl}?lang=${lang}` : baseUrl;
+      const response = await this.apiService.delete<any>(url);
       const message = response?.message || "Company deleted successfully";
       this.notificationService.success(message);
     } catch (e) {
@@ -114,12 +113,15 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async activateCompany(id: string): Promise<void> {
+  async activateCompany(id: string, reason?: string, lang?: string): Promise<void> {
     try {
-      const response = await this.apiService.post<any>(
-        `${API_ENDPOINTS.COMPANIES_ACTIVATE}/${id}`,
-        {} // Empty body required
-      );
+      const baseUrl = `${API_ENDPOINTS.COMPANIES_ACTIVATE}/${id}`;
+      const url = lang ? `${baseUrl}?lang=${lang}` : baseUrl;
+      const response = await this.apiService.post<any>(url, {
+        companyId: id,
+        reason: reason || "Company activated by administrator",
+        sendEmailNotification: true
+      });
       const message = response?.message || "Company activated successfully";
       this.notificationService.success(message);
     } catch (e) {
@@ -127,12 +129,16 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async deactivateCompany(id: string): Promise<void> {
+  async deactivateCompany(id: string, reason?: string, notes?: string, lang?: string): Promise<void> {
     try {
-      const response = await this.apiService.post<any>(
-        `${API_ENDPOINTS.COMPANIES_DEACTIVATE}/${id}`,
-        {} // Empty body required
-      );
+      const baseUrl = `${API_ENDPOINTS.COMPANIES_DEACTIVATE}/${id}`;
+      const url = lang ? `${baseUrl}?lang=${lang}` : baseUrl;
+      const response = await this.apiService.post<any>(url, {
+        companyId: id,
+        reason: reason || "Company deactivated by administrator",
+        notes,
+        sendEmailNotification: true
+      });
       const message = response?.message || "Company deactivated successfully";
       this.notificationService.success(message);
     } catch (e) {
@@ -140,11 +146,18 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async bulkActivate(companyIds: string[]): Promise<{ count: number; message: string }> {
+  async bulkActivate(companyIds: string[], reason?: string, sendEmailNotifications: boolean = true, lang?: string): Promise<{ count: number; message: string }> {
     try {
+      const url = lang 
+        ? `${API_ENDPOINTS.COMPANIES_BULK_ACTIVATE}?lang=${lang}` 
+        : API_ENDPOINTS.COMPANIES_BULK_ACTIVATE;
       const response = await this.apiService.post<any>(
-        API_ENDPOINTS.COMPANIES_BULK_ACTIVATE,
-        { companyIds }
+        url,
+        { 
+          companyIds, 
+          reason: reason || "Bulk activation by administrator",
+          sendEmailNotifications 
+        }
       );
       const result = response?.data || response;
       const count = result?.successCount || companyIds.length;
@@ -156,11 +169,19 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async bulkDeactivate(companyIds: string[]): Promise<{ count: number; message: string }> {
+  async bulkDeactivate(companyIds: string[], reason?: string, notes?: string, sendEmailNotifications: boolean = true, lang?: string): Promise<{ count: number; message: string }> {
     try {
+      const url = lang 
+        ? `${API_ENDPOINTS.COMPANIES_BULK_DEACTIVATE}?lang=${lang}` 
+        : API_ENDPOINTS.COMPANIES_BULK_DEACTIVATE;
       const response = await this.apiService.post<any>(
-        API_ENDPOINTS.COMPANIES_BULK_DEACTIVATE,
-        { companyIds }
+        url,
+        { 
+          companyIds, 
+          reason: reason || "Bulk deactivation by administrator",
+          notes,
+          sendEmailNotifications 
+        }
       );
       const result = response?.data || response;
       const count = result?.successCount || companyIds.length;
@@ -172,11 +193,18 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async bulkDelete(companyIds: string[]): Promise<{ count: number; message: string }> {
+  async bulkDelete(companyIds: string[], reason?: string, sendEmailNotifications: boolean = true, lang?: string): Promise<{ count: number; message: string }> {
     try {
+      const url = lang 
+        ? `${API_ENDPOINTS.COMPANIES_BULK_DELETE}?lang=${lang}` 
+        : API_ENDPOINTS.COMPANIES_BULK_DELETE;
       const response = await this.apiService.post<any>(
-        API_ENDPOINTS.COMPANIES_BULK_DELETE,
-        { companyIds }
+        url,
+        { 
+          companyIds, 
+          reason: reason || "Bulk deletion by administrator",
+          sendEmailNotifications 
+        }
       );
       const result = response?.data || response;
       const count = result?.successCount || companyIds.length;

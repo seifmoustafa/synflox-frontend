@@ -5,16 +5,19 @@ import { GenericCrudView } from "@/components/ui/generic-crud-view";
 import { useCompanyViewModel } from "@/viewmodels/company-viewmodel";
 
 export function CompanyView() {
-  const { vm, config } = useCompanyViewModel();
+  const { vm, config, ActionFormDialog } = useCompanyViewModel();
 
   if (!vm || !config) {
     return <div>Loading...</div>;
   }
 
   return (
-    <GenericCrudView 
-      viewModel={vm} 
-      config={config as any}
-    />
+    <>
+      <GenericCrudView 
+        viewModel={vm} 
+        config={config as any}
+      />
+      <ActionFormDialog />
+    </>
   );
 }
