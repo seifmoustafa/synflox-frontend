@@ -32,8 +32,14 @@ export function useSubscriptionViewModel() {
   // State for dropdown data
   const [companyOptions, setCompanyOptions] = useState<Array<{ value: string; label: string }>>([]);
   const [planOptions, setPlanOptions] = useState<Array<{ value: string; label: string }>>([]);
+  const [plansData, setPlansData] = useState<Array<{ id: string; allowTrial: boolean; isLifetimePlan: boolean }>>([]);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [dropdownsLoaded, setDropdownsLoaded] = useState(false);
   const [isLoadingDropdowns, setIsLoadingDropdowns] = useState(false);
+  
+  // Helper to check if selected plan allows trial
+  const selectedPlanAllowsTrial = plansData.find(p => p.id === selectedPlanId)?.allowTrial ?? true;
+  const selectedPlanIsLifetime = plansData.find(p => p.id === selectedPlanId)?.isLifetimePlan ?? false;
 
   // Load companies and plans for dropdowns
   const loadDropdownData = useCallback(async () => {
@@ -52,12 +58,19 @@ export function useSubscriptionViewModel() {
       
       const companyOpts = companies.data.map((c: any) => ({ value: c.id, label: c.name }));
       const planOpts = plans.plans.map((p: any) => ({ value: p.id, label: p.name }));
+      const planData = plans.plans.map((p: any) => ({ 
+        id: p.id, 
+        allowTrial: p.allowTrial ?? false,
+        isLifetimePlan: p.isLifetimePlan ?? false 
+      }));
       
       console.log("✅ Company options:", companyOpts);
       console.log("✅ Plan options:", planOpts);
+      console.log("✅ Plans data (with trial info):", planData);
       
       setCompanyOptions(companyOpts);
       setPlanOptions(planOpts);
+      setPlansData(planData);
       setDropdownsLoaded(true);
     } catch (error) {
       console.error("❌ Failed to load dropdown data:", error);
@@ -330,11 +343,18 @@ export function useSubscriptionViewModel() {
       return response;
     },
     create: async (data: any) => {
+      // Validate and sanitize based on plan restrictions
+      const selectedPlan = plansData.find(p => p.id === data.planId);
+      const canTrial = selectedPlan ? (selectedPlan.allowTrial && !selectedPlan.isLifetimePlan) : false;
+      const canAutoRenew = selectedPlan ? !selectedPlan.isLifetimePlan : true;
+      
       const request = new CreateSubscriptionRequest({
         companyId: data.companyId,
         planId: data.planId,
-        startWithTrial: data.startWithTrial || false,
-        autoRenew: data.autoRenew || false,
+        // Only allow trial if plan permits it
+        startWithTrial: canTrial ? (data.startWithTrial || false) : false,
+        // Only allow auto-renew if not lifetime plan
+        autoRenew: canAutoRenew ? (data.autoRenew || false) : false,
       });
       return await subscriptionService.createSubscription(request);
     },
@@ -474,18 +494,35 @@ export function useSubscriptionViewModel() {
         required: true,
         options: planOptions,
         helperText: t("subscription.planHelper"),
+        onChange: (value: any) => {
+          setSelectedPlanId(value);
+        },
       },
       {
         name: "startWithTrial",
         label: t("subscription.startWithTrial"),
         type: "checkbox" as const,
         helperText: t("subscription.trialHelper"),
+        // Only show if selected plan allows trial and is not lifetime
+        isVisible: (formData: Record<string, any>) => {
+          const planId = formData.planId;
+          if (!planId) return true; // Show by default until plan is selected
+          const plan = plansData.find(p => p.id === planId);
+          return plan ? (plan.allowTrial && !plan.isLifetimePlan) : true;
+        },
       },
       {
         name: "autoRenew",
         label: t("subscription.autoRenew"),
         type: "checkbox" as const,
         helperText: t("subscription.autoRenewHelper"),
+        // Hide auto-renew for lifetime plans
+        isVisible: (formData: Record<string, any>) => {
+          const planId = formData.planId;
+          if (!planId) return true; // Show by default until plan is selected
+          const plan = plansData.find(p => p.id === planId);
+          return plan ? !plan.isLifetimePlan : true;
+        },
       },
     ],
     editFields: [],

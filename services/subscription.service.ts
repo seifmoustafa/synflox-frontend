@@ -79,18 +79,10 @@ export class SubscriptionService implements ISubscriptionService {
       );
 
       const subscription = SubscriptionMapper.handleApiResponse(response);
-
-      this.notificationService.success(
-        "Subscription Created",
-        `Subscription created successfully for plan ${subscription.planName}`
-      );
-
+      // Note: Success notification handled by generic CRUD viewmodel
       return subscription;
     } catch (error: any) {
-      this.notificationService.error(
-        "Create Failed",
-        error.message || "Failed to create subscription"
-      );
+      // Note: Error notification handled by generic CRUD viewmodel
       throw error;
     }
   }
@@ -119,10 +111,6 @@ export class SubscriptionService implements ISubscriptionService {
       return finalResult;
     } catch (error: any) {
       console.error("🌐 Service: Error:", error);
-      this.notificationService.error(
-        "Load Failed",
-        error.message || "Failed to load subscriptions"
-      );
       throw error;
     }
   }
@@ -135,10 +123,6 @@ export class SubscriptionService implements ISubscriptionService {
 
       return SubscriptionMapper.handleApiResponse(response);
     } catch (error: any) {
-      this.notificationService.error(
-        "Fetch Failed",
-        error.message || "Failed to fetch subscription"
-      );
       throw error;
     }
   }
@@ -160,10 +144,6 @@ export class SubscriptionService implements ISubscriptionService {
         return null;
       }
 
-      this.notificationService.error(
-        "Fetch Failed",
-        error.message || "Failed to fetch active subscription"
-      );
       throw error;
     }
   }
@@ -177,10 +157,6 @@ export class SubscriptionService implements ISubscriptionService {
       const result = SubscriptionMapper.handleGetByCompanyResponse(response);
       return result.data;
     } catch (error: any) {
-      this.notificationService.error(
-        "Fetch Failed",
-        error.message || "Failed to fetch company subscriptions"
-      );
       throw error;
     }
   }
@@ -193,10 +169,6 @@ export class SubscriptionService implements ISubscriptionService {
 
       return SubscriptionMapper.handleStatusResponse(response);
     } catch (error: any) {
-      this.notificationService.error(
-        "Fetch Failed",
-        error.message || "Failed to fetch subscription status"
-      );
       throw error;
     }
   }
@@ -209,10 +181,6 @@ export class SubscriptionService implements ISubscriptionService {
 
       return SubscriptionMapper.handleHistoryResponse(response);
     } catch (error: any) {
-      this.notificationService.error(
-        "Fetch Failed",
-        error.message || "Failed to fetch subscription history"
-      );
       throw error;
     }
   }
@@ -230,10 +198,6 @@ export class SubscriptionService implements ISubscriptionService {
 
       return SubscriptionMapper.handleAnalyticsResponse(response);
     } catch (error: any) {
-      this.notificationService.error(
-        "Fetch Failed",
-        error.message || "Failed to fetch subscription analytics"
-      );
       throw error;
     }
   }
@@ -254,18 +218,9 @@ export class SubscriptionService implements ISubscriptionService {
       );
 
       const subscription = SubscriptionMapper.handleApiResponse(response);
-
-      this.notificationService.success(
-        "Subscription Renewed",
-        `Subscription renewed successfully`
-      );
-
+      // Note: Success notification handled by caller
       return subscription;
     } catch (error: any) {
-      this.notificationService.error(
-        "Renew Failed",
-        error.message || "Failed to renew subscription"
-      );
       throw error;
     }
   }
@@ -282,18 +237,9 @@ export class SubscriptionService implements ISubscriptionService {
       );
 
       const upgradeResponse = SubscriptionMapper.handleUpgradeResponse(response);
-
-      this.notificationService.success(
-        "Subscription Upgraded",
-        upgradeResponse.summary.message
-      );
-
+      // Note: Success notification handled by caller
       return upgradeResponse;
     } catch (error: any) {
-      this.notificationService.error(
-        "Upgrade Failed",
-        error.message || "Failed to upgrade subscription"
-      );
       throw error;
     }
   }
@@ -310,18 +256,9 @@ export class SubscriptionService implements ISubscriptionService {
       const response = await this.apiService.put(url, request.toJson());
 
       const result = SubscriptionMapper.handleActionResponse(response);
-
-      this.notificationService.warning(
-        "Subscription Cancelled",
-        result.message
-      );
-
+      // Note: Notification handled by caller
       return result;
     } catch (error: any) {
-      this.notificationService.error(
-        "Cancel Failed",
-        error.message || "Failed to cancel subscription"
-      );
       throw error;
     }
   }
@@ -338,18 +275,9 @@ export class SubscriptionService implements ISubscriptionService {
       const response = await this.apiService.put(url, request.toJson());
 
       const result = SubscriptionMapper.handleActionResponse(response);
-
-      this.notificationService.warning(
-        "Subscription Suspended",
-        result.message
-      );
-
+      // Note: Notification handled by caller
       return result;
     } catch (error: any) {
-      this.notificationService.error(
-        "Suspend Failed",
-        error.message || "Failed to suspend subscription"
-      );
       throw error;
     }
   }
@@ -366,18 +294,9 @@ export class SubscriptionService implements ISubscriptionService {
       const response = await this.apiService.put(url, request.toJson());
 
       const result = SubscriptionMapper.handleActionResponse(response);
-
-      this.notificationService.success(
-        "Subscription Resumed",
-        result.message
-      );
-
+      // Note: Notification handled by caller
       return result;
     } catch (error: any) {
-      this.notificationService.error(
-        "Resume Failed",
-        error.message || "Failed to resume subscription"
-      );
       throw error;
     }
   }
@@ -394,18 +313,9 @@ export class SubscriptionService implements ISubscriptionService {
       const response = await this.apiService.put(url, request.toJson());
 
       const result = SubscriptionMapper.handleActionResponse(response);
-
-      this.notificationService.info(
-        "Subscription Paused",
-        result.message
-      );
-
+      // Note: Notification handled by caller
       return result;
     } catch (error: any) {
-      this.notificationService.error(
-        "Pause Failed",
-        error.message || "Failed to pause subscription"
-      );
       throw error;
     }
   }
@@ -422,18 +332,9 @@ export class SubscriptionService implements ISubscriptionService {
       const response = await this.apiService.put(url, request.toJson());
 
       const result = SubscriptionMapper.handleActionResponse(response);
-
-      this.notificationService.success(
-        "Subscription Unpaused",
-        result.message
-      );
-
+      // Note: Notification handled by caller
       return result;
     } catch (error: any) {
-      this.notificationService.error(
-        "Unpause Failed",
-        error.message || "Failed to unpause subscription"
-      );
       throw error;
     }
   }
@@ -450,18 +351,9 @@ export class SubscriptionService implements ISubscriptionService {
       const response = await this.apiService.put(url, request.toJson());
 
       const result = SubscriptionMapper.handleActionResponse(response);
-
-      this.notificationService.success(
-        "Trial Stopped",
-        result.message
-      );
-
+      // Note: Notification handled by caller
       return result;
     } catch (error: any) {
-      this.notificationService.error(
-        "Stop Trial Failed",
-        error.message || "Failed to stop trial"
-      );
       throw error;
     }
   }
@@ -478,18 +370,9 @@ export class SubscriptionService implements ISubscriptionService {
       const response = await this.apiService.put(url, request.toJson());
 
       const subscription = SubscriptionMapper.handleApiResponse(response);
-
-      this.notificationService.success(
-        "Subscription Extended",
-        `Subscription extended by ${request.extensionDays} days`
-      );
-
+      // Note: Notification handled by caller
       return subscription;
     } catch (error: any) {
-      this.notificationService.error(
-        "Extend Failed",
-        error.message || "Failed to extend subscription"
-      );
       throw error;
     }
   }
@@ -506,18 +389,9 @@ export class SubscriptionService implements ISubscriptionService {
       const response = await this.apiService.put(url, request.toJson());
 
       const result = SubscriptionMapper.handleActionResponse(response);
-
-      this.notificationService.success(
-        "Subscription Reactivated",
-        result.message
-      );
-
+      // Note: Notification handled by caller
       return result;
     } catch (error: any) {
-      this.notificationService.error(
-        "Reactivate Failed",
-        error.message || "Failed to reactivate subscription"
-      );
       throw error;
     }
   }
