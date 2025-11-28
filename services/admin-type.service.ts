@@ -73,8 +73,7 @@ export class AdminTypeService implements IAdminTypeService {
         json
       );
       const adminTypeData = response?.data || response;
-      const message = response?.message || "Admin type created successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
       return AdminTypeMapper.fromJson(adminTypeData);
     } catch (e) {
       // Error message already shown by API service with backend message
@@ -90,8 +89,7 @@ export class AdminTypeService implements IAdminTypeService {
         json
       );
       const adminTypeData = response?.data || response;
-      const message = response?.message || "Admin type updated successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
       return AdminTypeMapper.fromJson(adminTypeData);
     } catch (e) {
       // Error message already shown by API service with backend message
@@ -123,11 +121,10 @@ export class AdminTypeService implements IAdminTypeService {
 
   async deleteAdminType(id: string): Promise<void> {
     try {
-      const response = await this.apiService.delete<any>(
+      await this.apiService.delete<any>(
         `${API_ENDPOINTS.ADMIN_TYPES_DELETE}/${id}`
       );
-      const message = response?.message || "Admin type deleted successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
     } catch (e) {
       // Error message already shown by API service with backend message
       throw e;

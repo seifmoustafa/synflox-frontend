@@ -106,12 +106,10 @@ export class ModuleService implements IModuleService {
       );
 
       const module = ModuleMapper.handleSingleResponse(response);
-      this.notificationService.success("Module created successfully");
+      // Note: Success notification handled by generic CRUD viewmodel
       return module;
     } catch (error: any) {
-      this.notificationService.error(
-        error.message || "Failed to create module"
-      );
+      // Note: Error notification handled by generic CRUD viewmodel
       throw error;
     }
   }
@@ -143,12 +141,10 @@ export class ModuleService implements IModuleService {
       );
 
       const module = ModuleMapper.handleSingleResponse(response);
-      this.notificationService.success("Module updated successfully");
+      // Note: Success notification handled by generic CRUD viewmodel
       return module;
     } catch (error: any) {
-      this.notificationService.error(
-        error.message || "Failed to update module"
-      );
+      // Note: Error notification handled by generic CRUD viewmodel
       throw error;
     }
   }
@@ -159,11 +155,9 @@ export class ModuleService implements IModuleService {
   async deleteModule(id: string): Promise<void> {
     try {
       await this.apiService.delete(API_ENDPOINTS.MODULES.BY_ID(id));
-      this.notificationService.success("Module deleted successfully");
+      // Note: Success notification handled by generic CRUD viewmodel
     } catch (error: any) {
-      this.notificationService.error(
-        error.message || "Failed to delete module"
-      );
+      // Note: Error notification handled by generic CRUD viewmodel
       throw error;
     }
   }

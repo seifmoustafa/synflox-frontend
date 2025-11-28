@@ -78,8 +78,7 @@ export class CompanyService implements ICompanyService {
         : API_ENDPOINTS.COMPANIES_CREATE;
       const response = await this.apiService.post<any>(url, json);
       const companyData = response?.data || response;
-      const message = response?.message || "Company created successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
       return CompanyMapper.fromJson(companyData);
     } catch (e) {
       throw e;
@@ -93,8 +92,7 @@ export class CompanyService implements ICompanyService {
       const url = lang ? `${baseUrl}?lang=${lang}` : baseUrl;
       const response = await this.apiService.put<any>(url, json);
       const companyData = response?.data || response;
-      const message = response?.message || "Company updated successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
       return CompanyMapper.fromJson(companyData);
     } catch (e) {
       throw e;
@@ -105,9 +103,8 @@ export class CompanyService implements ICompanyService {
     try {
       const baseUrl = `${API_ENDPOINTS.COMPANIES_DELETE}/${id}`;
       const url = lang ? `${baseUrl}?lang=${lang}` : baseUrl;
-      const response = await this.apiService.delete<any>(url);
-      const message = response?.message || "Company deleted successfully";
-      this.notificationService.success(message);
+      await this.apiService.delete<any>(url);
+      // Note: Success notification handled by generic CRUD viewmodel
     } catch (e) {
       throw e;
     }

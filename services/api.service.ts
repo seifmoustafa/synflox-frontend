@@ -1,7 +1,5 @@
-import { handleError, getUserFriendlyErrorMessage } from "@/lib/error-handler";
 import { appLogger } from "@/lib/logger";
 import { secureTokenService } from "@/lib/secure-token-service";
-import { toast } from "sonner";
 
 export interface IApiService {
   get<T>(endpoint: string, params?: Record<string, any>, signal?: AbortSignal): Promise<T>;
@@ -147,9 +145,7 @@ export class ApiService implements IApiService {
         // Don't retry on last attempt
         if (attempt === this.MAX_RETRIES) {
           appLogger.error(`❌ All ${this.MAX_RETRIES} retries failed`);
-          // Show toast only on final failure
-          const appError = handleError(lastError, `API Request: ${url}`);
-          toast.error(getUserFriendlyErrorMessage(appError));
+          // Note: Error notification handled by caller (service/viewmodel)
           throw lastError;
         }
         
@@ -214,8 +210,7 @@ export class ApiService implements IApiService {
       // Check if request was aborted after response
       if (signal?.aborted) {
         const error = new Error('Request was aborted');
-        const appError = handleError(error, `API Response: ${url}`);
-        toast.error(getUserFriendlyErrorMessage(appError));
+        appLogger.api('Request was aborted:', url);
         throw error;
       }
       
@@ -337,8 +332,7 @@ export class ApiService implements IApiService {
           appLogger.error("Client error - not retrying", { status: response.status, statusText: response.statusText });
           const error = new Error(errorMessage) as Error & { statusCode: number };
           error.statusCode = response.status;  // Mark with status code so retry logic knows not to retry
-          const appError = handleError(error, `API Request: ${url}`);
-          toast.error(errorMessage || getUserFriendlyErrorMessage(appError));
+          // Note: Error notification handled by caller (service/viewmodel)
           throw error;
         }
         

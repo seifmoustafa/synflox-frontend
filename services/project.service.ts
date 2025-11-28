@@ -75,8 +75,7 @@ export class ProjectService implements IProjectService {
         json
       );
       const projectData = response?.data || response;
-      const message = response?.message || "Project created successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
       return ProjectMapper.fromJson(projectData);
     } catch (e) {
       throw e;
@@ -91,8 +90,7 @@ export class ProjectService implements IProjectService {
         json
       );
       const projectData = response?.data || response;
-      const message = response?.message || "Project updated successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
       return ProjectMapper.fromJson(projectData);
     } catch (e) {
       throw e;
@@ -101,11 +99,10 @@ export class ProjectService implements IProjectService {
 
   async deleteProject(id: string): Promise<void> {
     try {
-      const response = await this.apiService.delete<any>(
+      await this.apiService.delete<any>(
         API_ENDPOINTS.PROJECTS.BY_ID(id)
       );
-      const message = response?.message || "Project deleted successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
     } catch (e) {
       throw e;
     }

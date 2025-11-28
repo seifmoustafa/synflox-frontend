@@ -91,12 +91,10 @@ export class SubscriptionPlanService implements ISubscriptionPlanService {
       );
 
       const plan = SubscriptionPlanMapper.handleSingleResponse(response);
-      this.notificationService.success("Subscription plan created successfully");
+      // Note: Success notification handled by generic CRUD viewmodel
       return plan;
     } catch (error: any) {
-      this.notificationService.error(
-        error.message || "Failed to create subscription plan"
-      );
+      // Note: Error notification handled by generic CRUD viewmodel
       throw error;
     }
   }
@@ -117,12 +115,10 @@ export class SubscriptionPlanService implements ISubscriptionPlanService {
       );
 
       const plan = SubscriptionPlanMapper.handleSingleResponse(response);
-      this.notificationService.success("Subscription plan updated successfully");
+      // Note: Success notification handled by generic CRUD viewmodel
       return plan;
     } catch (error: any) {
-      this.notificationService.error(
-        error.message || "Failed to update subscription plan"
-      );
+      // Note: Error notification handled by generic CRUD viewmodel
       throw error;
     }
   }
@@ -133,11 +129,9 @@ export class SubscriptionPlanService implements ISubscriptionPlanService {
   async deletePlan(id: string): Promise<void> {
     try {
       await this.apiService.delete(API_ENDPOINTS.PLANS.BY_ID(id));
-      this.notificationService.success("Subscription plan deleted successfully");
+      // Note: Success notification handled by generic CRUD viewmodel
     } catch (error: any) {
-      this.notificationService.error(
-        error.message || "Failed to delete subscription plan"
-      );
+      // Note: Error notification handled by generic CRUD viewmodel
       throw error;
     }
   }

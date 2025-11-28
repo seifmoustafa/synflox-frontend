@@ -86,8 +86,7 @@ export class AdminService implements IAdminService {
         json
       );
       const adminData = response?.data || response;
-      const message = response?.message || "Admin created successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
       return AdminMapper.fromJson(adminData);
     } catch (e) {
       // Error message already shown by API service with backend message
@@ -103,8 +102,7 @@ export class AdminService implements IAdminService {
         json
       );
       const adminData = response?.data || response;
-      const message = response?.message || "Admin updated successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
       return AdminMapper.fromJson(adminData);
     } catch (e) {
       // Error message already shown by API service with backend message
@@ -114,11 +112,10 @@ export class AdminService implements IAdminService {
 
   async deleteAdmin(id: string): Promise<void> {
     try {
-      const response = await this.apiService.delete<any>(
+      await this.apiService.delete<any>(
         `${API_ENDPOINTS.ADMINS_DELETE}/${id}`
       );
-      const message = response?.message || "Admin deleted successfully";
-      this.notificationService.success(message);
+      // Note: Success notification handled by generic CRUD viewmodel
     } catch (e) {
       // Error message already shown by API service with backend message
       throw e;
