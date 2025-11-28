@@ -15,7 +15,7 @@ import { ProjectService } from "@/services/project.service";
 import { ModuleService } from "@/services/module.service";
 import { SubscriptionPlanService } from "@/services/subscription-plan.service";
 import { SubscriptionService } from "@/services/subscription.service";
-import { DashboardService } from "@/services/dashboard.service";
+// Dashboard service removed for redesign
 
 interface Services {
   apiService: ApiService;
@@ -31,7 +31,6 @@ interface Services {
   moduleService: ModuleService;
   subscriptionPlanService: SubscriptionPlanService;
   subscriptionService: SubscriptionService;
-  dashboardService: DashboardService;
 }
 
 const ServiceContext = createContext<Services | null>(null);
@@ -51,7 +50,6 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
     const moduleService = new ModuleService(apiService, notificationService);
     const subscriptionPlanService = new SubscriptionPlanService(apiService, notificationService);
     const subscriptionService = new SubscriptionService(apiService, notificationService);
-    const dashboardService = new DashboardService(apiService, notificationService);
 
     return {
       apiService,
@@ -67,7 +65,6 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
       moduleService,
       subscriptionPlanService,
       subscriptionService,
-      dashboardService,
     };
   }, []);
 

@@ -147,24 +147,7 @@ export {
   type SubscriptionStatusData,
 } from './models/subscription.model';
 
-// Dashboard domain
-export {
-  Dashboard,
-  OverviewStats,
-  CompanyStats,
-  SubscriptionStats,
-  AdminStats,
-  Alerts,
-  RecentActivity,
-  type DashboardData,
-  type OverviewStatsData,
-  type CompanyStatsData,
-  type SubscriptionStatsData,
-  type AdminStatsData,
-  type AlertsData,
-  type RecentActivityData
-} from './models/dashboard.model';
-export type { DashboardResponse } from './mappers/dashboard.mapper';
+// Dashboard domain - REMOVED FOR REDESIGN
 
 // Security domain
 export {
@@ -196,5 +179,5 @@ export {
 } from './models/security.model';
 
 // Mappers
-export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, DashboardMapper, SecurityMapper } from './mappers';
+export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, SecurityMapper } from './mappers';
 export type { SubscriptionsResponse, CompanySubscriptionsResponse, UpgradeResponse } from './mappers/subscription.mapper';

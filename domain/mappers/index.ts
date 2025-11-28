@@ -17,5 +17,5 @@ export { ProjectMapper } from './project.mapper';
 export { ModuleMapper } from './module.mapper';
 export { SubscriptionPlanMapper } from './subscription-plan.mapper';
 export { SubscriptionMapper } from './subscription.mapper';
-export { DashboardMapper } from './dashboard.mapper';
+// Dashboard mapper removed for redesign
 export { SecurityMapper } from './security.mapper';
