@@ -147,7 +147,8 @@ export {
   type SubscriptionStatusData,
 } from './models/subscription.model';
 
-// Dashboard domain - REMOVED FOR REDESIGN
+// Dashboard domain
+export * from './models/dashboard';
 
 // Security domain
 export {
@@ -179,5 +180,5 @@ export {
 } from './models/security.model';
 
 // Mappers
-export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, SecurityMapper } from './mappers';
+export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, DashboardMapper, SecurityMapper } from './mappers';
 export type { SubscriptionsResponse, CompanySubscriptionsResponse, UpgradeResponse } from './mappers/subscription.mapper';

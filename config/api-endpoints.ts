@@ -141,5 +141,15 @@ export const API_ENDPOINTS = {
   // Navigation (if still needed)
   GET_MENU_ITEMS: "/MenuItems",
   
-  // Dashboard - REMOVED FOR REDESIGN
+  // Dashboard
+  DASHBOARD: {
+    OVERVIEW: "/dashboard/overview",
+    COMPANIES: "/dashboard/companies",
+    SUBSCRIPTIONS: "/dashboard/subscriptions",
+    REVENUE: "/dashboard/revenue",
+    ACTIVITY: "/dashboard/activity",
+    ALERTS: "/dashboard/alerts",
+    DISMISS_ALERT: "/dashboard/alerts/{id}/dismiss",
+    MARK_ALERT_READ: "/dashboard/alerts/{id}/read",
+  },
 };

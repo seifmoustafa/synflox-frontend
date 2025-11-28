@@ -412,6 +412,7 @@ export const en = {
     
     // Recent Activity
     recentActivity: "Recent Activity",
+    noRecentActivity: "No recent activity to show",
     newCompanies: "New Companies",
     newSubscriptions: "New Subscriptions",
     newAdmins: "New Administrators",
@@ -637,6 +638,76 @@ export const en = {
       subscriptionsGrowthDesc: "Daily subscription activations over time",
       adminsGrowth: "Admins Created",
       adminsGrowthDesc: "Daily admin registrations over time",
+    },
+
+    // New Dashboard Pages
+    pages: {
+      overview: "Overview",
+      companies: "Companies Analytics",
+      subscriptions: "Subscriptions Analytics",
+      revenue: "Revenue Analytics",
+      activity: "Activity Log",
+      alerts: "System Alerts",
+    },
+
+    // KPI Cards
+    kpi: {
+      companies: "Companies",
+      activeSubscriptions: "Active Subscriptions",
+      mrr: "MRR",
+      alerts: "Alerts",
+      growth: "Growth",
+      change: "Change",
+    },
+
+    // Quick Stats
+    quickStats: {
+      title: "Quick Stats",
+      totalCompanies: "Total Companies",
+      activeCompanies: "Active Companies",
+      inactiveCompanies: "Inactive Companies",
+      companiesWithoutSub: "Without Subscription",
+      totalSubscriptions: "Total Subscriptions",
+      activeSubscriptions: "Active Subscriptions",
+      trialSubscriptions: "Trial Subscriptions",
+      expiredSubscriptions: "Expired Subscriptions",
+      suspendedSubscriptions: "Suspended Subscriptions",
+      expiringToday: "Expiring Today",
+      expiringThisWeek: "Expiring This Week",
+      expiringThisMonth: "Expiring This Month",
+      totalAdmins: "Total Admins",
+      activeAdmins: "Active Admins",
+    },
+
+    // Expiry Timeline
+    expiryTimeline: {
+      title: "Expiry Timeline",
+      today: "Today",
+      thisWeek: "This Week",
+      thisMonth: "This Month",
+      next3Months: "Next 3 Months",
+      noExpiring: "No expiring subscriptions",
+      daysRemaining: "days remaining",
+      atRisk: "At Risk",
+      urgent: "Urgent",
+    },
+
+    // Alert Actions
+    alertActions: {
+      dismiss: "Dismiss",
+      markAsRead: "Mark as Read",
+      viewDetails: "View Details",
+      takeAction: "Take Action",
+      dismissed: "Alert dismissed",
+      markedAsRead: "Marked as read",
+    },
+
+    // Priority Badges
+    priority: {
+      critical: "Critical",
+      high: "High",
+      medium: "Medium",
+      low: "Low",
     },
   },
 

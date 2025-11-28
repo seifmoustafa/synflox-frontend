@@ -403,6 +403,7 @@ export const ar = {
     },
     // Recent Activity
     recentActivity: "النشاط الأخير",
+    noRecentActivity: "لا يوجد نشاط حديث للعرض",
     newCompanies: "شركات جديدة",
     newSubscriptions: "اشتراكات جديدة",
     newAdmins: "مسؤولون جدد",
@@ -627,6 +628,76 @@ export const ar = {
       subscriptionsGrowthDesc: "تفعيل الاشتراكات اليومية عبر الوقت",
       adminsGrowth: "المسؤولون المُنشأون",
       adminsGrowthDesc: "تسجيلات المسؤولين اليومية عبر الوقت",
+    },
+
+    // New Dashboard Pages
+    pages: {
+      overview: "نظرة عامة",
+      companies: "تحليلات الشركات",
+      subscriptions: "تحليلات الاشتراكات",
+      revenue: "تحليلات الإيرادات",
+      activity: "سجل النشاط",
+      alerts: "تنبيهات النظام",
+    },
+
+    // KPI Cards
+    kpi: {
+      companies: "الشركات",
+      activeSubscriptions: "الاشتراكات النشطة",
+      mrr: "الإيراد الشهري المتكرر",
+      alerts: "التنبيهات",
+      growth: "النمو",
+      change: "التغيير",
+    },
+
+    // Quick Stats
+    quickStats: {
+      title: "إحصائيات سريعة",
+      totalCompanies: "إجمالي الشركات",
+      activeCompanies: "الشركات النشطة",
+      inactiveCompanies: "الشركات غير النشطة",
+      companiesWithoutSub: "بدون اشتراك",
+      totalSubscriptions: "إجمالي الاشتراكات",
+      activeSubscriptions: "الاشتراكات النشطة",
+      trialSubscriptions: "الاشتراكات التجريبية",
+      expiredSubscriptions: "الاشتراكات المنتهية",
+      suspendedSubscriptions: "الاشتراكات الموقوفة",
+      expiringToday: "تنتهي اليوم",
+      expiringThisWeek: "تنتهي هذا الأسبوع",
+      expiringThisMonth: "تنتهي هذا الشهر",
+      totalAdmins: "إجمالي المسؤولين",
+      activeAdmins: "المسؤولون النشطون",
+    },
+
+    // Expiry Timeline
+    expiryTimeline: {
+      title: "الجدول الزمني للانتهاء",
+      today: "اليوم",
+      thisWeek: "هذا الأسبوع",
+      thisMonth: "هذا الشهر",
+      next3Months: "الأشهر الثلاثة القادمة",
+      noExpiring: "لا توجد اشتراكات منتهية",
+      daysRemaining: "أيام متبقية",
+      atRisk: "في خطر",
+      urgent: "عاجل",
+    },
+
+    // Alert Actions
+    alertActions: {
+      dismiss: "تجاهل",
+      markAsRead: "وضع علامة مقروءة",
+      viewDetails: "عرض التفاصيل",
+      takeAction: "اتخاذ إجراء",
+      dismissed: "تم تجاهل التنبيه",
+      markedAsRead: "تم وضع علامة مقروءة",
+    },
+
+    // Priority Badges
+    priority: {
+      critical: "حرج",
+      high: "مرتفع",
+      medium: "متوسط",
+      low: "منخفض",
     },
   },
 
