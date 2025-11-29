@@ -37,8 +37,8 @@ export interface AlertsByCategoryData {
 
 export interface AlertItemData {
   id: string;
-  priority: string;
-  category: string;
+  priority: string | number;  // Can be enum value (number) or string
+  category: string | number;  // Can be enum value (number) or string
   title: string;
   message: string;
   description?: string;
@@ -183,8 +183,10 @@ export class AlertItem {
 
   constructor(data: AlertItemData) {
     this.id = data.id;
-    this.priority = data.priority.toLowerCase() as AlertPriority;
-    this.category = data.category.toLowerCase().replace(/ /g, '_') as AlertCategory;
+    // Handle priority - can be number (enum) or string
+    this.priority = AlertItem.parsePriority(data.priority);
+    // Handle category - can be number (enum) or string
+    this.category = AlertItem.parseCategory(data.category);
     this.title = data.title;
     this.message = data.message;
     this.description = data.description;
@@ -246,6 +248,68 @@ export class AlertItem {
       case 'low':
         return { text: 'Low', variant: 'secondary' };
     }
+  }
+
+  // Static helpers to parse enum values (can be number or string)
+  private static readonly PRIORITY_MAP: Record<number, AlertPriority> = {
+    0: 'critical',
+    1: 'high',
+    2: 'medium',
+    3: 'low',
+  };
+
+  private static readonly CATEGORY_MAP: Record<number, AlertCategory> = {
+    0: 'subscription_expiry',
+    1: 'subscription_status',
+    2: 'company_status',
+    3: 'admin_activity',
+    4: 'system_health',
+    5: 'revenue',
+  };
+
+  static parsePriority(value: string | number | undefined | null): AlertPriority {
+    if (value === undefined || value === null) return 'low';
+    
+    // If it's a number, map from enum value
+    if (typeof value === 'number') {
+      return AlertItem.PRIORITY_MAP[value] || 'low';
+    }
+    
+    // If it's a string, normalize it
+    const normalized = String(value).toLowerCase().trim();
+    if (['critical', 'high', 'medium', 'low'].includes(normalized)) {
+      return normalized as AlertPriority;
+    }
+    
+    return 'low';
+  }
+
+  static parseCategory(value: string | number | undefined | null): AlertCategory {
+    if (value === undefined || value === null) return 'system_health';
+    
+    // If it's a number, map from enum value
+    if (typeof value === 'number') {
+      return AlertItem.CATEGORY_MAP[value] || 'system_health';
+    }
+    
+    // If it's a string, normalize it
+    const normalized = String(value).toLowerCase().trim().replace(/\s+/g, '_');
+    const validCategories: AlertCategory[] = [
+      'subscription_expiry', 'subscription_status', 'company_status',
+      'admin_activity', 'system_health', 'revenue'
+    ];
+    
+    // Try to match camelCase or PascalCase to snake_case
+    const snakeCased = normalized.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+    
+    if (validCategories.includes(snakeCased as AlertCategory)) {
+      return snakeCased as AlertCategory;
+    }
+    if (validCategories.includes(normalized as AlertCategory)) {
+      return normalized as AlertCategory;
+    }
+    
+    return 'system_health';
   }
 }
 

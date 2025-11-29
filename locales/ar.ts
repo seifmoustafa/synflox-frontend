@@ -335,6 +335,57 @@ export const ar = {
       revenue: "الإيرادات",
       insights: "الرؤى",
     },
+    
+    // Overview Dashboard
+    overview: {
+      title: "نظرة عامة على لوحة التحكم",
+      subtitle: "لمحة سريعة عن صحة وأداء نظامك",
+      
+      // KPI Cards
+      totalCompanies: "إجمالي الشركات",
+      activeSubscriptions: "الاشتراكات النشطة",
+      monthlyRevenue: "الإيراد الشهري",
+      activeAlerts: "التنبيهات النشطة",
+      vsLastMonth: "مقارنة بالشهر الماضي",
+      
+      // Charts
+      subscriptionStatus: "حالة الاشتراكات",
+      subscriptionStatusDesc: "توزيع حالات الاشتراكات",
+      growthTrend: "اتجاه النمو",
+      last30Days: "آخر 30 يوم",
+      companies: "الشركات",
+      subscriptions: "الاشتراكات",
+      total: "الإجمالي",
+      
+      // Status Labels
+      active: "نشط",
+      trial: "تجريبي",
+      expired: "منتهي",
+      suspended: "معلق",
+      
+      // Stats Cards
+      companiesOverview: "نظرة عامة على الشركات",
+      activeCompanies: "الشركات النشطة",
+      inactiveCompanies: "الشركات غير النشطة",
+      withoutSubscription: "بدون اشتراك",
+      subscriptionsOverview: "نظرة عامة على الاشتراكات",
+      expiringSoon: "تنتهي قريباً",
+      today: "اليوم",
+      thisWeek: "هذا الأسبوع",
+      thisMonth: "هذا الشهر",
+      systemHealth: "صحة النظام",
+      totalAdmins: "إجمالي المسؤولين",
+      activeAdmins: "المسؤولون النشطون",
+      companyGrowth: "نمو الشركات",
+      subGrowth: "نمو الاشتراكات",
+      
+      // Activity
+      recentActivity: "النشاط الأخير",
+      latestActions: "آخر إجراءات وأحداث النظام",
+      viewAll: "عرض الكل",
+      noActivity: "لا يوجد نشاط حديث",
+    },
+    
     // Health Status
     health: {
       healthy: "النظام سليم",
@@ -401,6 +452,248 @@ export const ar = {
       growthTrends: "اتجاهات النمو",
       growthTrendsDesc: "الشركات والاشتراكات الجديدة عبر الوقت",
     },
+    
+    // Companies Dashboard
+    companiesDashboard: {
+      title: "لوحة تحكم الشركات",
+      subtitle: "مراقبة مقاييس ورؤى الشركات",
+      totalCompanies: "إجمالي الشركات",
+      newThisMonth: "جديد هذا الشهر",
+      newThisWeek: "هذا الأسبوع",
+      thisWeek: "هذا الأسبوع",
+      subscriptionCoverage: "معدل التغطية",
+      alertsCount: "التنبيهات",
+      critical: "حرجة",
+      
+      // Status (based on subscription state)
+      active: "لديها اشتراك نشط",
+      inactive: "لا يوجد اشتراك نشط",
+      suspended: "معلق",
+      atRisk: "الاشتراك ينتهي قريباً",
+      
+      // Charts
+      statusDistribution: "توزيع الحالات",
+      statusDistributionDesc: "تفصيل حالات الشركات",
+      healthScore: "درجة الصحة",
+      growthTrend: "اتجاه النمو",
+      last30Days: "آخر 30 يوم",
+      newCompanies: "شركات جديدة",
+      avgPerDay: "المتوسط/اليوم",
+      bestDay: "أفضل يوم",
+      bestDayDate: "تاريخ أفضل يوم",
+      
+      // Top Companies
+      topCompanies: "أفضل الشركات",
+      topCompaniesDesc: "الشركات حسب قيمة الاشتراك",
+      noTopCompanies: "لا توجد شركات باشتراكات حتى الآن",
+      subscriptions: "اشتراكات",
+      totalValue: "إجمالي القيمة",
+      
+      // Subscription Coverage
+      subscriptionBreakdown: "تغطية الاشتراكات",
+      subscriptionBreakdownDesc: "الشركات حسب حالة الاشتراك",
+      withActive: "اشتراك نشط",
+      withTrial: "اشتراك تجريبي",
+      withExpired: "اشتراك منتهي",
+      withNone: "بدون اشتراك",
+      
+      // Alerts
+      alerts: "تنبيهات الشركات",
+      noAlerts: "لا تنبيهات - جميع الشركات بصحة جيدة!",
+      viewAll: "عرض الكل",
+      expiringToday: "ينتهي اليوم",
+      daysRemaining: "أيام متبقية",
+    },
+    
+    // Subscriptions Dashboard
+    subscriptionsDashboard: {
+      title: "لوحة تحكم الاشتراكات",
+      subtitle: "مراقبة مقاييس ودورة حياة الاشتراكات",
+      totalSubscriptions: "إجمالي الاشتراكات",
+      activeSubscriptions: "الاشتراكات النشطة",
+      trials: "تجريبية",
+      mrr: "الإيراد الشهري",
+      expiringThisMonth: "تنتهي هذا الشهر",
+      thisWeek: "هذا الأسبوع",
+      
+      // Status
+      active: "نشط",
+      trial: "تجريبي",
+      expired: "منتهي",
+      suspended: "معلق",
+      cancelled: "ملغى",
+      paused: "متوقف مؤقتاً",
+      
+      // Charts
+      statusDistribution: "توزيع الحالات",
+      statusDistributionDesc: "تفصيل حالات الاشتراكات",
+      planDistribution: "توزيع الخطط",
+      planDistributionDesc: "الاشتراكات حسب الخطة",
+      byPlan: "الاشتراكات حسب الخطة",
+      byPlanDesc: "توزيع الاشتراكات على الخطط",
+      subscriptions: "الاشتراكات",
+      topPlan: "أفضل خطة",
+      
+      // Lifecycle Metrics
+      lifecycleMetrics: "مقاييس دورة الحياة",
+      lifecycleMetricsDesc: "عمليات دورة حياة الاشتراكات هذا الشهر",
+      thisMonth: "هذا الشهر",
+      trialConversion: "تحويل التجريبي",
+      retentionRate: "معدل الاحتفاظ",
+      churnRate: "معدل الإلغاء",
+      renewalRate: "معدل التجديد",
+      actionsThisMonth: "الإجراءات هذا الشهر",
+      newSubs: "جديد",
+      renewals: "تجديدات",
+      cancellations: "إلغاءات",
+      upgrades: "ترقيات",
+      downgrades: "تخفيضات",
+      reactivations: "إعادة تفعيل",
+      extensions: "تمديدات",
+      operations: "العمليات",
+      avgDuration: "متوسط المدة",
+      days: "أيام",
+      
+      // Expiry Timeline
+      expiryTimeline: "جدول الانتهاء",
+      expiryTimelineDesc: "انتهاءات الاشتراكات القادمة",
+      expiringToday: "تنتهي اليوم",
+      expiringThisWeek: "تنتهي هذا الأسبوع",
+      expiringNext3Months: "تنتهي خلال 3 أشهر",
+      totalValue: "إجمالي القيمة",
+    },
+    
+    // Revenue Dashboard
+    revenueDashboard: {
+      title: "لوحة تحكم الإيرادات",
+      subtitle: "المقاييس المالية والتوقعات",
+      mrr: "الإيراد الشهري",
+      mrrDesc: "الإيراد الشهري المتكرر",
+      arr: "الإيراد السنوي",
+      arrDesc: "الإيراد السنوي المتكرر",
+      arpc: "متوسط الإيراد للعميل",
+      arpcDesc: "متوسط الإيراد لكل عميل",
+      activeCompanies: "الشركات النشطة",
+      activeCustomers: "العملاء النشطون",
+      perCompany: "لكل شركة",
+      vsLastMonth: "مقارنة بالشهر الماضي",
+      revenueByPlan: "الإيراد حسب الخطة",
+      byPlan: "الإيراد حسب الخطة",
+      byPlanDesc: "توزيع الإيراد الشهري حسب الخطة",
+      revenueByPlanDesc: "توزيع الإيراد الشهري",
+      revenue: "الإيراد",
+      monthlyRevenue: "الإيراد الشهري",
+      topPlan: "أفضل خطة",
+      trend: "اتجاه الإيرادات",
+      trendDesc: "أداء الإيرادات الشهرية",
+      revenueTrend: "اتجاه الإيرادات",
+      last12Months: "آخر 12 شهر",
+      projections: "التوقعات",
+      projectionsDesc: "توقعات الشهر القادم",
+      nextMonthMrr: "إيراد الشهر القادم",
+      expectedRenewals: "التجديدات المتوقعة",
+      subscriptionsToRenew: "اشتراكات للتجديد",
+      atRiskRevenue: "الإيراد في خطر",
+      atRiskSubs: "اشتراكات في خطر",
+      projectedChange: "التغيير المتوقع",
+      breakdown: "تفصيل الإيرادات",
+      breakdownDesc: "الإيرادات حسب نوع المصدر",
+      newSubscriptions: "اشتراكات جديدة",
+      renewals: "تجديدات",
+      upgrades: "ترقيات",
+      totalRevenue: "إجمالي الإيرادات",
+      projectionConfidence: "ثقة التوقعات",
+      confidenceNote: "بناءً على معدلات التجديد التاريخية",
+    },
+    
+    // Activity Dashboard
+    activityDashboard: {
+      title: "لوحة تحكم النشاط",
+      subtitle: "نشاط المسؤولين وسجل المراجعة",
+      totalActions: "إجمالي الإجراءات",
+      todayLogins: "تسجيلات الدخول اليوم",
+      todayActions: "الإجراءات اليوم",
+      activeAdmins: "المسؤولون النشطون",
+      activeSessions: "الجلسات النشطة",
+      peakHour: "ساعة الذروة",
+      topAdmins: "أفضل المسؤولين",
+      topAdminsDesc: "المسؤولون الأكثر نشاطاً",
+      noAdmins: "لا يوجد نشاط مسؤولين مسجل",
+      actions: "إجراءات",
+      recentActions: "الإجراءات الأخيرة",
+      recentActionsDesc: "آخر أنشطة المسؤولين",
+      recentActivity: "النشاط الأخير",
+      recentActivityDesc: "آخر نشاط في النظام",
+      noActivity: "لا يوجد نشاط حديث للعرض",
+      viewAll: "عرض الكل",
+      activityTimeline: "جدول النشاط",
+      activityTrend: "اتجاه النشاط",
+      last7Days: "آخر 7 أيام",
+      thisWeek: "هذا الأسبوع",
+      actionsByType: "الإجراءات حسب النوع",
+      actionsByTypeDesc: "توزيع أنواع الإجراءات",
+      count: "العدد",
+      
+      // Action Types
+      actionTypes: {
+        created: "إنشاء",
+        updated: "تحديث",
+        deleted: "حذف",
+        activated: "تفعيل",
+        suspended: "تعليق",
+        resumed: "استئناف",
+        cancelled: "إلغاء",
+        renewed: "تجديد",
+        login: "تسجيل دخول",
+        logout: "تسجيل خروج",
+      },
+      
+      // Entity Types
+      entityTypes: {
+        company: "شركة",
+        subscription: "اشتراك",
+        admin: "مسؤول",
+        licenseKey: "مفتاح ترخيص",
+        plan: "خطة",
+        project: "مشروع",
+        module: "وحدة",
+      },
+    },
+    
+    // Alerts Dashboard
+    alertsDashboard: {
+      title: "لوحة تحكم التنبيهات",
+      subtitle: "تنبيهات وإشعارات النظام",
+      critical: "حرجة",
+      high: "عالية الأولوية",
+      medium: "متوسطة الأولوية",
+      low: "منخفضة الأولوية",
+      unread: "غير مقروءة",
+      alerts: "التنبيهات",
+      criticalAlerts: "التنبيهات الحرجة",
+      highAlerts: "تنبيهات عالية الأولوية",
+      allAlerts: "جميع التنبيهات",
+      activeAlerts: "تنبيهات نشطة",
+      noCritical: "لا توجد تنبيهات حرجة",
+      noHigh: "لا توجد تنبيهات عالية الأولوية",
+      noAlerts: "الكل واضح!",
+      allGood: "لا تنبيهات - كل شيء يبدو جيداً!",
+      totalAlerts: "إجمالي التنبيهات",
+      byCategory: "التنبيهات حسب الفئة",
+      byCategoryDesc: "توزيع التنبيهات حسب الفئة",
+      byPriority: "التنبيهات حسب الأولوية",
+      byPriorityDesc: "توزيع التنبيهات حسب مستوى الأولوية",
+      expiringSubscriptions: "اشتراكات تنتهي قريباً",
+      expiredSubscriptions: "اشتراكات منتهية",
+      inactiveCompanies: "شركات غير نشطة",
+      systemHealth: "صحة النظام",
+      filter: "تصفية",
+      sort: "ترتيب",
+      today: "اليوم",
+      overdue: "متأخر",
+      daysRemaining: "أيام متبقية",
+    },
+    
     // Recent Activity
     recentActivity: "النشاط الأخير",
     noRecentActivity: "لا يوجد نشاط حديث للعرض",
@@ -716,6 +1009,14 @@ export const ar = {
     system: "النظام",
     productCatalog: "كتالوج المنتجات",
     licenseManagement: "إدارة التراخيص",
+    
+    // Dashboard Menu Items
+    overview: "نظرة عامة",
+    companiesDashboard: "الشركات",
+    subscriptionsDashboard: "الاشتراكات",
+    revenueDashboard: "الإيرادات",
+    activityDashboard: "النشاط",
+    alertsDashboard: "التنبيهات",
     
     // System Menu Items
     admins: "المسؤولون",

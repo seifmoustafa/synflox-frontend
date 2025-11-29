@@ -7,587 +7,557 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
+import { GenericChart, GENERIC_COLORS } from "@/components/charts/generic-chart";
 import { 
   RefreshCw, 
   Building2, 
-  CreditCard, 
-  DollarSign, 
-  Bell,
   TrendingUp,
   TrendingDown,
-  Minus,
   AlertTriangle,
+  CheckCircle2,
+  XCircle,
   Clock,
   Users,
+  Calendar,
+  DollarSign,
   Activity,
-} from "lucide-react";
-import {
+  Bell,
+  ArrowUpRight,
+  ArrowDownRight,
+  Minus,
+  Zap,
+  Shield,
+  FileKey,
+  BarChart3,
+  PieChart,
   LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Area,
-  AreaChart,
-} from "recharts";
-import type { KpiCard, QuickStats, DistributionItem, TimeSeriesDataPoint, RecentActivityItem } from "@/domain";
-import { Building2 as Building2Icon, CreditCard as CreditCardIcon, User, Package, FolderOpen, Box, Activity as ActivityIcon } from "lucide-react";
+} from "lucide-react";
 
-// KPI Card Component
-function KpiCardComponent({ kpi, icon: Icon }: { kpi: KpiCard; icon: React.ElementType }) {
-  const getChangeIcon = () => {
-    switch (kpi.changeDirection) {
-      case 'up': return <TrendingUp className="h-3 w-3" />;
-      case 'down': return <TrendingDown className="h-3 w-3" />;
-      default: return <Minus className="h-3 w-3" />;
-    }
-  };
+// ============================================================================
+// KPI Cards Section - Professional Metrics Display
+// ============================================================================
 
-  const getChangeVariant = (): "success" | "error" | "secondary" => {
-    switch (kpi.changeDirection) {
-      case 'up': return 'success';
-      case 'down': return 'error';
-      default: return 'secondary';
-    }
-  };
-
-  // Map color names to proper CSS colors
-  const getIconColor = () => {
-    const colorMap: Record<string, string> = {
-      blue: '#3b82f6',
-      green: '#22c55e',
-      purple: '#a855f7',
-      yellow: '#eab308',
-      red: '#ef4444',
-      orange: '#f97316',
-    };
-    return colorMap[kpi.color.toLowerCase()] || kpi.color;
-  };
-
-  const iconColor = getIconColor();
-
-  return (
-    <Card className="relative overflow-hidden">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">{kpi.title}</p>
-            <p className="text-3xl font-bold">{kpi.formattedValue}</p>
-            {kpi.hasChange && (
-              <Badge variant={getChangeVariant()} className="gap-1">
-                {getChangeIcon()}
-                <span>{kpi.formattedChange}</span>
-              </Badge>
-            )}
-          </div>
-          <div 
-            className="p-3 rounded-full" 
-            style={{ backgroundColor: `${iconColor}20` }}
-          >
-            <Icon className="h-6 w-6" style={{ color: iconColor }} />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// Quick Stats Component
-function QuickStatsComponent({ stats }: { stats: QuickStats }) {
-  const { t } = useI18n();
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{t('dashboard.quickStats.title')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {/* Companies Stats */}
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{t('dashboard.quickStats.totalCompanies')}</p>
-            <p className="text-xl font-semibold">{stats.totalCompanies}</p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{t('dashboard.quickStats.activeCompanies')}</p>
-            <p className="text-xl font-semibold text-green-600">{stats.activeCompanies}</p>
-          </div>
-          
-          {/* Subscriptions Stats */}
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{t('dashboard.quickStats.activeSubscriptions')}</p>
-            <p className="text-xl font-semibold text-blue-600">{stats.activeSubscriptions}</p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{t('dashboard.quickStats.trialSubscriptions')}</p>
-            <p className="text-xl font-semibold text-purple-600">{stats.trialSubscriptions}</p>
-          </div>
-
-          {/* Expiring Stats */}
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{t('dashboard.quickStats.expiringToday')}</p>
-            <p className={`text-xl font-semibold ${stats.expiringToday > 0 ? 'text-red-600' : ''}`}>
-              {stats.expiringToday}
-            </p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{t('dashboard.quickStats.expiringThisWeek')}</p>
-            <p className={`text-xl font-semibold ${stats.expiringThisWeek > 0 ? 'text-orange-600' : ''}`}>
-              {stats.expiringThisWeek}
-            </p>
-          </div>
-
-          {/* Admin Stats */}
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{t('dashboard.quickStats.totalAdmins')}</p>
-            <p className="text-xl font-semibold">{stats.totalAdmins}</p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{t('dashboard.quickStats.activeAdmins')}</p>
-            <p className="text-xl font-semibold text-green-600">{stats.activeAdmins}</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// Status Distribution Component
-function StatusDistributionComponent({ items }: { items: DistributionItem[] }) {
-  const { t } = useI18n();
-  const total = items.reduce((sum, item) => sum + item.count, 0);
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{t('dashboard.charts.subscriptionStatus')}</CardTitle>
-        <CardDescription>{t('dashboard.charts.subscriptionStatusDesc')}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {/* Progress Bar */}
-        <div className="h-4 rounded-full overflow-hidden flex mb-4">
-          {items.map((item, index) => (
-            <div
-              key={index}
-              className="h-full transition-all"
-              style={{ 
-                width: `${item.percentage}%`, 
-                backgroundColor: item.color 
-              }}
-            />
-          ))}
-        </div>
-        
-        {/* Legend */}
-        <div className="grid grid-cols-2 gap-3">
-          {items.map((item, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: item.color }}
-              />
-              <span className="text-sm text-muted-foreground">{item.label}</span>
-              <span className="text-sm font-medium ml-auto">{item.count}</span>
-              <span className="text-xs text-muted-foreground">({item.formattedPercentage})</span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// Alerts Summary Component
-function AlertsSummaryComponent({ stats }: { stats: QuickStats }) {
+function KpiCardsSection({ dashboard }: { dashboard: any }) {
   const { t } = useI18n();
   
-  const alerts = [
-    { 
-      label: t('dashboard.quickStats.expiringToday'), 
-      count: stats.expiringToday, 
-      priority: 'critical' as const,
-      variant: 'error' as const,
-      description: t('dashboard.subscriptions'),
+  const kpiCards = [
+    {
+      title: t('dashboard.overview.totalCompanies'),
+      value: dashboard.companiesKpi?.value ?? 0,
+      change: dashboard.companiesKpi?.changePercentage ?? 0,
+      direction: dashboard.companiesKpi?.changeDirection ?? 'unchanged',
+      icon: Building2,
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'bg-blue-500/10',
+      textColor: 'text-blue-500',
     },
-    { 
-      label: t('dashboard.quickStats.expiringThisWeek'), 
-      count: stats.expiringThisWeek, 
-      priority: 'high' as const,
-      variant: 'warning' as const,
-      description: t('dashboard.subscriptions'),
+    {
+      title: t('dashboard.overview.activeSubscriptions'),
+      value: dashboard.subscriptionsKpi?.value ?? 0,
+      change: dashboard.subscriptionsKpi?.changePercentage ?? 0,
+      direction: dashboard.subscriptionsKpi?.changeDirection ?? 'unchanged',
+      icon: Calendar,
+      color: 'from-green-500 to-green-600',
+      bgColor: 'bg-green-500/10',
+      textColor: 'text-green-500',
     },
-    { 
-      label: t('dashboard.quickStats.expiringThisMonth'), 
-      count: stats.expiringThisMonth, 
-      priority: 'medium' as const,
-      variant: 'pending' as const,
-      description: t('dashboard.subscriptions'),
+    {
+      title: t('dashboard.overview.monthlyRevenue'),
+      value: dashboard.revenueKpi?.value ?? 0,
+      change: dashboard.revenueKpi?.changePercentage ?? 0,
+      direction: dashboard.revenueKpi?.changeDirection ?? 'unchanged',
+      icon: DollarSign,
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'bg-purple-500/10',
+      textColor: 'text-purple-500',
+      isCurrency: true,
     },
-    { 
-      label: t('dashboard.quickStats.companiesWithoutSub'), 
-      count: stats.companiesWithoutSub, 
-      priority: 'low' as const,
-      variant: 'info' as const,
-      description: t('dashboard.companies'),
+    {
+      title: t('dashboard.overview.activeAlerts'),
+      value: dashboard.alertsKpi?.value ?? 0,
+      change: dashboard.alertsKpi?.changePercentage ?? 0,
+      direction: dashboard.alertsKpi?.changeDirection ?? 'unchanged',
+      icon: Bell,
+      color: 'from-orange-500 to-orange-600',
+      bgColor: 'bg-orange-500/10',
+      textColor: 'text-orange-500',
     },
   ];
 
-  const hasUrgentAlerts = stats.expiringToday > 0;
+  const formatValue = (value: number, isCurrency?: boolean) => {
+    if (isCurrency) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'EGP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(value);
+    }
+    return new Intl.NumberFormat('en-US').format(value);
+  };
 
   return (
-    <Card className={hasUrgentAlerts ? 'border-red-500/50 dark:border-red-500/30' : ''}>
-      <CardHeader>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {kpiCards.map((kpi, index) => (
+        <Card key={index} className="overflow-hidden border-0 shadow-lg">
+          <div className={`h-1 bg-gradient-to-r ${kpi.color}`} />
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground font-medium">{kpi.title}</p>
+                <p className="text-3xl font-bold tracking-tight">
+                  {formatValue(kpi.value, kpi.isCurrency)}
+                </p>
+                <div className="flex items-center gap-1">
+                  {kpi.direction === 'up' ? (
+                    <ArrowUpRight className="h-4 w-4 text-green-500" />
+                  ) : kpi.direction === 'down' ? (
+                    <ArrowDownRight className="h-4 w-4 text-red-500" />
+                  ) : (
+                    <Minus className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <span className={`text-sm font-medium ${
+                    kpi.direction === 'up' ? 'text-green-500' : 
+                    kpi.direction === 'down' ? 'text-red-500' : 
+                    'text-muted-foreground'
+                  }`}>
+                    {kpi.change > 0 ? '+' : ''}{kpi.change.toFixed(1)}%
+                  </span>
+                  <span className="text-xs text-muted-foreground">{t('dashboard.overview.vsLastMonth')}</span>
+                </div>
+              </div>
+              <div className={`p-3 rounded-xl ${kpi.bgColor}`}>
+                <kpi.icon className={`h-6 w-6 ${kpi.textColor}`} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+// ============================================================================
+// Subscription Status Distribution - Doughnut Chart
+// ============================================================================
+
+function SubscriptionDistributionChart({ distribution }: { distribution: any[] }) {
+  const { t } = useI18n();
+
+  // Helper to translate status labels from backend
+  const translateStatus = (status: string) => {
+    const statusMap: Record<string, string> = {
+      'Active': t('dashboard.overview.active'),
+      'Trial': t('dashboard.overview.trial'),
+      'Expired': t('dashboard.overview.expired'),
+      'Suspended': t('dashboard.overview.suspended'),
+    };
+    return statusMap[status] || status;
+  };
+
+  const chartData = {
+    labels: distribution?.map(d => translateStatus(d.label || d.name)) || [
+      t('dashboard.overview.active'),
+      t('dashboard.overview.trial'),
+      t('dashboard.overview.expired'),
+      t('dashboard.overview.suspended')
+    ],
+    datasets: [{
+      data: distribution?.map(d => d.value || d.count) || [0, 0, 0, 0],
+      backgroundColor: [
+        '#22c55e', // Green - Active
+        '#3b82f6', // Blue - Trial
+        '#f97316', // Orange - Expired  
+        '#ef4444', // Red - Suspended
+      ],
+      borderColor: 'transparent',
+      borderWidth: 0,
+      hoverOffset: 10,
+    }],
+  };
+
+  const total = distribution?.reduce((sum, d) => sum + (d.value || d.count || 0), 0) || 0;
+
+  return (
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-lg">{t('dashboard.systemAlerts')}</CardTitle>
-            {hasUrgentAlerts && (
-              <Badge variant="error" className="animate-pulse">
-                <AlertTriangle className="h-3 w-3 mr-1" />
-                {t('dashboard.priority.critical')}
-              </Badge>
-            )}
+          <div>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <PieChart className="h-5 w-5 text-purple-500" />
+              {t('dashboard.overview.subscriptionStatus')}
+            </CardTitle>
+            <CardDescription>{t('dashboard.overview.subscriptionStatusDesc')}</CardDescription>
           </div>
-          <Badge variant="secondary">{stats.totalExpiring} {t('dashboard.total')}</Badge>
+          <Badge variant="outline" className="text-xs">
+            {total} {t('dashboard.overview.total')}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col lg:flex-row items-center gap-6">
+          <div className="w-full lg:w-1/2 h-[250px]">
+            <GenericChart
+              title=""
+              description=""
+              data={chartData}
+              type="doughnut"
+              height={250}
+              exportable={false}
+              filterable={false}
+              resizable={false}
+            />
+          </div>
+          <div className="w-full lg:w-1/2 space-y-3">
+            {distribution?.map((item, index) => {
+              const colors = ['bg-green-500', 'bg-blue-500', 'bg-orange-500', 'bg-red-500'];
+              const value = item.value || item.count || 0;
+              const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+              return (
+                <div key={index} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${colors[index % colors.length]}`} />
+                    <span className="text-sm font-medium">{translateStatus(item.label || item.name)}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-bold">{value}</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {percentage}%
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ============================================================================
+// Growth Trend Chart - Area Chart
+// ============================================================================
+
+function GrowthTrendChart({ growthData }: { growthData: any[] }) {
+  const { t } = useI18n();
+
+  const chartData = {
+    labels: growthData?.map(d => {
+      const date = new Date(d.date);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }) || [],
+    datasets: [
+      {
+        label: t('dashboard.overview.companies'),
+        // Use ?? instead of || to preserve 0 values
+        data: growthData?.map(d => d.companies ?? 0) || [],
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 2,
+        pointHoverRadius: 5,
+      },
+      {
+        label: t('dashboard.overview.subscriptions'),
+        data: growthData?.map(d => d.subscriptions ?? 0) || [],
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34, 197, 94, 0.2)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 2,
+        pointHoverRadius: 5,
+      },
+    ],
+  };
+
+  return (
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <LineChart className="h-5 w-5 text-blue-500" />
+              {t('dashboard.overview.growthTrend')}
+            </CardTitle>
+            <CardDescription>{t('dashboard.overview.last30Days')}</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[300px]">
+          <GenericChart
+            title=""
+            description=""
+            data={chartData}
+            type="line"
+            height={300}
+            exportable={false}
+            filterable={false}
+            resizable={false}
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ============================================================================
+// Quick Stats Grid - Detailed Metrics
+// ============================================================================
+
+function QuickStatsGrid({ stats }: { stats: any }) {
+  const { t } = useI18n();
+
+  const statGroups = [
+    {
+      title: t('dashboard.overview.companiesOverview'),
+      icon: Building2,
+      color: 'text-blue-500',
+      items: [
+        { label: t('dashboard.overview.totalCompanies'), value: stats?.totalCompanies ?? 0 },
+        { label: t('dashboard.overview.activeCompanies'), value: stats?.activeCompanies ?? 0 },
+        { label: t('dashboard.overview.inactiveCompanies'), value: stats?.inactiveCompanies ?? 0 },
+        { label: t('dashboard.overview.withoutSubscription'), value: stats?.companiesWithoutSub ?? 0 },
+      ],
+    },
+    {
+      title: t('dashboard.overview.subscriptionsOverview'),
+      icon: Calendar,
+      color: 'text-green-500',
+      items: [
+        { label: t('dashboard.overview.total'), value: stats?.totalSubscriptions ?? 0 },
+        { label: t('dashboard.overview.active'), value: stats?.activeSubscriptions ?? 0 },
+        { label: t('dashboard.overview.trial'), value: stats?.trialSubscriptions ?? 0 },
+        { label: t('dashboard.overview.suspended'), value: stats?.suspendedSubscriptions ?? 0 },
+      ],
+    },
+    {
+      title: t('dashboard.overview.expiringSoon'),
+      icon: AlertTriangle,
+      color: 'text-orange-500',
+      items: [
+        { label: t('dashboard.overview.today'), value: stats?.expiringToday ?? 0, urgent: true },
+        { label: t('dashboard.overview.thisWeek'), value: stats?.expiringThisWeek ?? 0 },
+        { label: t('dashboard.overview.thisMonth'), value: stats?.expiringThisMonth ?? 0 },
+        { label: t('dashboard.overview.expired'), value: stats?.expiredSubscriptions ?? 0 },
+      ],
+    },
+    {
+      title: t('dashboard.overview.systemHealth'),
+      icon: Activity,
+      color: 'text-purple-500',
+      items: [
+        { label: t('dashboard.overview.totalAdmins'), value: stats?.totalAdmins ?? 0 },
+        { label: t('dashboard.overview.activeAdmins'), value: stats?.activeAdmins ?? 0 },
+        { label: t('dashboard.overview.companyGrowth'), value: `${(stats?.companyGrowthRate ?? 0).toFixed(1)}%`, isPercent: true },
+        { label: t('dashboard.overview.subGrowth'), value: `${(stats?.subscriptionGrowthRate ?? 0).toFixed(1)}%`, isPercent: true },
+      ],
+    },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {statGroups.map((group, groupIndex) => (
+        <Card key={groupIndex} className="border-0 shadow-lg">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <group.icon className={`h-4 w-4 ${group.color}`} />
+              {group.title}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {group.items.map((item, itemIndex) => (
+              <div key={itemIndex} className="flex items-center justify-between py-1">
+                <span className="text-sm text-muted-foreground">{item.label}</span>
+                <span className={`font-semibold ${(item as any).urgent ? 'text-red-500' : ''}`}>
+                  {item.value}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+// ============================================================================
+// Recent Activity Timeline
+// ============================================================================
+
+function RecentActivitySection({ activities }: { activities: any[] }) {
+  const { t } = useI18n();
+
+  const getActivityIcon = (type: string) => {
+    switch (type?.toLowerCase()) {
+      case 'created': return CheckCircle2;
+      case 'updated': return RefreshCw;
+      case 'deleted': return XCircle;
+      case 'activated': return Zap;
+      case 'suspended': return Shield;
+      default: return Activity;
+    }
+  };
+
+  const getActivityColor = (type: string) => {
+    switch (type?.toLowerCase()) {
+      case 'created': return 'text-green-500 bg-green-500/10';
+      case 'updated': return 'text-blue-500 bg-blue-500/10';
+      case 'deleted': return 'text-red-500 bg-red-500/10';
+      case 'activated': return 'text-purple-500 bg-purple-500/10';
+      case 'suspended': return 'text-orange-500 bg-orange-500/10';
+      default: return 'text-gray-500 bg-gray-500/10';
+    }
+  };
+
+  return (
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Activity className="h-5 w-5 text-green-500" />
+              {t('dashboard.overview.recentActivity')}
+            </CardTitle>
+            <CardDescription>{t('dashboard.overview.latestActions')}</CardDescription>
+          </div>
+          <Button variant="outline" size="sm">
+            {t('dashboard.overview.viewAll')}
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {alerts.map((alert, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Badge variant={alert.variant} className="w-2 h-2 p-0 rounded-full" />
-                <span className="text-sm">{alert.label}</span>
-              </div>
-              <Badge variant={alert.count > 0 ? alert.variant : "secondary"}>
-                {alert.count}
-              </Badge>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// Growth Trends Chart Component
-function GrowthTrendsChart({ data }: { data: TimeSeriesDataPoint[] }) {
-  const { t } = useI18n();
-  const [mounted, setMounted] = React.useState(false);
-
-  // Fix hydration issue with recharts
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Transform data for chart - show last 14 days for better readability
-  const chartData = data.slice(-14).map(point => ({
-    date: point.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    value: point.value,
-    label: point.label,
-  }));
-
-  // Calculate max value for Y axis
-  const maxValue = Math.max(...chartData.map(d => d.value), 1);
-
-  if (!mounted) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">{t('dashboard.charts.growthTrends')}</CardTitle>
-          <CardDescription>{t('dashboard.charts.growthTrendsDesc')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[250px] flex items-center justify-center">
-            <Skeleton className="h-full w-full" />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{t('dashboard.charts.growthTrends')}</CardTitle>
-        <CardDescription>{t('dashboard.charts.growthTrendsDesc')}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div style={{ width: '100%', height: 250 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart 
-              data={chartData}
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-            >
-              <defs>
-                <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                vertical={false}
-                stroke="#374151"
-                opacity={0.3}
-              />
-              <XAxis 
-                dataKey="date" 
-                tick={{ fontSize: 11, fill: '#9ca3af' }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis 
-                tick={{ fontSize: 11, fill: '#9ca3af' }}
-                tickLine={false}
-                axisLine={false}
-                allowDecimals={false}
-                domain={[0, maxValue + 1]}
-              />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: '#1f2937',
-                  border: '1px solid #374151',
-                  borderRadius: '8px',
-                  color: '#f9fafb',
-                }}
-                labelStyle={{ color: '#f9fafb' }}
-                formatter={(value: number) => [value, t('dashboard.companies')]}
-              />
-              <Area
-                type="monotone"
-                dataKey="value"
-                stroke="#3b82f6"
-                strokeWidth={2}
-                fill="url(#growthGradient)"
-                dot={{ r: 3, fill: '#3b82f6', strokeWidth: 0 }}
-                activeDot={{ r: 5, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
-          <span>{data.length} {t('dashboard.timeSeries.dataPoints')}</span>
-          <span>{t('dashboard.timeSeries.last30Days')}</span>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// Recent Activity Component
-function RecentActivityComponent({ activities }: { activities: RecentActivityItem[] }) {
-  const { t } = useI18n();
-
-  const getIconForEntityType = (entityType: string) => {
-    switch (entityType) {
-      case 'Company': return Building2Icon;
-      case 'Subscription': return CreditCardIcon;
-      case 'Admin': return User;
-      case 'Plan': return Package;
-      case 'Project': return FolderOpen;
-      case 'Module': return Box;
-      default: return ActivityIcon;
-    }
-  };
-
-  if (activities.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">{t('dashboard.recentActivity')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-            <ActivityIcon className="h-12 w-12 mb-3 opacity-50" />
-            <p className="text-sm">{t('dashboard.noRecentActivity')}</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{t('dashboard.recentActivity')}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {activities.map((activity) => {
-            const Icon = getIconForEntityType(activity.entityType);
+          {(activities || []).slice(0, 8).map((activity, index) => {
+            const Icon = getActivityIcon(activity.actionType);
+            const colorClass = getActivityColor(activity.actionType);
             return (
-              <div key={activity.id} className="flex items-start gap-3">
-                <div 
-                  className="p-2 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: `${activity.color}20` }}
-                >
-                  <Icon className="h-4 w-4" style={{ color: activity.color }} />
+              <div key={activity.id || index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                <div className={`p-2 rounded-full ${colorClass}`}>
+                  <Icon className="h-4 w-4" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">
-                    <span className="text-primary">{activity.performedBy}</span>
+                  <p className="text-sm font-medium truncate">
+                    {activity.description || `${activity.actionType} ${activity.entityType}`}
                   </p>
-                  <p className="text-xs text-muted-foreground truncate">
-                    {activity.description}
-                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-muted-foreground">{activity.performedBy}</span>
+                    <span className="text-xs text-muted-foreground">•</span>
+                    <span className="text-xs text-muted-foreground">{activity.timeAgo}</span>
+                  </div>
                 </div>
-                <span className="text-xs text-muted-foreground flex-shrink-0">
-                  {activity.timeAgo}
-                </span>
+                <Badge variant="secondary" className="text-xs shrink-0">
+                  {activity.entityType}
+                </Badge>
               </div>
             );
           })}
+          {(!activities || activities.length === 0) && (
+            <div className="text-center py-8 text-muted-foreground">
+              <Activity className="h-12 w-12 mx-auto mb-3 opacity-20" />
+              <p>{t('dashboard.overview.noActivity')}</p>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
   );
 }
 
+// ============================================================================
 // Loading Skeleton
+// ============================================================================
+
 function OverviewSkeleton() {
   return (
     <div className="space-y-6">
-      {/* KPI Cards Skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
-          <Card key={i}>
+          <Card key={i} className="border-0 shadow-lg">
             <CardContent className="p-6">
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-8 w-32" />
-                <Skeleton className="h-5 w-16" />
-              </div>
+              <Skeleton className="h-4 w-24 mb-2" />
+              <Skeleton className="h-8 w-32 mb-2" />
+              <Skeleton className="h-4 w-20" />
             </CardContent>
           </Card>
         ))}
       </div>
-
-      {/* Quick Stats Skeleton */}
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-5 w-32" />
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="space-y-2">
-                <Skeleton className="h-3 w-20" />
-                <Skeleton className="h-6 w-12" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Charts Skeleton */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-5 w-40" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-32 w-full" />
-          </CardContent>
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-6"><Skeleton className="h-[300px]" /></CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-5 w-32" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-32 w-full" />
-          </CardContent>
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-6"><Skeleton className="h-[300px]" /></CardContent>
         </Card>
       </div>
     </div>
   );
 }
 
-// Main Overview View
+// ============================================================================
+// Main View
+// ============================================================================
+
 export function OverviewView() {
   const { dashboard, isLoading, error, refresh, formattedLastUpdate } = useOverviewViewModel();
   const { t } = useI18n();
 
-  const getKpiIcon = (title: string) => {
-    const lower = title.toLowerCase();
-    if (lower.includes('compan')) return Building2;
-    if (lower.includes('subscription')) return CreditCard;
-    if (lower.includes('mrr') || lower.includes('revenue')) return DollarSign;
-    if (lower.includes('alert')) return Bell;
-    return Activity;
-  };
-
-  if (error && !dashboard) {
+  if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-        <AlertTriangle className="h-12 w-12 text-red-500" />
-        <p className="text-lg font-medium text-red-600">{error}</p>
-        <Button onClick={refresh} variant="outline">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          {t('dashboard.retry')}
-        </Button>
-      </div>
+      <Card className="p-6 border-0 shadow-lg">
+        <div className="flex flex-col items-center justify-center py-12">
+          <AlertTriangle className="h-16 w-16 text-red-500 mb-4" />
+          <p className="text-lg font-medium mb-2">{t('dashboard.error')}</p>
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <Button onClick={refresh} variant="outline">
+            <RefreshCw className="mr-2 h-4 w-4" />
+            {t('common.retry')}
+          </Button>
+        </div>
+      </Card>
     );
   }
 
-  if (isLoading && !dashboard) {
+  if (isLoading || !dashboard) {
     return <OverviewSkeleton />;
-  }
-
-  if (!dashboard) {
-    return null;
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">{t('dashboard.pages.overview')}</h1>
-          <p className="text-sm text-muted-foreground flex items-center gap-2">
-            <Clock className="h-3 w-3" />
-            {t('dashboard.lastUpdated')}: {formattedLastUpdate}
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.overview.title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('dashboard.overview.subtitle')}</p>
         </div>
-        <Button 
-          onClick={refresh} 
-          variant="outline" 
-          size="sm"
-          disabled={isLoading}
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-          {t('dashboard.refresh')}
-        </Button>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-muted-foreground">
+            {t('dashboard.lastUpdated')}: {formattedLastUpdate}
+          </span>
+          <Button variant="outline" size="sm" onClick={refresh} className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            {t('common.refresh')}
+          </Button>
+        </div>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {dashboard.kpiCards.map((kpi, index) => (
-          <KpiCardComponent 
-            key={index} 
-            kpi={kpi} 
-            icon={getKpiIcon(kpi.title)} 
-          />
-        ))}
-      </div>
-
-      {/* Quick Stats */}
-      <QuickStatsComponent stats={dashboard.stats} />
+      <KpiCardsSection dashboard={dashboard} />
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <StatusDistributionComponent items={dashboard.subscriptionStatusDistribution} />
-        <AlertsSummaryComponent stats={dashboard.stats} />
+        <SubscriptionDistributionChart distribution={dashboard.subscriptionStatusDistribution} />
+        <GrowthTrendChart growthData={dashboard.growthTrend} />
       </div>
 
-      {/* Growth Trend & Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {dashboard.growthTrend.length > 0 && (
-          <GrowthTrendsChart data={dashboard.growthTrend} />
-        )}
-        <RecentActivityComponent activities={dashboard.recentActivity} />
-      </div>
+      {/* Quick Stats */}
+      <QuickStatsGrid stats={dashboard.stats} />
+
+      {/* Recent Activity */}
+      <RecentActivitySection activities={dashboard.recentActivity} />
     </div>
   );
 }

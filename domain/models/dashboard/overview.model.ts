@@ -9,6 +9,8 @@ import {
   DistributionItemData,
   TimeSeriesDataPoint,
   TimeSeriesDataPointData,
+  GrowthTrendDataPoint,
+  GrowthTrendDataPointData,
   ChangeDirection,
   formatCurrency,
   formatNumber,
@@ -70,7 +72,7 @@ export interface OverviewDashboardData {
   alertsKpi: KpiCardData;
   stats: QuickStatsData;
   subscriptionStatusDistribution: DistributionItemData[];
-  growthTrend: TimeSeriesDataPointData[];
+  growthTrend: GrowthTrendDataPointData[];
   recentActivity: RecentActivityItemData[];
   generatedAt: string;
 }
@@ -237,7 +239,7 @@ export class OverviewDashboard {
   public readonly alertsKpi: KpiCard;
   public readonly stats: QuickStats;
   public readonly subscriptionStatusDistribution: DistributionItem[];
-  public readonly growthTrend: TimeSeriesDataPoint[];
+  public readonly growthTrend: GrowthTrendDataPoint[];
   public readonly recentActivity: RecentActivityItem[];
   public readonly generatedAt: Date;
 
@@ -250,7 +252,7 @@ export class OverviewDashboard {
     this.subscriptionStatusDistribution = data.subscriptionStatusDistribution.map(
       d => new DistributionItem(d)
     );
-    this.growthTrend = data.growthTrend.map(d => new TimeSeriesDataPoint(d));
+    this.growthTrend = data.growthTrend.map(d => new GrowthTrendDataPoint(d));
     this.recentActivity = data.recentActivity.map(d => new RecentActivityItem(d));
     this.generatedAt = new Date(data.generatedAt);
   }

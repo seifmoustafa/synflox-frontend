@@ -337,6 +337,56 @@ export const en = {
       insights: "Insights",
     },
     
+    // Overview Dashboard
+    overview: {
+      title: "Dashboard Overview",
+      subtitle: "Quick snapshot of your system's health and performance",
+      
+      // KPI Cards
+      totalCompanies: "Total Companies",
+      activeSubscriptions: "Active Subscriptions",
+      monthlyRevenue: "Monthly Revenue",
+      activeAlerts: "Active Alerts",
+      vsLastMonth: "vs last month",
+      
+      // Charts
+      subscriptionStatus: "Subscription Status",
+      subscriptionStatusDesc: "Distribution of subscription statuses",
+      growthTrend: "Growth Trend",
+      last30Days: "Last 30 days",
+      companies: "Companies",
+      subscriptions: "Subscriptions",
+      total: "Total",
+      
+      // Status Labels
+      active: "Active",
+      trial: "Trial",
+      expired: "Expired",
+      suspended: "Suspended",
+      
+      // Stats Cards
+      companiesOverview: "Companies Overview",
+      activeCompanies: "Active Companies",
+      inactiveCompanies: "Inactive Companies",
+      withoutSubscription: "Without Subscription",
+      subscriptionsOverview: "Subscriptions Overview",
+      expiringSoon: "Expiring Soon",
+      today: "Today",
+      thisWeek: "This Week",
+      thisMonth: "This Month",
+      systemHealth: "System Health",
+      totalAdmins: "Total Admins",
+      activeAdmins: "Active Admins",
+      companyGrowth: "Company Growth",
+      subGrowth: "Subscription Growth",
+      
+      // Activity
+      recentActivity: "Recent Activity",
+      latestActions: "Latest system actions and events",
+      viewAll: "View All",
+      noActivity: "No recent activity",
+    },
+    
     // Health Status
     health: {
       healthy: "System Healthy",
@@ -408,6 +458,247 @@ export const en = {
       subscriptionGrowth: "Subscription Growth",
       planDistribution: "Plan distribution by company",
       statusBreakdown: "Status Breakdown",
+    },
+    
+    // Companies Dashboard
+    companiesDashboard: {
+      title: "Companies Dashboard",
+      subtitle: "Monitor company metrics and insights",
+      totalCompanies: "Total Companies",
+      newThisMonth: "New This Month",
+      newThisWeek: "this week",
+      thisWeek: "this week",
+      subscriptionCoverage: "Coverage Rate",
+      alertsCount: "Alerts",
+      critical: "critical",
+      
+      // Status (based on subscription state)
+      active: "With Active Subscription",
+      inactive: "No Active Subscription",
+      suspended: "Suspended",
+      atRisk: "Subscription Expiring Soon",
+      
+      // Charts
+      statusDistribution: "Status Distribution",
+      statusDistributionDesc: "Company status breakdown",
+      healthScore: "Health Score",
+      growthTrend: "Growth Trend",
+      last30Days: "Last 30 days",
+      newCompanies: "new companies",
+      avgPerDay: "Avg/Day",
+      bestDay: "Best Day",
+      bestDayDate: "Best Day Date",
+      
+      // Top Companies
+      topCompanies: "Top Companies",
+      topCompaniesDesc: "Companies by subscription value",
+      noTopCompanies: "No companies with subscriptions yet",
+      subscriptions: "subscriptions",
+      totalValue: "Total Value",
+      
+      // Subscription Coverage
+      subscriptionBreakdown: "Subscription Coverage",
+      subscriptionBreakdownDesc: "Companies by subscription status",
+      withActive: "Active Subscription",
+      withTrial: "Trial Subscription",
+      withExpired: "Expired Subscription",
+      withNone: "No Subscription",
+      
+      // Alerts
+      alerts: "Company Alerts",
+      noAlerts: "No alerts - all companies healthy!",
+      viewAll: "View All",
+      expiringToday: "Expiring Today",
+      daysRemaining: "days remaining",
+    },
+    
+    // Subscriptions Dashboard
+    subscriptionsDashboard: {
+      title: "Subscriptions Dashboard",
+      subtitle: "Monitor subscription metrics and lifecycle",
+      totalSubscriptions: "Total Subscriptions",
+      activeSubscriptions: "Active Subscriptions",
+      trials: "trials",
+      mrr: "Monthly Revenue",
+      expiringThisMonth: "Expiring This Month",
+      thisWeek: "this week",
+      
+      // Status
+      active: "Active",
+      trial: "Trial",
+      expired: "Expired",
+      suspended: "Suspended",
+      cancelled: "Cancelled",
+      paused: "Paused",
+      
+      // Charts
+      statusDistribution: "Status Distribution",
+      statusDistributionDesc: "Subscription status breakdown",
+      planDistribution: "Plan Distribution",
+      planDistributionDesc: "Subscriptions by plan",
+      byPlan: "Subscriptions by Plan",
+      byPlanDesc: "Distribution of subscriptions across plans",
+      subscriptions: "Subscriptions",
+      topPlan: "Top Plan",
+      
+      // Lifecycle Metrics
+      lifecycleMetrics: "Lifecycle Metrics",
+      lifecycleMetricsDesc: "Subscription lifecycle operations this month",
+      thisMonth: "This Month",
+      trialConversion: "Trial Conversion",
+      retentionRate: "Retention Rate",
+      churnRate: "Churn Rate",
+      renewalRate: "Renewal Rate",
+      actionsThisMonth: "Actions This Month",
+      newSubs: "New",
+      renewals: "Renewals",
+      cancellations: "Cancellations",
+      upgrades: "Upgrades",
+      downgrades: "Downgrades",
+      reactivations: "Reactivations",
+      extensions: "Extensions",
+      operations: "Operations",
+      avgDuration: "Average Duration",
+      days: "days",
+      
+      // Expiry Timeline
+      expiryTimeline: "Expiry Timeline",
+      expiryTimelineDesc: "Upcoming subscription expirations",
+      expiringToday: "Expiring Today",
+      expiringThisWeek: "Expiring This Week",
+      expiringNext3Months: "Expiring Next 3 Months",
+      totalValue: "Total Value",
+    },
+    
+    // Revenue Dashboard
+    revenueDashboard: {
+      title: "Revenue Dashboard",
+      subtitle: "Financial metrics and projections",
+      mrr: "MRR",
+      mrrDesc: "Monthly Recurring Revenue",
+      arr: "ARR",
+      arrDesc: "Annual Recurring Revenue",
+      arpc: "ARPC",
+      arpcDesc: "Average Revenue Per Customer",
+      activeCompanies: "Active Companies",
+      activeCustomers: "Active Customers",
+      perCompany: "per company",
+      vsLastMonth: "vs last month",
+      revenueByPlan: "Revenue by Plan",
+      byPlan: "Revenue by Plan",
+      byPlanDesc: "Monthly revenue distribution by plan",
+      revenueByPlanDesc: "Monthly revenue distribution",
+      revenue: "Revenue",
+      monthlyRevenue: "Monthly Revenue",
+      topPlan: "Top Plan",
+      trend: "Revenue Trend",
+      trendDesc: "Monthly revenue performance over time",
+      revenueTrend: "Revenue Trend",
+      last12Months: "Last 12 months",
+      projections: "Projections",
+      projectionsDesc: "Next month forecast",
+      nextMonthMrr: "Next Month MRR",
+      expectedRenewals: "Expected Renewals",
+      subscriptionsToRenew: "subscriptions to renew",
+      atRiskRevenue: "At Risk Revenue",
+      atRiskSubs: "at risk subscriptions",
+      projectedChange: "Projected Change",
+      breakdown: "Revenue Breakdown",
+      breakdownDesc: "Revenue by source type",
+      newSubscriptions: "New Subscriptions",
+      renewals: "Renewals",
+      upgrades: "Upgrades",
+      totalRevenue: "Total Revenue",
+      projectionConfidence: "Projection Confidence",
+      confidenceNote: "Based on historical renewal rates",
+    },
+    
+    // Activity Dashboard
+    activityDashboard: {
+      title: "Activity Dashboard",
+      subtitle: "Admin activity and audit trail",
+      totalActions: "Total Actions",
+      todayLogins: "Today's Logins",
+      todayActions: "Today's Actions",
+      activeAdmins: "Active Admins",
+      activeSessions: "Active Sessions",
+      peakHour: "Peak Hour",
+      topAdmins: "Top Admins",
+      topAdminsDesc: "Most active administrators",
+      noAdmins: "No admin activity recorded",
+      actions: "actions",
+      recentActions: "Recent Actions",
+      recentActionsDesc: "Latest admin activities",
+      recentActivity: "Recent Activity",
+      recentActivityDesc: "Latest system activity",
+      noActivity: "No recent activity to display",
+      viewAll: "View All",
+      activityTimeline: "Activity Timeline",
+      activityTrend: "Activity Trend",
+      last7Days: "Last 7 days",
+      thisWeek: "this week",
+      actionsByType: "Actions by Type",
+      actionsByTypeDesc: "Distribution of action types",
+      count: "Count",
+      
+      // Action Types
+      actionTypes: {
+        created: "Created",
+        updated: "Updated",
+        deleted: "Deleted",
+        activated: "Activated",
+        suspended: "Suspended",
+        resumed: "Resumed",
+        cancelled: "Cancelled",
+        renewed: "Renewed",
+        login: "Login",
+        logout: "Logout",
+      },
+      
+      // Entity Types
+      entityTypes: {
+        company: "Company",
+        subscription: "Subscription",
+        admin: "Admin",
+        licenseKey: "License Key",
+        plan: "Plan",
+        project: "Project",
+        module: "Module",
+      },
+    },
+    
+    // Alerts Dashboard
+    alertsDashboard: {
+      title: "Alerts Dashboard",
+      subtitle: "System alerts and notifications",
+      critical: "Critical",
+      high: "High Priority",
+      medium: "Medium Priority",
+      low: "Low Priority",
+      unread: "Unread",
+      alerts: "Alerts",
+      criticalAlerts: "Critical Alerts",
+      highAlerts: "High Priority Alerts",
+      allAlerts: "All Alerts",
+      activeAlerts: "active alerts",
+      noCritical: "No critical alerts",
+      noHigh: "No high priority alerts",
+      noAlerts: "All Clear!",
+      allGood: "No alerts - everything looks good!",
+      totalAlerts: "Total Alerts",
+      byCategory: "Alerts by Category",
+      byCategoryDesc: "Distribution of alerts by category",
+      byPriority: "Alerts by Priority",
+      byPriorityDesc: "Distribution of alerts by priority level",
+      expiringSubscriptions: "Expiring Subscriptions",
+      expiredSubscriptions: "Expired Subscriptions",
+      inactiveCompanies: "Inactive Companies",
+      systemHealth: "System Health",
+      filter: "Filter",
+      sort: "Sort",
+      today: "Today",
+      overdue: "Overdue",
+      daysRemaining: "days remaining",
     },
     
     // Recent Activity
@@ -726,6 +1017,14 @@ export const en = {
     system: "System",
     productCatalog: "Product Catalog",
     licenseManagement: "License Management",
+    
+    // Dashboard Menu Items
+    overview: "Overview",
+    companiesDashboard: "Companies",
+    subscriptionsDashboard: "Subscriptions",
+    revenueDashboard: "Revenue",
+    activityDashboard: "Activity",
+    alertsDashboard: "Alerts",
     
     // System Menu Items
     admins: "Admins",

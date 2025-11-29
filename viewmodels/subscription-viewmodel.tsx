@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useState, useEffect, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import { useGenericCrudViewModel } from "@/hooks/use-generic-crud-viewmodel";
@@ -27,7 +27,11 @@ export function useSubscriptionViewModel() {
   const { subscriptionService, companyService, subscriptionPlanService } = useServices();
   const { t, language } = useI18n();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { showActionForm, ActionFormDialog } = useActionFormDialog();
+  
+  // Get pre-selected company from URL query parameter
+  const preSelectedCompanyId = searchParams.get('companyId');
   
   // State for dropdown data
   const [companyOptions, setCompanyOptions] = useState<Array<{ value: string; label: string }>>([]);
@@ -478,6 +482,11 @@ export function useSubscriptionViewModel() {
       },
     ],
 
+    // Pre-fill form with company from URL if provided
+    createInitialValues: preSelectedCompanyId ? {
+      companyId: preSelectedCompanyId,
+    } : {},
+    
     createFields: [
       {
         name: "companyId",
@@ -486,6 +495,8 @@ export function useSubscriptionViewModel() {
         required: true,
         options: companyOptions,
         helperText: t("subscription.companyHelper"),
+        // Disable company selection if pre-selected from alerts
+        disabled: !!preSelectedCompanyId,
       },
       {
         name: "planId",

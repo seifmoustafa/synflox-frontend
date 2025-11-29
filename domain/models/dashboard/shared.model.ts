@@ -25,6 +25,13 @@ export interface TimeSeriesDataPointData {
   value: number;
 }
 
+export interface GrowthTrendDataPointData {
+  date: string;
+  label: string;
+  companies: number;
+  subscriptions: number;
+}
+
 export interface DistributionItemData {
   label?: string;
   name?: string; // Backend may return 'name' instead of 'label'
@@ -77,6 +84,20 @@ export class TimeSeriesDataPoint {
     this.date = new Date(data.date);
     this.label = data.label;
     this.value = data.value;
+  }
+}
+
+export class GrowthTrendDataPoint {
+  public readonly date: Date;
+  public readonly label: string;
+  public readonly companies: number;
+  public readonly subscriptions: number;
+
+  constructor(data: GrowthTrendDataPointData) {
+    this.date = new Date(data.date);
+    this.label = data.label;
+    this.companies = data.companies;
+    this.subscriptions = data.subscriptions;
   }
 }
 
