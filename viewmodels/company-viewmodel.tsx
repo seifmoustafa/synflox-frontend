@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import { useGenericCrudViewModel } from "@/hooks/use-generic-crud-viewmodel";
@@ -11,12 +12,13 @@ import type {
 } from "@/domain";
 import type { BulkAction } from "@/components/ui/generic-crud-view";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Eye } from "lucide-react";
 import { useActionFormDialog, getActionFormFields } from "@/components/ui/action-form-dialog";
 
 export function useCompanyViewModel() {
   const { companyService } = useServices();
   const { t, language } = useI18n();
+  const router = useRouter();
   const { showActionForm, ActionFormDialog } = useActionFormDialog();
 
   const vm = useGenericCrudViewModel<
@@ -223,8 +225,9 @@ export function useCompanyViewModel() {
       getActions: (vm: any, t: any, handleDelete?: (item: Company) => void) => [
         {
           label: t("common.view"),
-          onClick: (item: Company) => vm.openViewModal(item),
+          onClick: (item: Company) => router.push(`/companies/${item.id}`),
           variant: "ghost" as const,
+          icon: Eye,
         },
         {
           label: t("common.edit"),

@@ -30,8 +30,9 @@ export function useSubscriptionViewModel() {
   const searchParams = useSearchParams();
   const { showActionForm, ActionFormDialog } = useActionFormDialog();
   
-  // Get pre-selected company from URL query parameter
+  // Get URL query parameters
   const preSelectedCompanyId = searchParams.get('companyId');
+  const shouldOpenCreateModal = searchParams.get('create') === 'true';
   
   // State for dropdown data
   const [companyOptions, setCompanyOptions] = useState<Array<{ value: string; label: string }>>([]);
@@ -384,6 +385,17 @@ export function useSubscriptionViewModel() {
     service,
     vmConfig
   );
+
+  // Auto-open create modal if URL has ?create=true
+  useEffect(() => {
+    if (shouldOpenCreateModal && vm.setIsCreateModalOpen) {
+      // Small delay to ensure dropdowns are loaded
+      const timer = setTimeout(() => {
+        vm.setIsCreateModalOpen(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldOpenCreateModal, vm.setIsCreateModalOpen]);
 
   // Table configuration
   const config = {

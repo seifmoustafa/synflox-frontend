@@ -269,20 +269,22 @@ function AlertItemsList({ alerts, onMarkRead, onDismiss }: {
     if (!actionUrl) return;
     
     // Convert backend URLs to frontend routes
-    // Backend: /subscriptions/create?companyId=xxx → /subscriptions/new?companyId=xxx
+    // Backend: /subscriptions/create?companyId=xxx → /subscriptions?create=true&companyId=xxx
     // Backend: /companies/{id} → /companies/{id}
     // Backend: /subscriptions/{id} → /subscriptions/{id}
-    // Backend: /subscriptions/{id}/renew → /subscriptions/{id}/edit (for now)
+    // Backend: /subscriptions/{id}/renew → /subscriptions/{id}
     
     let frontendUrl = actionUrl;
     
-    // Handle subscription create
+    // Handle subscription create - open modal on subscriptions page
     if (actionUrl.includes('/subscriptions/create')) {
-      frontendUrl = actionUrl.replace('/subscriptions/create', '/subscriptions/new');
+      const companyIdMatch = actionUrl.match(/companyId=([^&]+)/);
+      const companyId = companyIdMatch ? companyIdMatch[1] : '';
+      frontendUrl = `/subscriptions?create=true&companyId=${companyId}`;
     }
-    // Handle subscription renew
+    // Handle subscription renew - go to subscription detail
     else if (actionUrl.includes('/renew')) {
-      frontendUrl = actionUrl.replace('/renew', '/edit');
+      frontendUrl = actionUrl.replace('/renew', '');
     }
     
     router.push(frontendUrl);

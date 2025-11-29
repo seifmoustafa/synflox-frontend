@@ -192,14 +192,18 @@ export class SubscriptionMapper {
 
   /**
    * Handle GetByCompany subscriptions API response
+   * Note: ApiService.unwrap() already extracts .data, so response is the array directly
    */
   static handleGetByCompanyResponse(response: any): CompanySubscriptionsResponse {
-    if (!response || !response.data) {
+    if (!response) {
       return { data: [] };
     }
 
-    const subscriptions = Array.isArray(response.data)
-      ? response.data.map((item: any) => this.fromJson(item))
+    // Handle both cases: response is array directly (after unwrap) or has .data property
+    const dataArray = Array.isArray(response) ? response : (response.data || []);
+    
+    const subscriptions = Array.isArray(dataArray)
+      ? dataArray.map((item: any) => this.fromJson(item))
       : [];
 
     return { data: subscriptions };
