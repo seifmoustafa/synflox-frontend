@@ -6,6 +6,29 @@
 import { Currency } from "./subscription-plan.model";
 
 // ============================================================================
+// ENUMS - Access Mode
+// ============================================================================
+
+/**
+ * Subscription access mode - defines current access level
+ * Matches backend SubscriptionAccessMode enum
+ */
+export enum SubscriptionAccessMode {
+  /** Default/uninitialized value */
+  None = 0,
+  /** Full access to all entitled features */
+  Full = 1,
+  /** Grace period - full access but subscription expiring soon */
+  GracePeriod = 2,
+  /** Read-only access - view and export only */
+  ReadOnly = 3,
+  /** Export-only access - data export before full block */
+  ExportOnly = 4,
+  /** Completely blocked - upgrade required */
+  Blocked = 5
+}
+
+// ============================================================================
 // INTERFACES - API Response Data
 // ============================================================================
 
@@ -68,6 +91,17 @@ export interface SubscriptionData {
   projects?: SubscriptionProjectData[];
   modules?: SubscriptionModuleData[];
   customFeatures?: string[];
+  // Enterprise Entitlement System fields
+  accessMode?: SubscriptionAccessMode;
+  accessModeDisplay?: string;
+  fallbackPlanId?: string | null;
+  fallbackPlanName?: string | null;
+  exportDeadlineUtc?: string | null;
+  entitlementsVersion?: number;
+  accessRestrictionMessage?: string | null;
+  entitlementCount?: number;
+  gracePeriodDays?: number;
+  exportGraceDays?: number;
 }
 
 /**
@@ -130,6 +164,18 @@ export class Subscription {
   readonly modules: SubscriptionModuleData[];
   readonly customFeatures: string[];
   
+  // Enterprise Entitlement System fields
+  readonly accessMode: SubscriptionAccessMode;
+  readonly accessModeDisplay: string;
+  readonly fallbackPlanId?: string | null;
+  readonly fallbackPlanName?: string | null;
+  readonly exportDeadlineUtc?: Date | null;
+  readonly entitlementsVersion: number;
+  readonly accessRestrictionMessage?: string | null;
+  readonly entitlementCount: number;
+  readonly gracePeriodDays: number;
+  readonly exportGraceDays: number;
+  
   // Backend computed properties
   private _status?: string;
   private _daysRemaining?: number;
@@ -173,6 +219,18 @@ export class Subscription {
     this.projects = data.projects || [];
     this.modules = data.modules || [];
     this.customFeatures = data.customFeatures || [];
+    
+    // Set entitlement system fields
+    this.accessMode = data.accessMode ?? SubscriptionAccessMode.Full;
+    this.accessModeDisplay = data.accessModeDisplay || 'Full Access';
+    this.fallbackPlanId = data.fallbackPlanId || null;
+    this.fallbackPlanName = data.fallbackPlanName || null;
+    this.exportDeadlineUtc = data.exportDeadlineUtc ? new Date(data.exportDeadlineUtc) : null;
+    this.entitlementsVersion = data.entitlementsVersion ?? 1;
+    this.accessRestrictionMessage = data.accessRestrictionMessage || null;
+    this.entitlementCount = data.entitlementCount ?? 0;
+    this.gracePeriodDays = data.gracePeriodDays ?? 0;
+    this.exportGraceDays = data.exportGraceDays ?? 30;
     
     // Set backend computed properties
     this._status = data.status;
@@ -344,6 +402,84 @@ export class Subscription {
     return this.isExpired && !this.isLifetime;
   }
 
+  // ============================================================================
+  // BUSINESS LOGIC - Access Mode
+  // ============================================================================
+
+  /**
+   * Check if subscription has restricted access (not full)
+   */
+  get isRestrictedAccess(): boolean {
+    return this.accessMode !== SubscriptionAccessMode.Full && 
+           this.accessMode !== SubscriptionAccessMode.None;
+  }
+
+  /**
+   * Check if subscription is in grace period
+   */
+  get isInGracePeriod(): boolean {
+    return this.accessMode === SubscriptionAccessMode.GracePeriod;
+  }
+
+  /**
+   * Check if subscription is blocked
+   */
+  get isBlocked(): boolean {
+    return this.accessMode === SubscriptionAccessMode.Blocked;
+  }
+
+  /**
+   * Check if subscription is in export-only mode
+   */
+  get isExportOnly(): boolean {
+    return this.accessMode === SubscriptionAccessMode.ExportOnly;
+  }
+
+  /**
+   * Check if subscription is read-only
+   */
+  get isReadOnly(): boolean {
+    return this.accessMode === SubscriptionAccessMode.ReadOnly;
+  }
+
+  /**
+   * Get access mode badge color
+   */
+  get accessModeColor(): "green" | "yellow" | "blue" | "orange" | "red" | "gray" {
+    switch (this.accessMode) {
+      case SubscriptionAccessMode.Full:
+        return "green";
+      case SubscriptionAccessMode.GracePeriod:
+        return "yellow";
+      case SubscriptionAccessMode.ReadOnly:
+        return "blue";
+      case SubscriptionAccessMode.ExportOnly:
+        return "orange";
+      case SubscriptionAccessMode.Blocked:
+        return "red";
+      default:
+        return "gray";
+    }
+  }
+
+  /**
+   * Days until export deadline (if in export-only mode)
+   */
+  get daysUntilExportDeadline(): number | null {
+    if (!this.exportDeadlineUtc) return null;
+    const now = new Date();
+    const days = Math.ceil(
+      (this.exportDeadlineUtc.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return Math.max(0, days);
+  }
+
+  /**
+   * Check if has entitlements
+   */
+  get hasEntitlements(): boolean {
+    return this.entitlementCount > 0;
+  }
 
   /**
    * Immutable update
@@ -378,6 +514,17 @@ export class Subscription {
       offlineLicenseKey: this.offlineLicenseKey,
       licenseKeyGeneratedAt: this.licenseKeyGeneratedAt?.toISOString() || null,
       licenseKeyVersion: this.licenseKeyVersion,
+      // Entitlement fields
+      accessMode: this.accessMode,
+      accessModeDisplay: this.accessModeDisplay,
+      fallbackPlanId: this.fallbackPlanId,
+      fallbackPlanName: this.fallbackPlanName,
+      exportDeadlineUtc: this.exportDeadlineUtc?.toISOString() || null,
+      entitlementsVersion: this.entitlementsVersion,
+      accessRestrictionMessage: this.accessRestrictionMessage,
+      entitlementCount: this.entitlementCount,
+      gracePeriodDays: this.gracePeriodDays,
+      exportGraceDays: this.exportGraceDays,
     };
   }
 }

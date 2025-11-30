@@ -138,6 +138,7 @@ export type { SubscriptionPlansResponse } from './mappers/subscription-plan.mapp
 export {
   Subscription,
   SubscriptionStatus,
+  SubscriptionAccessMode,
   CreateSubscriptionRequest,
   UpgradeSubscriptionRequest,
   RenewSubscriptionRequest,

@@ -1248,6 +1248,21 @@ export const en = {
     gracePeriod: "Grace Period (days)",
     gracePeriodHelper: "Days after expiry before termination (0-30)",
     gracePeriodRangeHelper: "0-30 days",
+    exportGraceDays: "Export Grace Period (days)",
+    exportGraceDaysHelper: "Days allowed for data export after blocked (0-90)",
+    isFreeTier: "Free Tier Plan",
+    isFreeTierHelper: "Mark this as a free tier with limited access",
+    fallbackAccessMode: "Fallback Access Mode",
+    fallbackAccessModeHelper: "Access mode when subscription falls back",
+    defaultFallbackPlan: "Default Fallback Plan",
+    defaultFallbackPlanHelper: "Free tier plan to fall back to when subscription expires",
+    showLockedModulesInMenu: "Show Locked Modules",
+    showLockedModulesInMenuHelper: "Display locked modules in menu with lock icon",
+    accessModes: {
+      readOnly: "Read Only",
+      exportOnly: "Export Only",
+      blocked: "Blocked",
+    },
     nameHelper: "2-150 characters",
     descriptionHelper: "Max 2000 characters",
     trialDurationHelper: "1-60 days (required when trial enabled)",
@@ -1296,6 +1311,27 @@ export const en = {
       lifetime: "Lifetime",
       unknown: "Unknown",
     },
+    
+    // Access Mode (Entitlement System)
+    accessMode: {
+      label: "Access Mode",
+      none: "None",
+      full: "Full Access",
+      gracePeriod: "Grace Period",
+      readOnly: "Read Only",
+      exportOnly: "Export Only",
+      blocked: "Blocked",
+    },
+    accessModeWarning: {
+      gracePeriod: "Subscription expiring soon. Please renew to maintain full access.",
+      readOnly: "Limited to read-only access. Upgrade to restore full functionality.",
+      exportOnly: "Export-only mode. {days} days remaining to export your data.",
+      blocked: "Access blocked. Please renew or upgrade your subscription.",
+    },
+    entitlements: "Entitlements",
+    entitlementCount: "Entitled Features",
+    fallbackPlan: "Fallback Plan",
+    exportDeadline: "Export Deadline",
     
     // Operations
     operations: {

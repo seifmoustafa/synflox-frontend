@@ -5,6 +5,7 @@
 
 import type { ProjectData } from './project.model';
 import type { ModuleData } from './module.model';
+import { SubscriptionAccessMode } from './subscription.model';
 
 /**
  * Plan duration types
@@ -34,6 +35,7 @@ export enum UpgradePolicy {
  * Supported currencies
  */
 export enum Currency {
+  Free = 0,  // Free plan (no price)
   USD = 1,
   EUR = 2,
   EGP = 3,
@@ -75,6 +77,14 @@ export interface SubscriptionPlanData {
   createdTimestamp?: string | null;
   lastModifiedBy?: string | null;
   lastModifiedTimestamp?: string | null;
+  // Enterprise Entitlement System fields
+  isFreeTier?: boolean;
+  fallbackAccessMode?: SubscriptionAccessMode;
+  exportGraceDays?: number;
+  defaultFallbackPlanId?: string | null;
+  defaultFallbackPlanName?: string | null;
+  showLockedModulesInMenu?: boolean;
+  lockedItemStyle?: string;
 }
 
 /**
@@ -100,7 +110,15 @@ export class SubscriptionPlan {
     public readonly createdBy: string | null = null,
     public readonly createdTimestamp: string | null = null,
     public readonly lastModifiedBy: string | null = null,
-    public readonly lastModifiedTimestamp: string | null = null
+    public readonly lastModifiedTimestamp: string | null = null,
+    // Enterprise Entitlement System fields
+    public readonly isFreeTier: boolean = false,
+    public readonly fallbackAccessMode: SubscriptionAccessMode = SubscriptionAccessMode.ReadOnly,
+    public readonly exportGraceDays: number = 30,
+    public readonly defaultFallbackPlanId: string | null = null,
+    public readonly defaultFallbackPlanName: string | null = null,
+    public readonly showLockedModulesInMenu: boolean = true,
+    public readonly lockedItemStyle: string = 'greyed_with_lock'
   ) {}
 
   /**
@@ -151,6 +169,10 @@ export class SubscriptionPlan {
    */
   get primaryPrice(): PlanPriceData | null {
     if (this.prices.length === 0) return null;
+    // For free tier, return the Free currency price (check both enum and raw value)
+    const freePrice = this.prices.find(p => (p.currency as number) === 0);
+    if (freePrice) return freePrice;
+    // Otherwise prefer USD or first available
     return this.prices.find(p => p.currency === Currency.USD) || this.prices[0];
   }
 
@@ -158,7 +180,13 @@ export class SubscriptionPlan {
    * Format price with currency symbol
    */
   formatPrice(price: PlanPriceData): string {
+    // Free tier plans show "Free" instead of price (check raw value for API compatibility)
+    if ((price.currency as number) === 0) {
+      return 'Free';
+    }
+    
     const symbols: Record<Currency, string> = {
+      [Currency.Free]: '',
       [Currency.USD]: '$',
       [Currency.EUR]: '€',
       [Currency.EGP]: 'EGP ',
@@ -194,8 +222,30 @@ export class SubscriptionPlan {
       updates.createdBy ?? this.createdBy,
       updates.createdTimestamp ?? this.createdTimestamp,
       updates.lastModifiedBy ?? this.lastModifiedBy,
-      updates.lastModifiedTimestamp ?? this.lastModifiedTimestamp
+      updates.lastModifiedTimestamp ?? this.lastModifiedTimestamp,
+      // Entitlement fields
+      updates.isFreeTier ?? this.isFreeTier,
+      updates.fallbackAccessMode ?? this.fallbackAccessMode,
+      updates.exportGraceDays ?? this.exportGraceDays,
+      updates.defaultFallbackPlanId ?? this.defaultFallbackPlanId,
+      updates.defaultFallbackPlanName ?? this.defaultFallbackPlanName,
+      updates.showLockedModulesInMenu ?? this.showLockedModulesInMenu,
+      updates.lockedItemStyle ?? this.lockedItemStyle
     );
+  }
+
+  /**
+   * Check if plan has a fallback plan configured
+   */
+  get hasFallbackPlan(): boolean {
+    return !!this.defaultFallbackPlanId;
+  }
+
+  /**
+   * Check if this is a premium plan (not free tier)
+   */
+  get isPremium(): boolean {
+    return !this.isFreeTier;
   }
 }
 
@@ -215,6 +265,13 @@ export interface CreatePlanRequestData {
   customFeatures?: string[];
   projectIds?: string[];
   moduleIds?: string[];
+  // Enterprise Entitlement System fields
+  isFreeTier?: boolean;
+  fallbackAccessMode?: SubscriptionAccessMode;
+  exportGraceDays?: number;
+  defaultFallbackPlanId?: string | null;
+  showLockedModulesInMenu?: boolean;
+  lockedItemStyle?: string;
 }
 
 export class CreatePlanRequest {
@@ -230,6 +287,13 @@ export class CreatePlanRequest {
   public readonly customFeatures: string[];
   public readonly projectIds: string[];
   public readonly moduleIds: string[];
+  // Enterprise Entitlement System fields
+  public readonly isFreeTier: boolean;
+  public readonly fallbackAccessMode: SubscriptionAccessMode;
+  public readonly exportGraceDays: number;
+  public readonly defaultFallbackPlanId: string | null;
+  public readonly showLockedModulesInMenu: boolean;
+  public readonly lockedItemStyle: string;
 
   constructor(data: CreatePlanRequestData) {
     this.name = data.name;
@@ -244,29 +308,43 @@ export class CreatePlanRequest {
     this.customFeatures = data.customFeatures || [];
     this.projectIds = data.projectIds || [];
     this.moduleIds = data.moduleIds || [];
+    // Entitlement fields
+    this.isFreeTier = data.isFreeTier ?? false;
+    this.fallbackAccessMode = data.fallbackAccessMode ?? SubscriptionAccessMode.ReadOnly;
+    this.exportGraceDays = data.exportGraceDays ?? 30;
+    this.defaultFallbackPlanId = data.defaultFallbackPlanId ?? null;
+    this.showLockedModulesInMenu = data.showLockedModulesInMenu ?? true;
+    this.lockedItemStyle = data.lockedItemStyle ?? 'greyed_with_lock';
   }
 
   /**
    * Validate the request data
+   * Note: Free Tier plans don't need prices (backend auto-sets Free currency)
    */
   get isValid(): boolean {
-    return !!(
+    const hasValidName = !!(
       this.name &&
       this.name.trim().length >= 2 &&
-      this.name.length <= 150 &&
-      this.prices.length > 0
+      this.name.length <= 150
     );
+    
+    // Free Tier plans don't need prices
+    if (this.isFreeTier) {
+      return hasValidName;
+    }
+    
+    return hasValidName && this.prices.length > 0;
   }
 
   /**
    * Convert to JSON for API
+   * Note: Free Tier plans don't send prices (backend auto-sets)
    */
   toJSON() {
-    return {
+    const json: any = {
       name: this.name.trim(),
       description: this.description?.trim() || null,
       durationType: this.durationType,
-      prices: this.prices,
       allowTrial: this.allowTrial,
       trialDurationDays: this.trialDurationDays,
       autoRenew: this.autoRenew,
@@ -275,7 +353,21 @@ export class CreatePlanRequest {
       customFeatures: this.customFeatures,
       projectIds: this.projectIds,
       moduleIds: this.moduleIds,
+      // Entitlement fields
+      isFreeTier: this.isFreeTier,
+      fallbackAccessMode: this.fallbackAccessMode,
+      exportGraceDays: this.exportGraceDays,
+      defaultFallbackPlanId: this.defaultFallbackPlanId,
+      showLockedModulesInMenu: this.showLockedModulesInMenu,
+      lockedItemStyle: this.lockedItemStyle,
     };
+    
+    // Only include prices for non-free plans
+    if (!this.isFreeTier) {
+      json.prices = this.prices;
+    }
+    
+    return json;
   }
 }
 
@@ -296,6 +388,13 @@ export interface UpdatePlanRequestData {
   customFeatures?: string[];
   projectIds?: string[];
   moduleIds?: string[];
+  // Enterprise Entitlement System fields
+  isFreeTier?: boolean;
+  fallbackAccessMode?: SubscriptionAccessMode;
+  exportGraceDays?: number;
+  defaultFallbackPlanId?: string | null;
+  showLockedModulesInMenu?: boolean;
+  lockedItemStyle?: string;
 }
 
 export class UpdatePlanRequest {
@@ -312,6 +411,13 @@ export class UpdatePlanRequest {
   public readonly customFeatures?: string[];
   public readonly projectIds?: string[];
   public readonly moduleIds?: string[];
+  // Enterprise Entitlement System fields
+  public readonly isFreeTier?: boolean;
+  public readonly fallbackAccessMode?: SubscriptionAccessMode;
+  public readonly exportGraceDays?: number;
+  public readonly defaultFallbackPlanId?: string | null;
+  public readonly showLockedModulesInMenu?: boolean;
+  public readonly lockedItemStyle?: string;
 
   constructor(data: UpdatePlanRequestData) {
     this.id = data.id;
@@ -327,6 +433,13 @@ export class UpdatePlanRequest {
     this.customFeatures = data.customFeatures;
     this.projectIds = data.projectIds;
     this.moduleIds = data.moduleIds;
+    // Entitlement fields
+    this.isFreeTier = data.isFreeTier;
+    this.fallbackAccessMode = data.fallbackAccessMode;
+    this.exportGraceDays = data.exportGraceDays;
+    this.defaultFallbackPlanId = data.defaultFallbackPlanId;
+    this.showLockedModulesInMenu = data.showLockedModulesInMenu;
+    this.lockedItemStyle = data.lockedItemStyle;
   }
 
   /**
@@ -341,13 +454,15 @@ export class UpdatePlanRequest {
 
   /**
    * Convert to JSON for API
+   * Note: Free Tier plans don't send prices (backend auto-sets)
    */
   toJSON() {
     const data: any = {};
     if (this.name !== undefined) data.name = this.name?.trim() || null;
     if (this.description !== undefined) data.description = this.description?.trim() || null;
     if (this.durationType !== undefined) data.durationType = this.durationType;
-    if (this.prices !== undefined) data.prices = this.prices;
+    // Only include prices for non-free plans
+    if (this.prices !== undefined && !this.isFreeTier) data.prices = this.prices;
     if (this.allowTrial !== undefined) data.allowTrial = this.allowTrial;
     if (this.trialDurationDays !== undefined) data.trialDurationDays = this.trialDurationDays;
     if (this.autoRenew !== undefined) data.autoRenew = this.autoRenew;
@@ -356,6 +471,13 @@ export class UpdatePlanRequest {
     if (this.customFeatures !== undefined) data.customFeatures = this.customFeatures;
     if (this.projectIds !== undefined) data.projectIds = this.projectIds;
     if (this.moduleIds !== undefined) data.moduleIds = this.moduleIds;
+    // Entitlement fields
+    if (this.isFreeTier !== undefined) data.isFreeTier = this.isFreeTier;
+    if (this.fallbackAccessMode !== undefined) data.fallbackAccessMode = this.fallbackAccessMode;
+    if (this.exportGraceDays !== undefined) data.exportGraceDays = this.exportGraceDays;
+    if (this.defaultFallbackPlanId !== undefined) data.defaultFallbackPlanId = this.defaultFallbackPlanId;
+    if (this.showLockedModulesInMenu !== undefined) data.showLockedModulesInMenu = this.showLockedModulesInMenu;
+    if (this.lockedItemStyle !== undefined) data.lockedItemStyle = this.lockedItemStyle;
     return data;
   }
 }

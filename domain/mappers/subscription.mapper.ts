@@ -96,6 +96,17 @@ export class SubscriptionMapper {
       projects: json.projects || json.Projects || [],
       modules: json.modules || json.Modules || [],
       customFeatures: json.customFeatures || json.CustomFeatures || [],
+      // Enterprise Entitlement System fields
+      accessMode: json.accessMode ?? json.AccessMode ?? 1, // Default to Full
+      accessModeDisplay: json.accessModeDisplay || json.AccessModeDisplay || 'Full Access',
+      fallbackPlanId: json.fallbackPlanId || json.FallbackPlanId || null,
+      fallbackPlanName: json.fallbackPlanName || json.FallbackPlanName || null,
+      exportDeadlineUtc: json.exportDeadlineUtc || json.ExportDeadlineUtc || null,
+      entitlementsVersion: json.entitlementsVersion ?? json.EntitlementsVersion ?? 1,
+      accessRestrictionMessage: json.accessRestrictionMessage || json.AccessRestrictionMessage || null,
+      entitlementCount: json.entitlementCount ?? json.EntitlementCount ?? 0,
+      gracePeriodDays: json.gracePeriodDays ?? json.GracePeriodDays ?? 0,
+      exportGraceDays: json.exportGraceDays ?? json.ExportGraceDays ?? 30,
     };
 
     const subscription = new Subscription(data);
@@ -127,6 +138,17 @@ export class SubscriptionMapper {
       offlineLicenseKey: subscription.offlineLicenseKey,
       licenseKeyGeneratedAt: subscription.licenseKeyGeneratedAt?.toISOString() || null,
       licenseKeyVersion: subscription.licenseKeyVersion,
+      // Entitlement fields
+      accessMode: subscription.accessMode,
+      accessModeDisplay: subscription.accessModeDisplay,
+      fallbackPlanId: subscription.fallbackPlanId,
+      fallbackPlanName: subscription.fallbackPlanName,
+      exportDeadlineUtc: subscription.exportDeadlineUtc?.toISOString() || null,
+      entitlementsVersion: subscription.entitlementsVersion,
+      accessRestrictionMessage: subscription.accessRestrictionMessage,
+      entitlementCount: subscription.entitlementCount,
+      gracePeriodDays: subscription.gracePeriodDays,
+      exportGraceDays: subscription.exportGraceDays,
     };
   }
 

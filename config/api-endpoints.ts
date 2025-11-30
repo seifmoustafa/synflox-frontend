@@ -104,6 +104,7 @@ export const API_ENDPOINTS = {
     GET_ALL: "/plans",
     BY_ID: (id: string) => `/plans/${id}`,
     CREATE: "/plans",
+    FREE_TIER: "/plans/free-tier",
   },
   
   // Subscriptions Management

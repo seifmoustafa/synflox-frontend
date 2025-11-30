@@ -21,6 +21,7 @@ export interface ISubscriptionPlanService {
   createPlan(request: CreatePlanRequest): Promise<SubscriptionPlan>;
   updatePlan(request: UpdatePlanRequest): Promise<SubscriptionPlan>;
   deletePlan(id: string): Promise<void>;
+  getFreeTierPlans(): Promise<SubscriptionPlan[]>;
 }
 
 /**
@@ -133,6 +134,22 @@ export class SubscriptionPlanService implements ISubscriptionPlanService {
     } catch (error: any) {
       // Note: Error notification handled by generic CRUD viewmodel
       throw error;
+    }
+  }
+
+  /**
+   * Get all free tier plans (for fallback plan dropdown)
+   */
+  async getFreeTierPlans(): Promise<SubscriptionPlan[]> {
+    try {
+      const response = await this.apiService.get<any>(
+        API_ENDPOINTS.PLANS.FREE_TIER
+      );
+      const result = SubscriptionPlanMapper.handleApiResponse(response);
+      return result.plans;
+    } catch (error: any) {
+      // Return empty array on error - fallback dropdown will just be empty
+      return [];
     }
   }
 }

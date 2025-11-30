@@ -1239,6 +1239,21 @@ export const ar = {
     gracePeriod: "فترة السماح (بالأيام)",
     gracePeriodHelper: "الأيام بعد انتهاء الصلاحية قبل الإنهاء (0-30)",
     gracePeriodRangeHelper: "0-30 يوماً",
+    exportGraceDays: "فترة تصدير البيانات (بالأيام)",
+    exportGraceDaysHelper: "الأيام المسموح بها لتصدير البيانات بعد الحظر (0-90)",
+    isFreeTier: "خطة مجانية",
+    isFreeTierHelper: "تحديد هذه الخطة كخطة مجانية بصلاحيات محدودة",
+    fallbackAccessMode: "وضع الوصول الاحتياطي",
+    fallbackAccessModeHelper: "وضع الوصول عند انتهاء الاشتراك",
+    defaultFallbackPlan: "الخطة الاحتياطية الافتراضية",
+    defaultFallbackPlanHelper: "الخطة المجانية للرجوع إليها عند انتهاء الاشتراك",
+    showLockedModulesInMenu: "إظهار الوحدات المقفلة",
+    showLockedModulesInMenuHelper: "عرض الوحدات المقفلة في القائمة مع أيقونة القفل",
+    accessModes: {
+      readOnly: "قراءة فقط",
+      exportOnly: "تصدير فقط",
+      blocked: "محظور",
+    },
     nameHelper: "2-150 حرفاً",
     descriptionHelper: "بحد أقصى 2000 حرف",
     trialDurationHelper: "1-60 يوماً (مطلوب عند تفعيل التجربة)",
@@ -1289,6 +1304,27 @@ export const ar = {
       unknown: "غير معروف",
     },
     
+    // Access Mode (Entitlement System)
+    accessMode: {
+      label: "وضع الوصول",
+      none: "لا شيء",
+      full: "وصول كامل",
+      gracePeriod: "فترة السماح",
+      readOnly: "قراءة فقط",
+      exportOnly: "تصدير فقط",
+      blocked: "محظور",
+    },
+    accessModeWarning: {
+      gracePeriod: "الاشتراك ينتهي قريباً. يرجى التجديد للحفاظ على الوصول الكامل.",
+      readOnly: "مقيد بالقراءة فقط. قم بالترقية لاستعادة الوظائف الكاملة.",
+      exportOnly: "وضع التصدير فقط. متبقي {days} يوم لتصدير بياناتك.",
+      blocked: "تم حظر الوصول. يرجى تجديد أو ترقية اشتراكك.",
+    },
+    entitlements: "الاستحقاقات",
+    entitlementCount: "الميزات المستحقة",
+    fallbackPlan: "الخطة البديلة",
+    exportDeadline: "موعد انتهاء التصدير",
+    
     // Operations
     operations: {
       view: "عرض التفاصيل",
@@ -1305,6 +1341,7 @@ export const ar = {
       reactivate: "إعادة تفعيل",
       confirmCancel: "تأكيد الإلغاء",
       cancelConfirmation: "هل أنت متأكد من إلغاء هذا الاشتراك؟ لا يمكن التراجع عن هذا الإجراء.",
+      upgrade:"ترقية"
     },
     
     // Upgrade Dialog

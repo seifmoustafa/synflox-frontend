@@ -19,9 +19,10 @@ export function useSubscriptionPlanViewModel() {
   const { subscriptionPlanService, projectService, moduleService } = useServices();
   const { t } = useI18n();
   
-  // Load projects and modules for dropdowns
+  // Load projects, modules, and free tier plans for dropdowns
   const [projectOptions, setProjectOptions] = React.useState<Array<{value: string, label: string}>>([]);
   const [moduleOptions, setModuleOptions] = React.useState<Array<{value: string, label: string}>>([]);
+  const [freeTierPlanOptions, setFreeTierPlanOptions] = React.useState<Array<{value: string, label: string}>>([]);
 
   React.useEffect(() => {
     // Load projects
@@ -39,7 +40,15 @@ export function useSubscriptionPlanViewModel() {
         label: m.name
       })));
     });
-  }, [projectService, moduleService]);
+
+    // Load free tier plans for fallback dropdown
+    subscriptionPlanService.getFreeTierPlans().then(plans => {
+      setFreeTierPlanOptions(plans.map((p: any) => ({
+        value: p.id,
+        label: p.name
+      })));
+    });
+  }, [projectService, moduleService, subscriptionPlanService]);
 
   // ⭐ CUSTOM VALIDATION: At least one project or module required
   const validatePlanContent = (formData: any): string | null => {
@@ -76,6 +85,10 @@ export function useSubscriptionPlanViewModel() {
       autoRenew: data.autoRenew,
       upgradePolicy: data.upgradePolicy ? parseInt(data.upgradePolicy) : undefined,
       gracePeriodDays: data.gracePeriodDays,
+      exportGraceDays: data.exportGraceDays,
+      isFreeTier: data.isFreeTier,
+      fallbackAccessMode: data.fallbackAccessMode ? parseInt(data.fallbackAccessMode) : undefined,
+      showLockedModulesInMenu: data.showLockedModulesInMenu,
       customFeatures: data.customFeatures || [],
       projectIds: data.projectIds || [],
       moduleIds: data.moduleIds || [],
@@ -107,6 +120,10 @@ export function useSubscriptionPlanViewModel() {
       autoRenew: data.autoRenew,
       upgradePolicy: data.upgradePolicy ? parseInt(data.upgradePolicy) : undefined,
       gracePeriodDays: data.gracePeriodDays,
+      exportGraceDays: data.exportGraceDays,
+      isFreeTier: data.isFreeTier,
+      fallbackAccessMode: data.fallbackAccessMode ? parseInt(data.fallbackAccessMode) : undefined,
+      showLockedModulesInMenu: data.showLockedModulesInMenu,
       customFeatures: data.customFeatures || [],
       projectIds: data.projectIds || [],
       moduleIds: data.moduleIds || [],
@@ -207,6 +224,12 @@ export function useSubscriptionPlanViewModel() {
           helperText: t("plan.descriptionHelper"),
         },
         {
+          name: "isFreeTier",
+          label: t("plan.isFreeTier"),
+          type: "checkbox" as const,
+          helperText: t("plan.isFreeTierHelper"),
+        },
+        {
           name: "durationType",
           label: t("plan.durationType"),
           type: "select" as const,
@@ -219,6 +242,7 @@ export function useSubscriptionPlanViewModel() {
             { value: "6", label: t("plan.duration.yearly") },
             { value: "99", label: t("plan.duration.lifetime") },
           ],
+          isVisible: (formData: any) => !formData.isFreeTier, // Hide for Free Tier (forced to Lifetime)
         },
         {
           name: "currency",
@@ -236,6 +260,7 @@ export function useSubscriptionPlanViewModel() {
             { value: "7", label: t("plan.currencies.jpy") },
             { value: "8", label: t("plan.currencies.cny") },
           ],
+          isVisible: (formData: any) => !formData.isFreeTier, // Hide for Free Tier (price is 0)
         },
         {
           name: "amount",
@@ -244,13 +269,14 @@ export function useSubscriptionPlanViewModel() {
           required: true,
           placeholder: "99.99",
           helperText: t("plan.amount"),
+          isVisible: (formData: any) => !formData.isFreeTier, // Hide for Free Tier (price is 0)
         },
         {
           name: "allowTrial",
           label: t("plan.allowTrial"),
           type: "checkbox" as const,
           helperText: t("plan.trialHelper"),
-          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime plans
+          isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier, // Hide for Lifetime or Free Tier
         },
         {
           name: "trialDurationDays",
@@ -261,14 +287,14 @@ export function useSubscriptionPlanViewModel() {
           min: 1,
           max: 60,
           helperText: t("plan.trialDurationHelper"),
-          isVisible: (formData: any) => formData.durationType !== "99" && formData.allowTrial === true, // Show only if not Lifetime AND trial enabled
+          isVisible: (formData: any) => formData.durationType !== "99" && formData.allowTrial === true && !formData.isFreeTier, // Show only if not Lifetime AND trial enabled AND not Free Tier
         },
         {
           name: "autoRenew",
           label: t("plan.autoRenew"),
           type: "checkbox" as const,
           helperText: t("plan.autoRenewHelper"),
-          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime plans
+          isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier, // Hide for Lifetime or Free Tier
         },
         {
           name: "upgradePolicy",
@@ -280,7 +306,7 @@ export function useSubscriptionPlanViewModel() {
             { value: "1", label: t("plan.upgradePolicies.prorated") },
             { value: "2", label: t("plan.upgradePolicies.deferred") },
           ],
-          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime (forced to FullReplace)
+          isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier, // Hide for Lifetime or Free Tier
         },
         {
           name: "gracePeriodDays",
@@ -290,7 +316,44 @@ export function useSubscriptionPlanViewModel() {
           min: 0,
           max: 30,
           helperText: t("plan.gracePeriodRangeHelper"),
-          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime (forced to 0)
+          isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier, // Hide for Lifetime or Free Tier
+        },
+        {
+          name: "exportGraceDays",
+          label: t("plan.exportGraceDays"),
+          type: "number" as const,
+          placeholder: "30",
+          min: 0,
+          max: 90,
+          helperText: t("plan.exportGraceDaysHelper"),
+          isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier, // Hide for Lifetime or Free Tier
+        },
+        {
+          name: "defaultFallbackPlanId",
+          label: t("plan.defaultFallbackPlan"),
+          type: "select" as const,
+          options: [{ value: "", label: t("common.none") }, ...freeTierPlanOptions],
+          helperText: t("plan.defaultFallbackPlanHelper"),
+          isVisible: (formData: any) => !formData.isFreeTier && formData.durationType !== "99", // Hide for Free Tier or Lifetime (no expiry = no fallback)
+        },
+        {
+          name: "fallbackAccessMode",
+          label: t("plan.fallbackAccessMode"),
+          type: "select" as const,
+          options: [
+            { value: "2", label: t("plan.accessModes.readOnly") },
+            { value: "3", label: t("plan.accessModes.exportOnly") },
+            { value: "4", label: t("plan.accessModes.blocked") },
+          ],
+          helperText: t("plan.fallbackAccessModeHelper"),
+          isVisible: (formData: any) => !formData.isFreeTier && formData.durationType !== "99", // Hide for Free Tier or Lifetime (no expiry = no fallback mode)
+        },
+        {
+          name: "showLockedModulesInMenu",
+          label: t("plan.showLockedModulesInMenu"),
+          type: "checkbox" as const,
+          helperText: t("plan.showLockedModulesInMenuHelper"),
+          isVisible: (formData: any) => !formData.isFreeTier, // Hide for Free Tier only (Lifetime can still show locked modules)
         },
         {
           name: "customFeatures",
@@ -334,10 +397,17 @@ export function useSubscriptionPlanViewModel() {
           helperText: t("plan.descriptionHelper"),
         },
         {
+          name: "isFreeTier",
+          label: t("plan.isFreeTier"),
+          type: "checkbox" as const,
+          helperText: t("plan.isFreeTierHelper"),
+        },
+        {
           name: "durationType",
           label: t("plan.durationType"),
           type: "select" as const,
           required: true,
+          isVisible: (formData: any) => !formData.isFreeTier, // Hide for Free Tier (forced to Lifetime)
           helperText: t("plan.duration.monthly"),
           options: [
             { value: "1", label: t("plan.duration.weekly") },
@@ -363,6 +433,7 @@ export function useSubscriptionPlanViewModel() {
             { value: "7", label: t("plan.currencies.jpy") },
             { value: "8", label: t("plan.currencies.cny") },
           ],
+          isVisible: (formData: any) => !formData.isFreeTier, // Hide for Free Tier (price is 0)
         },
         {
           name: "amount",
@@ -371,13 +442,14 @@ export function useSubscriptionPlanViewModel() {
           required: true,
           placeholder: "99.99",
           helperText: t("plan.amount"),
+          isVisible: (formData: any) => !formData.isFreeTier, // Hide for Free Tier (price is 0)
         },
         {
           name: "allowTrial",
           label: t("plan.allowTrial"),
           type: "checkbox" as const,
           helperText: t("plan.trialHelper"),
-          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime plans
+          isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier, // Hide for Lifetime or Free Tier
         },
         {
           name: "trialDurationDays",
@@ -388,14 +460,14 @@ export function useSubscriptionPlanViewModel() {
           min: 1,
           max: 60,
           helperText: t("plan.trialDurationHelper"),
-          isVisible: (formData: any) => formData.durationType !== "99" && formData.allowTrial === true, // Show only if not Lifetime AND trial enabled
+          isVisible: (formData: any) => formData.durationType !== "99" && formData.allowTrial === true && !formData.isFreeTier, // Show only if not Lifetime AND trial enabled AND not Free Tier
         },
         {
           name: "autoRenew",
           label: t("plan.autoRenew"),
           type: "checkbox" as const,
           helperText: t("plan.autoRenewHelper"),
-          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime plans
+          isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier, // Hide for Lifetime or Free Tier
         },
         {
           name: "upgradePolicy",
@@ -407,7 +479,7 @@ export function useSubscriptionPlanViewModel() {
             { value: "1", label: t("plan.upgradePolicies.prorated") },
             { value: "2", label: t("plan.upgradePolicies.deferred") },
           ],
-          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime (forced to FullReplace)
+          isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier, // Hide for Lifetime or Free Tier
         },
         {
           name: "gracePeriodDays",
@@ -417,7 +489,44 @@ export function useSubscriptionPlanViewModel() {
           min: 0,
           max: 30,
           helperText: t("plan.gracePeriodRangeHelper"),
-          isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime (forced to 0)
+          isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier, // Hide for Lifetime or Free Tier
+        },
+        {
+          name: "exportGraceDays",
+          label: t("plan.exportGraceDays"),
+          type: "number" as const,
+          placeholder: "30",
+          min: 0,
+          max: 90,
+          helperText: t("plan.exportGraceDaysHelper"),
+          isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier, // Hide for Lifetime or Free Tier
+        },
+        {
+          name: "defaultFallbackPlanId",
+          label: t("plan.defaultFallbackPlan"),
+          type: "select" as const,
+          options: [{ value: "", label: t("common.none") }, ...freeTierPlanOptions],
+          helperText: t("plan.defaultFallbackPlanHelper"),
+          isVisible: (formData: any) => !formData.isFreeTier && formData.durationType !== "99", // Hide for Free Tier or Lifetime (no expiry = no fallback)
+        },
+        {
+          name: "fallbackAccessMode",
+          label: t("plan.fallbackAccessMode"),
+          type: "select" as const,
+          options: [
+            { value: "2", label: t("plan.accessModes.readOnly") },
+            { value: "3", label: t("plan.accessModes.exportOnly") },
+            { value: "4", label: t("plan.accessModes.blocked") },
+          ],
+          helperText: t("plan.fallbackAccessModeHelper"),
+          isVisible: (formData: any) => !formData.isFreeTier && formData.durationType !== "99", // Hide for Free Tier or Lifetime (no expiry = no fallback mode)
+        },
+        {
+          name: "showLockedModulesInMenu",
+          label: t("plan.showLockedModulesInMenu"),
+          type: "checkbox" as const,
+          helperText: t("plan.showLockedModulesInMenuHelper"),
+          isVisible: (formData: any) => !formData.isFreeTier, // Hide for Free Tier only (Lifetime can still show locked modules)
         },
         {
           name: "customFeatures",
@@ -451,6 +560,10 @@ export function useSubscriptionPlanViewModel() {
         autoRenew: false,
         upgradePolicy: 0, // FullReplace by default
         gracePeriodDays: 0,
+        exportGraceDays: 30,
+        isFreeTier: false,
+        fallbackAccessMode: "2", // ReadOnly
+        showLockedModulesInMenu: true,
         customFeatures: [],
         projectIds: [],
         moduleIds: [],
@@ -466,6 +579,10 @@ export function useSubscriptionPlanViewModel() {
         autoRenew: plan.autoRenew,
         upgradePolicy: plan.upgradePolicy?.toString() || "0", // Convert to string for select
         gracePeriodDays: plan.gracePeriodDays,
+        exportGraceDays: plan.exportGraceDays,
+        isFreeTier: plan.isFreeTier,
+        fallbackAccessMode: plan.fallbackAccessMode?.toString() || "2",
+        showLockedModulesInMenu: plan.showLockedModulesInMenu,
         customFeatures: plan.customFeatures || [],
         projectIds: plan.projects?.map(p => p.id) || [],
         moduleIds: plan.modules?.map(m => m.id) || [],

@@ -46,7 +46,15 @@ export class SubscriptionPlanMapper {
       data.createdBy ?? null,
       data.createdTimestamp ?? null,
       data.lastModifiedBy ?? null,
-      data.lastModifiedTimestamp ?? null
+      data.lastModifiedTimestamp ?? null,
+      // Entitlement fields
+      data.isFreeTier ?? false,
+      data.fallbackAccessMode ?? 3, // Default to ReadOnly
+      data.exportGraceDays ?? 30,
+      data.defaultFallbackPlanId ?? null,
+      data.defaultFallbackPlanName ?? null,
+      data.showLockedModulesInMenu ?? true,
+      data.lockedItemStyle ?? 'greyed_with_lock'
     );
   }
 
@@ -74,6 +82,14 @@ export class SubscriptionPlanMapper {
       createdTimestamp: plan.createdTimestamp,
       lastModifiedBy: plan.lastModifiedBy,
       lastModifiedTimestamp: plan.lastModifiedTimestamp,
+      // Entitlement fields
+      isFreeTier: plan.isFreeTier,
+      fallbackAccessMode: plan.fallbackAccessMode,
+      exportGraceDays: plan.exportGraceDays,
+      defaultFallbackPlanId: plan.defaultFallbackPlanId,
+      defaultFallbackPlanName: plan.defaultFallbackPlanName,
+      showLockedModulesInMenu: plan.showLockedModulesInMenu,
+      lockedItemStyle: plan.lockedItemStyle,
     };
   }
 
