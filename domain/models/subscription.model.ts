@@ -71,9 +71,13 @@ export interface SubscriptionData {
   currency: Currency;
   amount: number;
   statusReason?: string | null;
-  nextPlanId?: string | null;
-  nextPlanName?: string | null;
-  nextPlanStartDateUtc?: string | null;
+  // Next subscription for deferred upgrades
+  nextSubscriptionId?: string | null;
+  nextSubscriptionPlanName?: string | null;
+  nextSubscriptionActivationDateUtc?: string | null;
+  // Subscription chain (for upgrades/renewals)
+  parentSubscriptionId?: string | null;
+  parentSubscriptionDisplayName?: string | null;
   offlineLicenseKey?: string | null;
   licenseKeyGeneratedAt?: string | null;
   licenseKeyVersion: number;
@@ -94,8 +98,9 @@ export interface SubscriptionData {
   // Enterprise Entitlement System fields
   accessMode?: SubscriptionAccessMode;
   accessModeDisplay?: string;
-  fallbackPlanId?: string | null;
-  fallbackPlanName?: string | null;
+  // Default fallback from plan (read-only)
+  defaultFallbackPlanId?: string | null;
+  defaultFallbackPlanName?: string | null;
   exportDeadlineUtc?: string | null;
   entitlementsVersion?: number;
   accessRestrictionMessage?: string | null;
@@ -151,9 +156,13 @@ export class Subscription {
   readonly currency: Currency;
   readonly amount: number;
   readonly statusReason?: string | null;
-  readonly nextPlanId?: string | null;
-  readonly nextPlanName?: string | null;
-  readonly nextPlanStartDateUtc?: Date | null;
+  // Next subscription for deferred upgrades
+  readonly nextSubscriptionId?: string | null;
+  readonly nextSubscriptionPlanName?: string | null;
+  readonly nextSubscriptionActivationDateUtc?: Date | null;
+  // Subscription chain
+  readonly parentSubscriptionId?: string | null;
+  readonly parentSubscriptionDisplayName?: string | null;
   readonly offlineLicenseKey?: string | null;
   readonly licenseKeyGeneratedAt?: Date | null;
   readonly licenseKeyVersion: number;
@@ -167,8 +176,8 @@ export class Subscription {
   // Enterprise Entitlement System fields
   readonly accessMode: SubscriptionAccessMode;
   readonly accessModeDisplay: string;
-  readonly fallbackPlanId?: string | null;
-  readonly fallbackPlanName?: string | null;
+  readonly defaultFallbackPlanId?: string | null;
+  readonly defaultFallbackPlanName?: string | null;
   readonly exportDeadlineUtc?: Date | null;
   readonly entitlementsVersion: number;
   readonly accessRestrictionMessage?: string | null;
@@ -203,11 +212,15 @@ export class Subscription {
     this.currency = data.currency;
     this.amount = data.amount;
     this.statusReason = data.statusReason;
-    this.nextPlanId = data.nextPlanId;
-    this.nextPlanName = data.nextPlanName;
-    this.nextPlanStartDateUtc = data.nextPlanStartDateUtc
-      ? new Date(data.nextPlanStartDateUtc)
+    // Next subscription for deferred upgrades
+    this.nextSubscriptionId = data.nextSubscriptionId || null;
+    this.nextSubscriptionPlanName = data.nextSubscriptionPlanName || null;
+    this.nextSubscriptionActivationDateUtc = data.nextSubscriptionActivationDateUtc
+      ? new Date(data.nextSubscriptionActivationDateUtc)
       : null;
+    // Subscription chain
+    this.parentSubscriptionId = data.parentSubscriptionId || null;
+    this.parentSubscriptionDisplayName = data.parentSubscriptionDisplayName || null;
     this.offlineLicenseKey = data.offlineLicenseKey;
     this.licenseKeyGeneratedAt = data.licenseKeyGeneratedAt
       ? new Date(data.licenseKeyGeneratedAt)
@@ -223,8 +236,8 @@ export class Subscription {
     // Set entitlement system fields
     this.accessMode = data.accessMode ?? SubscriptionAccessMode.Full;
     this.accessModeDisplay = data.accessModeDisplay || 'Full Access';
-    this.fallbackPlanId = data.fallbackPlanId || null;
-    this.fallbackPlanName = data.fallbackPlanName || null;
+    this.defaultFallbackPlanId = data.defaultFallbackPlanId || null;
+    this.defaultFallbackPlanName = data.defaultFallbackPlanName || null;
     this.exportDeadlineUtc = data.exportDeadlineUtc ? new Date(data.exportDeadlineUtc) : null;
     this.entitlementsVersion = data.entitlementsVersion ?? 1;
     this.accessRestrictionMessage = data.accessRestrictionMessage || null;
@@ -305,7 +318,21 @@ export class Subscription {
    * Check if has scheduled upgrade (deferred)
    */
   get hasScheduledUpgrade(): boolean {
-    return !!this.nextPlanId && !!this.nextPlanStartDateUtc;
+    return !!this.nextSubscriptionId && !!this.nextSubscriptionActivationDateUtc;
+  }
+
+  /**
+   * Check if this subscription was created from an upgrade/renewal
+   */
+  get hasParentSubscription(): boolean {
+    return !!this.parentSubscriptionId;
+  }
+
+  /**
+   * Check if has a fallback plan configured (from plan)
+   */
+  get hasFallbackPlan(): boolean {
+    return !!this.defaultFallbackPlanId;
   }
 
   /**
@@ -508,17 +535,21 @@ export class Subscription {
       currency: this.currency,
       amount: this.amount,
       statusReason: this.statusReason,
-      nextPlanId: this.nextPlanId,
-      nextPlanName: this.nextPlanName,
-      nextPlanStartDateUtc: this.nextPlanStartDateUtc?.toISOString() || null,
+      // Next subscription for deferred upgrades
+      nextSubscriptionId: this.nextSubscriptionId,
+      nextSubscriptionPlanName: this.nextSubscriptionPlanName,
+      nextSubscriptionActivationDateUtc: this.nextSubscriptionActivationDateUtc?.toISOString() || null,
+      // Subscription chain
+      parentSubscriptionId: this.parentSubscriptionId,
+      parentSubscriptionDisplayName: this.parentSubscriptionDisplayName,
       offlineLicenseKey: this.offlineLicenseKey,
       licenseKeyGeneratedAt: this.licenseKeyGeneratedAt?.toISOString() || null,
       licenseKeyVersion: this.licenseKeyVersion,
       // Entitlement fields
       accessMode: this.accessMode,
       accessModeDisplay: this.accessModeDisplay,
-      fallbackPlanId: this.fallbackPlanId,
-      fallbackPlanName: this.fallbackPlanName,
+      defaultFallbackPlanId: this.defaultFallbackPlanId,
+      defaultFallbackPlanName: this.defaultFallbackPlanName,
       exportDeadlineUtc: this.exportDeadlineUtc?.toISOString() || null,
       entitlementsVersion: this.entitlementsVersion,
       accessRestrictionMessage: this.accessRestrictionMessage,
@@ -590,28 +621,31 @@ export class SubscriptionStatus {
 export class CreateSubscriptionRequest {
   readonly companyId: string;
   readonly planId: string;
-  readonly currency?: Currency | null; // Optional - backend will auto-select from plan
+  readonly currency?: Currency | null;
+  readonly customAmount?: number | null; // Override plan price
+  readonly startDateUtc?: string | null; // Custom start date
   readonly startWithTrial: boolean;
   readonly autoRenew?: boolean | null;
-  readonly nextPlanId?: string | null;
-  readonly nextPlanStartDateUtc?: string | null;
+  readonly statusReason?: string | null; // Notes/reason
 
   constructor(data: {
     companyId: string;
     planId: string;
-    currency?: Currency | null; // Optional - backend will auto-select from plan
+    currency?: Currency | null;
+    customAmount?: number | null;
+    startDateUtc?: string | null;
     startWithTrial?: boolean;
     autoRenew?: boolean | null;
-    nextPlanId?: string | null;
-    nextPlanStartDateUtc?: string | null;
+    statusReason?: string | null;
   }) {
     this.companyId = data.companyId;
     this.planId = data.planId;
     this.currency = data.currency;
+    this.customAmount = data.customAmount;
+    this.startDateUtc = data.startDateUtc;
     this.startWithTrial = data.startWithTrial ?? false;
     this.autoRenew = data.autoRenew;
-    this.nextPlanId = data.nextPlanId;
-    this.nextPlanStartDateUtc = data.nextPlanStartDateUtc;
+    this.statusReason = data.statusReason;
   }
 
   /**
@@ -628,15 +662,17 @@ export class CreateSubscriptionRequest {
    * Convert to API format
    */
   toJson(): any {
-    return {
+    const json: any = {
       companyId: this.companyId,
       planId: this.planId,
-      currency: this.currency,
       startWithTrial: this.startWithTrial,
       autoRenew: this.autoRenew,
-      nextPlanId: this.nextPlanId,
-      nextPlanStartDateUtc: this.nextPlanStartDateUtc,
     };
+    if (this.currency) json.currency = this.currency;
+    if (this.customAmount) json.amount = this.customAmount; // Backend expects 'amount'
+    if (this.startDateUtc) json.startDateUtc = this.startDateUtc;
+    if (this.statusReason) json.statusReason = this.statusReason;
+    return json;
   }
 }
 

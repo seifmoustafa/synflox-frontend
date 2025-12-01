@@ -43,6 +43,8 @@ export class SubscriptionPlanMapper {
       data.prices || [],
       data.projects || [],
       data.modules || [],
+      data.projectCount ?? 0,
+      data.moduleCount ?? 0,
       data.createdBy ?? null,
       data.createdTimestamp ?? null,
       data.lastModifiedBy ?? null,
@@ -54,7 +56,14 @@ export class SubscriptionPlanMapper {
       data.defaultFallbackPlanId ?? null,
       data.defaultFallbackPlanName ?? null,
       data.showLockedModulesInMenu ?? true,
-      data.lockedItemStyle ?? 'greyed_with_lock'
+      data.lockedItemStyle ?? 'greyed_with_lock',
+      // Plan Hierarchy
+      data.parentPlanId ?? null,
+      data.parentPlanName ?? null,
+      data.displayOrder ?? 0,
+      data.childPlanCount ?? 0,
+      data.inheritedProjectsCount ?? 0,
+      data.inheritedModulesCount ?? 0
     );
   }
 
@@ -90,6 +99,13 @@ export class SubscriptionPlanMapper {
       defaultFallbackPlanName: plan.defaultFallbackPlanName,
       showLockedModulesInMenu: plan.showLockedModulesInMenu,
       lockedItemStyle: plan.lockedItemStyle,
+      // Plan Hierarchy
+      parentPlanId: plan.parentPlanId,
+      parentPlanName: plan.parentPlanName,
+      displayOrder: plan.displayOrder,
+      childPlanCount: plan.childPlanCount,
+      inheritedProjectsCount: plan.inheritedProjectsCount,
+      inheritedModulesCount: plan.inheritedModulesCount,
     };
   }
 

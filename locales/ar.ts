@@ -1259,6 +1259,16 @@ export const ar = {
     trialDurationHelper: "1-60 يوماً (مطلوب عند تفعيل التجربة)",
     mustIncludeContent: "يجب أن تتضمن الخطة مشروعاً واحداً أو وحدة واحدة على الأقل",
     notFound: "الخطة غير موجودة",
+    // Plan Hierarchy
+    parentPlan: "الخطة الأم",
+    parentPlanHelper: "وراثة المشاريع والوحدات من خطة أم",
+    displayOrder: "ترتيب العرض",
+    displayOrderHelper: "ترتيب فرز الخطط (الأقل = الأولوية الأعلى)",
+    parentPlanName: "يرث من",
+    childPlanCount: "الخطط الفرعية",
+    inheritedProjects: "المشاريع الموروثة",
+    inheritedModules: "الوحدات الموروثة",
+    inherited: "موروثة",
   },
 
   // Subscriptions
@@ -1280,15 +1290,23 @@ export const ar = {
     plan: "الخطة",
     planHelper: "اختر خطة الاشتراك",
     currency: "العملة",
+    currencyHelper: "اختر عملة الدفع لهذا الاشتراك",
     selectCurrency: "اختر عملة الدفع",
+    customAmount: "مبلغ مخصص",
+    customAmountPlaceholder: "اتركه فارغاً لاستخدام سعر الخطة",
+    customAmountHelper: "تجاوز سعر الخطة بمبلغ مخصص (اختياري)",
     startWithTrial: "البدء بفترة تجريبية",
     trialHelper: "بدء الاشتراك في وضع التجربة (إذا كانت الخطة تسمح)",
     autoRenew: "التجديد التلقائي",
     autoRenewHelper: "تجديد تلقائي عند انتهاء الاشتراك",
     startDate: "تاريخ البداية",
+    startDateHelper: "متى يجب أن يبدأ الاشتراك (الافتراضي: اليوم)",
     expiryDate: "تاريخ الانتهاء",
     daysRemaining: "الأيام المتبقية",
     amount: "المبلغ",
+    notes: "ملاحظات",
+    notesPlaceholder: "أضف أي ملاحظات حول هذا الاشتراك...",
+    notesHelper: "ملاحظات داخلية لهذا الاشتراك (بحد أقصى 500 حرف)",
     dateUnknown: "تاريخ غير معروف",
     lifetime: "مدى الحياة",
     
@@ -4101,6 +4119,7 @@ export const ar = {
 
   // Common
   common: {
+    none:"لا شيء",
     optional:"إختياري",
     processing:"جاري معالجة...",
     items:"الميزات",

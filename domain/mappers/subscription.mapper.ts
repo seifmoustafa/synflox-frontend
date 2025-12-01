@@ -76,9 +76,13 @@ export class SubscriptionMapper {
       currency: json.currency ?? 1, // Default to USD
       amount: json.amount ?? 0,
       statusReason: json.statusReason || null,
-      nextPlanId: json.nextPlanId || null,
-      nextPlanName: json.nextPlanName || null,
-      nextPlanStartDateUtc: json.nextPlanStartDateUtc || null,
+      // Next subscription for deferred upgrades
+      nextSubscriptionId: json.nextSubscriptionId || null,
+      nextSubscriptionPlanName: json.nextSubscriptionPlanName || null,
+      nextSubscriptionActivationDateUtc: json.nextSubscriptionActivationDateUtc || null,
+      // Subscription chain
+      parentSubscriptionId: json.parentSubscriptionId || null,
+      parentSubscriptionDisplayName: json.parentSubscriptionDisplayName || null,
       offlineLicenseKey: json.offlineLicenseKey || null,
       licenseKeyGeneratedAt: json.licenseKeyGeneratedAt || null,
       licenseKeyVersion: json.licenseKeyVersion || 0,
@@ -99,8 +103,8 @@ export class SubscriptionMapper {
       // Enterprise Entitlement System fields
       accessMode: json.accessMode ?? json.AccessMode ?? 1, // Default to Full
       accessModeDisplay: json.accessModeDisplay || json.AccessModeDisplay || 'Full Access',
-      fallbackPlanId: json.fallbackPlanId || json.FallbackPlanId || null,
-      fallbackPlanName: json.fallbackPlanName || json.FallbackPlanName || null,
+      defaultFallbackPlanId: json.defaultFallbackPlanId || json.DefaultFallbackPlanId || null,
+      defaultFallbackPlanName: json.defaultFallbackPlanName || json.DefaultFallbackPlanName || null,
       exportDeadlineUtc: json.exportDeadlineUtc || json.ExportDeadlineUtc || null,
       entitlementsVersion: json.entitlementsVersion ?? json.EntitlementsVersion ?? 1,
       accessRestrictionMessage: json.accessRestrictionMessage || json.AccessRestrictionMessage || null,
@@ -132,17 +136,21 @@ export class SubscriptionMapper {
       currency: subscription.currency,
       amount: subscription.amount,
       statusReason: subscription.statusReason,
-      nextPlanId: subscription.nextPlanId,
-      nextPlanName: subscription.nextPlanName,
-      nextPlanStartDateUtc: subscription.nextPlanStartDateUtc?.toISOString() || null,
+      // Next subscription for deferred upgrades
+      nextSubscriptionId: subscription.nextSubscriptionId,
+      nextSubscriptionPlanName: subscription.nextSubscriptionPlanName,
+      nextSubscriptionActivationDateUtc: subscription.nextSubscriptionActivationDateUtc?.toISOString() || null,
+      // Subscription chain
+      parentSubscriptionId: subscription.parentSubscriptionId,
+      parentSubscriptionDisplayName: subscription.parentSubscriptionDisplayName,
       offlineLicenseKey: subscription.offlineLicenseKey,
       licenseKeyGeneratedAt: subscription.licenseKeyGeneratedAt?.toISOString() || null,
       licenseKeyVersion: subscription.licenseKeyVersion,
       // Entitlement fields
       accessMode: subscription.accessMode,
       accessModeDisplay: subscription.accessModeDisplay,
-      fallbackPlanId: subscription.fallbackPlanId,
-      fallbackPlanName: subscription.fallbackPlanName,
+      defaultFallbackPlanId: subscription.defaultFallbackPlanId,
+      defaultFallbackPlanName: subscription.defaultFallbackPlanName,
       exportDeadlineUtc: subscription.exportDeadlineUtc?.toISOString() || null,
       entitlementsVersion: subscription.entitlementsVersion,
       accessRestrictionMessage: subscription.accessRestrictionMessage,

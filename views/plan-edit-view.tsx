@@ -26,6 +26,8 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
   const [loading, setLoading] = useState(true);
   const [projectOptions, setProjectOptions] = useState<Array<{value: string, label: string}>>([]);
   const [moduleOptions, setModuleOptions] = useState<Array<{value: string, label: string}>>([]);
+  const [parentPlanOptions, setParentPlanOptions] = useState<Array<{value: string, label: string}>>([]);
+  const [fallbackPlanOptions, setFallbackPlanOptions] = useState<Array<{value: string, label: string}>>([]);
 
   useEffect(() => {
     loadData();
@@ -51,6 +53,21 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
       setModuleOptions(modulesResult.modules.map((m: any) => ({
         value: m.id,
         label: m.name
+      })));
+
+      // Load all plans for parent and fallback dropdowns
+      const plansResult = await subscriptionPlanService.getAllPlans(1, 100);
+      // Filter out current plan for parent selection
+      setParentPlanOptions(plansResult.plans
+        .filter((p: any) => p.id !== planId)
+        .map((p: any) => ({
+          value: p.id,
+          label: `${p.name}${p.parentPlanName ? ` (← ${p.parentPlanName})` : ''}`
+        })));
+      // All plans for fallback, mark free tier ones
+      setFallbackPlanOptions(plansResult.plans.map((p: any) => ({
+        value: p.id,
+        label: p.isFreeTier ? `⭐ ${p.name} (${t("plan.isFreeTier")})` : p.name
       })));
     } catch (error) {
       appLogger.error("Failed to load data:", error);
@@ -81,6 +98,14 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
         customFeatures: data.customFeatures || [],
         projectIds: data.projectIds || [],
         moduleIds: data.moduleIds || [],
+        // New fields
+        isFreeTier: data.isFreeTier,
+        parentPlanId: data.parentPlanId || null,
+        displayOrder: data.displayOrder ? parseInt(data.displayOrder) : 0,
+        exportGraceDays: data.exportGraceDays ? parseInt(data.exportGraceDays) : 30,
+        defaultFallbackPlanId: data.defaultFallbackPlanId || null,
+        fallbackAccessMode: data.fallbackAccessMode ? parseInt(data.fallbackAccessMode) : undefined,
+        showLockedModulesInMenu: data.showLockedModulesInMenu,
       });
 
       await subscriptionPlanService.updatePlan(request);
@@ -125,6 +150,14 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
     customFeatures: plan.customFeatures || [],
     projectIds: plan.projects?.map(p => p.id) || [],
     moduleIds: plan.modules?.map(m => m.id) || [],
+    // New fields
+    isFreeTier: plan.isFreeTier || false,
+    parentPlanId: plan.parentPlanId || "",
+    displayOrder: plan.displayOrder || 0,
+    exportGraceDays: plan.exportGraceDays || 30,
+    defaultFallbackPlanId: plan.defaultFallbackPlanId || "",
+    fallbackAccessMode: plan.fallbackAccessMode?.toString() || "2",
+    showLockedModulesInMenu: plan.showLockedModulesInMenu ?? true,
   };
 
   const fields = [
@@ -147,6 +180,27 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
       helperText: t("plan.descriptionHelper"),
     },
     {
+      name: "isFreeTier",
+      label: t("plan.isFreeTier"),
+      type: "checkbox" as const,
+      helperText: t("plan.isFreeTierHelper"),
+    },
+    {
+      name: "parentPlanId",
+      label: t("plan.parentPlan"),
+      type: "select" as const,
+      options: [{ value: "", label: t("common.none") }, ...parentPlanOptions],
+      helperText: t("plan.parentPlanHelper"),
+    },
+    {
+      name: "displayOrder",
+      label: t("plan.displayOrder"),
+      type: "number" as const,
+      placeholder: "0",
+      min: 0,
+      helperText: t("plan.displayOrderHelper"),
+    },
+    {
       name: "durationType",
       label: t("plan.durationType"),
       type: "select" as const,
@@ -159,6 +213,7 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
         { value: "6", label: t("plan.duration.yearly") },
         { value: "99", label: t("plan.duration.lifetime") },
       ],
+      isVisible: (formData: any) => !formData.isFreeTier,
     },
     {
       name: "currency",
@@ -176,6 +231,7 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
         { value: "7", label: t("plan.currencies.jpy") },
         { value: "8", label: t("plan.currencies.cny") },
       ],
+      isVisible: (formData: any) => !formData.isFreeTier,
     },
     {
       name: "amount",
@@ -184,13 +240,14 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
       required: true,
       placeholder: "99.99",
       helperText: t("plan.amount"),
+      isVisible: (formData: any) => !formData.isFreeTier,
     },
     {
       name: "allowTrial",
       label: t("plan.allowTrial"),
       type: "checkbox" as const,
       helperText: t("plan.trialHelper"),
-      isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime plans
+      isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier,
     },
     {
       name: "trialDurationDays",
@@ -201,14 +258,14 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
       min: 1,
       max: 60,
       helperText: t("plan.trialDurationHelper"),
-      isVisible: (formData: any) => formData.durationType !== "99" && formData.allowTrial === true, // Show only if not Lifetime AND trial enabled
+      isVisible: (formData: any) => formData.durationType !== "99" && formData.allowTrial === true && !formData.isFreeTier,
     },
     {
       name: "autoRenew",
       label: t("plan.autoRenew"),
       type: "checkbox" as const,
       helperText: t("plan.autoRenewHelper"),
-      isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime plans
+      isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier,
     },
     {
       name: "upgradePolicy",
@@ -220,7 +277,7 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
         { value: "1", label: t("plan.upgradePolicies.prorated") },
         { value: "2", label: t("plan.upgradePolicies.deferred") },
       ],
-      isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime (forced to FullReplace)
+      isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier,
     },
     {
       name: "gracePeriodDays",
@@ -230,7 +287,44 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
       min: 0,
       max: 30,
       helperText: t("plan.gracePeriodRangeHelper"),
-      isVisible: (formData: any) => formData.durationType !== "99", // Hide for Lifetime (forced to 0)
+      isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier,
+    },
+    {
+      name: "exportGraceDays",
+      label: t("plan.exportGraceDays"),
+      type: "number" as const,
+      placeholder: "30",
+      min: 0,
+      max: 90,
+      helperText: t("plan.exportGraceDaysHelper"),
+      isVisible: (formData: any) => formData.durationType !== "99" && !formData.isFreeTier,
+    },
+    {
+      name: "defaultFallbackPlanId",
+      label: t("plan.defaultFallbackPlan"),
+      type: "select" as const,
+      options: [{ value: "", label: t("common.none") }, ...fallbackPlanOptions],
+      helperText: t("plan.defaultFallbackPlanHelper"),
+      isVisible: (formData: any) => !formData.isFreeTier && formData.durationType !== "99",
+    },
+    {
+      name: "fallbackAccessMode",
+      label: t("plan.fallbackAccessMode"),
+      type: "select" as const,
+      options: [
+        { value: "2", label: t("plan.accessModes.readOnly") },
+        { value: "3", label: t("plan.accessModes.exportOnly") },
+        { value: "4", label: t("plan.accessModes.blocked") },
+      ],
+      helperText: t("plan.fallbackAccessModeHelper"),
+      isVisible: (formData: any) => !formData.isFreeTier && formData.durationType !== "99",
+    },
+    {
+      name: "showLockedModulesInMenu",
+      label: t("plan.showLockedModulesInMenu"),
+      type: "checkbox" as const,
+      helperText: t("plan.showLockedModulesInMenuHelper"),
+      isVisible: (formData: any) => !formData.isFreeTier,
     },
     {
       name: "customFeatures",

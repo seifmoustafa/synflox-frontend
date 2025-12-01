@@ -19,10 +19,11 @@ export function useSubscriptionPlanViewModel() {
   const { subscriptionPlanService, projectService, moduleService } = useServices();
   const { t } = useI18n();
   
-  // Load projects, modules, and free tier plans for dropdowns
+  // Load projects, modules, free tier plans, and parent plans for dropdowns
   const [projectOptions, setProjectOptions] = React.useState<Array<{value: string, label: string}>>([]);
   const [moduleOptions, setModuleOptions] = React.useState<Array<{value: string, label: string}>>([]);
   const [freeTierPlanOptions, setFreeTierPlanOptions] = React.useState<Array<{value: string, label: string}>>([]);
+  const [parentPlanOptions, setParentPlanOptions] = React.useState<Array<{value: string, label: string}>>([]);
 
   React.useEffect(() => {
     // Load projects
@@ -41,21 +42,30 @@ export function useSubscriptionPlanViewModel() {
       })));
     });
 
-    // Load free tier plans for fallback dropdown
-    subscriptionPlanService.getFreeTierPlans().then(plans => {
-      setFreeTierPlanOptions(plans.map((p: any) => ({
+    // Load all plans for dropdowns
+    subscriptionPlanService.getAllPlans(1, 100).then(result => {
+      // For parent plan dropdown - show hierarchy
+      setParentPlanOptions(result.plans.map((p: any) => ({
         value: p.id,
-        label: p.name
+        label: `${p.name}${p.parentPlanName ? ` (← ${p.parentPlanName})` : ''}`
+      })));
+      
+      // For fallback plan dropdown - show all plans with free tier indicator
+      setFreeTierPlanOptions(result.plans.map((p: any) => ({
+        value: p.id,
+        label: p.isFreeTier ? `⭐ ${p.name} (${t("plan.isFreeTier")})` : p.name
       })));
     });
-  }, [projectService, moduleService, subscriptionPlanService]);
+  }, [projectService, moduleService, subscriptionPlanService, t]);
 
-  // ⭐ CUSTOM VALIDATION: At least one project or module required
+  // ⭐ CUSTOM VALIDATION: At least one project or module required (unless inheriting from parent)
   const validatePlanContent = (formData: any): string | null => {
     const hasProjects = formData.projectIds && formData.projectIds.length > 0;
     const hasModules = formData.moduleIds && formData.moduleIds.length > 0;
+    const hasParent = !!formData.parentPlanId;
     
-    if (!hasProjects && !hasModules) {
+    // Plans with a parent can inherit all content from parent
+    if (!hasProjects && !hasModules && !hasParent) {
       return t("plan.mustIncludeContent");
     }
     
@@ -92,6 +102,9 @@ export function useSubscriptionPlanViewModel() {
       customFeatures: data.customFeatures || [],
       projectIds: data.projectIds || [],
       moduleIds: data.moduleIds || [],
+      // Plan Hierarchy
+      parentPlanId: data.parentPlanId || null,
+      displayOrder: data.displayOrder ? parseInt(data.displayOrder) : 0,
     });
     return await subscriptionPlanService.createPlan(request);
   };
@@ -127,6 +140,9 @@ export function useSubscriptionPlanViewModel() {
       customFeatures: data.customFeatures || [],
       projectIds: data.projectIds || [],
       moduleIds: data.moduleIds || [],
+      // Plan Hierarchy
+      parentPlanId: data.parentPlanId || null,
+      displayOrder: data.displayOrder ? parseInt(data.displayOrder) : undefined,
     });
     return await subscriptionPlanService.updatePlan(request);
   };
@@ -195,12 +211,32 @@ export function useSubscriptionPlanViewModel() {
           },
         },
         {
+          key: "parentPlan",
+          label: t("plan.parentPlanName"),
+          render: (_val: unknown, plan: SubscriptionPlan) => (
+            plan.parentPlanName ? (
+              <Badge variant="secondary" className="gap-1">
+                ← {plan.parentPlanName}
+              </Badge>
+            ) : (
+              <span className="text-muted-foreground text-sm">—</span>
+            )
+          ),
+        },
+        {
           key: "features",
           label: t("plan.features"),
           render: (_val: unknown, plan: SubscriptionPlan) => (
-            <Badge variant="outline">
-              {plan.featuresCount} {t("common.items")}
-            </Badge>
+            <div className="flex flex-col gap-1">
+              <Badge variant="outline">
+                {plan.projectsCount} {t("plan.projects")} / {plan.modulesCount} {t("plan.modules")}
+              </Badge>
+              {plan.hasParentPlan && (plan.inheritedProjectsCount > 0 || plan.inheritedModulesCount > 0) && (
+                <span className="text-xs text-muted-foreground">
+                  +{plan.inheritedProjectsCount} / +{plan.inheritedModulesCount} {t("plan.inherited")}
+                </span>
+              )}
+            </div>
           ),
         },
       ],
@@ -228,6 +264,21 @@ export function useSubscriptionPlanViewModel() {
           label: t("plan.isFreeTier"),
           type: "checkbox" as const,
           helperText: t("plan.isFreeTierHelper"),
+        },
+        {
+          name: "parentPlanId",
+          label: t("plan.parentPlan"),
+          type: "select" as const,
+          options: [{ value: "", label: t("common.none") }, ...parentPlanOptions],
+          helperText: t("plan.parentPlanHelper"),
+        },
+        {
+          name: "displayOrder",
+          label: t("plan.displayOrder"),
+          type: "number" as const,
+          placeholder: "0",
+          min: 0,
+          helperText: t("plan.displayOrderHelper"),
         },
         {
           name: "durationType",
@@ -401,6 +452,21 @@ export function useSubscriptionPlanViewModel() {
           label: t("plan.isFreeTier"),
           type: "checkbox" as const,
           helperText: t("plan.isFreeTierHelper"),
+        },
+        {
+          name: "parentPlanId",
+          label: t("plan.parentPlan"),
+          type: "select" as const,
+          options: [{ value: "", label: t("common.none") }, ...parentPlanOptions],
+          helperText: t("plan.parentPlanHelper"),
+        },
+        {
+          name: "displayOrder",
+          label: t("plan.displayOrder"),
+          type: "number" as const,
+          placeholder: "0",
+          min: 0,
+          helperText: t("plan.displayOrderHelper"),
         },
         {
           name: "durationType",

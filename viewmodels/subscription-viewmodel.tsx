@@ -356,10 +356,18 @@ export function useSubscriptionViewModel() {
       const request = new CreateSubscriptionRequest({
         companyId: data.companyId,
         planId: data.planId,
+        // Currency selection
+        currency: data.currency ? parseInt(data.currency) : 1, // Default USD
+        // Custom amount (optional override)
+        customAmount: data.customAmount ? parseFloat(data.customAmount) : undefined,
+        // Start date (optional, default today)
+        startDateUtc: data.startDateUtc || undefined,
         // Only allow trial if plan permits it
         startWithTrial: canTrial ? (data.startWithTrial || false) : false,
         // Only allow auto-renew if not lifetime plan
         autoRenew: canAutoRenew ? (data.autoRenew || false) : false,
+        // Notes/status reason
+        statusReason: data.statusReason || undefined,
       });
       return await subscriptionService.createSubscription(request);
     },
@@ -507,7 +515,6 @@ export function useSubscriptionViewModel() {
         required: true,
         options: companyOptions,
         helperText: t("subscription.companyHelper"),
-        // Disable company selection if pre-selected from alerts
         disabled: !!preSelectedCompanyId,
       },
       {
@@ -522,14 +529,44 @@ export function useSubscriptionViewModel() {
         },
       },
       {
+        name: "currency",
+        label: t("subscription.currency"),
+        type: "select" as const,
+        required: true,
+        helperText: t("subscription.currencyHelper"),
+        options: [
+          { value: "1", label: t("plan.currencies.usd") },
+          { value: "2", label: t("plan.currencies.eur") },
+          { value: "3", label: t("plan.currencies.egp") },
+          { value: "4", label: t("plan.currencies.sar") },
+          { value: "5", label: t("plan.currencies.aed") },
+          { value: "6", label: t("plan.currencies.gbp") },
+          { value: "7", label: t("plan.currencies.jpy") },
+          { value: "8", label: t("plan.currencies.cny") },
+        ],
+      },
+      {
+        name: "customAmount",
+        label: t("subscription.customAmount"),
+        type: "number" as const,
+        placeholder: t("subscription.customAmountPlaceholder"),
+        helperText: t("subscription.customAmountHelper"),
+        min: 0,
+      },
+      {
+        name: "startDateUtc",
+        label: t("subscription.startDate"),
+        type: "date" as const,
+        helperText: t("subscription.startDateHelper"),
+      },
+      {
         name: "startWithTrial",
         label: t("subscription.startWithTrial"),
         type: "checkbox" as const,
         helperText: t("subscription.trialHelper"),
-        // Only show if selected plan allows trial and is not lifetime
         isVisible: (formData: Record<string, any>) => {
           const planId = formData.planId;
-          if (!planId) return true; // Show by default until plan is selected
+          if (!planId) return true;
           const plan = plansData.find(p => p.id === planId);
           return plan ? (plan.allowTrial && !plan.isLifetimePlan) : true;
         },
@@ -539,16 +576,38 @@ export function useSubscriptionViewModel() {
         label: t("subscription.autoRenew"),
         type: "checkbox" as const,
         helperText: t("subscription.autoRenewHelper"),
-        // Hide auto-renew for lifetime plans
         isVisible: (formData: Record<string, any>) => {
           const planId = formData.planId;
-          if (!planId) return true; // Show by default until plan is selected
+          if (!planId) return true;
           const plan = plansData.find(p => p.id === planId);
           return plan ? !plan.isLifetimePlan : true;
         },
       },
+      {
+        name: "statusReason",
+        label: t("subscription.notes"),
+        type: "textarea" as const,
+        placeholder: t("subscription.notesPlaceholder"),
+        helperText: t("subscription.notesHelper"),
+        maxLength: 500,
+      },
     ],
-    editFields: [],
+    editFields: [
+      {
+        name: "autoRenew",
+        label: t("subscription.autoRenew"),
+        type: "checkbox" as const,
+        helperText: t("subscription.autoRenewHelper"),
+      },
+      {
+        name: "statusReason",
+        label: t("subscription.notes"),
+        type: "textarea" as const,
+        placeholder: t("subscription.notesPlaceholder"),
+        helperText: t("subscription.notesHelper"),
+        maxLength: 500,
+      },
+    ],
     
     // Actions configuration - show only relevant actions based on subscription state
     getActions: (vm: any, t: any, handleDelete?: (item: Subscription) => void) => [

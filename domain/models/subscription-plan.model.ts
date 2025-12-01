@@ -73,6 +73,8 @@ export interface SubscriptionPlanData {
   prices: PlanPriceData[];
   projects?: ProjectData[];
   modules?: ModuleData[];
+  projectCount?: number;
+  moduleCount?: number;
   createdBy?: string | null;
   createdTimestamp?: string | null;
   lastModifiedBy?: string | null;
@@ -85,6 +87,13 @@ export interface SubscriptionPlanData {
   defaultFallbackPlanName?: string | null;
   showLockedModulesInMenu?: boolean;
   lockedItemStyle?: string;
+  // Plan Hierarchy (Inheritance)
+  parentPlanId?: string | null;
+  parentPlanName?: string | null;
+  displayOrder?: number;
+  childPlanCount?: number;
+  inheritedProjectsCount?: number;
+  inheritedModulesCount?: number;
 }
 
 /**
@@ -107,6 +116,8 @@ export class SubscriptionPlan {
     public readonly prices: PlanPriceData[],
     public readonly projects: ProjectData[] = [],
     public readonly modules: ModuleData[] = [],
+    private readonly _projectCount: number = 0,
+    private readonly _moduleCount: number = 0,
     public readonly createdBy: string | null = null,
     public readonly createdTimestamp: string | null = null,
     public readonly lastModifiedBy: string | null = null,
@@ -118,7 +129,14 @@ export class SubscriptionPlan {
     public readonly defaultFallbackPlanId: string | null = null,
     public readonly defaultFallbackPlanName: string | null = null,
     public readonly showLockedModulesInMenu: boolean = true,
-    public readonly lockedItemStyle: string = 'greyed_with_lock'
+    public readonly lockedItemStyle: string = 'greyed_with_lock',
+    // Plan Hierarchy (Inheritance)
+    public readonly parentPlanId: string | null = null,
+    public readonly parentPlanName: string | null = null,
+    public readonly displayOrder: number = 0,
+    public readonly childPlanCount: number = 0,
+    public readonly inheritedProjectsCount: number = 0,
+    public readonly inheritedModulesCount: number = 0
   ) {}
 
   /**
@@ -151,17 +169,17 @@ export class SubscriptionPlan {
   }
 
   /**
-   * Get projects count
+   * Get projects count (from API count field, fallback to array length)
    */
   get projectsCount(): number {
-    return this.projects.length;
+    return this._projectCount > 0 ? this._projectCount : this.projects.length;
   }
 
   /**
-   * Get modules count
+   * Get modules count (from API count field, fallback to array length)
    */
   get modulesCount(): number {
-    return this.modules.length;
+    return this._moduleCount > 0 ? this._moduleCount : this.modules.length;
   }
 
   /**
@@ -174,6 +192,34 @@ export class SubscriptionPlan {
     if (freePrice) return freePrice;
     // Otherwise prefer USD or first available
     return this.prices.find(p => p.currency === Currency.USD) || this.prices[0];
+  }
+
+  /**
+   * Check if this plan has a parent (inherits from another plan)
+   */
+  get hasParentPlan(): boolean {
+    return !!this.parentPlanId;
+  }
+
+  /**
+   * Check if this plan has child plans (is a parent)
+   */
+  get hasChildPlans(): boolean {
+    return this.childPlanCount > 0;
+  }
+
+  /**
+   * Get total features including inherited
+   */
+  get totalProjectsCount(): number {
+    return this.projectsCount + this.inheritedProjectsCount;
+  }
+
+  /**
+   * Get total modules including inherited
+   */
+  get totalModulesCount(): number {
+    return this.modulesCount + this.inheritedModulesCount;
   }
 
   /**
@@ -219,6 +265,8 @@ export class SubscriptionPlan {
       updates.prices ?? this.prices,
       updates.projects ?? this.projects,
       updates.modules ?? this.modules,
+      updates.projectCount ?? this._projectCount,
+      updates.moduleCount ?? this._moduleCount,
       updates.createdBy ?? this.createdBy,
       updates.createdTimestamp ?? this.createdTimestamp,
       updates.lastModifiedBy ?? this.lastModifiedBy,
@@ -230,7 +278,14 @@ export class SubscriptionPlan {
       updates.defaultFallbackPlanId ?? this.defaultFallbackPlanId,
       updates.defaultFallbackPlanName ?? this.defaultFallbackPlanName,
       updates.showLockedModulesInMenu ?? this.showLockedModulesInMenu,
-      updates.lockedItemStyle ?? this.lockedItemStyle
+      updates.lockedItemStyle ?? this.lockedItemStyle,
+      // Hierarchy fields
+      updates.parentPlanId ?? this.parentPlanId,
+      updates.parentPlanName ?? this.parentPlanName,
+      updates.displayOrder ?? this.displayOrder,
+      updates.childPlanCount ?? this.childPlanCount,
+      updates.inheritedProjectsCount ?? this.inheritedProjectsCount,
+      updates.inheritedModulesCount ?? this.inheritedModulesCount
     );
   }
 
@@ -272,6 +327,9 @@ export interface CreatePlanRequestData {
   defaultFallbackPlanId?: string | null;
   showLockedModulesInMenu?: boolean;
   lockedItemStyle?: string;
+  // Plan Hierarchy
+  parentPlanId?: string | null;
+  displayOrder?: number;
 }
 
 export class CreatePlanRequest {
@@ -294,6 +352,9 @@ export class CreatePlanRequest {
   public readonly defaultFallbackPlanId: string | null;
   public readonly showLockedModulesInMenu: boolean;
   public readonly lockedItemStyle: string;
+  // Plan Hierarchy
+  public readonly parentPlanId: string | null;
+  public readonly displayOrder: number;
 
   constructor(data: CreatePlanRequestData) {
     this.name = data.name;
@@ -315,6 +376,9 @@ export class CreatePlanRequest {
     this.defaultFallbackPlanId = data.defaultFallbackPlanId ?? null;
     this.showLockedModulesInMenu = data.showLockedModulesInMenu ?? true;
     this.lockedItemStyle = data.lockedItemStyle ?? 'greyed_with_lock';
+    // Hierarchy fields
+    this.parentPlanId = data.parentPlanId ?? null;
+    this.displayOrder = data.displayOrder ?? 0;
   }
 
   /**
@@ -360,6 +424,9 @@ export class CreatePlanRequest {
       defaultFallbackPlanId: this.defaultFallbackPlanId,
       showLockedModulesInMenu: this.showLockedModulesInMenu,
       lockedItemStyle: this.lockedItemStyle,
+      // Hierarchy fields
+      parentPlanId: this.parentPlanId,
+      displayOrder: this.displayOrder,
     };
     
     // Only include prices for non-free plans
@@ -395,6 +462,9 @@ export interface UpdatePlanRequestData {
   defaultFallbackPlanId?: string | null;
   showLockedModulesInMenu?: boolean;
   lockedItemStyle?: string;
+  // Plan Hierarchy
+  parentPlanId?: string | null;
+  displayOrder?: number;
 }
 
 export class UpdatePlanRequest {
@@ -418,6 +488,9 @@ export class UpdatePlanRequest {
   public readonly defaultFallbackPlanId?: string | null;
   public readonly showLockedModulesInMenu?: boolean;
   public readonly lockedItemStyle?: string;
+  // Plan Hierarchy
+  public readonly parentPlanId?: string | null;
+  public readonly displayOrder?: number;
 
   constructor(data: UpdatePlanRequestData) {
     this.id = data.id;
@@ -440,6 +513,9 @@ export class UpdatePlanRequest {
     this.defaultFallbackPlanId = data.defaultFallbackPlanId;
     this.showLockedModulesInMenu = data.showLockedModulesInMenu;
     this.lockedItemStyle = data.lockedItemStyle;
+    // Hierarchy fields
+    this.parentPlanId = data.parentPlanId;
+    this.displayOrder = data.displayOrder;
   }
 
   /**
@@ -478,6 +554,9 @@ export class UpdatePlanRequest {
     if (this.defaultFallbackPlanId !== undefined) data.defaultFallbackPlanId = this.defaultFallbackPlanId;
     if (this.showLockedModulesInMenu !== undefined) data.showLockedModulesInMenu = this.showLockedModulesInMenu;
     if (this.lockedItemStyle !== undefined) data.lockedItemStyle = this.lockedItemStyle;
+    // Hierarchy fields
+    if (this.parentPlanId !== undefined) data.parentPlanId = this.parentPlanId;
+    if (this.displayOrder !== undefined) data.displayOrder = this.displayOrder;
     return data;
   }
 }
