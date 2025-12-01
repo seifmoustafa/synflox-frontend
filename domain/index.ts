@@ -151,6 +151,10 @@ export {
 // Dashboard domain
 export * from './models/dashboard';
 
+// Entitlement domain - REMOVED (v2.0: Plan-level entitlements)
+// Old SubscriptionEntitlement model is deprecated
+// New PlanEntitlement will be added in Phase 2
+
 // Security domain
 export {
   ChangePasswordRequest,
@@ -183,3 +187,4 @@ export {
 // Mappers
 export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, DashboardMapper, SecurityMapper } from './mappers';
 export type { SubscriptionsResponse, CompanySubscriptionsResponse, UpgradeResponse } from './mappers/subscription.mapper';
+// EntitlementMapper exports REMOVED - will be replaced with PlanEntitlement in Phase 2

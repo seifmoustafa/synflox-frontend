@@ -37,7 +37,7 @@ export function useSubscriptionViewModel() {
   // State for dropdown data
   const [companyOptions, setCompanyOptions] = useState<Array<{ value: string; label: string }>>([]);
   const [planOptions, setPlanOptions] = useState<Array<{ value: string; label: string }>>([]);
-  const [plansData, setPlansData] = useState<Array<{ id: string; allowTrial: boolean; isLifetimePlan: boolean }>>([]);
+  const [plansData, setPlansData] = useState<Array<{ id: string; allowTrial: boolean; isLifetimePlan: boolean; isFreeTier: boolean }>>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [dropdownsLoaded, setDropdownsLoaded] = useState(false);
   const [isLoadingDropdowns, setIsLoadingDropdowns] = useState(false);
@@ -66,7 +66,8 @@ export function useSubscriptionViewModel() {
       const planData = plans.plans.map((p: any) => ({ 
         id: p.id, 
         allowTrial: p.allowTrial ?? false,
-        isLifetimePlan: p.isLifetimePlan ?? false 
+        isLifetimePlan: p.isLifetimePlan ?? false,
+        isFreeTier: p.isFreeTier ?? false 
       }));
       
       console.log("✅ Company options:", companyOpts);
@@ -544,6 +545,13 @@ export function useSubscriptionViewModel() {
           { value: "7", label: t("plan.currencies.jpy") },
           { value: "8", label: t("plan.currencies.cny") },
         ],
+        // Hide currency field for free tier plans
+        isVisible: (formData: Record<string, any>) => {
+          const planId = formData.planId;
+          if (!planId) return true;
+          const plan = plansData.find(p => p.id === planId);
+          return plan ? !plan.isFreeTier : true;
+        },
       },
       {
         name: "customAmount",
@@ -552,6 +560,13 @@ export function useSubscriptionViewModel() {
         placeholder: t("subscription.customAmountPlaceholder"),
         helperText: t("subscription.customAmountHelper"),
         min: 0,
+        // Hide custom amount field for free tier plans
+        isVisible: (formData: Record<string, any>) => {
+          const planId = formData.planId;
+          if (!planId) return true;
+          const plan = plansData.find(p => p.id === planId);
+          return plan ? !plan.isFreeTier : true;
+        },
       },
       {
         name: "startDateUtc",

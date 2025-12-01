@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Edit, BarChart3, Key, Settings, Calendar, DollarSign, Building, Package, Clock, AlertCircle, CheckCircle, XCircle, Pause, Play, RotateCcw, Layers, Box, Star, ArrowLeft } from "lucide-react";
+import { Edit, BarChart3, Key, Settings, Calendar, DollarSign, Building, Package, Clock, AlertCircle, CheckCircle, XCircle, Pause, Play, RotateCcw, Layers, Box, Star, ArrowLeft, Shield } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -299,6 +299,7 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               <BarChart3 className="h-4 w-4 me-2" />
               {t("subscription.analytics")}
             </Button>
+            {/* Entitlements button REMOVED - v2.0: Will be Plan-level entitlements view */}
           </div>
         </CardContent>
       </Card>

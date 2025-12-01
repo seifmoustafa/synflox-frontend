@@ -4142,6 +4142,8 @@ export const ar = {
     no: "لا",
     active: "نشط",
     inActive: "غير نشط",
+    settings: "الإعدادات",
+    select: "اختر",
     collapseAll: "طي الكل",
     expandAll: "إظهار الكل",
     selectDate: "اختر التاريخ",
@@ -4494,5 +4496,135 @@ export const ar = {
       sessionExpired: "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
       loginRequired: "يرجى تسجيل الدخول للمتابعة.",
     },
+  },
+
+  // Entitlements
+  entitlements: {
+    title: "الصلاحيات",
+    description: "إدارة {count} صلاحية لهذا الاشتراك",
+    noEntitlements: "لا توجد صلاحيات",
+    noEntitlementsDescription: "امنح الوصول للمشاريع والوحدات للبدء.",
+    grantFirst: "منح الصلاحية الأولى",
+    name: "الاسم",
+    grantType: "نوع المنح",
+    accessLevel: "مستوى الوصول",
+    source: "المصدر",
+    permissions: "الصلاحيات",
+    status: "الحالة",
+    project: "المشروع",
+    module: "الوحدة",
+    projectHelper: "اختر مشروعاً (مطلوب للمشروع الكامل أو وحدات محددة)",
+    moduleHelper: "اختر وحدة (مطلوب للوحدات المحددة أو المستقلة)",
+    
+    // Stats
+    totalEntitlements: "إجمالي الصلاحيات",
+    projectsWithAccess: "المشاريع المتاحة",
+    customGrants: "المنح المخصصة",
+    manuallyGranted: "ممنوحة يدوياً",
+    entitlementsCount: "صلاحية",
+    allEntitlements: "جميع الصلاحيات",
+    entitledProjects: "المشاريع المصرح بها",
+    byProject: "حسب المشروع",
+    custom: "مخصص",
+    
+    // Version Control
+    versionControl: "التحكم بالإصدار",
+    versionDescription: "إدارة إصدار الصلاحيات لذاكرة العميل",
+    currentVersion: "الإصدار الحالي",
+    incrementOnChange: "يزداد تلقائياً عند أي تغيير",
+    forceRefresh: "فرض تحديث العميل",
+    
+    // Bulk Operations
+    bulkOperations: "العمليات الجماعية",
+    bulkDescription: "إدارة الصلاحيات بشكل جماعي",
+    copyFromPlan: "نسخ من الخطة",
+    addUpgrade: "إضافة صلاحيات الترقية",
+    revokeAll: "إلغاء جميع الصلاحيات",
+    revokeWarning: "لا يمكن التراجع عن هذا الإجراء. سيفقد الاشتراك الوصول فوراً.",
+    
+    // Access Status
+    accessStatus: "حالة الوصول",
+    accessStatusDescription: "وضع الوصول الحالي وإصدار الصلاحيات للاشتراك",
+    currentMode: "الوضع الحالي",
+    daysRemaining: "الأيام المتبقية",
+    gracePeriod: "فترة السماح",
+    viewMatrix: "عرض المصفوفة",
+    incrementVersion: "زيادة الإصدار",
+    version: "الإصدار",
+    accessMode: "وضع الوصول",
+    projects: "المشاريع",
+    
+    // Grant Types
+    grantTypes: {
+      fullProject: "وصول كامل للمشروع",
+      specificModules: "وحدات محددة",
+      standaloneModule: "وحدة مستقلة",
+      featureOnly: "ميزة فقط",
+    },
+    
+    // Access Levels
+    accessLevels: {
+      full: "وصول كامل",
+      readOnly: "قراءة فقط",
+      exportOnly: "تصدير فقط",
+      blocked: "محظور",
+    },
+    
+    // Sources
+    sources: {
+      planDefault: "افتراضي الخطة",
+      adminGrant: "منح إداري",
+      upgrade: "ترقية",
+      promotional: "ترويجي",
+      contractOverride: "تجاوز العقد",
+      fallback: "احتياطي",
+    },
+    
+    // CRUD Permissions
+    canCreate: "يمكن الإنشاء",
+    canRead: "يمكن القراءة",
+    canUpdate: "يمكن التحديث",
+    canDelete: "يمكن الحذف",
+    canExport: "يمكن التصدير",
+    displayInMenu: "عرض في القائمة",
+    isActive: "نشط",
+    expiresAt: "ينتهي في",
+    expiresAtHelper: "اتركه فارغاً بدون انتهاء",
+    notes: "ملاحظات",
+    
+    // Actions
+    grant: "منح صلاحية",
+    grantTitle: "منح صلاحية جديدة",
+    grantDescription: "منح الوصول لمشروع أو وحدة لهذا الاشتراك",
+    editTitle: "تعديل الصلاحية",
+    editDescription: "تعديل صلاحية {name}",
+    revokeTitle: "إلغاء الصلاحية",
+    revokeDescription: "هل أنت متأكد من إلغاء الوصول إلى {name}؟",
+    revoke: "إلغاء",
+    revokeReason: "سبب الإلغاء",
+    revokeReasonPlaceholder: "أدخل سبب إلغاء هذه الصلاحية...",
+    
+    // Matrix
+    matrixTitle: "مصفوفة الصلاحيات",
+    matrixDescription: "عرض كامل لجميع صلاحيات هذا الاشتراك",
+    
+    // Settings Tab
+    settings: "الإعدادات",
+    
+    // Access Modes (for display)
+    modes: {
+      full: "وصول كامل",
+      fullaccess: "وصول كامل",
+      graceperiod: "فترة السماح",
+      readonly: "قراءة فقط",
+      exportonly: "تصدير فقط",
+      blocked: "محظور",
+    },
+    
+    // Standalone
+    standalone: "مستقل",
+    
+    // Matrix Dialog
+    modulesCount: "وحدات",
   },
 };

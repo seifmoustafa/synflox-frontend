@@ -4127,6 +4127,8 @@ export const en = {
     active: "Active",
     inactive: "Inactive",
     overview: "Overview",
+    settings: "Settings",
+    select: "Select",
     created: "Created",
     add_child: "Add child",
     will_add_under: "Will be added under",
@@ -4689,5 +4691,135 @@ export const en = {
       autoSaveEnabled: "Auto-save is enabled",
       spellCheckEnabled: "Spell check is enabled",
     },
+  },
+
+  // Entitlements
+  entitlements: {
+    title: "Entitlements",
+    description: "Managing {count} entitlements for this subscription",
+    noEntitlements: "No entitlements found",
+    noEntitlementsDescription: "Grant access to projects and modules to get started.",
+    grantFirst: "Grant First Entitlement",
+    name: "Name",
+    grantType: "Grant Type",
+    accessLevel: "Access Level",
+    source: "Source",
+    permissions: "Permissions",
+    status: "Status",
+    project: "Project",
+    module: "Module",
+    projectHelper: "Select a project (required for Full Project or Specific Modules)",
+    moduleHelper: "Select a module (required for Specific Modules or Standalone)",
+    
+    // Stats
+    totalEntitlements: "Total Entitlements",
+    projectsWithAccess: "Projects with access",
+    customGrants: "Custom Grants",
+    manuallyGranted: "Manually granted",
+    entitlementsCount: "entitlements",
+    allEntitlements: "All Entitlements",
+    entitledProjects: "Entitled Projects",
+    byProject: "By Project",
+    custom: "Custom",
+    
+    // Version Control
+    versionControl: "Version Control",
+    versionDescription: "Manage entitlements version for client cache",
+    currentVersion: "Current Version",
+    incrementOnChange: "Auto-increments on any change",
+    forceRefresh: "Force Client Refresh",
+    
+    // Bulk Operations
+    bulkOperations: "Bulk Operations",
+    bulkDescription: "Manage entitlements in bulk",
+    copyFromPlan: "Copy from Plan",
+    addUpgrade: "Add Upgrade Entitlements",
+    revokeAll: "Revoke All Entitlements",
+    revokeWarning: "This action cannot be undone. The subscription will lose access immediately.",
+    
+    // Access Status
+    accessStatus: "Access Status",
+    accessStatusDescription: "Current subscription access mode and entitlements version",
+    currentMode: "Current Mode",
+    daysRemaining: "Days Remaining",
+    gracePeriod: "Grace Period",
+    viewMatrix: "View Matrix",
+    incrementVersion: "Increment Version",
+    version: "Version",
+    accessMode: "Access Mode",
+    projects: "Projects",
+    
+    // Grant Types
+    grantTypes: {
+      fullProject: "Full Project Access",
+      specificModules: "Specific Modules",
+      standaloneModule: "Standalone Module",
+      featureOnly: "Feature Only",
+    },
+    
+    // Access Levels
+    accessLevels: {
+      full: "Full Access",
+      readOnly: "Read Only",
+      exportOnly: "Export Only",
+      blocked: "Blocked",
+    },
+    
+    // Sources
+    sources: {
+      planDefault: "Plan Default",
+      adminGrant: "Admin Grant",
+      upgrade: "Upgrade",
+      promotional: "Promotional",
+      contractOverride: "Contract Override",
+      fallback: "Fallback",
+    },
+    
+    // CRUD Permissions
+    canCreate: "Can Create",
+    canRead: "Can Read",
+    canUpdate: "Can Update",
+    canDelete: "Can Delete",
+    canExport: "Can Export",
+    displayInMenu: "Display in Menu",
+    isActive: "Is Active",
+    expiresAt: "Expires At",
+    expiresAtHelper: "Leave empty for no expiration",
+    notes: "Notes",
+    
+    // Actions
+    grant: "Grant Entitlement",
+    grantTitle: "Grant New Entitlement",
+    grantDescription: "Grant access to a project or module for this subscription",
+    editTitle: "Edit Entitlement",
+    editDescription: "Editing entitlement for {name}",
+    revokeTitle: "Revoke Entitlement",
+    revokeDescription: "Are you sure you want to revoke access to {name}?",
+    revoke: "Revoke",
+    revokeReason: "Reason for Revocation",
+    revokeReasonPlaceholder: "Enter the reason for revoking this entitlement...",
+    
+    // Matrix
+    matrixTitle: "Entitlement Matrix",
+    matrixDescription: "Complete view of all entitlements for this subscription",
+    
+    // Settings Tab
+    settings: "Settings",
+    
+    // Access Modes (for display)
+    modes: {
+      full: "Full Access",
+      fullaccess: "Full Access",
+      graceperiod: "Grace Period",
+      readonly: "Read Only",
+      exportonly: "Export Only",
+      blocked: "Blocked",
+    },
+    
+    // Standalone
+    standalone: "Standalone",
+    
+    // Matrix Dialog
+    modulesCount: "modules",
   },
 };

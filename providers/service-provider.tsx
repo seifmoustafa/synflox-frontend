@@ -16,6 +16,7 @@ import { ModuleService } from "@/services/module.service";
 import { SubscriptionPlanService } from "@/services/subscription-plan.service";
 import { SubscriptionService } from "@/services/subscription.service";
 import { DashboardService } from "@/services/dashboard.service";
+// EntitlementService REMOVED - v2.0: Will be replaced with PlanEntitlementService
 
 interface Services {
   apiService: ApiService;
@@ -32,6 +33,7 @@ interface Services {
   subscriptionPlanService: SubscriptionPlanService;
   subscriptionService: SubscriptionService;
   dashboardService: DashboardService;
+  // entitlementService REMOVED - v2.0: Will be PlanEntitlementService
 }
 
 const ServiceContext = createContext<Services | null>(null);
@@ -52,6 +54,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
     const subscriptionPlanService = new SubscriptionPlanService(apiService, notificationService);
     const subscriptionService = new SubscriptionService(apiService, notificationService);
     const dashboardService = new DashboardService(apiService, notificationService);
+    // entitlementService REMOVED
 
     return {
       apiService,
@@ -68,6 +71,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
       subscriptionPlanService,
       subscriptionService,
       dashboardService,
+      // entitlementService REMOVED
     };
   }, []);
 

@@ -153,4 +153,22 @@ export const API_ENDPOINTS = {
     DISMISS_ALERT: "/dashboard/alerts/{id}/dismiss",
     MARK_ALERT_READ: "/dashboard/alerts/{id}/read",
   },
+
+  // Entitlements Management
+  ENTITLEMENTS: {
+    BASE: "/entitlements",
+    BY_ID: (id: string) => `/entitlements/${id}`,
+    BY_SUBSCRIPTION: (subscriptionId: string) => `/entitlements/subscription/${subscriptionId}`,
+    MATRIX: (subscriptionId: string) => `/entitlements/subscription/${subscriptionId}/matrix`,
+    ACCESS_MODE: (subscriptionId: string) => `/entitlements/subscription/${subscriptionId}/access-mode`,
+    VERSION: (subscriptionId: string) => `/entitlements/subscription/${subscriptionId}/version`,
+    INCREMENT_VERSION: (subscriptionId: string) => `/entitlements/subscription/${subscriptionId}/increment-version`,
+    COPY_FROM_PLAN: "/entitlements/copy-from-plan",
+    ADD_UPGRADE: "/entitlements/add-upgrade",
+    REPLACE: "/entitlements/replace",
+    DOWNGRADE_TO_FALLBACK: "/entitlements/downgrade-to-fallback",
+    BULK_REVOKE: "/entitlements/bulk-revoke",
+    CHECK_PROJECT_ACCESS: "/entitlements/check-project-access",
+    CHECK_MODULE_ACCESS: "/entitlements/check-module-access",
+  },
 };
