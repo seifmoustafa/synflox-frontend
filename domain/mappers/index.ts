@@ -19,4 +19,4 @@ export { SubscriptionPlanMapper } from './subscription-plan.mapper';
 export { SubscriptionMapper } from './subscription.mapper';
 export { DashboardMapper } from './dashboard.mapper';
 export { SecurityMapper } from './security.mapper';
-// EntitlementMapper REMOVED - v2.0: Will be replaced with PlanEntitlementMapper
+export { PlanEntitlementMapper } from './plan-entitlement.mapper';

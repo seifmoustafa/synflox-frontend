@@ -154,7 +154,7 @@ export const API_ENDPOINTS = {
     MARK_ALERT_READ: "/dashboard/alerts/{id}/read",
   },
 
-  // Entitlements Management
+  // Subscription Entitlements Management (Runtime)
   ENTITLEMENTS: {
     BASE: "/entitlements",
     BY_ID: (id: string) => `/entitlements/${id}`,
@@ -170,5 +170,14 @@ export const API_ENDPOINTS = {
     BULK_REVOKE: "/entitlements/bulk-revoke",
     CHECK_PROJECT_ACCESS: "/entitlements/check-project-access",
     CHECK_MODULE_ACCESS: "/entitlements/check-module-access",
+  },
+
+  // Plan Entitlements Management (Plan-Level Permissions)
+  PLAN_ENTITLEMENTS: {
+    BY_PLAN: (planId: string) => `/plan-entitlements/plan/${planId}`,
+    BY_ID: (id: string) => `/plan-entitlements/${id}`,
+    CREATE: "/plan-entitlements",
+    UPDATE: (id: string) => `/plan-entitlements/${id}`,
+    DELETE: (id: string) => `/plan-entitlements/${id}`,
   },
 };

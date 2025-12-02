@@ -151,9 +151,19 @@ export {
 // Dashboard domain
 export * from './models/dashboard';
 
-// Entitlement domain - REMOVED (v2.0: Plan-level entitlements)
-// Old SubscriptionEntitlement model is deprecated
-// New PlanEntitlement will be added in Phase 2
+// Plan Entitlement domain (v2.0: Plan-level entitlements)
+export {
+  PlanEntitlement,
+  CreatePlanEntitlementRequest,
+  UpdatePlanEntitlementRequest,
+  EntitlementAccessLevel,
+  buildEntitlementTree,
+  type PlanEntitlementData,
+  type CreatePlanEntitlementRequestData,
+  type UpdatePlanEntitlementRequestData,
+  type EntitlementTreeNode,
+} from './models/plan-entitlement.model';
+export type { PlanEntitlementsResponse } from './mappers/plan-entitlement.mapper';
 
 // Security domain
 export {
@@ -185,6 +195,5 @@ export {
 } from './models/security.model';
 
 // Mappers
-export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, DashboardMapper, SecurityMapper } from './mappers';
+export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, DashboardMapper, SecurityMapper, PlanEntitlementMapper } from './mappers';
 export type { SubscriptionsResponse, CompanySubscriptionsResponse, UpgradeResponse } from './mappers/subscription.mapper';
-// EntitlementMapper exports REMOVED - will be replaced with PlanEntitlement in Phase 2

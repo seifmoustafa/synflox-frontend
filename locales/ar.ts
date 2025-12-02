@@ -1406,8 +1406,16 @@ export const ar = {
       overview: "نظرة عامة",
       billing: "الفوترة",
       features: "الميزات",
+      entitlements: "الصلاحيات",
       history: "التاريخ",
     },
+    
+    // Entitlements Tab
+    entitlementsTitle: "صلاحيات الوصول",
+    entitlementsDescription: "عرض صلاحيات الوصول الموروثة من خطة الاشتراك",
+    editInPlan: "تعديل في الخطة",
+    planEntitlements: "صلاحيات الخطة",
+    planEntitlementsDescription: "هذه الصلاحيات موروثة من خطة الاشتراك. للتعديل، انتقل إلى صفحة تفاصيل الخطة.",
     
     // Edit page
     editSubscription: "تعديل الاشتراك",
@@ -4119,6 +4127,7 @@ export const ar = {
 
   // Common
   common: {
+    contact:"تواصل",
     none:"لا شيء",
     optional:"إختياري",
     processing:"جاري معالجة...",
@@ -4626,5 +4635,33 @@ export const ar = {
     
     // Matrix Dialog
     modulesCount: "وحدات",
+    
+    // Plan Entitlements (v2.0)
+    planTitle: "الصلاحيات",
+    planDescription: "تكوين صلاحيات الوصول للمشاريع والوحدات في هذه الخطة",
+    planNoEntitlements: "لم يتم تكوين صلاحيات",
+    addProjectsFirst: "أضف مشاريع أو وحدات لهذه الخطة أولاً",
+    items: "عناصر",
+    projectType: "مشروع",
+    moduleType: "وحدة",
+    inherited: "موروث",
+    override: "تجاوز",
+    inheritedTooltip: "يرث الصلاحيات من المشروع الأب",
+    overrideTooltip: "هذه الوحدة لديها صلاحيات مخصصة تختلف عن المشروع الأب",
+    cascadeWarningTitle: "تحذير التجاوز",
+    cascadeWarningMessage: "بعض الوحدات الفرعية لديها صلاحيات مخصصة. تغيير صلاحية هذا المشروع سيعيد تعيين جميع التجاوزات الفرعية.",
+    resetAndApply: "إعادة التعيين والتطبيق",
+    deleteWarning: "هل أنت متأكد من حذف هذه الصلاحية؟",
+    showInMenu: "عرض في القائمة",
+    accessNone: "لا شيء",
+    accessReadOnly: "قراءة فقط",
+    accessLimited: "محدود",
+    accessStandard: "قياسي",
+    accessFull: "وصول كامل",
+    createPerm: "إنشاء",
+    readPerm: "قراءة",
+    updatePerm: "تحديث",
+    deletePerm: "حذف",
+    exportPerm: "تصدير",
   },
 };

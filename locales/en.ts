@@ -1412,8 +1412,16 @@ export const en = {
       overview: "Overview",
       billing: "Billing",
       features: "Features",
+      entitlements: "Entitlements",
       history: "History",
     },
+    
+    // Entitlements Tab
+    entitlementsTitle: "Access Permissions",
+    entitlementsDescription: "View the access permissions inherited from this subscription's plan",
+    editInPlan: "Edit in Plan",
+    planEntitlements: "Plan Entitlements",
+    planEntitlementsDescription: "These permissions are inherited from the subscription plan. To edit, go to the plan details page.",
     
     // Edit page
     editSubscription: "Edit Subscription",
@@ -4821,5 +4829,33 @@ export const en = {
     
     // Matrix Dialog
     modulesCount: "modules",
+    
+    // Plan Entitlements (v2.0)
+    planTitle: "Entitlements",
+    planDescription: "Configure access permissions for projects and modules in this plan",
+    planNoEntitlements: "No entitlements configured",
+    addProjectsFirst: "Add projects or modules to this plan first",
+    items: "items",
+    projectType: "Project",
+    moduleType: "Module",
+    inherited: "Inherited",
+    override: "Override",
+    inheritedTooltip: "Inherits permissions from parent project",
+    overrideTooltip: "This module has custom permissions different from its parent project",
+    cascadeWarningTitle: "Override Warning",
+    cascadeWarningMessage: "Some child modules have custom permissions. Changing this project's permission will reset all child overrides.",
+    resetAndApply: "Reset & Apply",
+    deleteWarning: "Are you sure you want to delete this entitlement?",
+    showInMenu: "Show in menu",
+    accessNone: "None",
+    accessReadOnly: "Read Only",
+    accessLimited: "Limited",
+    accessStandard: "Standard",
+    accessFull: "Full Access",
+    createPerm: "Create",
+    readPerm: "Read",
+    updatePerm: "Update",
+    deletePerm: "Delete",
+    exportPerm: "Export",
   },
 };

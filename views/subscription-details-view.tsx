@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Edit, BarChart3, Key, Settings, Calendar, DollarSign, Building, Package, Clock, AlertCircle, CheckCircle, XCircle, Pause, Play, RotateCcw, Layers, Box, Star, ArrowLeft, Shield } from "lucide-react";
+import { Edit, BarChart3, Key, Settings, Calendar, DollarSign, Building, Package, Clock, AlertCircle, CheckCircle, XCircle, Pause, Play, RotateCcw, Layers, Box, Star, ArrowLeft, Shield, Lock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { PageBreadcrumbs } from "@/components/ui/page-breadcrumbs";
 import { useI18n } from "@/providers/i18n-provider";
+import { useServices } from "@/providers/service-provider";
 import { formatDate } from "@/lib/utils";
 import { Currency } from "@/domain/models/subscription-plan.model";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
@@ -22,6 +23,8 @@ import {
   SubscriptionActionDialogData,
   SubscriptionActionType 
 } from "@/components/dialogs/subscription-action-dialog";
+import { EntitlementsTree } from "@/components/ui/entitlements-tree";
+import { PlanEntitlement } from "@/domain";
 
 interface SubscriptionDetailsViewProps {
   subscriptionId: string;
@@ -30,6 +33,7 @@ interface SubscriptionDetailsViewProps {
 export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsViewProps) {
   const { t } = useI18n();
   const router = useRouter();
+  const { planEntitlementService } = useServices();
   const { 
     subscription, 
     subscriptionStatus,
@@ -41,7 +45,29 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
     error, 
     handleLifecycleAction 
   } = useSubscriptionDetailsViewModel(subscriptionId);
+  
+  // Entitlements state (loaded from plan)
+  const [entitlements, setEntitlements] = useState<PlanEntitlement[]>([]);
+  const [entitlementsLoading, setEntitlementsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Load entitlements when subscription data is available (from the plan)
+  const loadEntitlements = useCallback(async () => {
+    if (!subscription?.planId) return;
+    try {
+      setEntitlementsLoading(true);
+      const result = await planEntitlementService.getByPlanId(subscription.planId);
+      setEntitlements(result);
+    } catch (error) {
+      console.error("Failed to load entitlements:", error);
+    } finally {
+      setEntitlementsLoading(false);
+    }
+  }, [subscription?.planId, planEntitlementService]);
+
+  useEffect(() => {
+    loadEntitlements();
+  }, [loadEntitlements]);
   
   // Action dialog state
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
@@ -306,10 +332,11 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
 
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4" dir={t("dir") as "ltr" | "rtl"}>
-        <TabsList className={`grid w-full grid-cols-4 ${t("dir") === "rtl" ? "direction-rtl" : ""}`}>
+        <TabsList className={`grid w-full grid-cols-5 ${t("dir") === "rtl" ? "direction-rtl" : ""}`}>
           {t("dir") === "rtl" ? (
             <>
               <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
+              <TabsTrigger value="entitlements">{t("subscription.tabs.entitlements")}</TabsTrigger>
               <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
               <TabsTrigger value="billing">{t("subscription.tabs.billing")}</TabsTrigger>
               <TabsTrigger value="overview">{t("subscription.tabs.overview")}</TabsTrigger>
@@ -319,6 +346,7 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               <TabsTrigger value="overview">{t("subscription.tabs.overview")}</TabsTrigger>
               <TabsTrigger value="billing">{t("subscription.tabs.billing")}</TabsTrigger>
               <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
+              <TabsTrigger value="entitlements">{t("subscription.tabs.entitlements")}</TabsTrigger>
               <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
             </>
           )}
@@ -652,6 +680,48 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="entitlements" className="space-y-4">
+          {/* View Plan Details Button */}
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                {t("subscription.entitlementsTitle")}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t("subscription.entitlementsDescription")}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/plans/${subscription.planId}`)}
+            >
+              <Edit className="h-4 w-4 me-2" />
+              {t("subscription.editInPlan")}
+            </Button>
+          </div>
+
+          {/* Entitlements Tree (Read-only view) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Lock className="h-5 w-5 text-muted-foreground" />
+                {t("subscription.planEntitlements")}
+              </CardTitle>
+              <CardDescription>
+                {t("subscription.planEntitlementsDescription")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EntitlementsTree
+                entitlements={entitlements}
+                loading={entitlementsLoading}
+                readonly={true}
+              />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">

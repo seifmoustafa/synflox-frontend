@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
-import { SubscriptionPlan } from "@/domain";
+import { SubscriptionPlan, PlanEntitlement, UpdatePlanEntitlementRequest } from "@/domain";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Trash2, ExternalLink } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Shield } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageBreadcrumbs } from "@/components/ui/page-breadcrumbs";
+import { EntitlementsTree } from "@/components/ui/entitlements-tree";
 import { appLogger } from "@/lib/logger";
 
 interface PlanDetailsViewProps {
@@ -19,14 +20,29 @@ interface PlanDetailsViewProps {
 
 export function PlanDetailsView({ planId }: PlanDetailsViewProps) {
   const router = useRouter();
-  const { subscriptionPlanService } = useServices();
+  const { subscriptionPlanService, planEntitlementService } = useServices();
   const { t } = useI18n();
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [entitlements, setEntitlements] = useState<PlanEntitlement[]>([]);
+  const [entitlementsLoading, setEntitlementsLoading] = useState(false);
+
+  const loadEntitlements = useCallback(async () => {
+    try {
+      setEntitlementsLoading(true);
+      const result = await planEntitlementService.getByPlanId(planId);
+      setEntitlements(result);
+    } catch (error) {
+      appLogger.error("Failed to load entitlements:", error);
+    } finally {
+      setEntitlementsLoading(false);
+    }
+  }, [planId, planEntitlementService]);
 
   useEffect(() => {
     loadPlan();
-  }, [planId]);
+    loadEntitlements();
+  }, [planId, loadEntitlements]);
 
   const loadPlan = async () => {
     try {
@@ -37,6 +53,21 @@ export function PlanDetailsView({ planId }: PlanDetailsViewProps) {
       appLogger.error("Failed to load plan:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEntitlementUpdate = async (request: UpdatePlanEntitlementRequest) => {
+    const result = await planEntitlementService.update(request);
+    if (result) {
+      // Reload entitlements to reflect changes
+      await loadEntitlements();
+    }
+  };
+
+  const handleEntitlementDelete = async (id: string) => {
+    const success = await planEntitlementService.delete(id);
+    if (success) {
+      await loadEntitlements();
     }
   };
 
@@ -192,71 +223,26 @@ export function PlanDetailsView({ planId }: PlanDetailsViewProps) {
         </Card>
       )}
 
-      {/* Projects */}
-      {plan.projects && plan.projects.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("plan.projects")}</CardTitle>
-            <CardDescription>{t("plan.projectsHelper")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {plan.projects.map((project) => (
-                <div
-                  key={project.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-                  onClick={() => router.push(`/projects/${project.id}`)}
-                >
-                  <div>
-                    <div className="font-medium flex items-center gap-2">
-                      {project.name}
-                      {/* <ExternalLink className="h-4 w-4 text-muted-foreground" /> */}
-                    </div>
-                    {project.description && (
-                      <div className="text-sm text-muted-foreground">
-                        {project.description}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Modules */}
-      {plan.modules && plan.modules.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("plan.modules")}</CardTitle>
-            <CardDescription>{t("plan.modulesHelper")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {plan.modules.map((module) => (
-                <div
-                  key={module.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer"
-                  onClick={() => router.push(`/modules/${module.id}`)}
-                >
-                  <div>
-                    <div className="font-medium flex items-center gap-2">
-                      {module.name}
-                      {/* <ExternalLink className="h-4 w-4 text-muted-foreground" /> */}
-                    </div>
-                    {module.description && (
-                      <div className="text-sm text-muted-foreground">
-                        {module.description}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Entitlements - Hierarchical Permission Tree */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            {t("entitlements.planTitle") || "Entitlements"}
+          </CardTitle>
+          <CardDescription>
+            {t("entitlements.planDescription") || "Configure access permissions for projects and modules in this plan"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <EntitlementsTree
+            entitlements={entitlements}
+            loading={entitlementsLoading}
+            onUpdate={handleEntitlementUpdate}
+            onDelete={handleEntitlementDelete}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 }
