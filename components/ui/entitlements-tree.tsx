@@ -481,13 +481,13 @@ function EntitlementNode({
         )}
 
         {/* Name */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+        <div className="flex-1 min-w-[120px]">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className={cn(
-              "font-medium truncate",
-              entitlement.isProjectEntitlement && "text-primary"
+              "font-medium",
+              entitlement.isProjectEntitlement ? "text-primary" : "text-foreground"
             )}>
-              {entitlement.targetName}
+              {entitlement.targetName || entitlement.projectName || entitlement.moduleName || "Unknown"}
             </span>
             {getStatusBadge()}
           </div>
