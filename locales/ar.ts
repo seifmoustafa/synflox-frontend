@@ -4127,6 +4127,7 @@ export const ar = {
 
   // Common
   common: {
+    days:"أيام",
     contact:"تواصل",
     none:"لا شيء",
     optional:"إختياري",
