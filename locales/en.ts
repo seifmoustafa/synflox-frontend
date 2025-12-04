@@ -1356,6 +1356,7 @@ export const en = {
       expiring: "Expiring Soon",
       expired: "Expired",
       suspended: "Suspended",
+      paused: "Paused",
       cancelled: "Cancelled",
       lifetime: "Lifetime",
       unknown: "Unknown",

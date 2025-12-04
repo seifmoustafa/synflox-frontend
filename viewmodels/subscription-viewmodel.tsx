@@ -453,6 +453,7 @@ export function useSubscriptionViewModel() {
             Expiring: "yellow",
             Expired: "red",
             Suspended: "orange",
+            Paused: "cyan", // Timer frozen
             Cancelled: "gray",
             Lifetime: "purple",
           };
@@ -671,13 +672,13 @@ export function useSubscriptionViewModel() {
         label: t("subscription.operations.pause"),
         onClick: (item: Subscription) => handlePause(item),
         variant: "outline" as const,
-        show: (item: Subscription) => item.isActive && !item.isTrial && item.status !== "Suspended",
+        show: (item: Subscription) => item.canPause, // Active, not lifetime, not paused
       },
       {
         label: t("subscription.operations.unpause"),
         onClick: (item: Subscription) => handleUnpause(item),
         variant: "outline" as const,
-        show: (item: Subscription) => item.status === "Paused",
+        show: (item: Subscription) => item.canUnpause, // Currently paused
       },
       {
         label: t("subscription.operations.stopTrial"),

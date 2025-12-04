@@ -1348,6 +1348,7 @@ export const ar = {
       expiring: "ينتهي قريباً",
       expired: "منتهي",
       suspended: "معلق",
+      paused: "متوقف مؤقتاً",
       cancelled: "ملغي",
       lifetime: "مدى الحياة",
       unknown: "غير معروف",

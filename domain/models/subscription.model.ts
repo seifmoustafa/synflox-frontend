@@ -68,6 +68,10 @@ export interface SubscriptionData {
   isExpired: boolean;
   isLifetime: boolean;
   autoRenew: boolean;
+  // Pause state (timer freeze)
+  isPaused: boolean;
+  pausedAtUtc?: string | null;
+  remainingDaysWhenPaused?: number | null;
   currency: Currency;
   amount: number;
   statusReason?: string | null;
@@ -91,6 +95,8 @@ export interface SubscriptionData {
   canUpgrade?: boolean;
   canExtend?: boolean;
   canReactivate?: boolean;
+  canPause?: boolean;
+  canUnpause?: boolean;
   // Plan features
   projects?: SubscriptionProjectData[];
   modules?: SubscriptionModuleData[];
@@ -153,6 +159,10 @@ export class Subscription {
   readonly isExpired: boolean;
   readonly isLifetime: boolean;
   readonly autoRenew: boolean;
+  // Pause state (timer freeze)
+  readonly isPaused: boolean;
+  readonly pausedAtUtc?: Date | null;
+  readonly remainingDaysWhenPaused?: number | null;
   readonly currency: Currency;
   readonly amount: number;
   readonly statusReason?: string | null;
@@ -195,6 +205,8 @@ export class Subscription {
   private _canUpgrade?: boolean;
   private _canExtend?: boolean;
   private _canReactivate?: boolean;
+  private _canPause?: boolean;
+  private _canUnpause?: boolean;
 
   constructor(data: SubscriptionData) {
     this.id = data.id;
@@ -209,6 +221,10 @@ export class Subscription {
     this.isExpired = data.isExpired;
     this.isLifetime = data.isLifetime;
     this.autoRenew = data.autoRenew;
+    // Pause state
+    this.isPaused = data.isPaused ?? false;
+    this.pausedAtUtc = data.pausedAtUtc ? new Date(data.pausedAtUtc) : null;
+    this.remainingDaysWhenPaused = data.remainingDaysWhenPaused ?? null;
     this.currency = data.currency;
     this.amount = data.amount;
     this.statusReason = data.statusReason;
@@ -255,6 +271,8 @@ export class Subscription {
     this._canUpgrade = data.canUpgrade;
     this._canExtend = data.canExtend;
     this._canReactivate = data.canReactivate;
+    this._canPause = data.canPause;
+    this._canUnpause = data.canUnpause;
   }
 
   // ============================================================================
@@ -270,6 +288,7 @@ export class Subscription {
     
     // Fallback to frontend calculation
     if (this.isLifetime) return "Lifetime";
+    if (this.isPaused) return "Paused";
     if (this.isExpired) return "Expired";
     if (!this.isActive && this.statusReason?.includes("suspend")) return "Suspended";
     if (!this.isActive && this.statusReason?.includes("cancel")) return "Cancelled";
@@ -345,7 +364,7 @@ export class Subscription {
   /**
    * Status badge color
    */
-  get statusColor(): "blue" | "green" | "yellow" | "red" | "orange" | "gray" | "purple" {
+  get statusColor(): "blue" | "green" | "yellow" | "red" | "orange" | "gray" | "purple" | "cyan" {
     switch (this.status) {
       case "Trial":
         return "blue";
@@ -357,6 +376,8 @@ export class Subscription {
         return "red";
       case "Suspended":
         return "orange";
+      case "Paused":
+        return "cyan"; // Timer frozen - distinct from suspended
       case "Cancelled":
         return "gray";
       case "Lifetime":
@@ -427,6 +448,22 @@ export class Subscription {
   get canReactivate(): boolean {
     if (this._canReactivate !== undefined) return this._canReactivate;
     return this.isExpired && !this.isLifetime;
+  }
+
+  /**
+   * Check if can be paused (prefer backend computed value)
+   */
+  get canPause(): boolean {
+    if (this._canPause !== undefined) return this._canPause;
+    return this.isActive && !this.isLifetime && !this.isPaused && !this.isExpired;
+  }
+
+  /**
+   * Check if can be unpaused (prefer backend computed value)
+   */
+  get canUnpause(): boolean {
+    if (this._canUnpause !== undefined) return this._canUnpause;
+    return this.isPaused;
   }
 
   // ============================================================================
@@ -532,6 +569,10 @@ export class Subscription {
       isExpired: this.isExpired,
       isLifetime: this.isLifetime,
       autoRenew: this.autoRenew,
+      // Pause state
+      isPaused: this.isPaused,
+      pausedAtUtc: this.pausedAtUtc?.toISOString() || null,
+      remainingDaysWhenPaused: this.remainingDaysWhenPaused,
       currency: this.currency,
       amount: this.amount,
       statusReason: this.statusReason,

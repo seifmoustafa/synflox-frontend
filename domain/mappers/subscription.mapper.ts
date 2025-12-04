@@ -73,6 +73,10 @@ export class SubscriptionMapper {
       isExpired: json.isExpired ?? false,
       isLifetime: json.isLifetime ?? false,
       autoRenew: json.autoRenew ?? false,
+      // Pause state
+      isPaused: json.isPaused ?? false,
+      pausedAtUtc: json.pausedAtUtc || null,
+      remainingDaysWhenPaused: json.remainingDaysWhenPaused ?? null,
       currency: json.currency ?? 1, // Default to USD
       amount: json.amount ?? 0,
       statusReason: json.statusReason || null,
@@ -96,6 +100,8 @@ export class SubscriptionMapper {
       canUpgrade: json.canUpgrade,
       canExtend: json.canExtend,
       canReactivate: json.canReactivate,
+      canPause: json.canPause,
+      canUnpause: json.canUnpause,
       // Plan features - handle both camelCase and PascalCase
       projects: json.projects || json.Projects || [],
       modules: json.modules || json.Modules || [],
