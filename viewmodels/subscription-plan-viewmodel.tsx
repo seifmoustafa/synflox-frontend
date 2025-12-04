@@ -13,6 +13,7 @@ import {
   UpgradePolicy,
 } from "@/domain";
 import { Badge } from "@/components/ui/badge";
+import { PlanModuleConflict, CreatePlanWithConfirmationRequest } from "@/services/subscription-plan.service";
 
 export function useSubscriptionPlanViewModel() {
   const router = useRouter();
@@ -24,6 +25,19 @@ export function useSubscriptionPlanViewModel() {
   const [moduleOptions, setModuleOptions] = React.useState<Array<{value: string, label: string}>>([]);
   const [freeTierPlanOptions, setFreeTierPlanOptions] = React.useState<Array<{value: string, label: string}>>([]);
   const [parentPlanOptions, setParentPlanOptions] = React.useState<Array<{value: string, label: string}>>([]);
+  
+  // Module conflict dialog state for CREATE
+  const [showConflictDialog, setShowConflictDialog] = React.useState(false);
+  const [moduleConflicts, setModuleConflicts] = React.useState<PlanModuleConflict[]>([]);
+  const [pendingCreateData, setPendingCreateData] = React.useState<any>(null);
+  const [isConfirmLoading, setIsConfirmLoading] = React.useState(false);
+  
+  // Custom initial values for reopening form with data
+  const [customCreateInitialValues, setCustomCreateInitialValues] = React.useState<any>(null);
+  
+  // Ref to store modal closer and refresh function (will be set after VM is created)
+  const closeCreateModalRef = React.useRef<(() => void) | null>(null);
+  const refreshDataRef = React.useRef<(() => void) | null>(null);
 
   React.useEffect(() => {
     // Load projects
@@ -106,7 +120,113 @@ export function useSubscriptionPlanViewModel() {
       parentPlanId: data.parentPlanId || null,
       displayOrder: data.displayOrder ? parseInt(data.displayOrder) : 0,
     });
-    return await subscriptionPlanService.createPlan(request);
+    
+    try {
+      return await subscriptionPlanService.createPlan(request);
+    } catch (error: any) {
+      // Handle module conflict error (409 Conflict)
+      const isConflict = error?.statusCode === 409 || error?.response?.status === 409;
+      const responseData = error?.response?.data;
+      
+      if (isConflict && responseData?.requiresConfirmation) {
+        // Store data for confirmation dialog
+        setPendingCreateData(data);
+        const conflicts = responseData.validationResult?.moduleConflicts || [];
+        setModuleConflicts(conflicts);
+        
+        // Close the create modal first
+        if (closeCreateModalRef.current) {
+          closeCreateModalRef.current();
+        }
+        
+        // Show conflict dialog
+        setShowConflictDialog(true);
+        
+        // Return a dummy result to prevent error - the dialog will handle the rest
+        return {} as SubscriptionPlan;
+      }
+      throw error;
+    }
+  };
+  
+  // Handle confirmation from conflict dialog
+  const handleConfirmCreate = async () => {
+    if (!pendingCreateData) {
+      console.error("No pending data for confirmation");
+      setShowConflictDialog(false);
+      return;
+    }
+    
+    setIsConfirmLoading(true);
+    
+    try {
+      // Build the confirmation request
+      const prices = pendingCreateData.currency && pendingCreateData.amount ? [{
+        currency: parseInt(pendingCreateData.currency),
+        amount: parseFloat(pendingCreateData.amount)
+      }] : [];
+
+      const request = {
+        name: pendingCreateData.name,
+        description: pendingCreateData.description,
+        durationType: parseInt(pendingCreateData.durationType),
+        prices,
+        allowTrial: pendingCreateData.allowTrial,
+        trialDurationDays: pendingCreateData.trialDurationDays,
+        autoRenew: pendingCreateData.autoRenew,
+        upgradePolicy: pendingCreateData.upgradePolicy ? parseInt(pendingCreateData.upgradePolicy) : undefined,
+        gracePeriodDays: pendingCreateData.gracePeriodDays,
+        exportGraceDays: pendingCreateData.exportGraceDays,
+        isFreeTier: pendingCreateData.isFreeTier,
+        fallbackAccessMode: pendingCreateData.fallbackAccessMode ? parseInt(pendingCreateData.fallbackAccessMode) : undefined,
+        showLockedModulesInMenu: pendingCreateData.showLockedModulesInMenu,
+        customFeatures: pendingCreateData.customFeatures || [],
+        projectIds: pendingCreateData.projectIds || [],
+        moduleIds: pendingCreateData.moduleIds || [],
+        parentPlanId: pendingCreateData.parentPlanId || null,
+        displayOrder: pendingCreateData.displayOrder ? parseInt(pendingCreateData.displayOrder) : 0,
+        confirmRemoveDuplicates: true,
+        isValid: true,
+      } as CreatePlanWithConfirmationRequest;
+
+      await subscriptionPlanService.createWithConfirmation(request);
+      
+      // Close dialog and clear state
+      setShowConflictDialog(false);
+      setPendingCreateData(null);
+      setModuleConflicts([]);
+      
+      // Refresh the data list (no page reload!)
+      if (refreshDataRef.current) {
+        refreshDataRef.current();
+      }
+    } catch (error) {
+      console.error("Failed to create plan with confirmation:", error);
+      // Keep dialog open on error so user can try again
+    } finally {
+      setIsConfirmLoading(false);
+    }
+  };
+  
+  // Ref to open modal (will be set after VM is created)
+  const openCreateModalRef = React.useRef<(() => void) | null>(null);
+  
+  const handleCancelConflictDialog = () => {
+    setShowConflictDialog(false);
+    setModuleConflicts([]);
+    
+    // Reopen the create modal with the pending data
+    if (pendingCreateData) {
+      // Set custom initial values for the form
+      setCustomCreateInitialValues(pendingCreateData);
+      // Open the modal
+      if (openCreateModalRef.current) {
+        openCreateModalRef.current();
+      }
+    }
+    
+    // Clear pending data after setting initial values
+    setPendingCreateData(null);
   };
 
   const updatePlan = async (id: string, data: any) => {
@@ -169,6 +289,24 @@ export function useSubscriptionPlanViewModel() {
       searchParamName: "search",
     }
   );
+  
+  // Store modal functions and refresh in refs so conflict handlers can access them
+  React.useEffect(() => {
+    closeCreateModalRef.current = () => vm.setIsCreateModalOpen(false);
+    openCreateModalRef.current = () => vm.setIsCreateModalOpen(true);
+    refreshDataRef.current = vm.refresh;
+  }, [vm.setIsCreateModalOpen, vm.refresh]);
+  
+  // Clear custom initial values when modal closes normally
+  React.useEffect(() => {
+    if (!vm.isCreateModalOpen && customCreateInitialValues) {
+      // Delay clearing to allow form to initialize with the values
+      const timer = setTimeout(() => {
+        setCustomCreateInitialValues(null);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [vm.isCreateModalOpen, customCreateInitialValues]);
 
   const config = useMemo(
     () => ({
@@ -617,7 +755,7 @@ export function useSubscriptionPlanViewModel() {
         },
         { name: "id", type: "hidden" as const, required: true },
       ],
-      createInitialValues: {
+      createInitialValues: customCreateInitialValues || {
         durationType: 3, // Monthly by default
         currency: 1, // USD by default
         amount: 0,
@@ -676,8 +814,19 @@ export function useSubscriptionPlanViewModel() {
         },
       ],
     }),
-    [t, subscriptionPlanService, vm]
+    [t, subscriptionPlanService, vm, customCreateInitialValues, projectOptions, moduleOptions, freeTierPlanOptions, parentPlanOptions]
   );
 
-  return { vm, config };
+  return { 
+    vm, 
+    config,
+    // Conflict dialog state for CREATE
+    conflictDialog: {
+      show: showConflictDialog,
+      conflicts: moduleConflicts,
+      onConfirm: handleConfirmCreate,
+      onCancel: handleCancelConflictDialog,
+      isLoading: isConfirmLoading,
+    }
+  };
 }

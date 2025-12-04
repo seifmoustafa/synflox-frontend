@@ -21,6 +21,8 @@ export interface ConfirmationDialogProps {
   onOpenChange: (open: boolean) => void
   title?: string
   description?: string
+  /** Custom content to render instead of description */
+  children?: React.ReactNode
   confirmText?: string
   cancelText?: string
   onConfirm: () => void | Promise<void>
@@ -66,6 +68,7 @@ export function ConfirmationDialog({
   onOpenChange,
   title,
   description,
+  children,
   confirmText = "Confirm",
   cancelText = "Cancel",
   onConfirm,
@@ -77,11 +80,15 @@ export function ConfirmationDialog({
   const config = variantConfig[variant]
   const IconComponent = config.icon
   
-  const handleConfirm = async () => {
+  const handleConfirm = async (e: React.MouseEvent) => {
+    // Prevent AlertDialogAction from auto-closing the dialog
+    e.preventDefault()
     try {
       await onConfirm()
+      // Only close on success - the caller's onConfirm should handle closing
     } catch (error) {
       appLogger.error("Confirmation action failed:", error)
+      // Keep dialog open on error
     }
   }
 
@@ -90,9 +97,16 @@ export function ConfirmationDialog({
     onOpenChange(false)
   }
 
+  // Handle backdrop/escape close - treat as cancel
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      handleCancel()
+    }
+  }
+
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="sm:max-w-[425px]">
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
+      <AlertDialogContent className="sm:max-w-[500px]">
         <AlertDialogHeader>
           <div className="flex items-center gap-3">
             {icon || (
@@ -100,13 +114,18 @@ export function ConfirmationDialog({
                 <IconComponent className="h-6 w-6" />
               </div>
             )}
-            <AlertDialogTitle className="text-left">
+            <AlertDialogTitle className="text-start">
               {title || config.title}
             </AlertDialogTitle>
           </div>
-          <AlertDialogDescription className="text-left mt-2">
-            {description || config.description}
-          </AlertDialogDescription>
+          {/* Render children if provided, otherwise description */}
+          {children ? (
+            <div className="mt-2 text-start">{children}</div>
+          ) : (
+            <AlertDialogDescription className="text-start mt-2">
+              {description || config.description}
+            </AlertDialogDescription>
+          )}
         </AlertDialogHeader>
         <AlertDialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-2">
           <AlertDialogCancel asChild>
@@ -118,23 +137,21 @@ export function ConfirmationDialog({
               {cancelText}
             </Button>
           </AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <Button
-              variant={config.confirmVariant}
-              onClick={handleConfirm}
-              disabled={isLoading}
-              className="min-w-[80px]"
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                  Loading...
-                </div>
-              ) : (
-                confirmText
-              )}
-            </Button>
-          </AlertDialogAction>
+          <Button
+            variant={config.confirmVariant}
+            onClick={handleConfirm}
+            disabled={isLoading}
+            className="min-w-[80px]"
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Loading...
+              </div>
+            ) : (
+              confirmText
+            )}
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

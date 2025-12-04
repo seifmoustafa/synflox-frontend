@@ -330,8 +330,10 @@ export class ApiService implements IApiService {
         // 4xx Client errors (except 401) - DO NOT RETRY
         if (response.status >= 400 && response.status < 500) {
           appLogger.error("Client error - not retrying", { status: response.status, statusText: response.statusText });
-          const error = new Error(errorMessage) as Error & { statusCode: number };
+          const error = new Error(errorMessage) as Error & { statusCode: number; response?: { status: number; data: any } };
           error.statusCode = response.status;  // Mark with status code so retry logic knows not to retry
+          // Preserve response data for 409 Conflict and similar cases
+          error.response = { status: response.status, data: errorData };
           // Note: Error notification handled by caller (service/viewmodel)
           throw error;
         }

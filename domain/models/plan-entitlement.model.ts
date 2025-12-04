@@ -5,15 +5,19 @@
  */
 
 /**
- * Entitlement access levels
+ * Entitlement access levels - MUST match backend Domain.Enums.EntitlementAccessLevel
  */
 export enum EntitlementAccessLevel {
+  /** No access */
   None = 0,
-  ReadOnly = 1,
-  Limited = 2,
-  Standard = 3,
-  Full = 4,
-  Custom = 5,
+  /** Full access - all CRUD operations allowed */
+  Full = 1,
+  /** Read-only access - view and export only */
+  ReadOnly = 2,
+  /** Export-only access - can only export data */
+  ExportOnly = 3,
+  /** Blocked - no access whatsoever */
+  Blocked = 4,
 }
 
 /**

@@ -1189,8 +1189,32 @@ export const en = {
   plan: {
     title: "Subscription Plans Management",
     description: "Manage subscription plans and pricing",
+    editDescription: "Configure plan settings and pricing",
     item: "Plan",
     items: "Plans",
+    // Tabs
+    basicInfo: "Basic",
+    basicInfoDesc: "Plan name, description and hierarchy",
+    pricingTab: "Pricing",
+    pricingDesc: "Set the plan duration and price",
+    billingTab: "Billing",
+    billingDesc: "Auto-renewal and upgrade policies",
+    accessTab: "Access",
+    accessDesc: "Fallback behavior and menu visibility",
+    // Edit Page Sections
+    trialSettings: "Trial Period",
+    trialDesc: "Configure free trial options",
+    billingSettings: "Billing Settings",
+    accessSettings: "Access Control",
+    contentAccess: "Content Access",
+    contentAccessDesc: "Select projects and modules included in this plan",
+    freeTierEnabled: "Free Tier Enabled",
+    freeTierPricingNote: "Pricing options are disabled for free tier plans. Disable the free tier option in Basic tab to configure pricing.",
+    billingNotApplicable: "Billing Not Applicable",
+    freeTierNoBilling: "Free tier plans don't have billing options.",
+    lifetimeNoBilling: "Lifetime plans are one-time purchases with no recurring billing.",
+    selectProjectsPlaceholder: "Select projects...",
+    selectModulesPlaceholder: "Select modules...",
     name: "Plan Name",
     namePlaceholder: "Enter plan name (e.g., Pro Plan, Enterprise)",
     planDescription: "Description",
@@ -1278,6 +1302,13 @@ export const en = {
     inheritedProjects: "Inherited Projects",
     inheritedModules: "Inherited Modules",
     inherited: "inherited",
+    
+    // Module Conflict Dialog
+    moduleConflictTitle: "Module Conflict Detected",
+    moduleConflictDescription: "The following modules are already included in the selected projects and will be managed under their respective projects:",
+    alreadyInProject: "already in",
+    moduleConflictNote: "These modules will be removed from the standalone modules list. They will inherit permissions from their parent project instead.",
+    confirmRemoveDuplicates: "Confirm & Save",
   },
 
   // Subscriptions
@@ -4849,6 +4880,8 @@ export const en = {
     showInMenu: "Show in menu",
     accessNone: "None",
     accessReadOnly: "Read Only",
+    accessExportOnly: "Export Only",
+    accessBlocked: "Blocked",
     accessLimited: "Limited",
     accessStandard: "Standard",
     accessFull: "Full Access",
@@ -4857,5 +4890,6 @@ export const en = {
     updatePerm: "Update",
     deletePerm: "Delete",
     exportPerm: "Export",
+    moduleUnderProject: "Module",
   },
 };

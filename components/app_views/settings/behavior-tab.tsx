@@ -22,7 +22,7 @@ export function BehaviorTab() {
         <div className="space-y-6">
           <div className={cn(
             "flex items-center justify-between",
-            direction === "rtl" ? "flex-row-reverse" : ""
+            // direction === "rtl" ? "flex-row-reverse" : ""
           )}>
             <div className="space-y-0.5">
               <Label>{t("settings.behavior.breadcrumbs.label")}</Label>
@@ -40,7 +40,7 @@ export function BehaviorTab() {
 
           <div className={cn(
             "flex items-center justify-between",
-            direction === "rtl" ? "flex-row-reverse" : ""
+            // direction === "rtl" ? "flex-row-reverse" : ""
           )}>
             <div className="space-y-0.5">
               <Label>{t("settings.behavior.userAvatar.label")}</Label>
@@ -58,7 +58,7 @@ export function BehaviorTab() {
 
           <div className={cn(
             "flex items-center justify-between",
-            direction === "rtl" ? "flex-row-reverse" : ""
+            // direction === "rtl" ? "flex-row-reverse" : ""
           )}>
             <div className="space-y-0.5">
               <Label>{t("settings.behavior.notifications.label")}</Label>
@@ -76,7 +76,7 @@ export function BehaviorTab() {
 
           <div className={cn(
             "flex items-center justify-between",
-            direction === "rtl" ? "flex-row-reverse" : ""
+            // direction === "rtl" ? "flex-row-reverse" : ""
           )}>
             <div className="space-y-0.5">
               <Label>{t("settings.behavior.logo.label")}</Label>
@@ -94,7 +94,7 @@ export function BehaviorTab() {
 
           <div className={cn(
             "flex items-center justify-between",
-            direction === "rtl" ? "flex-row-reverse" : ""
+            // direction === "rtl" ? "flex-row-reverse" : ""
           )}>
             <div className="space-y-0.5">
               <Label>{t("settings.behavior.compact.label")}</Label>

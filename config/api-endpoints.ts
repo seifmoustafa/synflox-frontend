@@ -104,7 +104,10 @@ export const API_ENDPOINTS = {
     GET_ALL: "/plans",
     BY_ID: (id: string) => `/plans/${id}`,
     CREATE: "/plans",
+    CREATE_WITH_CONFIRMATION: "/plans/with-confirmation",
     FREE_TIER: "/plans/free-tier",
+    VALIDATE_MODULES: "/plans/validate-modules",
+    UPDATE_WITH_CONFIRMATION: (id: string) => `/plans/${id}/with-confirmation`,
   },
   
   // Subscriptions Management

@@ -1180,8 +1180,32 @@ export const ar = {
   plan: {
     title: "إدارة خطط الاشتراك",
     description: "إدارة خطط الاشتراك والأسعار",
+    editDescription: "تكوين إعدادات الخطة والتسعير",
     item: "خطة",
     items: "الخطط",
+    // Tabs
+    basicInfo: "أساسي",
+    basicInfoDesc: "اسم الخطة والوصف والتسلسل الهرمي",
+    pricingTab: "التسعير",
+    pricingDesc: "تحديد مدة الخطة والسعر",
+    billingTab: "الفوترة",
+    billingDesc: "التجديد التلقائي وسياسات الترقية",
+    accessTab: "الوصول",
+    accessDesc: "سلوك النسخ الاحتياطي ورؤية القائمة",
+    // Edit Page Sections
+    trialSettings: "الفترة التجريبية",
+    trialDesc: "تكوين خيارات الفترة التجريبية المجانية",
+    billingSettings: "إعدادات الفوترة",
+    accessSettings: "التحكم في الوصول",
+    contentAccess: "الوصول للمحتوى",
+    contentAccessDesc: "اختر المشاريع والوحدات المضمنة في هذه الخطة",
+    freeTierEnabled: "الخطة المجانية مفعلة",
+    freeTierPricingNote: "خيارات التسعير معطلة للخطط المجانية. قم بتعطيل خيار الخطة المجانية في تبويب الأساسي لتكوين التسعير.",
+    billingNotApplicable: "الفوترة غير قابلة للتطبيق",
+    freeTierNoBilling: "الخطط المجانية لا تحتوي على خيارات فوترة.",
+    lifetimeNoBilling: "خطط مدى الحياة هي عمليات شراء لمرة واحدة بدون فوترة متكررة.",
+    selectProjectsPlaceholder: "اختر المشاريع...",
+    selectModulesPlaceholder: "اختر الوحدات...",
     name: "اسم الخطة",
     namePlaceholder: "أدخل اسم الخطة (مثل: الخطة الاحترافية، المؤسسية)",
     planDescription: "الوصف",
@@ -1269,6 +1293,13 @@ export const ar = {
     inheritedProjects: "المشاريع الموروثة",
     inheritedModules: "الوحدات الموروثة",
     inherited: "موروثة",
+    
+    // Module Conflict Dialog
+    moduleConflictTitle: "تم اكتشاف تعارض في الوحدات",
+    moduleConflictDescription: "الوحدات التالية مضمنة بالفعل في المشاريع المحددة وسيتم إدارتها تحت مشاريعها:",
+    alreadyInProject: "موجود في",
+    moduleConflictNote: "سيتم إزالة هذه الوحدات من قائمة الوحدات المستقلة. وستتوارث الصلاحيات من المشروع الأصلي.",
+    confirmRemoveDuplicates: "تأكيد وحفظ",
   },
 
   // Subscriptions
@@ -4656,6 +4687,8 @@ export const ar = {
     showInMenu: "عرض في القائمة",
     accessNone: "لا شيء",
     accessReadOnly: "قراءة فقط",
+    accessExportOnly: "تصدير فقط",
+    accessBlocked: "محظور",
     accessLimited: "محدود",
     accessStandard: "قياسي",
     accessFull: "وصول كامل",
@@ -4664,5 +4697,6 @@ export const ar = {
     updatePerm: "تحديث",
     deletePerm: "حذف",
     exportPerm: "تصدير",
+    moduleUnderProject: "وحدة",
   },
 };

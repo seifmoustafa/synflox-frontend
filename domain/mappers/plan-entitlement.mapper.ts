@@ -141,31 +141,29 @@ export class PlanEntitlementMapper {
   }
 
   /**
-   * Get access level display string
+   * Get access level display string - matches backend enum
    */
   static getAccessLevelDisplay(level?: EntitlementAccessLevel): string {
     switch (level) {
       case EntitlementAccessLevel.None: return 'None';
-      case EntitlementAccessLevel.ReadOnly: return 'Read Only';
-      case EntitlementAccessLevel.Limited: return 'Limited';
-      case EntitlementAccessLevel.Standard: return 'Standard';
       case EntitlementAccessLevel.Full: return 'Full Access';
-      case EntitlementAccessLevel.Custom: return 'Custom';
+      case EntitlementAccessLevel.ReadOnly: return 'Read Only';
+      case EntitlementAccessLevel.ExportOnly: return 'Export Only';
+      case EntitlementAccessLevel.Blocked: return 'Blocked';
       default: return 'Full Access';
     }
   }
 
   /**
-   * Get access level options for dropdowns
+   * Get access level options for dropdowns - matches backend enum
    */
   static getAccessLevelOptions(): { value: EntitlementAccessLevel; label: string }[] {
     return [
       { value: EntitlementAccessLevel.None, label: 'None' },
-      { value: EntitlementAccessLevel.ReadOnly, label: 'Read Only' },
-      { value: EntitlementAccessLevel.Limited, label: 'Limited' },
-      { value: EntitlementAccessLevel.Standard, label: 'Standard' },
       { value: EntitlementAccessLevel.Full, label: 'Full Access' },
-      { value: EntitlementAccessLevel.Custom, label: 'Custom' },
+      { value: EntitlementAccessLevel.ReadOnly, label: 'Read Only' },
+      { value: EntitlementAccessLevel.ExportOnly, label: 'Export Only' },
+      { value: EntitlementAccessLevel.Blocked, label: 'Blocked' },
     ];
   }
 }

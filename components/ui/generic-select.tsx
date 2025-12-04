@@ -881,8 +881,10 @@ export const GenericSelect = React.forwardRef<
       }
     }, [isOpen, searchType, options, calculateDropdownPosition]);
 
+    const isRTL = direction === "rtl";
+    
     return (
-      <div ref={containerRef} className="relative w-full" {...props}>
+      <div ref={containerRef} className="relative w-full" dir={isRTL ? "rtl" : "ltr"} {...props}>
         <div
           ref={(node) => {
             triggerRef.current = node;
@@ -962,7 +964,7 @@ export const GenericSelect = React.forwardRef<
                 : undefined,
           }}
         >
-          <div className="flex-1 flex flex-wrap gap-1 items-center min-h-[1.5rem] overflow-hidden">
+          <div className={cn("flex-1 flex flex-wrap gap-1 items-center min-h-[1.5rem] overflow-hidden", isRTL && "text-right")}>
             {isMultiSelect && selectedOptions.length > 0 ? (
               selectedOptions.length <= maxSelectedDisplay ? (
                 // Show individual chips for small selections
@@ -1049,6 +1051,7 @@ export const GenericSelect = React.forwardRef<
               ref={dropdownRef}
               data-dropdown-portal="true"
               data-searchable-select="true"
+              dir={isRTL ? "rtl" : "ltr"}
               className={cn(
                 "fixed z-[2147483647] min-w-[8rem] overflow-hidden shadow-lg pointer-events-auto",
                 styles.dropdown
@@ -1143,7 +1146,7 @@ export const GenericSelect = React.forwardRef<
 
               {/* Multi-select batch operations */}
               {isMultiSelect && displayOptions.length > 0 && (
-                <div className="p-2 border-b border-border/50 flex gap-2">
+                <div className={cn("p-2 border-b border-border/50 flex gap-2", isRTL && "flex-row-reverse")}>
                   <button
                     type="button"
                     onClick={handleSelectAll}
