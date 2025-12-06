@@ -4795,6 +4795,14 @@ export const ar = {
     machineBinding: "ربط الجهاز",
     bound: "مرتبط بجهاز",
     notBound: "غير مرتبط",
+    keyBinding: "ربط المفتاح",
+    keyBound: "مفتاح مرتبط بجهاز",
+    keyNotBound: "مفتاح غير مرتبط",
+    keyNotBoundHint: "الترخيص يعمل على أي جهاز. انظر تبويب الأجهزة للتفعيلات.",
+    connectedDevices: "الأجهزة المتصلة",
+    atCapacity: "الحد الأقصى",
+    devicesActive: "أجهزة نشطة",
+    noDevicesYet: "لا توجد أجهزة بعد",
     
     // License Key
     licenseKey: "مفتاح الترخيص",

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useLicenseViewModel } from "@/viewmodels/license-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
+import { useServices } from "@/providers/service-provider";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +52,7 @@ import {
   ShieldCheck,
   ShieldX,
 } from "lucide-react";
-import { License, GenerateLicenseRequest, ValidateLicenseRequest } from "@/domain/models/license.model";
+import { License, GenerateLicenseRequest, ValidateLicenseRequest, ActivationSummary } from "@/domain/models/license.model";
 
 // ============================================================================
 // License Info Card
@@ -59,6 +60,7 @@ import { License, GenerateLicenseRequest, ValidateLicenseRequest } from "@/domai
 
 interface LicenseInfoCardProps {
   license: License;
+  activations?: ActivationSummary | null;
   onGenerate: () => void;
   onRegenerate: () => void;
   onRevoke: () => void;
@@ -69,6 +71,7 @@ interface LicenseInfoCardProps {
 
 function LicenseInfoCard({
   license,
+  activations,
   onGenerate,
   onRegenerate,
   onRevoke,
@@ -152,15 +155,27 @@ function LicenseInfoCard({
           <div className="p-4 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">
               <Monitor className="h-4 w-4" />
-              <span className="text-sm">{t("license.machineBinding")}</span>
+              <span className="text-sm">{t("license.connectedDevices")}</span>
             </div>
-            <p className="font-semibold">
-              {license.isMachineBound ? t("license.bound") : t("license.notBound")}
-            </p>
-            {license.machineFingerprint && (
-              <p className="text-xs text-muted-foreground truncate">
-                {license.machineFingerprint}
-              </p>
+            {activations ? (
+              <>
+                <p className="font-semibold">
+                  {activations.activeDeviceCount} / {activations.isUnlimited ? "∞" : activations.maxDevices}
+                </p>
+                <p className={`text-xs ${
+                  !activations.isUnlimited && activations.remainingSlots === 0 ? 'text-orange-500' :
+                  activations.hasDevices ? 'text-green-500' :
+                  'text-muted-foreground'
+                }`}>
+                  {!activations.isUnlimited && activations.remainingSlots === 0
+                    ? t("license.atCapacity") 
+                    : activations.hasDevices 
+                      ? t("license.devicesActive")
+                      : t("license.noDevicesYet")}
+                </p>
+              </>
+            ) : (
+              <p className="font-semibold text-muted-foreground">-</p>
             )}
           </div>
         </div>
@@ -633,6 +648,21 @@ interface LicenseViewProps {
 export function LicenseView({ subscriptionId }: LicenseViewProps) {
   const vm = useLicenseViewModel(subscriptionId);
   const { t } = useI18n();
+  const { licenseService } = useServices();
+  const [activations, setActivations] = React.useState<ActivationSummary | null>(null);
+
+  // Fetch device activations
+  React.useEffect(() => {
+    const loadActivations = async () => {
+      try {
+        const result = await licenseService.getActivations(subscriptionId);
+        setActivations(result);
+      } catch (error) {
+        console.error("Failed to load activations:", error);
+      }
+    };
+    loadActivations();
+  }, [subscriptionId, licenseService]);
 
   if (vm.isLoading) {
     return <LicenseSkeleton />;
@@ -697,6 +727,7 @@ export function LicenseView({ subscriptionId }: LicenseViewProps) {
     <>
       <LicenseInfoCard
         license={vm.license}
+        activations={activations}
         onGenerate={() => vm.openGenerateDialog(subscriptionId)}
         onRegenerate={() => vm.regenerateLicense(subscriptionId)}
         onRevoke={() => vm.openRevokeDialog(subscriptionId)}

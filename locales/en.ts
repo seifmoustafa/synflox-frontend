@@ -4988,6 +4988,14 @@ export const en = {
     machineBinding: "Machine Binding",
     bound: "Machine Bound",
     notBound: "Not Bound",
+    keyBinding: "Key Binding",
+    keyBound: "Key Bound to Machine",
+    keyNotBound: "Key Not Bound",
+    keyNotBoundHint: "License works on any device. See Devices tab for activations.",
+    connectedDevices: "Connected Devices",
+    atCapacity: "At capacity",
+    devicesActive: "Devices active",
+    noDevicesYet: "No devices yet",
     
     // License Key
     licenseKey: "License Key",
