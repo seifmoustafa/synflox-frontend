@@ -183,4 +183,19 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/plan-entitlements/${id}`,
     DELETE: (id: string) => `/plan-entitlements/${id}`,
   },
+
+  // Offline License Management
+  OFFLINE_LICENSE: {
+    GENERATE: (subscriptionId: string) => `/offline-license/generate/${subscriptionId}`,
+    REGENERATE: (subscriptionId: string) => `/offline-license/regenerate/${subscriptionId}`,
+    VALIDATE: "/offline-license/validate",
+    CHECK: "/offline-license/check",
+    REVOKE: (subscriptionId: string) => `/offline-license/revoke/${subscriptionId}`,
+    GET_BY_SUBSCRIPTION: (subscriptionId: string) => `/offline-license/subscription/${subscriptionId}`,
+    GET_BY_COMPANY: (companyId: string) => `/offline-license/company/${companyId}`,
+    HAS_KEY: (subscriptionId: string) => `/offline-license/has-key/${subscriptionId}`,
+    DOWNLOAD: (subscriptionId: string) => `/offline-license/download/${subscriptionId}`,
+    ADD_MACHINE: (subscriptionId: string) => `/offline-license/${subscriptionId}/machines`,
+    COMPUTE_FINGERPRINT: "/offline-license/compute-fingerprint",
+  },
 };

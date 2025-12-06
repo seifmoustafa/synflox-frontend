@@ -194,6 +194,22 @@ export {
   type SecurityDashboardData
 } from './models/security.model';
 
+// License domain
+export {
+  License,
+  CompanyLicenseSummary,
+  GenerateLicenseResponse,
+  ValidateLicenseResponse,
+  GenerateLicenseRequest,
+  ValidateLicenseRequest,
+  type LicenseData,
+  type CompanyLicenseSummaryData,
+  type GenerateLicenseResponseData,
+  type ValidateLicenseResponseData,
+  type MachineFingerprint,
+} from './models/license.model';
+export { LicenseMapper } from './mappers/license.mapper';
+
 // Mappers
-export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, DashboardMapper, SecurityMapper, PlanEntitlementMapper } from './mappers';
+export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, DashboardMapper, SecurityMapper, PlanEntitlementMapper, LicenseMapper as LicenseMapperAlias } from './mappers';
 export type { SubscriptionsResponse, CompanySubscriptionsResponse, UpgradeResponse } from './mappers/subscription.mapper';

@@ -25,6 +25,7 @@ import {
 } from "@/components/dialogs/subscription-action-dialog";
 import { EntitlementsTree } from "@/components/ui/entitlements-tree";
 import { PlanEntitlement } from "@/domain";
+import { LicenseView } from "@/views/license-view";
 
 interface SubscriptionDetailsViewProps {
   subscriptionId: string;
@@ -313,7 +314,7 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
             )}
             <Button
               variant="outline"
-              onClick={() => router.push(`/subscriptions/${subscriptionId}/license-keys`)}
+              onClick={() => setActiveTab("license")}
             >
               <Key className="h-4 w-4 me-2" />
               {t("subscription.licenseKeys")}
@@ -332,10 +333,11 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
 
       {/* Detailed Information Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4" dir={t("dir") as "ltr" | "rtl"}>
-        <TabsList className={`grid w-full grid-cols-5 ${t("dir") === "rtl" ? "direction-rtl" : ""}`}>
+        <TabsList className={`flex flex-wrap w-full justify-start gap-1 ${t("dir") === "rtl" ? "flex-row-reverse" : ""}`}>
           {t("dir") === "rtl" ? (
             <>
               <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
+              <TabsTrigger value="license">{t("subscription.tabs.license")}</TabsTrigger>
               <TabsTrigger value="entitlements">{t("subscription.tabs.entitlements")}</TabsTrigger>
               <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
               <TabsTrigger value="billing">{t("subscription.tabs.billing")}</TabsTrigger>
@@ -347,6 +349,7 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               <TabsTrigger value="billing">{t("subscription.tabs.billing")}</TabsTrigger>
               <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
               <TabsTrigger value="entitlements">{t("subscription.tabs.entitlements")}</TabsTrigger>
+              <TabsTrigger value="license">{t("subscription.tabs.license")}</TabsTrigger>
               <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
             </>
           )}
@@ -722,6 +725,11 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* License Tab */}
+        <TabsContent value="license" className="space-y-4">
+          <LicenseView subscriptionId={subscriptionId} />
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">

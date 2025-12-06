@@ -17,6 +17,7 @@ import { SubscriptionPlanService } from "@/services/subscription-plan.service";
 import { SubscriptionService } from "@/services/subscription.service";
 import { DashboardService } from "@/services/dashboard.service";
 import { PlanEntitlementService } from "@/services/plan-entitlement.service";
+import { LicenseService } from "@/services/license.service";
 
 interface Services {
   apiService: ApiService;
@@ -34,6 +35,7 @@ interface Services {
   subscriptionService: SubscriptionService;
   dashboardService: DashboardService;
   planEntitlementService: PlanEntitlementService;
+  licenseService: LicenseService;
 }
 
 const ServiceContext = createContext<Services | null>(null);
@@ -55,6 +57,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
     const subscriptionService = new SubscriptionService(apiService, notificationService);
     const dashboardService = new DashboardService(apiService, notificationService);
     const planEntitlementService = new PlanEntitlementService(apiService, notificationService);
+    const licenseService = new LicenseService(apiService, notificationService);
 
     return {
       apiService,
@@ -72,6 +75,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
       subscriptionService,
       dashboardService,
       planEntitlementService,
+      licenseService,
     };
   }, []);
 

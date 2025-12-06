@@ -1445,6 +1445,7 @@ export const en = {
       billing: "Billing",
       features: "Features",
       entitlements: "Entitlements",
+      license: "License",
       history: "History",
     },
     
@@ -4892,5 +4893,75 @@ export const en = {
     deletePerm: "Delete",
     exportPerm: "Export",
     moduleUnderProject: "Module",
+  },
+
+  // License Management
+  license: {
+    title: "License Key",
+    subtitle: "Offline license key for this subscription",
+    
+    // Status
+    company: "Company",
+    plan: "Plan",
+    expiresAt: "Expires At",
+    expired: "Expired",
+    daysRemaining: "days remaining",
+    machineBinding: "Machine Binding",
+    bound: "Machine Bound",
+    notBound: "Not Bound",
+    
+    // License Key
+    licenseKey: "License Key",
+    yourLicenseKey: "Your License Key",
+    version: "Version",
+    entitlementsVersion: "Entitlements Version",
+    generatedAt: "Generated At",
+    
+    // Actions
+    generate: "Generate License",
+    regenerate: "Regenerate",
+    download: "Download",
+    downloadFile: "Download File",
+    copy: "Copy Key",
+    revoke: "Revoke License",
+    validate: "Validate",
+    
+    // Generate Dialog
+    generateTitle: "Generate License Key",
+    generateDescription: "Generate a new offline license key for this subscription. The key will contain all entitlements and permissions.",
+    notes: "Notes (Optional)",
+    notesPlaceholder: "Add notes about this license generation...",
+    allowMultipleMachines: "Allow Multiple Machines",
+    allowMultipleMachinesDesc: "Enable this to allow the license on multiple machines",
+    
+    // Generated Success
+    generatedSuccessfully: "License Generated Successfully",
+    saveKeyWarning: "Please save this license key securely. You can download it as a file or copy it to clipboard.",
+    keyNotStoredWarning: "Important: This key will not be displayed again. Make sure to save it now!",
+    
+    // Validation
+    validateTitle: "Validate License Key",
+    validateDescription: "Paste a license key to verify its validity and view its details.",
+    pasteKeyHere: "Paste license key here...",
+    validateOnline: "Online Validation",
+    validateOnlineDesc: "Check subscription status in database (requires network)",
+    valid: "Valid License",
+    invalid: "Invalid License",
+    warnings: "Warnings",
+    
+    // Revoke
+    revokeTitle: "Revoke License Key",
+    revokeDescription: "This will permanently invalidate the current license key. The client will need to obtain a new key to continue using the software offline.",
+    revokeReason: "Reason (Optional)",
+    revokeReasonPlaceholder: "Enter reason for revocation...",
+    
+    // Empty State
+    noLicense: "No License Key",
+    noLicenseDesc: "Generate a license key to enable offline access for this subscription.",
+    
+    // Notifications
+    copiedToClipboard: "License key copied to clipboard",
+    copyFailed: "Failed to copy license key",
+    downloadSuccess: "License file downloaded",
   },
 };

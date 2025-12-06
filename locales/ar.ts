@@ -1439,6 +1439,7 @@ export const ar = {
       billing: "الفوترة",
       features: "الميزات",
       entitlements: "الصلاحيات",
+      license: "الترخيص",
       history: "التاريخ",
     },
     
@@ -4699,5 +4700,75 @@ export const ar = {
     deletePerm: "حذف",
     exportPerm: "تصدير",
     moduleUnderProject: "وحدة",
+  },
+
+  // License Management
+  license: {
+    title: "مفتاح الترخيص",
+    subtitle: "مفتاح الترخيص للعمل دون اتصال لهذا الاشتراك",
+    
+    // Status
+    company: "الشركة",
+    plan: "الخطة",
+    expiresAt: "تاريخ الانتهاء",
+    expired: "منتهي الصلاحية",
+    daysRemaining: "يوم متبقي",
+    machineBinding: "ربط الجهاز",
+    bound: "مرتبط بجهاز",
+    notBound: "غير مرتبط",
+    
+    // License Key
+    licenseKey: "مفتاح الترخيص",
+    yourLicenseKey: "مفتاح الترخيص الخاص بك",
+    version: "الإصدار",
+    entitlementsVersion: "إصدار الصلاحيات",
+    generatedAt: "تاريخ الإنشاء",
+    
+    // Actions
+    generate: "إنشاء مفتاح",
+    regenerate: "إعادة الإنشاء",
+    download: "تحميل",
+    downloadFile: "تحميل الملف",
+    copy: "نسخ المفتاح",
+    revoke: "إلغاء الترخيص",
+    validate: "التحقق",
+    
+    // Generate Dialog
+    generateTitle: "إنشاء مفتاح ترخيص",
+    generateDescription: "إنشاء مفتاح ترخيص جديد للعمل دون اتصال لهذا الاشتراك. سيحتوي المفتاح على جميع الصلاحيات والأذونات.",
+    notes: "ملاحظات (اختياري)",
+    notesPlaceholder: "أضف ملاحظات حول إنشاء هذا الترخيص...",
+    allowMultipleMachines: "السماح بأجهزة متعددة",
+    allowMultipleMachinesDesc: "تفعيل هذا للسماح باستخدام الترخيص على أجهزة متعددة",
+    
+    // Generated Success
+    generatedSuccessfully: "تم إنشاء الترخيص بنجاح",
+    saveKeyWarning: "يرجى حفظ مفتاح الترخيص هذا بشكل آمن. يمكنك تحميله كملف أو نسخه إلى الحافظة.",
+    keyNotStoredWarning: "مهم: لن يتم عرض هذا المفتاح مرة أخرى. تأكد من حفظه الآن!",
+    
+    // Validation
+    validateTitle: "التحقق من مفتاح الترخيص",
+    validateDescription: "الصق مفتاح ترخيص للتحقق من صلاحيته وعرض تفاصيله.",
+    pasteKeyHere: "الصق مفتاح الترخيص هنا...",
+    validateOnline: "التحقق عبر الإنترنت",
+    validateOnlineDesc: "التحقق من حالة الاشتراك في قاعدة البيانات (يتطلب اتصال بالشبكة)",
+    valid: "ترخيص صالح",
+    invalid: "ترخيص غير صالح",
+    warnings: "تحذيرات",
+    
+    // Revoke
+    revokeTitle: "إلغاء مفتاح الترخيص",
+    revokeDescription: "سيؤدي هذا إلى إبطال مفتاح الترخيص الحالي بشكل دائم. سيحتاج العميل إلى الحصول على مفتاح جديد لمتابعة استخدام البرنامج دون اتصال.",
+    revokeReason: "السبب (اختياري)",
+    revokeReasonPlaceholder: "أدخل سبب الإلغاء...",
+    
+    // Empty State
+    noLicense: "لا يوجد مفتاح ترخيص",
+    noLicenseDesc: "قم بإنشاء مفتاح ترخيص لتمكين الوصول دون اتصال لهذا الاشتراك.",
+    
+    // Notifications
+    copiedToClipboard: "تم نسخ مفتاح الترخيص إلى الحافظة",
+    copyFailed: "فشل في نسخ مفتاح الترخيص",
+    downloadSuccess: "تم تحميل ملف الترخيص",
   },
 };

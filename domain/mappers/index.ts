@@ -20,3 +20,4 @@ export { SubscriptionMapper } from './subscription.mapper';
 export { DashboardMapper } from './dashboard.mapper';
 export { SecurityMapper } from './security.mapper';
 export { PlanEntitlementMapper } from './plan-entitlement.mapper';
+export { LicenseMapper } from './license.mapper';
