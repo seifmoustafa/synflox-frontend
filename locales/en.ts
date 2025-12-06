@@ -1303,6 +1303,55 @@ export const en = {
     inheritedModules: "Inherited Modules",
     inherited: "inherited",
     
+    // Device Binding Settings (legacy keys for backward compatibility)
+    deviceBindingTab: "Device Binding",
+    deviceBindingTitle: "Device Binding Settings",
+    deviceBindingDesc: "Configure device limits and binding policies for offline licenses",
+    maxDevices: "Max Devices",
+    maxDevicesHelper: "Maximum number of devices that can be bound to this license (0 = unlimited)",
+    requireMachineBinding: "Require Machine Binding",
+    requireMachineBindingHelper: "Devices must be explicitly bound before license validation",
+    deviceReplacementPolicy: "Replacement Policy",
+    deviceReplacementPolicyHelper: "How to handle device replacement when limit is reached",
+    replacementPolicies: {
+      autoReplaceOldest: "Auto Replace Oldest",
+      autoReplaceLeastActive: "Auto Replace Least Active",
+      adminApproval: "Admin Approval Required",
+    },
+    allowConcurrentUsage: "Allow Concurrent Usage",
+    allowConcurrentUsageHelper: "Allow same license to be used on multiple devices simultaneously",
+    concurrentUsageTimeout: "Concurrent Usage Timeout",
+    concurrentUsageTimeoutHelper: "Minutes before a device session is considered inactive",
+    hardwareChangeTolerance: "Hardware Change Tolerance",
+    hardwareChangeToleranceHelper: "Number of hardware changes allowed before requiring admin approval",
+    deviceBindingNotApplicable: "Device Binding Not Applicable",
+    deviceBindingNotApplicableDesc: "Device binding is only available for plans with machine binding requirement enabled.",
+    
+    // Device Binding Settings (nested structure for forms)
+    devices: {
+      title: "Device Binding",
+      maxDevices: "Max Devices",
+      maxDevicesHelper: "Maximum number of devices (0 = unlimited)",
+      requireMachineBinding: "Require Machine Binding",
+      requireMachineBindingHelper: "Require devices to be explicitly bound",
+      replacementPolicy: "Replacement Policy",
+      replacementPolicyHelper: "How to handle device replacement when limit is reached",
+      policies: {
+        autoReplaceOldest: "Auto Replace Oldest",
+        autoReplaceLeastActive: "Auto Replace Least Active",
+        adminApproval: "Admin Approval Required",
+      },
+      hardwareChangeTolerance: "Hardware Change Tolerance",
+      hardwareChangeToleranceHelper: "Hardware changes allowed before requiring approval (0-10)",
+      allowConcurrentUsage: "Allow Concurrent Usage",
+      allowConcurrentUsageHelper: "Allow simultaneous use on multiple devices",
+      concurrentUsageTimeout: "Concurrent Usage Timeout",
+      concurrentUsageTimeoutHelper: "Minutes before session considered inactive (5-1440)",
+      unlimited: "Unlimited",
+      enabled: "Enabled",
+      disabled: "Disabled",
+    },
+    
     // Module Conflict Dialog
     moduleConflictTitle: "Module Conflict Detected",
     moduleConflictDescription: "The following modules are already included in the selected projects and will be managed under their respective projects:",
@@ -1630,6 +1679,36 @@ export const en = {
         stopTrial: "Trial converted to paid subscription",
         renew: "Subscription renewed by administrator",
       },
+    },
+    
+    // Device Binding
+    devices: {
+      title: "Bound Devices",
+      description: "Devices that have been bound to this subscription's license",
+      noDevices: "No devices bound to this subscription",
+      noDevicesDescription: "Devices will appear here once they are bound using a Client Admin Token",
+      deviceCount: "{count} of {max} devices",
+      unlimited: "Unlimited",
+      deviceName: "Device Name",
+      operatingSystem: "Operating System",
+      lastSeen: "Last Seen",
+      activatedAt: "Activated At",
+      ipAddress: "IP Address",
+      machineHash: "Machine Hash",
+      validations: "Validations",
+      hardwareChanges: "Hardware Changes",
+      active: "Active",
+      inactive: "Inactive",
+      remainingSlots: "Remaining Slots",
+      usagePercentage: "Usage",
+      unbind: "Unbind Device",
+      unbindAll: "Unbind All Devices",
+      unbindConfirm: "Are you sure you want to unbind this device?",
+      unbindAllConfirm: "Are you sure you want to unbind ALL devices from this subscription?",
+      requireMachineBinding: "Machine Binding Required",
+      allowConcurrentUsage: "Concurrent Usage Allowed",
+      hardwareChangeTolerance: "Hardware Change Tolerance",
+      bindingSettings: "Binding Settings",
     },
   },
 
@@ -4963,5 +5042,71 @@ export const en = {
     copiedToClipboard: "License key copied to clipboard",
     copyFailed: "Failed to copy license key",
     downloadSuccess: "License file downloaded",
+  },
+
+  // Client Admin Tokens (for device binding)
+  clientAdminToken: {
+    title: "Client Admin Tokens",
+    description: "Manage tokens for client administrators to bind devices",
+    item: "Token",
+    items: "Tokens",
+    noTokens: "No tokens found",
+    noTokensDescription: "Generate a token to allow client administrators to manage device bindings.",
+    
+    // Fields
+    name: "Token Name",
+    namePlaceholder: "e.g., IT Admin Token",
+    nameHelper: "A friendly name to identify this token",
+    expiryDays: "Expires In (Days)",
+    expiryDaysHelper: "Number of days until the token expires",
+    status: "Status",
+    issuedAt: "Issued At",
+    expiresAt: "Expires At",
+    daysRemaining: "Days Remaining",
+    lastUsed: "Last Used",
+    usageCount: "Usage Count",
+    lastUsedIp: "Last Used From",
+    dailyApiLimit: "Daily API Limit",
+    dailyApiLimitHelper: "Maximum API calls per day (0 = unlimited)",
+    todayApiCalls: "Today's Calls",
+    notes: "Notes",
+    notesPlaceholder: "Internal notes about this token...",
+    
+    // Permissions
+    permissions: "Permissions",
+    canBindDevices: "Can Bind Devices",
+    canUnbindDevices: "Can Unbind Devices",
+    canViewDevices: "Can View Devices",
+    canApproveReplacements: "Can Approve Replacements",
+    
+    // Status
+    active: "Active",
+    expired: "Expired",
+    revoked: "Revoked",
+    expiringSoon: "Expiring Soon",
+    
+    // Actions
+    generate: "Generate Token",
+    revoke: "Revoke Token",
+    copy: "Copy Token",
+    
+    // Generate Dialog
+    generateTitle: "Generate Client Admin Token",
+    generateDescription: "Generate a new token for client administrators to manage device bindings for this company.",
+    
+    // Generated Success
+    generatedSuccessfully: "Token Generated Successfully",
+    saveTokenWarning: "Please save this token securely. It will only be displayed once!",
+    tokenNotStoredWarning: "Important: This token cannot be retrieved later. Make sure to save it now!",
+    
+    // Revoke Dialog
+    revokeTitle: "Revoke Token",
+    revokeDescription: "Are you sure you want to revoke this token? This action cannot be undone and will immediately prevent the token from being used.",
+    
+    // Notifications
+    copiedToClipboard: "Token copied to clipboard",
+    copyFailed: "Failed to copy token",
+    generateSuccess: "Token generated successfully",
+    revokeSuccess: "Token revoked successfully",
   },
 };

@@ -127,6 +127,7 @@ export {
   PlanDurationType,
   UpgradePolicy,
   Currency,
+  DeviceReplacementPolicy,
   type SubscriptionPlanData,
   type CreatePlanRequestData,
   type UpdatePlanRequestData,
@@ -210,6 +211,17 @@ export {
 } from './models/license.model';
 export { LicenseMapper } from './mappers/license.mapper';
 
+// Client Admin Token domain (for device binding)
+export {
+  AdminToken,
+  GenerateAdminTokenRequest,
+  GenerateAdminTokenResponse,
+  type AdminTokenData,
+  type GenerateAdminTokenRequestData,
+  type GenerateAdminTokenResponseData,
+} from './models/client-admin-token.model';
+export { ClientAdminTokenMapper, type AdminTokensResponse } from './mappers/client-admin-token.mapper';
+
 // Mappers
-export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, DashboardMapper, SecurityMapper, PlanEntitlementMapper, LicenseMapper as LicenseMapperAlias } from './mappers';
+export { AuthMapper, NavigationMapper, NotificationMapper, AccountMapper, AdminMapper, AdminTypeMapper, CompanyMapper, ProjectMapper, ModuleMapper, SubscriptionPlanMapper, SubscriptionMapper, DashboardMapper, SecurityMapper, PlanEntitlementMapper, LicenseMapper as LicenseMapperAlias, ClientAdminTokenMapper as ClientAdminTokenMapperAlias } from './mappers';
 export type { SubscriptionsResponse, CompanySubscriptionsResponse, UpgradeResponse } from './mappers/subscription.mapper';

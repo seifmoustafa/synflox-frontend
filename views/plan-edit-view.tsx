@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
-import { SubscriptionPlan, UpdatePlanRequest } from "@/domain";
+import { SubscriptionPlan, UpdatePlanRequest, DeviceReplacementPolicy } from "@/domain";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   AlertTriangle, Package, FolderOpen, ArrowRight, Save, X, ArrowLeft,
   DollarSign, Clock, Shield, Settings2, Layers, Star, Info,
-  ChevronRight, CheckCircle2, AlertCircle, Sparkles, Zap
+  ChevronRight, CheckCircle2, AlertCircle, Sparkles, Zap, Smartphone
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageBreadcrumbs } from "@/components/ui/page-breadcrumbs";
@@ -72,6 +72,13 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
     defaultFallbackPlanId: "",
     fallbackAccessMode: "2",
     showLockedModulesInMenu: true,
+    // Device Binding
+    maxDevices: "0",
+    requireMachineBinding: false,
+    deviceReplacementPolicy: "2",
+    allowConcurrentUsage: false,
+    concurrentUsageTimeoutMinutes: "30",
+    hardwareChangeTolerance: "2",
   });
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -105,6 +112,13 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
         defaultFallbackPlanId: plan.defaultFallbackPlanId || "",
         fallbackAccessMode: plan.fallbackAccessMode?.toString() || "2",
         showLockedModulesInMenu: plan.showLockedModulesInMenu ?? true,
+        // Device Binding
+        maxDevices: plan.maxDevices?.toString() || "0",
+        requireMachineBinding: plan.requireMachineBinding || false,
+        deviceReplacementPolicy: plan.deviceReplacementPolicy?.toString() || "2",
+        allowConcurrentUsage: plan.allowConcurrentUsage || false,
+        concurrentUsageTimeoutMinutes: plan.concurrentUsageTimeoutMinutes?.toString() || "30",
+        hardwareChangeTolerance: plan.hardwareChangeTolerance?.toString() || "2",
       });
     }
   }, [plan]);
@@ -184,6 +198,13 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
       defaultFallbackPlanId: data.defaultFallbackPlanId || null,
       fallbackAccessMode: data.fallbackAccessMode ? parseInt(data.fallbackAccessMode) : undefined,
       showLockedModulesInMenu: data.showLockedModulesInMenu,
+      // Device Binding
+      maxDevices: data.maxDevices ? parseInt(data.maxDevices) : 0,
+      requireMachineBinding: data.requireMachineBinding,
+      deviceReplacementPolicy: data.deviceReplacementPolicy ? parseInt(data.deviceReplacementPolicy) : 2,
+      allowConcurrentUsage: data.allowConcurrentUsage,
+      concurrentUsageTimeoutMinutes: data.concurrentUsageTimeoutMinutes ? parseInt(data.concurrentUsageTimeoutMinutes) : 30,
+      hardwareChangeTolerance: data.hardwareChangeTolerance ? parseInt(data.hardwareChangeTolerance) : 2,
     }) as UpdatePlanWithConfirmationRequest;
 
     try {
@@ -426,8 +447,8 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
         />
 
         {/* Header with Actions */}
-        <div className={cn("flex items-center justify-between", isRTL && "flex-row-reverse")}>
-          <div className={cn("flex items-center gap-4", isRTL && "flex-row-reverse")}>
+        <div className={cn("flex items-center justify-between", )}>
+          <div className={cn("flex items-center gap-4", )}>
             <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Settings2 className="h-6 w-6 text-primary" />
             </div>
@@ -436,7 +457,7 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
               <p className="text-sm text-muted-foreground">{t("plan.editDescription") || "Configure plan settings and pricing"}</p>
             </div>
           </div>
-          <div className={cn("flex items-center gap-3", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex items-center gap-3", )}>
             <Button variant="outline" onClick={() => router.push(`/plans/${planId}`)}>
               <X className={cn("h-4 w-4", isRTL ? "ml-2" : "mr-2")} />
               {t("common.cancel")}
@@ -454,9 +475,13 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
 
         {/* Tabs Navigation */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className={cn("grid w-full grid-cols-4", isRTL && "direction-rtl")}>
+          <TabsList className={cn("grid w-full grid-cols-5", isRTL && "direction-rtl")}>
             {isRTL ? (
               <>
+                <TabsTrigger value="devices" className="gap-2 flex-row-reverse">
+                  <Smartphone className="h-4 w-4 shrink-0" />
+                  <span className="text-xs sm:text-sm truncate">{t("plan.deviceBindingTab") || "Devices"}</span>
+                </TabsTrigger>
                 <TabsTrigger value="access" className="gap-2 flex-row-reverse">
                   <Shield className="h-4 w-4 shrink-0" />
                   <span className="text-xs sm:text-sm truncate">{t("plan.accessTab") || "Access"}</span>
@@ -491,6 +516,10 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
                 <TabsTrigger value="access" className="gap-2">
                   <Shield className="h-4 w-4 shrink-0" />
                   <span className="text-xs sm:text-sm truncate">{t("plan.accessTab") || "Access"}</span>
+                </TabsTrigger>
+                <TabsTrigger value="devices" className="gap-2">
+                  <Smartphone className="h-4 w-4 shrink-0" />
+                  <span className="text-xs sm:text-sm truncate">{t("plan.deviceBindingTab") || "Devices"}</span>
                 </TabsTrigger>
               </>
             )}
@@ -837,6 +866,121 @@ export function PlanEditView({ planId }: PlanEditViewProps) {
                     allowClear
                   />
                 </div>
+              </div>
+            </SectionCard>
+          </TabsContent>
+
+          {/* Device Binding Tab */}
+          <TabsContent value="devices" className="space-y-6">
+            <SectionCard icon={Smartphone} title={t("plan.deviceBindingTitle") || "Device Binding Settings"} description={t("plan.deviceBindingDesc") || "Configure device limits and binding policies"}>
+              <div className="space-y-6">
+                {/* Require Machine Binding Toggle */}
+                <div className={cn("flex items-center justify-between p-4 rounded-lg border bg-muted/30", isRTL && "flex-row-reverse")}>
+                  <div className={cn("flex items-center gap-3", isRTL && "flex-row-reverse")}>
+                    <Smartphone className="h-5 w-5 text-primary" />
+                    <div className={isRTL ? "text-right" : "text-left"}>
+                      <p className="font-medium">{t("plan.requireMachineBinding")}</p>
+                      <p className="text-sm text-muted-foreground">{t("plan.requireMachineBindingHelper")}</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={formData.requireMachineBinding}
+                    onCheckedChange={(checked) => updateField("requireMachineBinding", checked)}
+                  />
+                </div>
+
+                {/* Device Settings - Only show when binding is required */}
+                {formData.requireMachineBinding && (
+                  <div className="grid gap-4">
+                    {/* Max Devices */}
+                    <div className="space-y-2">
+                      <FieldLabel label={t("plan.maxDevices")} tooltip={t("plan.maxDevicesHelper")} />
+                      <Input
+                        type="number"
+                        value={formData.maxDevices}
+                        onChange={(e) => updateField("maxDevices", e.target.value)}
+                        min={0}
+                        max={100}
+                        className={isRTL ? "text-right" : ""}
+                        dir={isRTL ? "rtl" : "ltr"}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {parseInt(formData.maxDevices) === 0 ? "Unlimited devices" : `Maximum ${formData.maxDevices} devices allowed`}
+                      </p>
+                    </div>
+
+                    {/* Replacement Policy */}
+                    <div className="space-y-2">
+                      <FieldLabel label={t("plan.deviceReplacementPolicy")} tooltip={t("plan.deviceReplacementPolicyHelper")} />
+                      <GenericSelect
+                        type="single"
+                        options={[
+                          { value: "0", label: t("plan.replacementPolicies.autoReplaceOldest") || "Auto Replace Oldest" },
+                          { value: "1", label: t("plan.replacementPolicies.autoReplaceLeastActive") || "Auto Replace Least Active" },
+                          { value: "2", label: t("plan.replacementPolicies.adminApproval") || "Admin Approval Required" },
+                        ]}
+                        value={formData.deviceReplacementPolicy}
+                        onValueChange={(v: string | string[]) => updateField("deviceReplacementPolicy", typeof v === "string" ? v : v[0] || "2")}
+                      />
+                    </div>
+
+                    {/* Hardware Change Tolerance */}
+                    <div className="space-y-2">
+                      <FieldLabel label={t("plan.hardwareChangeTolerance")} tooltip={t("plan.hardwareChangeToleranceHelper")} />
+                      <Input
+                        type="number"
+                        value={formData.hardwareChangeTolerance}
+                        onChange={(e) => updateField("hardwareChangeTolerance", e.target.value)}
+                        min={0}
+                        max={10}
+                        className={isRTL ? "text-right" : ""}
+                        dir={isRTL ? "rtl" : "ltr"}
+                      />
+                    </div>
+
+                    {/* Allow Concurrent Usage */}
+                    <div className={cn("flex items-center justify-between p-4 rounded-lg border", isRTL && "flex-row-reverse")}>
+                      <div className={cn("flex items-center gap-3", isRTL && "flex-row-reverse")}>
+                        <div className={isRTL ? "text-right" : "text-left"}>
+                          <p className="font-medium">{t("plan.allowConcurrentUsage")}</p>
+                          <p className="text-sm text-muted-foreground">{t("plan.allowConcurrentUsageHelper")}</p>
+                        </div>
+                      </div>
+                      <Switch
+                        checked={formData.allowConcurrentUsage}
+                        onCheckedChange={(checked) => updateField("allowConcurrentUsage", checked)}
+                      />
+                    </div>
+
+                    {/* Concurrent Usage Timeout - Only show when concurrent usage is allowed */}
+                    {formData.allowConcurrentUsage && (
+                      <div className="space-y-2">
+                        <FieldLabel label={t("plan.concurrentUsageTimeout")} tooltip={t("plan.concurrentUsageTimeoutHelper")} />
+                        <div className={cn("flex items-center gap-2", isRTL && "flex-row-reverse")}>
+                          <Input
+                            type="number"
+                            value={formData.concurrentUsageTimeoutMinutes}
+                            onChange={(e) => updateField("concurrentUsageTimeoutMinutes", e.target.value)}
+                            className={cn("w-24", isRTL && "text-right")}
+                            min={1}
+                            max={1440}
+                            dir={isRTL ? "rtl" : "ltr"}
+                          />
+                          <span className="text-muted-foreground">{t("common.minutes") || "minutes"}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Info when binding is not required */}
+                {!formData.requireMachineBinding && (
+                  <div className="p-4 rounded-lg bg-muted/50 border border-dashed text-center">
+                    <p className="text-muted-foreground text-sm">
+                      {t("plan.deviceBindingNotApplicableDesc") || "Enable machine binding to configure device limits and policies."}
+                    </p>
+                  </div>
+                )}
               </div>
             </SectionCard>
           </TabsContent>

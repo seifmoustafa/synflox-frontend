@@ -352,3 +352,108 @@ export class ValidateLicenseRequest {
     };
   }
 }
+
+// ============================================================================
+// Device Activation Models
+// ============================================================================
+
+export interface DeviceActivationData {
+  activationId: string;
+  deviceName?: string | null;
+  operatingSystem?: string | null;
+  machineHashTruncated: string;
+  activatedAtUtc: string;
+  lastSeenAtUtc: string;
+  lastIpAddress?: string | null;
+  isActive: boolean;
+  validationCount: number;
+  hardwareChangeCount: number;
+}
+
+export class DeviceActivation {
+  readonly activationId: string;
+  readonly deviceName?: string | null;
+  readonly operatingSystem?: string | null;
+  readonly machineHashTruncated: string;
+  readonly activatedAtUtc: Date;
+  readonly lastSeenAtUtc: Date;
+  readonly lastIpAddress?: string | null;
+  readonly isActive: boolean;
+  readonly validationCount: number;
+  readonly hardwareChangeCount: number;
+
+  constructor(data: DeviceActivationData) {
+    this.activationId = data.activationId;
+    this.deviceName = data.deviceName;
+    this.operatingSystem = data.operatingSystem;
+    this.machineHashTruncated = data.machineHashTruncated;
+    this.activatedAtUtc = new Date(data.activatedAtUtc);
+    this.lastSeenAtUtc = new Date(data.lastSeenAtUtc);
+    this.lastIpAddress = data.lastIpAddress;
+    this.isActive = data.isActive;
+    this.validationCount = data.validationCount;
+    this.hardwareChangeCount = data.hardwareChangeCount;
+  }
+
+  get displayName(): string {
+    return this.deviceName || 'Unknown Device';
+  }
+
+  get formattedLastSeen(): string {
+    return this.lastSeenAtUtc.toLocaleString();
+  }
+}
+
+export interface ActivationSummaryData {
+  subscriptionId: string;
+  companyName: string;
+  planName: string;
+  maxDevices: number;
+  activeDeviceCount: number;
+  requireMachineBinding: boolean;
+  allowConcurrentUsage: boolean;
+  hardwareChangeTolerance: number;
+  activations: DeviceActivationData[];
+}
+
+export class ActivationSummary {
+  readonly subscriptionId: string;
+  readonly companyName: string;
+  readonly planName: string;
+  readonly maxDevices: number;
+  readonly activeDeviceCount: number;
+  readonly requireMachineBinding: boolean;
+  readonly allowConcurrentUsage: boolean;
+  readonly hardwareChangeTolerance: number;
+  readonly activations: DeviceActivation[];
+
+  constructor(data: ActivationSummaryData) {
+    this.subscriptionId = data.subscriptionId;
+    this.companyName = data.companyName;
+    this.planName = data.planName;
+    this.maxDevices = data.maxDevices;
+    this.activeDeviceCount = data.activeDeviceCount;
+    this.requireMachineBinding = data.requireMachineBinding;
+    this.allowConcurrentUsage = data.allowConcurrentUsage;
+    this.hardwareChangeTolerance = data.hardwareChangeTolerance;
+    this.activations = data.activations.map(a => new DeviceActivation(a));
+  }
+
+  get isUnlimited(): boolean {
+    return this.maxDevices === 0;
+  }
+
+  get remainingSlots(): number {
+    if (this.isUnlimited) return -1;
+    return this.maxDevices - this.activeDeviceCount;
+  }
+
+  get usagePercentage(): number {
+    if (this.isUnlimited) return 0;
+    return Math.round((this.activeDeviceCount / this.maxDevices) * 100);
+  }
+
+  get hasDevices(): boolean {
+    return this.activations.length > 0;
+  }
+}

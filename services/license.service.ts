@@ -13,6 +13,7 @@ import {
   GenerateLicenseRequest,
   ValidateLicenseRequest,
   MachineFingerprint,
+  ActivationSummary,
 } from '@/domain/models/license.model';
 import {
   LicenseMapper,
@@ -21,6 +22,7 @@ import {
   GenerateLicenseApiResponse,
   ValidateLicenseApiResponse,
   BooleanApiResponse,
+  ActivationSummaryApiResponse,
 } from '@/domain/mappers/license.mapper';
 import { appLogger } from '@/lib/logger';
 
@@ -49,6 +51,9 @@ export interface ILicenseService {
   // Machine Management
   addMachine(subscriptionId: string, fingerprint: MachineFingerprint): Promise<GenerateLicenseResponse | null>;
   computeFingerprint(fingerprint: MachineFingerprint): Promise<string | null>;
+  
+  // Device Activations
+  getActivations(subscriptionId: string): Promise<ActivationSummary | null>;
 }
 
 // ============================================================================
@@ -274,6 +279,22 @@ export class LicenseService implements ILicenseService {
       return response.isSuccess ? response.data : null;
     } catch (error) {
       console.error('Error computing fingerprint:', error);
+      return null;
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // Device Activations
+  // --------------------------------------------------------------------------
+
+  async getActivations(subscriptionId: string): Promise<ActivationSummary | null> {
+    try {
+      const response = await this.api.get<ActivationSummaryApiResponse>(
+        API_ENDPOINTS.OFFLINE_LICENSE.GET_ACTIVATIONS(subscriptionId)
+      );
+      return LicenseMapper.handleActivationSummaryResponse(response);
+    } catch (error) {
+      console.error('Error fetching device activations:', error);
       return null;
     }
   }

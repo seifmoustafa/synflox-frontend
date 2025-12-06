@@ -8,7 +8,7 @@ import { SubscriptionPlan, PlanEntitlement, UpdatePlanEntitlementRequest } from 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Trash2, Shield } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, Shield, Monitor, CheckCircle2, XCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageBreadcrumbs } from "@/components/ui/page-breadcrumbs";
 import { EntitlementsTree } from "@/components/ui/entitlements-tree";
@@ -201,6 +201,108 @@ export function PlanDetailsView({ planId }: PlanDetailsViewProps) {
                 {plan.gracePeriodDays} {t("common.days")}
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Device Binding Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Monitor className="h-5 w-5" />
+            {t("plan.devices.title")}
+          </CardTitle>
+          <CardDescription>
+            {t("plan.deviceBindingDesc")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Max Devices */}
+            <div className="p-4 rounded-lg border bg-muted/30">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t("plan.devices.maxDevices")}
+              </label>
+              <div className="mt-1 text-xl font-bold">
+                {plan.maxDevices === 0 ? t("plan.devices.unlimited") : plan.maxDevices}
+              </div>
+            </div>
+
+            {/* Require Machine Binding */}
+            <div className="p-4 rounded-lg border bg-muted/30">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t("plan.devices.requireMachineBinding")}
+              </label>
+              <div className="mt-1 flex items-center gap-2">
+                {plan.requireMachineBinding ? (
+                  <>
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    <span className="text-green-600 font-medium">{t("plan.devices.enabled")}</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-5 w-5 text-gray-400" />
+                    <span className="text-muted-foreground">{t("plan.devices.disabled")}</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Replacement Policy */}
+            <div className="p-4 rounded-lg border bg-muted/30">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t("plan.devices.replacementPolicy")}
+              </label>
+              <div className="mt-1">
+                <Badge variant="outline">
+                  {plan.deviceReplacementPolicy === 0 && t("plan.devices.policies.autoReplaceOldest")}
+                  {plan.deviceReplacementPolicy === 1 && t("plan.devices.policies.autoReplaceLeastActive")}
+                  {plan.deviceReplacementPolicy === 2 && t("plan.devices.policies.adminApproval")}
+                </Badge>
+              </div>
+            </div>
+
+            {/* Hardware Change Tolerance */}
+            <div className="p-4 rounded-lg border bg-muted/30">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t("plan.devices.hardwareChangeTolerance")}
+              </label>
+              <div className="mt-1 text-xl font-bold">
+                {plan.hardwareChangeTolerance}
+              </div>
+            </div>
+
+            {/* Allow Concurrent Usage */}
+            <div className="p-4 rounded-lg border bg-muted/30">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t("plan.devices.allowConcurrentUsage")}
+              </label>
+              <div className="mt-1 flex items-center gap-2">
+                {plan.allowConcurrentUsage ? (
+                  <>
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    <span className="text-green-600 font-medium">{t("plan.devices.enabled")}</span>
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-5 w-5 text-gray-400" />
+                    <span className="text-muted-foreground">{t("plan.devices.disabled")}</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Concurrent Usage Timeout */}
+            {plan.allowConcurrentUsage && (
+              <div className="p-4 rounded-lg border bg-muted/30">
+                <label className="text-sm font-medium text-muted-foreground">
+                  {t("plan.devices.concurrentUsageTimeout")}
+                </label>
+                <div className="mt-1 text-xl font-bold">
+                  {plan.concurrentUsageTimeoutMinutes} {t("common.minutes")}
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

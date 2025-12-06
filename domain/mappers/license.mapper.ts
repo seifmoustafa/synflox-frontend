@@ -13,6 +13,8 @@ import {
   ValidateLicenseResponseData,
   GenerateLicenseRequest,
   ValidateLicenseRequest,
+  ActivationSummary,
+  ActivationSummaryData,
 } from '../models/license.model';
 
 // ============================================================================
@@ -49,6 +51,13 @@ export interface ValidateLicenseApiResponse {
 
 export interface BooleanApiResponse {
   data: boolean;
+  statusCode: number;
+  message: string;
+  errors?: string[];
+}
+
+export interface ActivationSummaryApiResponse {
+  data: ActivationSummaryData;
   statusCode: number;
   message: string;
   errors?: string[];
@@ -154,5 +163,20 @@ export class LicenseMapper {
 
   static validateRequestToJson(request: ValidateLicenseRequest): Record<string, unknown> {
     return request.toJson();
+  }
+
+  // Activation Summary
+  static activationSummaryFromJson(data: ActivationSummaryData): ActivationSummary {
+    return new ActivationSummary(data);
+  }
+
+  static handleActivationSummaryResponse(response: any): ActivationSummary | null {
+    if (isSuccessResponse(response)) {
+      const data = getData<ActivationSummaryData>(response);
+      if (data && 'activations' in data) {
+        return LicenseMapper.activationSummaryFromJson(data);
+      }
+    }
+    return null;
   }
 }

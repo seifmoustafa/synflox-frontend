@@ -32,6 +32,15 @@ export enum UpgradePolicy {
 }
 
 /**
+ * Device replacement policy options
+ */
+export enum DeviceReplacementPolicy {
+  AutoReplaceOldest = 0,
+  AutoReplaceLeastActive = 1,
+  AdminApproval = 2,
+}
+
+/**
  * Supported currencies
  */
 export enum Currency {
@@ -94,6 +103,13 @@ export interface SubscriptionPlanData {
   childPlanCount?: number;
   inheritedProjectsCount?: number;
   inheritedModulesCount?: number;
+  // Device Binding Settings
+  maxDevices?: number;
+  requireMachineBinding?: boolean;
+  deviceReplacementPolicy?: DeviceReplacementPolicy;
+  allowConcurrentUsage?: boolean;
+  concurrentUsageTimeoutMinutes?: number;
+  hardwareChangeTolerance?: number;
 }
 
 /**
@@ -136,7 +152,14 @@ export class SubscriptionPlan {
     public readonly displayOrder: number = 0,
     public readonly childPlanCount: number = 0,
     public readonly inheritedProjectsCount: number = 0,
-    public readonly inheritedModulesCount: number = 0
+    public readonly inheritedModulesCount: number = 0,
+    // Device Binding Settings
+    public readonly maxDevices: number = 0,
+    public readonly requireMachineBinding: boolean = false,
+    public readonly deviceReplacementPolicy: DeviceReplacementPolicy = DeviceReplacementPolicy.AdminApproval,
+    public readonly allowConcurrentUsage: boolean = false,
+    public readonly concurrentUsageTimeoutMinutes: number = 30,
+    public readonly hardwareChangeTolerance: number = 2
   ) {}
 
   /**
@@ -285,7 +308,14 @@ export class SubscriptionPlan {
       updates.displayOrder ?? this.displayOrder,
       updates.childPlanCount ?? this.childPlanCount,
       updates.inheritedProjectsCount ?? this.inheritedProjectsCount,
-      updates.inheritedModulesCount ?? this.inheritedModulesCount
+      updates.inheritedModulesCount ?? this.inheritedModulesCount,
+      // Device binding fields
+      updates.maxDevices ?? this.maxDevices,
+      updates.requireMachineBinding ?? this.requireMachineBinding,
+      updates.deviceReplacementPolicy ?? this.deviceReplacementPolicy,
+      updates.allowConcurrentUsage ?? this.allowConcurrentUsage,
+      updates.concurrentUsageTimeoutMinutes ?? this.concurrentUsageTimeoutMinutes,
+      updates.hardwareChangeTolerance ?? this.hardwareChangeTolerance
     );
   }
 
@@ -301,6 +331,29 @@ export class SubscriptionPlan {
    */
   get isPremium(): boolean {
     return !this.isFreeTier;
+  }
+
+  /**
+   * Check if plan requires device binding
+   */
+  get hasDeviceBinding(): boolean {
+    return this.requireMachineBinding && this.maxDevices > 0;
+  }
+
+  /**
+   * Get device policy display name
+   */
+  get devicePolicyName(): string {
+    switch (this.deviceReplacementPolicy) {
+      case DeviceReplacementPolicy.AutoReplaceOldest:
+        return 'Auto Replace Oldest';
+      case DeviceReplacementPolicy.AutoReplaceLeastActive:
+        return 'Auto Replace Least Active';
+      case DeviceReplacementPolicy.AdminApproval:
+        return 'Admin Approval';
+      default:
+        return 'Unknown';
+    }
   }
 }
 
@@ -330,6 +383,13 @@ export interface CreatePlanRequestData {
   // Plan Hierarchy
   parentPlanId?: string | null;
   displayOrder?: number;
+  // Device Binding
+  maxDevices?: number;
+  requireMachineBinding?: boolean;
+  deviceReplacementPolicy?: DeviceReplacementPolicy;
+  allowConcurrentUsage?: boolean;
+  concurrentUsageTimeoutMinutes?: number;
+  hardwareChangeTolerance?: number;
 }
 
 export class CreatePlanRequest {
@@ -355,6 +415,13 @@ export class CreatePlanRequest {
   // Plan Hierarchy
   public readonly parentPlanId: string | null;
   public readonly displayOrder: number;
+  // Device Binding
+  public readonly maxDevices: number;
+  public readonly requireMachineBinding: boolean;
+  public readonly deviceReplacementPolicy: DeviceReplacementPolicy;
+  public readonly allowConcurrentUsage: boolean;
+  public readonly concurrentUsageTimeoutMinutes: number;
+  public readonly hardwareChangeTolerance: number;
 
   constructor(data: CreatePlanRequestData) {
     this.name = data.name;
@@ -379,6 +446,13 @@ export class CreatePlanRequest {
     // Hierarchy fields
     this.parentPlanId = data.parentPlanId ?? null;
     this.displayOrder = data.displayOrder ?? 0;
+    // Device Binding fields
+    this.maxDevices = data.maxDevices ?? 0;
+    this.requireMachineBinding = data.requireMachineBinding ?? false;
+    this.deviceReplacementPolicy = data.deviceReplacementPolicy ?? DeviceReplacementPolicy.AdminApproval;
+    this.allowConcurrentUsage = data.allowConcurrentUsage ?? false;
+    this.concurrentUsageTimeoutMinutes = data.concurrentUsageTimeoutMinutes ?? 30;
+    this.hardwareChangeTolerance = data.hardwareChangeTolerance ?? 2;
   }
 
   /**
@@ -427,6 +501,13 @@ export class CreatePlanRequest {
       // Hierarchy fields
       parentPlanId: this.parentPlanId,
       displayOrder: this.displayOrder,
+      // Device Binding fields
+      maxDevices: this.maxDevices,
+      requireMachineBinding: this.requireMachineBinding,
+      deviceReplacementPolicy: this.deviceReplacementPolicy,
+      allowConcurrentUsage: this.allowConcurrentUsage,
+      concurrentUsageTimeoutMinutes: this.concurrentUsageTimeoutMinutes,
+      hardwareChangeTolerance: this.hardwareChangeTolerance,
     };
     
     // Only include prices for non-free plans
@@ -465,6 +546,13 @@ export interface UpdatePlanRequestData {
   // Plan Hierarchy
   parentPlanId?: string | null;
   displayOrder?: number;
+  // Device Binding
+  maxDevices?: number;
+  requireMachineBinding?: boolean;
+  deviceReplacementPolicy?: DeviceReplacementPolicy;
+  allowConcurrentUsage?: boolean;
+  concurrentUsageTimeoutMinutes?: number;
+  hardwareChangeTolerance?: number;
 }
 
 export class UpdatePlanRequest {
@@ -491,6 +579,13 @@ export class UpdatePlanRequest {
   // Plan Hierarchy
   public readonly parentPlanId?: string | null;
   public readonly displayOrder?: number;
+  // Device Binding
+  public readonly maxDevices?: number;
+  public readonly requireMachineBinding?: boolean;
+  public readonly deviceReplacementPolicy?: DeviceReplacementPolicy;
+  public readonly allowConcurrentUsage?: boolean;
+  public readonly concurrentUsageTimeoutMinutes?: number;
+  public readonly hardwareChangeTolerance?: number;
 
   constructor(data: UpdatePlanRequestData) {
     this.id = data.id;
@@ -516,6 +611,13 @@ export class UpdatePlanRequest {
     // Hierarchy fields
     this.parentPlanId = data.parentPlanId;
     this.displayOrder = data.displayOrder;
+    // Device Binding fields
+    this.maxDevices = data.maxDevices;
+    this.requireMachineBinding = data.requireMachineBinding;
+    this.deviceReplacementPolicy = data.deviceReplacementPolicy;
+    this.allowConcurrentUsage = data.allowConcurrentUsage;
+    this.concurrentUsageTimeoutMinutes = data.concurrentUsageTimeoutMinutes;
+    this.hardwareChangeTolerance = data.hardwareChangeTolerance;
   }
 
   /**
@@ -557,6 +659,13 @@ export class UpdatePlanRequest {
     // Hierarchy fields
     if (this.parentPlanId !== undefined) data.parentPlanId = this.parentPlanId;
     if (this.displayOrder !== undefined) data.displayOrder = this.displayOrder;
+    // Device Binding fields
+    if (this.maxDevices !== undefined) data.maxDevices = this.maxDevices;
+    if (this.requireMachineBinding !== undefined) data.requireMachineBinding = this.requireMachineBinding;
+    if (this.deviceReplacementPolicy !== undefined) data.deviceReplacementPolicy = this.deviceReplacementPolicy;
+    if (this.allowConcurrentUsage !== undefined) data.allowConcurrentUsage = this.allowConcurrentUsage;
+    if (this.concurrentUsageTimeoutMinutes !== undefined) data.concurrentUsageTimeoutMinutes = this.concurrentUsageTimeoutMinutes;
+    if (this.hardwareChangeTolerance !== undefined) data.hardwareChangeTolerance = this.hardwareChangeTolerance;
     return data;
   }
 }

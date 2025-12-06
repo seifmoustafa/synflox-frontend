@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Edit, BarChart3, Key, Settings, Calendar, DollarSign, Building, Package, Clock, AlertCircle, CheckCircle, XCircle, Pause, Play, RotateCcw, Layers, Box, Star, ArrowLeft, Shield, Lock } from "lucide-react";
+import { Edit, BarChart3, Key, Settings, Calendar, DollarSign, Building, Package, Clock, AlertCircle, CheckCircle, XCircle, Pause, Play, RotateCcw, Layers, Box, Star, ArrowLeft, Shield, Lock, Monitor, Laptop } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,7 @@ import {
 } from "@/components/dialogs/subscription-action-dialog";
 import { EntitlementsTree } from "@/components/ui/entitlements-tree";
 import { PlanEntitlement } from "@/domain";
+import { ActivationSummary } from "@/domain/models/license.model";
 import { LicenseView } from "@/views/license-view";
 
 interface SubscriptionDetailsViewProps {
@@ -34,7 +35,7 @@ interface SubscriptionDetailsViewProps {
 export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsViewProps) {
   const { t } = useI18n();
   const router = useRouter();
-  const { planEntitlementService } = useServices();
+  const { planEntitlementService, licenseService } = useServices();
   const { 
     subscription, 
     subscriptionStatus,
@@ -51,6 +52,10 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
   const [entitlements, setEntitlements] = useState<PlanEntitlement[]>([]);
   const [entitlementsLoading, setEntitlementsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  
+  // Device activations state
+  const [activations, setActivations] = useState<ActivationSummary | null>(null);
+  const [activationsLoading, setActivationsLoading] = useState(false);
 
   // Load entitlements when subscription data is available (from the plan)
   const loadEntitlements = useCallback(async () => {
@@ -69,6 +74,24 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
   useEffect(() => {
     loadEntitlements();
   }, [loadEntitlements]);
+
+  // Load device activations
+  const loadActivations = useCallback(async () => {
+    if (!subscriptionId) return;
+    try {
+      setActivationsLoading(true);
+      const result = await licenseService.getActivations(subscriptionId);
+      setActivations(result);
+    } catch (error) {
+      console.error("Failed to load device activations:", error);
+    } finally {
+      setActivationsLoading(false);
+    }
+  }, [subscriptionId, licenseService]);
+
+  useEffect(() => {
+    loadActivations();
+  }, [loadActivations]);
   
   // Action dialog state
   const [actionDialogOpen, setActionDialogOpen] = useState(false);
@@ -337,6 +360,7 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
           {t("dir") === "rtl" ? (
             <>
               <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
+              <TabsTrigger value="devices">{t("subscription.devices.title")}</TabsTrigger>
               <TabsTrigger value="license">{t("subscription.tabs.license")}</TabsTrigger>
               <TabsTrigger value="entitlements">{t("subscription.tabs.entitlements")}</TabsTrigger>
               <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
@@ -350,6 +374,7 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
               <TabsTrigger value="entitlements">{t("subscription.tabs.entitlements")}</TabsTrigger>
               <TabsTrigger value="license">{t("subscription.tabs.license")}</TabsTrigger>
+              <TabsTrigger value="devices">{t("subscription.devices.title")}</TabsTrigger>
               <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
             </>
           )}
@@ -730,6 +755,147 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
         {/* License Tab */}
         <TabsContent value="license" className="space-y-4">
           <LicenseView subscriptionId={subscriptionId} />
+        </TabsContent>
+
+        {/* Devices Tab */}
+        <TabsContent value="devices" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Monitor className="h-5 w-5" />
+                    {t("subscription.devices.title")}
+                  </CardTitle>
+                  <CardDescription>
+                    {t("subscription.devices.description")}
+                  </CardDescription>
+                </div>
+                {activations && (
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">{t("subscription.devices.usagePercentage")}</p>
+                      <p className="text-2xl font-bold">
+                        {activations.activeDeviceCount} / {activations.isUnlimited ? "∞" : activations.maxDevices}
+                      </p>
+                    </div>
+                    {!activations.isUnlimited && (
+                      <Progress 
+                        value={activations.usagePercentage} 
+                        className="w-24 h-2"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {activationsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <LoadingSpinner size="md" />
+                </div>
+              ) : activations && activations.hasDevices ? (
+                <div className="space-y-6">
+                  {/* Binding Settings Summary */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 rounded-lg border bg-muted/30">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {t("subscription.devices.requireMachineBinding")}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {activations.requireMachineBinding ? (
+                          <>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <span className="text-green-600 font-medium">{t("common.yes")}</span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="h-4 w-4 text-gray-400" />
+                            <span className="text-muted-foreground">{t("common.no")}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-4 rounded-lg border bg-muted/30">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {t("subscription.devices.allowConcurrentUsage")}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {activations.allowConcurrentUsage ? (
+                          <>
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <span className="text-green-600 font-medium">{t("common.yes")}</span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="h-4 w-4 text-gray-400" />
+                            <span className="text-muted-foreground">{t("common.no")}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="p-4 rounded-lg border bg-muted/30">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {t("subscription.devices.hardwareChangeTolerance")}
+                      </p>
+                      <p className="text-xl font-bold mt-1">
+                        {activations.hardwareChangeTolerance}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Devices List */}
+                  <div className="border rounded-lg divide-y">
+                    {activations.activations.map((device) => (
+                      <div key={device.activationId} className="p-4 flex items-start gap-4">
+                        <div className={`p-2 rounded-lg ${device.isActive ? 'bg-green-100 dark:bg-green-900/30' : 'bg-gray-100 dark:bg-gray-900/30'}`}>
+                          <Laptop className={`h-6 w-6 ${device.isActive ? 'text-green-600' : 'text-gray-400'}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{device.displayName}</p>
+                            <Badge variant={device.isActive ? "default" : "secondary"} className="text-xs">
+                              {device.isActive ? t("subscription.devices.active") : t("subscription.devices.inactive")}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {device.operatingSystem || "Unknown OS"} • {device.machineHashTruncated}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {t("subscription.devices.lastSeen")}: {device.formattedLastSeen}
+                            </span>
+                            <span>
+                              {t("subscription.devices.validations")}: {device.validationCount}
+                            </span>
+                            {device.hardwareChangeCount > 0 && (
+                              <span className="text-orange-500">
+                                {t("subscription.devices.hardwareChanges")}: {device.hardwareChangeCount}
+                              </span>
+                            )}
+                          </div>
+                          {device.lastIpAddress && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {t("subscription.devices.ipAddress")}: {device.lastIpAddress}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Monitor className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium">{t("subscription.devices.noDevices")}</h3>
+                  <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+                    {t("subscription.devices.noDevicesDescription")}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">

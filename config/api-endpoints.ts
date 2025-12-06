@@ -197,5 +197,15 @@ export const API_ENDPOINTS = {
     DOWNLOAD: (subscriptionId: string) => `/offline-license/download/${subscriptionId}`,
     ADD_MACHINE: (subscriptionId: string) => `/offline-license/${subscriptionId}/machines`,
     COMPUTE_FINGERPRINT: "/offline-license/compute-fingerprint",
+    // Device activations
+    GET_ACTIVATIONS: (subscriptionId: string) => `/offline-license/${subscriptionId}/activations`,
+    DEACTIVATE_ALL: (subscriptionId: string) => `/offline-license/${subscriptionId}/activations`,
+  },
+
+  // Client Admin Token Management (for device binding)
+  CLIENT_ADMIN_TOKENS: {
+    GENERATE: "/admin/offline-license-tokens/generate",
+    REVOKE: (tokenId: string) => `/admin/offline-license-tokens/${tokenId}`,
+    GET_BY_COMPANY: (companyId: string) => `/admin/offline-license-tokens/company/${companyId}`,
   },
 };

@@ -3,6 +3,7 @@ import {
   SubscriptionPlanData,
   CreatePlanRequest,
   UpdatePlanRequest,
+  DeviceReplacementPolicy,
 } from "../models/subscription-plan.model";
 
 /**
@@ -63,7 +64,14 @@ export class SubscriptionPlanMapper {
       data.displayOrder ?? 0,
       data.childPlanCount ?? 0,
       data.inheritedProjectsCount ?? 0,
-      data.inheritedModulesCount ?? 0
+      data.inheritedModulesCount ?? 0,
+      // Device Binding
+      data.maxDevices ?? 0,
+      data.requireMachineBinding ?? false,
+      data.deviceReplacementPolicy ?? DeviceReplacementPolicy.AdminApproval,
+      data.allowConcurrentUsage ?? false,
+      data.concurrentUsageTimeoutMinutes ?? 30,
+      data.hardwareChangeTolerance ?? 2
     );
   }
 
@@ -106,6 +114,13 @@ export class SubscriptionPlanMapper {
       childPlanCount: plan.childPlanCount,
       inheritedProjectsCount: plan.inheritedProjectsCount,
       inheritedModulesCount: plan.inheritedModulesCount,
+      // Device Binding
+      maxDevices: plan.maxDevices,
+      requireMachineBinding: plan.requireMachineBinding,
+      deviceReplacementPolicy: plan.deviceReplacementPolicy,
+      allowConcurrentUsage: plan.allowConcurrentUsage,
+      concurrentUsageTimeoutMinutes: plan.concurrentUsageTimeoutMinutes,
+      hardwareChangeTolerance: plan.hardwareChangeTolerance,
     };
   }
 

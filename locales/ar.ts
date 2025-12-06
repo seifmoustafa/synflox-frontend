@@ -1294,6 +1294,55 @@ export const ar = {
     inheritedModules: "الوحدات الموروثة",
     inherited: "موروثة",
     
+    // Device Binding Settings
+    deviceBindingTab: "ربط الأجهزة",
+    deviceBindingTitle: "إعدادات ربط الأجهزة",
+    deviceBindingDesc: "تكوين حدود الأجهزة وسياسات الربط للتراخيص غير المتصلة",
+    maxDevices: "الحد الأقصى للأجهزة",
+    maxDevicesHelper: "أقصى عدد من الأجهزة التي يمكن ربطها بهذا الترخيص (0 = غير محدود)",
+    requireMachineBinding: "تتطلب ربط الجهاز",
+    requireMachineBindingHelper: "يجب ربط الأجهزة صراحة قبل التحقق من الترخيص",
+    deviceReplacementPolicy: "سياسة الاستبدال",
+    deviceReplacementPolicyHelper: "كيفية التعامل مع استبدال الجهاز عند الوصول للحد الأقصى",
+    replacementPolicies: {
+      autoReplaceOldest: "استبدال الأقدم تلقائياً",
+      autoReplaceLeastActive: "استبدال الأقل نشاطاً تلقائياً",
+      adminApproval: "يتطلب موافقة المسؤول",
+    },
+    allowConcurrentUsage: "السماح بالاستخدام المتزامن",
+    allowConcurrentUsageHelper: "السماح باستخدام نفس الترخيص على أجهزة متعددة في وقت واحد",
+    concurrentUsageTimeout: "مهلة الاستخدام المتزامن",
+    concurrentUsageTimeoutHelper: "الدقائق قبل اعتبار جلسة الجهاز غير نشطة",
+    hardwareChangeTolerance: "تحمل تغيير الأجهزة",
+    hardwareChangeToleranceHelper: "عدد تغييرات الأجهزة المسموح بها قبل طلب موافقة المسؤول",
+    deviceBindingNotApplicable: "ربط الأجهزة غير قابل للتطبيق",
+    deviceBindingNotApplicableDesc: "ربط الأجهزة متاح فقط للخطط التي تتطلب ربط الجهاز.",
+    
+    // Device Binding Settings (nested structure for forms)
+    devices: {
+      title: "ربط الأجهزة",
+      maxDevices: "الحد الأقصى للأجهزة",
+      maxDevicesHelper: "أقصى عدد للأجهزة (0 = غير محدود)",
+      requireMachineBinding: "تتطلب ربط الجهاز",
+      requireMachineBindingHelper: "تتطلب ربط الأجهزة صراحة",
+      replacementPolicy: "سياسة الاستبدال",
+      replacementPolicyHelper: "كيفية التعامل مع استبدال الجهاز عند الوصول للحد الأقصى",
+      policies: {
+        autoReplaceOldest: "استبدال الأقدم تلقائياً",
+        autoReplaceLeastActive: "استبدال الأقل نشاطاً تلقائياً",
+        adminApproval: "يتطلب موافقة المسؤول",
+      },
+      hardwareChangeTolerance: "تحمل تغيير الأجهزة",
+      hardwareChangeToleranceHelper: "تغييرات الأجهزة المسموح بها قبل طلب الموافقة (0-10)",
+      allowConcurrentUsage: "السماح بالاستخدام المتزامن",
+      allowConcurrentUsageHelper: "السماح بالاستخدام المتزامن على أجهزة متعددة",
+      concurrentUsageTimeout: "مهلة الاستخدام المتزامن",
+      concurrentUsageTimeoutHelper: "الدقائق قبل اعتبار الجلسة غير نشطة (5-1440)",
+      unlimited: "غير محدود",
+      enabled: "مفعّل",
+      disabled: "معطّل",
+    },
+    
     // Module Conflict Dialog
     moduleConflictTitle: "تم اكتشاف تعارض في الوحدات",
     moduleConflictDescription: "الوحدات التالية مضمنة بالفعل في المشاريع المحددة وسيتم إدارتها تحت مشاريعها:",
@@ -1624,6 +1673,36 @@ export const ar = {
         stopTrial: "تم تحويل التجربة إلى اشتراك مدفوع",
         renew: "تم تجديد الاشتراك بواسطة المسؤول",
       },
+    },
+    
+    // Device Binding
+    devices: {
+      title: "الأجهزة المرتبطة",
+      description: "الأجهزة المرتبطة بترخيص هذا الاشتراك",
+      noDevices: "لا توجد أجهزة مرتبطة بهذا الاشتراك",
+      noDevicesDescription: "ستظهر الأجهزة هنا بمجرد ربطها باستخدام رمز مسؤول العميل",
+      deviceCount: "{count} من {max} جهاز",
+      unlimited: "غير محدود",
+      deviceName: "اسم الجهاز",
+      operatingSystem: "نظام التشغيل",
+      lastSeen: "آخر ظهور",
+      activatedAt: "تاريخ التفعيل",
+      ipAddress: "عنوان IP",
+      machineHash: "معرف الجهاز",
+      validations: "عمليات التحقق",
+      hardwareChanges: "تغييرات الأجهزة",
+      active: "نشط",
+      inactive: "غير نشط",
+      remainingSlots: "الأماكن المتبقية",
+      usagePercentage: "الاستخدام",
+      unbind: "إلغاء ربط الجهاز",
+      unbindAll: "إلغاء ربط جميع الأجهزة",
+      unbindConfirm: "هل أنت متأكد من إلغاء ربط هذا الجهاز؟",
+      unbindAllConfirm: "هل أنت متأكد من إلغاء ربط جميع الأجهزة من هذا الاشتراك؟",
+      requireMachineBinding: "ربط الجهاز مطلوب",
+      allowConcurrentUsage: "الاستخدام المتزامن مسموح",
+      hardwareChangeTolerance: "تحمل تغيير الأجهزة",
+      bindingSettings: "إعدادات الربط",
     },
   },
 
@@ -4770,5 +4849,71 @@ export const ar = {
     copiedToClipboard: "تم نسخ مفتاح الترخيص إلى الحافظة",
     copyFailed: "فشل في نسخ مفتاح الترخيص",
     downloadSuccess: "تم تحميل ملف الترخيص",
+  },
+
+  // Client Admin Tokens (for device binding)
+  clientAdminToken: {
+    title: "رموز مسؤول العميل",
+    description: "إدارة الرموز لمسؤولي العملاء لربط الأجهزة",
+    item: "رمز",
+    items: "الرموز",
+    noTokens: "لا توجد رموز",
+    noTokensDescription: "قم بإنشاء رمز للسماح لمسؤولي العملاء بإدارة ربط الأجهزة.",
+    
+    // Fields
+    name: "اسم الرمز",
+    namePlaceholder: "مثال: رمز مسؤول تقنية المعلومات",
+    nameHelper: "اسم ودي لتحديد هذا الرمز",
+    expiryDays: "ينتهي خلال (أيام)",
+    expiryDaysHelper: "عدد الأيام حتى انتهاء صلاحية الرمز",
+    status: "الحالة",
+    issuedAt: "صدر في",
+    expiresAt: "ينتهي في",
+    daysRemaining: "الأيام المتبقية",
+    lastUsed: "آخر استخدام",
+    usageCount: "عدد الاستخدامات",
+    lastUsedIp: "آخر استخدام من",
+    dailyApiLimit: "الحد اليومي للواجهة",
+    dailyApiLimitHelper: "أقصى عدد من استدعاءات API في اليوم (0 = غير محدود)",
+    todayApiCalls: "استدعاءات اليوم",
+    notes: "ملاحظات",
+    notesPlaceholder: "ملاحظات داخلية حول هذا الرمز...",
+    
+    // Permissions
+    permissions: "الصلاحيات",
+    canBindDevices: "يمكن ربط الأجهزة",
+    canUnbindDevices: "يمكن إلغاء ربط الأجهزة",
+    canViewDevices: "يمكن عرض الأجهزة",
+    canApproveReplacements: "يمكن الموافقة على الاستبدال",
+    
+    // Status
+    active: "نشط",
+    expired: "منتهي الصلاحية",
+    revoked: "ملغي",
+    expiringSoon: "ينتهي قريباً",
+    
+    // Actions
+    generate: "إنشاء رمز",
+    revoke: "إلغاء الرمز",
+    copy: "نسخ الرمز",
+    
+    // Generate Dialog
+    generateTitle: "إنشاء رمز مسؤول العميل",
+    generateDescription: "إنشاء رمز جديد لمسؤولي العملاء لإدارة ربط الأجهزة لهذه الشركة.",
+    
+    // Generated Success
+    generatedSuccessfully: "تم إنشاء الرمز بنجاح",
+    saveTokenWarning: "يرجى حفظ هذا الرمز بشكل آمن. سيتم عرضه مرة واحدة فقط!",
+    tokenNotStoredWarning: "هام: لا يمكن استرداد هذا الرمز لاحقاً. تأكد من حفظه الآن!",
+    
+    // Revoke Dialog
+    revokeTitle: "إلغاء الرمز",
+    revokeDescription: "هل أنت متأكد من أنك تريد إلغاء هذا الرمز؟ لا يمكن التراجع عن هذا الإجراء وسيمنع استخدام الرمز فوراً.",
+    
+    // Notifications
+    copiedToClipboard: "تم نسخ الرمز إلى الحافظة",
+    copyFailed: "فشل في نسخ الرمز",
+    generateSuccess: "تم إنشاء الرمز بنجاح",
+    revokeSuccess: "تم إلغاء الرمز بنجاح",
   },
 };

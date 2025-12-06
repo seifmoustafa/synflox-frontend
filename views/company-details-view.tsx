@@ -19,7 +19,8 @@ import { RenewalReminder } from "@/components/company/renewal-reminder";
 import { QuickActions } from "@/components/company/quick-actions";
 import { ExportHistoryButton } from "@/components/subscription/export-history-button";
 import { CompanyAnalytics } from "@/components/company/company-analytics";
-import { formatDate } from "@/lib/utils";
+import { ClientAdminTokens } from "@/components/company/client-admin-tokens";
+import { formatDate, cn } from "@/lib/utils";
 import {
   Building2,
   Mail,
@@ -43,6 +44,7 @@ import {
   Zap,
   Pause,
   Play,
+  Key,
 } from "lucide-react";
 
 interface CompanyDetailsViewProps {
@@ -62,9 +64,10 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
     handleCreateSubscription,
     handleBack,
   } = useCompanyDetailsViewModel(companyId);
-  const { t } = useI18n();
+  const { t, direction } = useI18n();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
+  const isRTL = direction === "rtl";
 
   if (isLoading) {
     return (
@@ -224,16 +227,39 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
       />
 
       {/* Tabs Section */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
-          <TabsTrigger value="overview" className="gap-2">
-            <Building2 className="h-4 w-4" />
-            {t("dashboard.overview.title")}
-          </TabsTrigger>
-          <TabsTrigger value="subscriptions" className="gap-2">
-            <CreditCard className="h-4 w-4" />
-            {t("subscription.items")}
-          </TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
+        <TabsList className={cn("grid w-full grid-cols-3 lg:w-[600px]", isRTL && "lg:mr-0 lg:ml-auto")}>
+          {isRTL ? (
+            <>
+              <TabsTrigger value="tokens" className="gap-2 ">
+                <Key className="h-4 w-4" />
+                {t("clientAdminToken.items")}
+              </TabsTrigger>
+              <TabsTrigger value="subscriptions" className="gap-2 ">
+                <CreditCard className="h-4 w-4" />
+                {t("subscription.items")}
+              </TabsTrigger>
+              <TabsTrigger value="overview" className="gap-2 ">
+                <Building2 className="h-4 w-4" />
+                {t("dashboard.overview.title")}
+              </TabsTrigger>
+            </>
+          ) : (
+            <>
+              <TabsTrigger value="overview" className="gap-2">
+                <Building2 className="h-4 w-4" />
+                {t("dashboard.overview.title")}
+              </TabsTrigger>
+              <TabsTrigger value="subscriptions" className="gap-2">
+                <CreditCard className="h-4 w-4" />
+                {t("subscription.items")}
+              </TabsTrigger>
+              <TabsTrigger value="tokens" className="gap-2">
+                <Key className="h-4 w-4" />
+                {t("clientAdminToken.items")}
+              </TabsTrigger>
+            </>
+          )}
         </TabsList>
 
         {/* Overview Tab */}
@@ -472,6 +498,11 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Tokens Tab */}
+        <TabsContent value="tokens" className="space-y-6">
+          <ClientAdminTokens companyId={companyId} />
         </TabsContent>
       </Tabs>
     </div>
