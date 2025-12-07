@@ -22,6 +22,7 @@ import { QuickActions } from "@/components/company/quick-actions";
 import { ExportHistoryButton } from "@/components/subscription/export-history-button";
 import { CompanyAnalytics } from "@/components/company/company-analytics";
 import { ClientAdminTokens } from "@/components/company/client-admin-tokens";
+import { CompanyAdminSection } from "@/components/company/company-admin-section";
 import { formatDate, cn } from "@/lib/utils";
 import {
   Building2,
@@ -46,6 +47,7 @@ import {
   Pause,
   Play,
   Key,
+  UserCog,
 } from "lucide-react";
 
 interface CompanyDetailsViewProps {
@@ -231,12 +233,16 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
-        <TabsList className={cn("grid w-full grid-cols-3 lg:w-[600px]", isRTL && "lg:mr-0 lg:ml-auto")}>
+        <TabsList className={cn("grid w-full grid-cols-4 lg:w-[800px]", isRTL && "lg:mr-0 lg:ml-auto")}>
           {isRTL ? (
             <>
               <TabsTrigger value="tokens" className="gap-2 ">
                 <Key className="h-4 w-4" />
                 {t("clientAdminToken.items")}
+              </TabsTrigger>
+              <TabsTrigger value="admin" className="gap-2 ">
+                <UserCog className="h-4 w-4" />
+                {t("companyAdmin.item")}
               </TabsTrigger>
               <TabsTrigger value="subscriptions" className="gap-2 ">
                 <CreditCard className="h-4 w-4" />
@@ -256,6 +262,10 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
               <TabsTrigger value="subscriptions" className="gap-2">
                 <CreditCard className="h-4 w-4" />
                 {t("subscription.items")}
+              </TabsTrigger>
+              <TabsTrigger value="admin" className="gap-2">
+                <UserCog className="h-4 w-4" />
+                {t("companyAdmin.item")}
               </TabsTrigger>
               <TabsTrigger value="tokens" className="gap-2">
                 <Key className="h-4 w-4" />
@@ -501,6 +511,11 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Admin Tab */}
+        <TabsContent value="admin" className="space-y-6">
+          <CompanyAdminSection companyId={companyId} companyName={company.name} />
         </TabsContent>
 
         {/* Tokens Tab */}

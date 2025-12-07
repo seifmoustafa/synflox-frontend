@@ -209,4 +209,18 @@ export const API_ENDPOINTS = {
     REVOKE: (tokenId: string) => `/admin/offline-license-tokens/${tokenId}`,
     GET_BY_COMPANY: (companyId: string) => `/admin/offline-license-tokens/company/${companyId}`,
   },
+
+  // Company Admin Management (Client Admin Accounts)
+  COMPANY_ADMINS: {
+    BASE: "/admin/company-admins",
+    BY_ID: (id: string) => `/admin/company-admins/${id}`,
+    BY_COMPANY: (companyId: string) => `/admin/company-admins/by-company/${companyId}`,
+    CHECK_USERNAME: "/admin/company-admins/check-username",
+    COMPANY_HAS_ADMIN: (companyId: string) => `/admin/company-admins/company-has-admin/${companyId}`,
+    RESET_PASSWORD: (id: string) => `/admin/company-admins/${id}/reset-password`,
+    UNLOCK: (id: string) => `/admin/company-admins/${id}/unlock`,
+    TERMINATE_SESSIONS: (id: string) => `/admin/company-admins/${id}/terminate-sessions`,
+    SESSIONS: (id: string) => `/admin/company-admins/${id}/sessions`,
+    ACTIVE_SESSIONS: (id: string) => `/admin/company-admins/${id}/active-sessions`,
+  },
 };

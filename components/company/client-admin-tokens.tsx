@@ -1,18 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
 import { AdminToken, GenerateAdminTokenRequest } from "@/domain";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { GenericModal } from "@/components/ui/generic-modal";
+import { GenericForm, FieldConfig } from "@/components/forms/generic-form";
 import {
   Dialog,
   DialogContent,
@@ -36,13 +34,8 @@ import {
   Copy,
   AlertTriangle,
   CheckCircle2,
-  XCircle,
   Clock,
-  Shield,
-  Eye,
-  Link2,
   RefreshCw,
-  AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -57,7 +50,6 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
   
   const [tokens, setTokens] = useState<AdminToken[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [showRevokeDialog, setShowRevokeDialog] = useState(false);
   const [showGeneratedTokenDialog, setShowGeneratedTokenDialog] = useState(false);
@@ -65,24 +57,87 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
   const [tokenToRevoke, setTokenToRevoke] = useState<AdminToken | null>(null);
   const [isRevoking, setIsRevoking] = useState(false);
   const [copied, setCopied] = useState(false);
-  
-  // Form state
-  const [formData, setFormData] = useState({
+
+  // ============================================================================
+  // Field Configuration for Generate Token Form
+  // ============================================================================
+
+  const generateTokenFields: FieldConfig[] = useMemo(() => [
+    {
+      name: "name",
+      label: `${t("clientAdminToken.name")} *`,
+      type: "text",
+      required: true,
+      placeholder: t("clientAdminToken.namePlaceholder"),
+      maxLength: 100,
+    },
+    {
+      name: "expiryDays",
+      label: t("clientAdminToken.expiryDays"),
+      type: "number",
+      required: true,
+      min: 1,
+      max: 3650,
+      defaultValue: 365,
+    },
+    // Permissions
+    {
+      name: "canBindDevices",
+      label: t("clientAdminToken.canBindDevices"),
+      type: "switch",
+      defaultValue: true,
+    },
+    {
+      name: "canUnbindDevices",
+      label: t("clientAdminToken.canUnbindDevices"),
+      type: "switch",
+      defaultValue: true,
+    },
+    {
+      name: "canViewDevices",
+      label: t("clientAdminToken.canViewDevices"),
+      type: "switch",
+      defaultValue: true,
+    },
+    {
+      name: "canApproveReplacements",
+      label: t("clientAdminToken.canApproveReplacements"),
+      type: "switch",
+      defaultValue: true,
+    },
+    {
+      name: "dailyApiLimit",
+      label: t("clientAdminToken.dailyApiLimit"),
+      type: "number",
+      min: 0,
+      defaultValue: 0,
+      helperText: t("clientAdminToken.dailyApiLimitHelper"),
+    },
+    {
+      name: "notes",
+      label: t("clientAdminToken.notes"),
+      type: "textarea",
+      placeholder: t("clientAdminToken.notesPlaceholder"),
+      rows: 2,
+    },
+  ], [t]);
+
+  const generateTokenInitialValues = useMemo(() => ({
     name: "",
-    expiryDays: "365",
+    expiryDays: 365,
     canBindDevices: true,
     canUnbindDevices: true,
     canViewDevices: true,
     canApproveReplacements: true,
-    dailyApiLimit: "0",
+    dailyApiLimit: 0,
     notes: "",
-  });
+  }), []);
 
-  useEffect(() => {
-    loadTokens();
-  }, [companyId]);
+  // ============================================================================
+  // Data Loading
+  // ============================================================================
 
-  const loadTokens = async () => {
+  const loadTokens = useCallback(async () => {
     try {
       setIsLoading(true);
       const result = await clientAdminTokenService.getTokensByCompany(companyId);
@@ -92,49 +147,36 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [companyId, clientAdminTokenService]);
 
-  const handleGenerate = async () => {
-    if (!formData.name.trim()) return;
+  useEffect(() => {
+    loadTokens();
+  }, [loadTokens]);
+
+  // ============================================================================
+  // Handlers
+  // ============================================================================
+
+  const handleGenerate = async (data: Record<string, any>) => {
+    const request = new GenerateAdminTokenRequest({
+      companyId,
+      name: data.name,
+      expiryDays: parseInt(data.expiryDays) || 365,
+      canBindDevices: data.canBindDevices,
+      canUnbindDevices: data.canUnbindDevices,
+      canViewDevices: data.canViewDevices,
+      canApproveReplacements: data.canApproveReplacements,
+      dailyApiLimit: parseInt(data.dailyApiLimit) || 0,
+      notes: data.notes || null,
+    });
     
-    try {
-      setIsGenerating(true);
-      const request = new GenerateAdminTokenRequest({
-        companyId,
-        name: formData.name,
-        expiryDays: parseInt(formData.expiryDays) || 365,
-        canBindDevices: formData.canBindDevices,
-        canUnbindDevices: formData.canUnbindDevices,
-        canViewDevices: formData.canViewDevices,
-        canApproveReplacements: formData.canApproveReplacements,
-        dailyApiLimit: parseInt(formData.dailyApiLimit) || 0,
-        notes: formData.notes || null,
-      });
-      
-      const response = await clientAdminTokenService.generateToken(request);
-      
-      if (response.success && response.token) {
-        setGeneratedToken(response.token);
-        setShowGenerateDialog(false);
-        setShowGeneratedTokenDialog(true);
-        // Reset form
-        setFormData({
-          name: "",
-          expiryDays: "365",
-          canBindDevices: true,
-          canUnbindDevices: true,
-          canViewDevices: true,
-          canApproveReplacements: true,
-          dailyApiLimit: "0",
-          notes: "",
-        });
-        // Reload tokens
-        loadTokens();
-      }
-    } catch (error) {
-      console.error("Failed to generate token:", error);
-    } finally {
-      setIsGenerating(false);
+    const response = await clientAdminTokenService.generateToken(request);
+    
+    if (response.success && response.token) {
+      setGeneratedToken(response.token);
+      setShowGenerateDialog(false);
+      setShowGeneratedTokenDialog(true);
+      await loadTokens();
     }
   };
 
@@ -146,7 +188,7 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
       await clientAdminTokenService.revokeToken(tokenToRevoke.id);
       setShowRevokeDialog(false);
       setTokenToRevoke(null);
-      loadTokens();
+      await loadTokens();
     } catch (error) {
       console.error("Failed to revoke token:", error);
     } finally {
@@ -173,6 +215,10 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
     }
     return <Badge variant="default" className="bg-green-500/10 text-green-600">{t("clientAdminToken.active")}</Badge>;
   };
+
+  // ============================================================================
+  // Render
+  // ============================================================================
 
   if (isLoading) {
     return (
@@ -281,119 +327,24 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
         </CardContent>
       </Card>
 
-      {/* Generate Token Dialog */}
-      <Dialog open={showGenerateDialog} onOpenChange={setShowGenerateDialog}>
-        <DialogContent className="sm:max-w-[500px]" dir={isRTL ? "rtl" : "ltr"}>
-          <DialogHeader>
-            <DialogTitle>{t("clientAdminToken.generateTitle")}</DialogTitle>
-            <DialogDescription>
-              {t("clientAdminToken.generateDescription")}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            {/* Token Name */}
-            <div className="space-y-2">
-              <Label>{t("clientAdminToken.name")} *</Label>
-              <Input
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder={t("clientAdminToken.namePlaceholder")}
-              />
-            </div>
+      {/* Generate Token Modal */}
+      <GenericModal
+        open={showGenerateDialog}
+        onOpenChange={setShowGenerateDialog}
+        title={t("clientAdminToken.generateTitle")}
+        description={t("clientAdminToken.generateDescription")}
+        size="md"
+        formKey={showGenerateDialog ? "generate-token" : undefined}
+      >
+        <GenericForm
+          fields={generateTokenFields}
+          initialValues={generateTokenInitialValues}
+          onSubmit={handleGenerate}
+          onCancel={() => setShowGenerateDialog(false)}
+        />
+      </GenericModal>
 
-            {/* Expiry Days */}
-            <div className="space-y-2">
-              <Label>{t("clientAdminToken.expiryDays")}</Label>
-              <Input
-                type="number"
-                value={formData.expiryDays}
-                onChange={(e) => setFormData({ ...formData, expiryDays: e.target.value })}
-                min={1}
-                max={3650}
-              />
-            </div>
-
-            {/* Permissions */}
-            <div className="space-y-3">
-              <Label>{t("clientAdminToken.permissions")}</Label>
-              <div className="space-y-2">
-                <div className={cn("flex items-center justify-between", isRTL && "")}>
-                  <span className="text-sm">{t("clientAdminToken.canBindDevices")}</span>
-                  <Switch
-                    checked={formData.canBindDevices}
-                    onCheckedChange={(checked) => setFormData({ ...formData, canBindDevices: checked })}
-                  />
-                </div>
-                <div className={cn("flex items-center justify-between", isRTL && "")}>
-                  <span className="text-sm">{t("clientAdminToken.canUnbindDevices")}</span>
-                  <Switch
-                    checked={formData.canUnbindDevices}
-                    onCheckedChange={(checked) => setFormData({ ...formData, canUnbindDevices: checked })}
-                  />
-                </div>
-                <div className={cn("flex items-center justify-between", isRTL && "")}>
-                  <span className="text-sm">{t("clientAdminToken.canViewDevices")}</span>
-                  <Switch
-                    checked={formData.canViewDevices}
-                    onCheckedChange={(checked) => setFormData({ ...formData, canViewDevices: checked })}
-                  />
-                </div>
-                <div className={cn("flex items-center justify-between", isRTL && "")}>
-                  <span className="text-sm">{t("clientAdminToken.canApproveReplacements")}</span>
-                  <Switch
-                    checked={formData.canApproveReplacements}
-                    onCheckedChange={(checked) => setFormData({ ...formData, canApproveReplacements: checked })}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Daily API Limit */}
-            <div className="space-y-2">
-              <Label>{t("clientAdminToken.dailyApiLimit")}</Label>
-              <Input
-                type="number"
-                value={formData.dailyApiLimit}
-                onChange={(e) => setFormData({ ...formData, dailyApiLimit: e.target.value })}
-                min={0}
-              />
-              <p className="text-xs text-muted-foreground">{t("clientAdminToken.dailyApiLimitHelper")}</p>
-            </div>
-
-            {/* Notes */}
-            <div className="space-y-2">
-              <Label>{t("clientAdminToken.notes")}</Label>
-              <Textarea
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder={t("clientAdminToken.notesPlaceholder")}
-                rows={2}
-              />
-            </div>
-          </div>
-
-          <DialogFooter className={isRTL ? "" : ""}>
-            <Button variant="outline" onClick={() => setShowGenerateDialog(false)}>
-              {t("common.cancel")}
-            </Button>
-            <Button 
-              onClick={handleGenerate} 
-              disabled={!formData.name.trim() || isGenerating}
-              className={cn("gap-2", isRTL && "")}
-            >
-              {isGenerating ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                <Plus className="h-4 w-4" />
-              )}
-              {t("clientAdminToken.generate")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Generated Token Success Dialog */}
+      {/* Generated Token Success Dialog - Keep as Dialog (just displays token) */}
       <Dialog open={showGeneratedTokenDialog} onOpenChange={setShowGeneratedTokenDialog}>
         <DialogContent className="sm:max-w-[600px]" dir={isRTL ? "rtl" : "ltr"}>
           <DialogHeader>
@@ -450,7 +401,7 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Revoke Confirmation Dialog */}
+      {/* Revoke Confirmation Dialog - Already using ConfirmationDialog (appropriate) */}
       <ConfirmationDialog
         open={showRevokeDialog}
         onOpenChange={setShowRevokeDialog}
