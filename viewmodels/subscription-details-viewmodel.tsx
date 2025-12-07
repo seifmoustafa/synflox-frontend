@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
+import { useCurrency } from "@/providers/currency-provider";
 import { 
   Subscription,
   SubscriptionStatus,
@@ -45,6 +46,7 @@ interface SubscriptionAnalytics {
 export function useSubscriptionDetailsViewModel(subscriptionId: string) {
   const { subscriptionService } = useServices();
   const { t } = useI18n();
+  const { activeCurrency, version } = useCurrency();
   const router = useRouter();
 
   // State
@@ -65,8 +67,8 @@ export function useSubscriptionDetailsViewModel(subscriptionId: string) {
       setLoading(true);
       setError(null);
       
-      console.log("🔍 Loading subscription details for ID:", subscriptionId);
-      const sub = await subscriptionService.getSubscriptionById(subscriptionId);
+      console.log("🔍 Loading subscription details for ID:", subscriptionId, "Currency:", activeCurrency);
+      const sub = await subscriptionService.getSubscriptionById(subscriptionId, activeCurrency);
       console.log("📦 Loaded subscription:", sub);
       
       setSubscription(sub);
@@ -76,7 +78,7 @@ export function useSubscriptionDetailsViewModel(subscriptionId: string) {
     } finally {
       setLoading(false);
     }
-  }, [subscriptionId, subscriptionService, t]);
+  }, [subscriptionId, subscriptionService, t, activeCurrency]);
 
   // Load subscription status (detailed)
   const loadSubscriptionStatus = useCallback(async () => {
@@ -123,7 +125,7 @@ export function useSubscriptionDetailsViewModel(subscriptionId: string) {
     }
   }, [subscriptionId, subscriptionService]);
 
-  // Load all data on mount
+  // Load all data on mount and when currency changes
   useEffect(() => {
     if (subscriptionId) {
       // Load main subscription data
@@ -133,7 +135,7 @@ export function useSubscriptionDetailsViewModel(subscriptionId: string) {
       loadHistory();
       loadAnalytics();
     }
-  }, [subscriptionId, loadSubscription, loadSubscriptionStatus, loadHistory, loadAnalytics]);
+  }, [subscriptionId, loadSubscription, loadSubscriptionStatus, loadHistory, loadAnalytics, version]);
 
   // Lifecycle action handlers
   const handleLifecycleAction = useCallback(async (

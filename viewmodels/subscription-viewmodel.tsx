@@ -357,10 +357,12 @@ export function useSubscriptionViewModel() {
       const request = new CreateSubscriptionRequest({
         companyId: data.companyId,
         planId: data.planId,
-        // Currency selection
-        currency: data.currency ? parseInt(data.currency) : 1, // Default USD
-        // Custom amount (optional override)
-        customAmount: data.customAmount ? parseFloat(data.customAmount) : undefined,
+        // Custom pricing override - if enabled, use custom currency and amount
+        overridePlanPricing: data.overridePlanPricing || false,
+        // Currency selection (required when override is enabled)
+        currency: data.currency ? parseInt(data.currency) : undefined,
+        // Custom amount (required when override is enabled)
+        amount: data.amount ? parseFloat(data.amount) : undefined,
         // Start date (optional, default today)
         startDateUtc: data.startDateUtc || undefined,
         // Only allow trial if plan permits it
@@ -531,6 +533,19 @@ export function useSubscriptionViewModel() {
         },
       },
       {
+        name: "overridePlanPricing",
+        label: t("subscription.overridePlanPricing") || "Custom Pricing",
+        type: "checkbox" as const,
+        helperText: t("subscription.overridePlanPricingHelper") || "Enable to set custom currency and amount instead of using plan defaults",
+        // Hide for free tier plans
+        isVisible: (formData: Record<string, any>) => {
+          const planId = formData.planId;
+          if (!planId) return false; // Hide until plan is selected
+          const plan = plansData.find(p => p.id === planId);
+          return plan ? !plan.isFreeTier : true;
+        },
+      },
+      {
         name: "currency",
         label: t("subscription.currency"),
         type: "select" as const,
@@ -546,25 +561,30 @@ export function useSubscriptionViewModel() {
           { value: "7", label: t("plan.currencies.jpy") },
           { value: "8", label: t("plan.currencies.cny") },
         ],
-        // Hide currency field for free tier plans
+        // Only show when override is enabled and not free tier
         isVisible: (formData: Record<string, any>) => {
+          if (!formData.overridePlanPricing) return false;
           const planId = formData.planId;
-          if (!planId) return true;
+          if (!planId) return false;
           const plan = plansData.find(p => p.id === planId);
           return plan ? !plan.isFreeTier : true;
         },
       },
       {
-        name: "customAmount",
-        label: t("subscription.customAmount"),
+        name: "amount",
+        label: t("subscription.amount") || "Amount",
         type: "number" as const,
-        placeholder: t("subscription.customAmountPlaceholder"),
-        helperText: t("subscription.customAmountHelper"),
+        required: true,
+        placeholder: t("subscription.amountPlaceholder") || "Enter amount",
+        helperText: t("subscription.amountHelper") || "Custom amount for this subscription",
         min: 0,
-        // Hide custom amount field for free tier plans
+        step: 0.01,
+        // Only show when override is enabled, currency is selected, and not free tier
         isVisible: (formData: Record<string, any>) => {
+          if (!formData.overridePlanPricing) return false;
+          if (!formData.currency) return false;
           const planId = formData.planId;
-          if (!planId) return true;
+          if (!planId) return false;
           const plan = plansData.find(p => p.id === planId);
           return plan ? !plan.isFreeTier : true;
         },

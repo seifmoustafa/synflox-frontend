@@ -335,7 +335,11 @@ export const ar = {
       revenue: "الإيرادات",
       insights: "الرؤى",
     },
-    
+    subscriptions:{
+      topPlan:"أفضل اشتراك",
+      title:"الإشتراكات",
+      topPlanDescription:"الاشتراكات الأكثر إيرادات"
+    },
     // Overview Dashboard
     overview: {
       title: "نظرة عامة على لوحة التحكم",
@@ -405,7 +409,6 @@ export const ar = {
     alerts: "التنبيهات",
     // Overview Cards
     companies: "الشركات",
-    subscriptions: "الاشتراكات",
     admins: "المسؤولون",
     active: "نشط",
     today: "اليوم",
@@ -1041,6 +1044,7 @@ export const ar = {
 
   // Company
   company: {
+    createdAt:"انشأ في",
     title: "إدارة الشركات",
     description: "إدارة الشركات والاشتراكات",
     item: "شركة",
@@ -1377,9 +1381,11 @@ export const ar = {
     currency: "العملة",
     currencyHelper: "اختر عملة الدفع لهذا الاشتراك",
     selectCurrency: "اختر عملة الدفع",
-    customAmount: "مبلغ مخصص",
-    customAmountPlaceholder: "اتركه فارغاً لاستخدام سعر الخطة",
-    customAmountHelper: "تجاوز سعر الخطة بمبلغ مخصص (اختياري)",
+    overridePlanPricing: "تسعير مخصص",
+    overridePlanPricingHelper: "تفعيل لتعيين عملة ومبلغ مخصصين بدلاً من استخدام إعدادات الخطة",
+    amount: "المبلغ",
+    amountPlaceholder: "أدخل المبلغ",
+    amountHelper: "المبلغ المخصص لهذا الاشتراك",
     startWithTrial: "البدء بفترة تجريبية",
     trialHelper: "بدء الاشتراك في وضع التجربة (إذا كانت الخطة تسمح)",
     autoRenew: "التجديد التلقائي",
@@ -1388,7 +1394,6 @@ export const ar = {
     startDateHelper: "متى يجب أن يبدأ الاشتراك (الافتراضي: اليوم)",
     expiryDate: "تاريخ الانتهاء",
     daysRemaining: "الأيام المتبقية",
-    amount: "المبلغ",
     notes: "ملاحظات",
     notesPlaceholder: "أضف أي ملاحظات حول هذا الاشتراك...",
     notesHelper: "ملاحظات داخلية لهذا الاشتراك (بحد أقصى 500 حرف)",

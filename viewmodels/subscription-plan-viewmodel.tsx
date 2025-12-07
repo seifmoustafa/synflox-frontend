@@ -438,8 +438,10 @@ export function useSubscriptionPlanViewModel() {
           label: t("plan.currency"),
           type: "select" as const,
           required: true,
+          placeholder: t("plan.selectCurrency"),
           helperText: t("plan.selectCurrency"),
           options: [
+            { value: "", label: t("plan.selectCurrency") },
             { value: "1", label: t("plan.currencies.usd") },
             { value: "2", label: t("plan.currencies.eur") },
             { value: "3", label: t("plan.currencies.egp") },
@@ -458,7 +460,8 @@ export function useSubscriptionPlanViewModel() {
           required: true,
           placeholder: "99.99",
           helperText: t("plan.amount"),
-          isVisible: (formData: any) => !formData.isFreeTier, // Hide for Free Tier (price is 0)
+          // Only show after currency is selected AND not Free Tier
+          isVisible: (formData: any) => !formData.isFreeTier && !!formData.currency,
         },
         {
           name: "allowTrial",
@@ -680,8 +683,10 @@ export function useSubscriptionPlanViewModel() {
           label: t("plan.currency"),
           type: "select" as const,
           required: true,
+          placeholder: t("plan.selectCurrency"),
           helperText: t("plan.selectCurrency"),
           options: [
+            { value: "", label: t("plan.selectCurrency") },
             { value: "1", label: t("plan.currencies.usd") },
             { value: "2", label: t("plan.currencies.eur") },
             { value: "3", label: t("plan.currencies.egp") },
@@ -700,7 +705,8 @@ export function useSubscriptionPlanViewModel() {
           required: true,
           placeholder: "99.99",
           helperText: t("plan.amount"),
-          isVisible: (formData: any) => !formData.isFreeTier, // Hide for Free Tier (price is 0)
+          // Only show after currency is selected AND not Free Tier
+          isVisible: (formData: any) => !formData.isFreeTier && !!formData.currency,
         },
         {
           name: "allowTrial",
@@ -810,13 +816,13 @@ export function useSubscriptionPlanViewModel() {
         { name: "id", type: "hidden" as const, required: true },
       ],
       createInitialValues: customCreateInitialValues || {
-        durationType: 3, // Monthly by default
-        currency: 1, // USD by default
+        durationType: "3", // Monthly by default (string for select)
+        currency: "", // Empty - user must select (string for select)
         amount: 0,
         allowTrial: false,
         trialDurationDays: null,
         autoRenew: false,
-        upgradePolicy: 0, // FullReplace by default
+        upgradePolicy: "0", // FullReplace by default (string for select)
         gracePeriodDays: 0,
         exportGraceDays: 30,
         isFreeTier: false,

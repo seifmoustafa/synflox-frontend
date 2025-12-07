@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCompanyDetailsViewModel } from "@/viewmodels/company-details-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
+import { useCurrency } from "@/providers/currency-provider";
+import { CurrencySelector } from "@/components/dashboard/currency-selector";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +38,6 @@ import {
   Clock,
   Users,
   TrendingUp,
-  DollarSign,
   Package,
   AlertCircle,
   ExternalLink,
@@ -65,6 +66,7 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
     handleBack,
   } = useCompanyDetailsViewModel(companyId);
   const { t, direction } = useI18n();
+  const { formatAmount, currencyInfo } = useCurrency();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
   const isRTL = direction === "rtl";
@@ -123,7 +125,8 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <CurrencySelector />
           <Button variant="outline" size="sm" onClick={refresh}>
             <RefreshCw className="h-4 w-4 me-2" />
             {t("common.refresh")}
@@ -176,11 +179,11 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t("subscription.amount")}</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">{currencyInfo.symbol}</span>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {totalRevenue.toLocaleString()}
+              {formatAmount(totalRevenue)}
             </div>
             <p className="text-xs text-muted-foreground">
               {t("dashboard.revenue.totalSubscriptionValue")}

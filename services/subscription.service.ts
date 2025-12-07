@@ -30,12 +30,12 @@ import { API_ENDPOINTS } from "@/config/api-endpoints";
 export interface ISubscriptionService {
   // CRUD Operations
   createSubscription(request: CreateSubscriptionRequest): Promise<Subscription>;
-  getSubscriptionById(id: string): Promise<Subscription>;
+  getSubscriptionById(id: string, currency?: string): Promise<Subscription>;
   getAllSubscriptions(page: number, pageSize: number, search?: string): Promise<{ data: Subscription[]; pagination: any }>;
   
   // Query Operations
   getActiveSubscription(companyId: string): Promise<Subscription | null>;
-  getCompanySubscriptions(companyId: string): Promise<Subscription[]>;
+  getCompanySubscriptions(companyId: string, currency?: string): Promise<Subscription[]>;
   getSubscriptionStatus(id: string): Promise<SubscriptionStatus>;
   getSubscriptionHistory(id: string): Promise<any[]>;
   getSubscriptionAnalytics(id: string, fromDate?: Date, toDate?: Date): Promise<any>;
@@ -115,10 +115,12 @@ export class SubscriptionService implements ISubscriptionService {
     }
   }
 
-  async getSubscriptionById(id: string): Promise<Subscription> {
+  async getSubscriptionById(id: string, currency?: string): Promise<Subscription> {
     try {
+      const params = currency ? { currency } : undefined;
       const response = await this.apiService.get(
-        API_ENDPOINTS.SUBSCRIPTIONS.BY_ID(id)
+        API_ENDPOINTS.SUBSCRIPTIONS.BY_ID(id),
+        params
       );
 
       return SubscriptionMapper.handleApiResponse(response);
@@ -148,10 +150,12 @@ export class SubscriptionService implements ISubscriptionService {
     }
   }
 
-  async getCompanySubscriptions(companyId: string): Promise<Subscription[]> {
+  async getCompanySubscriptions(companyId: string, currency?: string): Promise<Subscription[]> {
     try {
+      const params = currency ? { currency } : undefined;
       const response = await this.apiService.get(
-        API_ENDPOINTS.SUBSCRIPTIONS.GET_ALL_BY_COMPANY(companyId)
+        API_ENDPOINTS.SUBSCRIPTIONS.GET_ALL_BY_COMPANY(companyId),
+        params
       );
 
       const result = SubscriptionMapper.handleGetByCompanyResponse(response);

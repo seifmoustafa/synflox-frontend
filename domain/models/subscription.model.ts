@@ -72,8 +72,12 @@ export interface SubscriptionData {
   isPaused: boolean;
   pausedAtUtc?: string | null;
   remainingDaysWhenPaused?: number | null;
+  // Custom Pricing Override
+  overridePlanPricing: boolean;
   currency: Currency;
   amount: number;
+  planCurrency: Currency;  // Plan's default currency
+  planAmount: number;      // Plan's default amount
   statusReason?: string | null;
   // Next subscription for deferred upgrades
   nextSubscriptionId?: string | null;
@@ -163,8 +167,12 @@ export class Subscription {
   readonly isPaused: boolean;
   readonly pausedAtUtc?: Date | null;
   readonly remainingDaysWhenPaused?: number | null;
+  // Custom Pricing Override
+  readonly overridePlanPricing: boolean;
   readonly currency: Currency;
   readonly amount: number;
+  readonly planCurrency: Currency;  // Plan's default currency
+  readonly planAmount: number;      // Plan's default amount
   readonly statusReason?: string | null;
   // Next subscription for deferred upgrades
   readonly nextSubscriptionId?: string | null;
@@ -225,8 +233,12 @@ export class Subscription {
     this.isPaused = data.isPaused ?? false;
     this.pausedAtUtc = data.pausedAtUtc ? new Date(data.pausedAtUtc) : null;
     this.remainingDaysWhenPaused = data.remainingDaysWhenPaused ?? null;
+    // Custom Pricing Override
+    this.overridePlanPricing = data.overridePlanPricing ?? false;
     this.currency = data.currency;
     this.amount = data.amount;
+    this.planCurrency = data.planCurrency ?? data.currency;
+    this.planAmount = data.planAmount ?? data.amount;
     this.statusReason = data.statusReason;
     // Next subscription for deferred upgrades
     this.nextSubscriptionId = data.nextSubscriptionId || null;
@@ -573,8 +585,12 @@ export class Subscription {
       isPaused: this.isPaused,
       pausedAtUtc: this.pausedAtUtc?.toISOString() || null,
       remainingDaysWhenPaused: this.remainingDaysWhenPaused,
+      // Custom Pricing Override
+      overridePlanPricing: this.overridePlanPricing,
       currency: this.currency,
       amount: this.amount,
+      planCurrency: this.planCurrency,
+      planAmount: this.planAmount,
       statusReason: this.statusReason,
       // Next subscription for deferred upgrades
       nextSubscriptionId: this.nextSubscriptionId,
@@ -662,8 +678,9 @@ export class SubscriptionStatus {
 export class CreateSubscriptionRequest {
   readonly companyId: string;
   readonly planId: string;
+  readonly overridePlanPricing: boolean; // Whether to use custom pricing
   readonly currency?: Currency | null;
-  readonly customAmount?: number | null; // Override plan price
+  readonly amount?: number | null; // Custom amount when override is true
   readonly startDateUtc?: string | null; // Custom start date
   readonly startWithTrial: boolean;
   readonly autoRenew?: boolean | null;
@@ -672,8 +689,9 @@ export class CreateSubscriptionRequest {
   constructor(data: {
     companyId: string;
     planId: string;
+    overridePlanPricing?: boolean;
     currency?: Currency | null;
-    customAmount?: number | null;
+    amount?: number | null;
     startDateUtc?: string | null;
     startWithTrial?: boolean;
     autoRenew?: boolean | null;
@@ -681,8 +699,9 @@ export class CreateSubscriptionRequest {
   }) {
     this.companyId = data.companyId;
     this.planId = data.planId;
+    this.overridePlanPricing = data.overridePlanPricing ?? false;
     this.currency = data.currency;
-    this.customAmount = data.customAmount;
+    this.amount = data.amount;
     this.startDateUtc = data.startDateUtc;
     this.startWithTrial = data.startWithTrial ?? false;
     this.autoRenew = data.autoRenew;
@@ -690,9 +709,20 @@ export class CreateSubscriptionRequest {
   }
 
   /**
-   * Validate request
+   * Validate request - if override is enabled, currency and amount are required
    */
   get isValid(): boolean {
+    if (this.overridePlanPricing) {
+      return (
+        !!this.companyId &&
+        !!this.planId &&
+        this.currency !== null &&
+        this.currency !== undefined &&
+        this.amount !== null &&
+        this.amount !== undefined &&
+        this.amount > 0
+      );
+    }
     return (
       !!this.companyId &&
       !!this.planId
@@ -706,11 +736,14 @@ export class CreateSubscriptionRequest {
     const json: any = {
       companyId: this.companyId,
       planId: this.planId,
+      overridePlanPricing: this.overridePlanPricing,
       startWithTrial: this.startWithTrial,
       autoRenew: this.autoRenew,
     };
-    if (this.currency) json.currency = this.currency;
-    if (this.customAmount) json.amount = this.customAmount; // Backend expects 'amount'
+    if (this.overridePlanPricing) {
+      json.currency = this.currency;
+      json.amount = this.amount;
+    }
     if (this.startDateUtc) json.startDateUtc = this.startDateUtc;
     if (this.statusReason) json.statusReason = this.statusReason;
     return json;

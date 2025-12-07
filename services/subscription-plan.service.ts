@@ -63,7 +63,7 @@ export interface ISubscriptionPlanService {
     pageSize?: number,
     search?: string
   ): Promise<{ plans: SubscriptionPlan[]; pagination?: any }>;
-  getPlanById(id: string): Promise<SubscriptionPlan>;
+  getPlanById(id: string, currency?: string): Promise<SubscriptionPlan>;
   createPlan(request: CreatePlanRequest): Promise<SubscriptionPlan>;
   updatePlan(request: UpdatePlanRequest): Promise<SubscriptionPlan>;
   deletePlan(id: string): Promise<void>;
@@ -124,10 +124,12 @@ export class SubscriptionPlanService implements ISubscriptionPlanService {
   /**
    * Get subscription plan by ID
    */
-  async getPlanById(id: string): Promise<SubscriptionPlan> {
+  async getPlanById(id: string, currency?: string): Promise<SubscriptionPlan> {
     try {
+      const params = currency ? { currency } : undefined;
       const response = await this.apiService.get<any>(
-        API_ENDPOINTS.PLANS.BY_ID(id)
+        API_ENDPOINTS.PLANS.BY_ID(id),
+        params
       );
       return SubscriptionPlanMapper.handleSingleResponse(response);
     } catch (error: any) {

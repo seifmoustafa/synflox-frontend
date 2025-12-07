@@ -4,6 +4,7 @@ import { useCallback, useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
+import { useCurrency } from "@/providers/currency-provider";
 import { Company } from "@/domain";
 
 /**
@@ -14,6 +15,7 @@ export function useCompanyDetailsViewModel(companyId: string) {
   const { companyService, subscriptionService } = useServices();
   const { t } = useI18n();
   const router = useRouter();
+  const { activeCurrency, version } = useCurrency();
 
   const [company, setCompany] = useState<Company | null>(null);
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
@@ -36,7 +38,7 @@ export function useCompanyDetailsViewModel(companyId: string) {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await companyService.getCompanyById(companyId);
+      const data = await companyService.getCompanyById(companyId, activeCurrency);
       setCompany(data);
     } catch (err: any) {
       console.error("Failed to load company:", err);
@@ -44,7 +46,7 @@ export function useCompanyDetailsViewModel(companyId: string) {
     } finally {
       setIsLoading(false);
     }
-  }, [companyId, companyService]);
+  }, [companyId, companyService, activeCurrency]);
 
   // Load company subscriptions
   const loadSubscriptions = useCallback(async () => {
@@ -52,8 +54,8 @@ export function useCompanyDetailsViewModel(companyId: string) {
     
     try {
       setSubscriptionsLoading(true);
-      // Get subscriptions for this company
-      const data = await subscriptionService.getCompanySubscriptions(companyId);
+      // Get subscriptions for this company with currency conversion
+      const data = await subscriptionService.getCompanySubscriptions(companyId, activeCurrency);
       setSubscriptions(data || []);
     } catch (err: any) {
       console.error("Failed to load subscriptions:", err);
@@ -61,13 +63,13 @@ export function useCompanyDetailsViewModel(companyId: string) {
     } finally {
       setSubscriptionsLoading(false);
     }
-  }, [companyId, subscriptionService]);
+  }, [companyId, subscriptionService, activeCurrency]);
 
-  // Initial load
+  // Initial load and re-fetch on currency change
   useEffect(() => {
     loadCompany();
     loadSubscriptions();
-  }, [loadCompany, loadSubscriptions]);
+  }, [loadCompany, loadSubscriptions, version]);
 
   // Refresh data
   const refresh = useCallback(() => {

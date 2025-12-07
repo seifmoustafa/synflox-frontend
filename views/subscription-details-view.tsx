@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Edit, BarChart3, Key, Settings, Calendar, DollarSign, Building, Package, Clock, AlertCircle, CheckCircle, XCircle, Pause, Play, RotateCcw, Layers, Box, Star, ArrowLeft, Shield, Lock, Monitor, Laptop } from "lucide-react";
+import { CurrencySelector } from "@/components/dashboard/currency-selector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -190,7 +191,8 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
             {subscription.companyName} • {t("subscription.item")}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <CurrencySelector />
           <Button
             variant="outline"
             onClick={() => router.push(`/subscriptions/${subscriptionId}/edit`)}

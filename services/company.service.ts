@@ -21,7 +21,7 @@ export interface ICompanyService {
     pageSize?: number;
     search?: string;
   }): Promise<CompaniesResponse>;
-  getCompanyById(id: string): Promise<Company>;
+  getCompanyById(id: string, currency?: string): Promise<Company>;
   createCompany(data: CreateCompanyRequest, lang?: string): Promise<Company>;
   updateCompany(id: string, data: UpdateCompanyRequest, lang?: string): Promise<Company>;
   deleteCompany(id: string, lang?: string): Promise<void>;
@@ -58,10 +58,12 @@ export class CompanyService implements ICompanyService {
     }
   }
 
-  async getCompanyById(id: string): Promise<Company> {
+  async getCompanyById(id: string, currency?: string): Promise<Company> {
     try {
+      const params = currency ? { currency } : undefined;
       const response = await this.apiService.get<any>(
-        `${API_ENDPOINTS.COMPANIES_GET_BY_ID}/${id}`
+        `${API_ENDPOINTS.COMPANIES_GET_BY_ID}/${id}`,
+        params
       );
       const companyData = response?.data || response;
       return CompanyMapper.fromJson(companyData);

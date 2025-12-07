@@ -77,8 +77,12 @@ export class SubscriptionMapper {
       isPaused: json.isPaused ?? false,
       pausedAtUtc: json.pausedAtUtc || null,
       remainingDaysWhenPaused: json.remainingDaysWhenPaused ?? null,
+      // Custom Pricing Override
+      overridePlanPricing: json.overridePlanPricing ?? false,
       currency: json.currency ?? 1, // Default to USD
       amount: json.amount ?? 0,
+      planCurrency: json.planCurrency ?? json.currency ?? 1,
+      planAmount: json.planAmount ?? json.amount ?? 0,
       statusReason: json.statusReason || null,
       // Next subscription for deferred upgrades
       nextSubscriptionId: json.nextSubscriptionId || null,

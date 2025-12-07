@@ -39,12 +39,7 @@ export function PlanDetailsView({ planId }: PlanDetailsViewProps) {
     }
   }, [planId, planEntitlementService]);
 
-  useEffect(() => {
-    loadPlan();
-    loadEntitlements();
-  }, [planId, loadEntitlements]);
-
-  const loadPlan = async () => {
+  const loadPlan = useCallback(async () => {
     try {
       setLoading(true);
       const result = await subscriptionPlanService.getPlanById(planId);
@@ -54,7 +49,13 @@ export function PlanDetailsView({ planId }: PlanDetailsViewProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [planId, subscriptionPlanService]);
+
+  // Load plan and entitlements on mount
+  useEffect(() => {
+    loadPlan();
+    loadEntitlements();
+  }, [loadPlan, loadEntitlements]);
 
   const handleEntitlementUpdate = async (request: UpdatePlanEntitlementRequest) => {
     const result = await planEntitlementService.update(request);
@@ -128,7 +129,7 @@ export function PlanDetailsView({ planId }: PlanDetailsViewProps) {
             <p className="text-muted-foreground mt-2">{plan.description}</p>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button onClick={handleEdit} variant="outline">
             <Edit className="mr-2 h-4 w-4" />
             {t("common.edit")}
