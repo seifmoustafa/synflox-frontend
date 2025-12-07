@@ -3,6 +3,7 @@
 import React from "react";
 import { useOverviewViewModel } from "@/viewmodels/dashboard/overview-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
+import { CurrencySelector } from "@/components/dashboard/currency-selector";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -72,6 +73,7 @@ function KpiCardsSection({ dashboard }: { dashboard: any }) {
       bgColor: 'bg-purple-500/10',
       textColor: 'text-purple-500',
       isCurrency: true,
+      currencySymbol: dashboard.revenueKpi?.currencySymbol ?? '$',
     },
     {
       title: t('dashboard.overview.activeAlerts'),
@@ -85,14 +87,13 @@ function KpiCardsSection({ dashboard }: { dashboard: any }) {
     },
   ];
 
-  const formatValue = (value: number, isCurrency?: boolean) => {
+  const formatValue = (value: number, isCurrency?: boolean, currencySymbol?: string) => {
     if (isCurrency) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'EGP',
+      const symbol = currencySymbol || '$';
+      return `${symbol}${new Intl.NumberFormat('en-US', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
-      }).format(value);
+      }).format(value)}`;
     }
     return new Intl.NumberFormat('en-US').format(value);
   };
@@ -107,7 +108,7 @@ function KpiCardsSection({ dashboard }: { dashboard: any }) {
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground font-medium">{kpi.title}</p>
                 <p className="text-3xl font-bold tracking-tight">
-                  {formatValue(kpi.value, kpi.isCurrency)}
+                  {formatValue(kpi.value, kpi.isCurrency, kpi.currencySymbol)}
                 </p>
                 <div className="flex items-center gap-1">
                   {kpi.direction === 'up' ? (
@@ -534,6 +535,7 @@ export function OverviewView() {
           <p className="text-muted-foreground mt-1">{t('dashboard.overview.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
+          <CurrencySelector />
           <span className="text-xs text-muted-foreground">
             {t('dashboard.lastUpdated')}: {formattedLastUpdate}
           </span>

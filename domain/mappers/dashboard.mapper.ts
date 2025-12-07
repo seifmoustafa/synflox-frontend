@@ -17,6 +17,8 @@ import {
   // Revenue
   RevenueDashboard,
   type RevenueDashboardData,
+  CurrencyRates,
+  type CurrencyRatesData,
   // Activity
   ActivityDashboard,
   type ActivityDashboardData,
@@ -119,6 +121,27 @@ export class DashboardMapper {
       return this.revenueFromJson(response.data);
     }
     return this.revenueFromJson(response);
+  }
+  
+  // ===========================================================================
+  // Exchange Rates
+  // ===========================================================================
+  
+  /**
+   * Convert API response to CurrencyRates domain model
+   */
+  static exchangeRatesFromJson(json: any): CurrencyRates {
+    return new CurrencyRates(json as CurrencyRatesData);
+  }
+  
+  /**
+   * Handle API response for exchange rates
+   */
+  static handleExchangeRatesResponse(response: any): CurrencyRates {
+    if (response && typeof response === 'object' && 'data' in response && response.data) {
+      return this.exchangeRatesFromJson(response.data);
+    }
+    return this.exchangeRatesFromJson(response);
   }
 
   // ===========================================================================

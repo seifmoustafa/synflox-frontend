@@ -604,6 +604,10 @@ export const ar = {
       totalRevenue: "إجمالي الإيرادات",
       projectionConfidence: "ثقة التوقعات",
       confidenceNote: "بناءً على معدلات التجديد التاريخية",
+      superAdminOnly: "للمدير الأعلى فقط",
+      ratesFrom: "أسعار الصرف من",
+      displayingIn: "العرض بعملة",
+      exchangeRatesUpdated: "تم تحديث أسعار الصرف",
     },
     
     // Activity Dashboard
@@ -1353,6 +1357,7 @@ export const ar = {
 
   // Subscriptions
   subscription: {
+    upgrade:"ترقية",
     trial:"تجريبي",
     status:"حالة الاشتراك",
     title: "إدارة الاشتراكات",
@@ -4293,6 +4298,19 @@ export const ar = {
     success: "تم بنجاح",
     refresh: "تحديث",
     retry: "إعادة المحاولة",
+    
+    // Currency Selector
+    currencySelector: {
+      applyMode: "وضع التطبيق",
+      global: "دائم",
+      temporary: "مؤقت",
+      selectCurrency: "اختر العملة",
+      globalDescription: "سيتم حفظ العملة وتطبيقها على جميع الصفحات",
+      temporaryDescription: "للعرض الحالي فقط، سيتم إعادة التعيين عند التحديث",
+      resetToGlobal: "إعادة للعملة المحفوظة",
+      temp: "مؤقت",
+    },
+    
     unknown: "غير معروف",
     user: "مستخدم",
     copy: "نسخ",

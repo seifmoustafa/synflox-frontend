@@ -3,6 +3,7 @@
 import React from "react";
 import { useSubscriptionsViewModel } from "@/viewmodels/dashboard/subscriptions-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
+import { CurrencySelector } from "@/components/dashboard/currency-selector";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -467,6 +468,7 @@ export function SubscriptionsView() {
           <p className="text-muted-foreground mt-1">{t('dashboard.subscriptionsDashboard.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
+          <CurrencySelector />
           <span className="text-xs text-muted-foreground">
             {t('dashboard.lastUpdated')}: {formattedLastUpdate}
           </span>

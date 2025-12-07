@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
+import { useCurrency } from "@/providers/currency-provider";
 import type { SubscriptionsDashboard } from "@/domain";
 
 export interface UseSubscriptionsViewModelReturn {
@@ -23,6 +24,7 @@ export interface UseSubscriptionsViewModelReturn {
 export function useSubscriptionsViewModel(): UseSubscriptionsViewModelReturn {
   const { dashboardService } = useServices();
   const { t } = useI18n();
+  const { activeCurrency, version } = useCurrency();
   
   const [dashboard, setDashboard] = useState<SubscriptionsDashboard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +34,7 @@ export function useSubscriptionsViewModel(): UseSubscriptionsViewModelReturn {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await dashboardService.getSubscriptions();
+      const data = await dashboardService.getSubscriptions(activeCurrency);
       setDashboard(data);
     } catch (err) {
       console.error('Failed to fetch subscriptions dashboard:', err);
@@ -40,7 +42,7 @@ export function useSubscriptionsViewModel(): UseSubscriptionsViewModelReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [dashboardService, t]);
+  }, [dashboardService, t, activeCurrency, version]);
 
   useEffect(() => {
     fetchDashboard();

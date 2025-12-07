@@ -29,6 +29,7 @@ export interface KpiCardData {
   changeDirection?: string;
   icon: string;
   color: string;
+  currencySymbol?: string; // For monetary values
 }
 
 export interface RecentActivityItemData {
@@ -66,6 +67,10 @@ export interface QuickStatsData {
 }
 
 export interface OverviewDashboardData {
+  // Currency info
+  displayCurrency: string;
+  displayCurrencySymbol: string;
+  // KPIs
   companiesKpi: KpiCardData;
   subscriptionsKpi: KpiCardData;
   revenueKpi: KpiCardData;
@@ -89,6 +94,7 @@ export class KpiCard {
   public readonly changeDirection: ChangeDirection;
   public readonly icon: string;
   public readonly color: string;
+  public readonly currencySymbol?: string;
 
   constructor(data: KpiCardData) {
     this.title = data.title;
@@ -98,11 +104,13 @@ export class KpiCard {
     this.changeDirection = (data.changeDirection as ChangeDirection) || 'unchanged';
     this.icon = data.icon;
     this.color = data.color;
+    this.currencySymbol = data.currencySymbol;
   }
 
   get formattedValue(): string {
-    if (this.title.toLowerCase().includes('mrr') || this.title.toLowerCase().includes('revenue')) {
-      return formatCurrency(this.value);
+    if (this.currencySymbol || this.title.toLowerCase().includes('mrr') || this.title.toLowerCase().includes('revenue')) {
+      const symbol = this.currencySymbol || '$';
+      return `${symbol}${formatNumber(this.value)}`;
     }
     return formatNumber(this.value);
   }
@@ -233,6 +241,8 @@ export class QuickStats {
 }
 
 export class OverviewDashboard {
+  public readonly displayCurrency: string;
+  public readonly displayCurrencySymbol: string;
   public readonly companiesKpi: KpiCard;
   public readonly subscriptionsKpi: KpiCard;
   public readonly revenueKpi: KpiCard;
@@ -244,6 +254,8 @@ export class OverviewDashboard {
   public readonly generatedAt: Date;
 
   constructor(data: OverviewDashboardData) {
+    this.displayCurrency = data.displayCurrency;
+    this.displayCurrencySymbol = data.displayCurrencySymbol;
     this.companiesKpi = new KpiCard(data.companiesKpi);
     this.subscriptionsKpi = new KpiCard(data.subscriptionsKpi);
     this.revenueKpi = new KpiCard(data.revenueKpi);

@@ -84,6 +84,11 @@ export interface RevenueProjectionData {
 }
 
 export interface RevenueDashboardData {
+  // Currency info
+  displayCurrency: string;
+  displayCurrencySymbol: string;
+  
+  // Core data
   metrics: RevenueMetricsData;
   byPlan: RevenueByPlanData;
   byPlanChart: DistributionItemData[];
@@ -93,7 +98,25 @@ export interface RevenueDashboardData {
   averageOrderValue: number;
   totalTransactions: number;
   byCurrency: DistributionItemData[];
+  
+  // Timestamps
+  exchangeRatesUpdatedAt: string;
   generatedAt: string;
+}
+
+// Currency rates response
+export interface CurrencyRateItemData {
+  code: string;
+  name: string;
+  symbol: string;
+  rate: number;
+}
+
+export interface CurrencyRatesData {
+  baseCurrency: string;
+  rates: CurrencyRateItemData[];
+  lastUpdated: string;
+  source: string;
 }
 
 // ============================================================================
@@ -354,6 +377,11 @@ export class RevenueProjection {
 }
 
 export class RevenueDashboard {
+  // Currency info
+  public readonly displayCurrency: string;
+  public readonly displayCurrencySymbol: string;
+  
+  // Core data
   public readonly metrics: RevenueMetrics;
   public readonly byPlan: RevenueByPlan;
   public readonly byPlanChart: DistributionItem[];
@@ -363,9 +391,14 @@ export class RevenueDashboard {
   public readonly averageOrderValue: number;
   public readonly totalTransactions: number;
   public readonly byCurrency: DistributionItem[];
+  
+  // Timestamps
+  public readonly exchangeRatesUpdatedAt: Date;
   public readonly generatedAt: Date;
 
   constructor(data: RevenueDashboardData) {
+    this.displayCurrency = data.displayCurrency;
+    this.displayCurrencySymbol = data.displayCurrencySymbol;
     this.metrics = new RevenueMetrics(data.metrics);
     this.byPlan = new RevenueByPlan(data.byPlan);
     this.byPlanChart = data.byPlanChart.map(d => new DistributionItem(d));
@@ -375,18 +408,69 @@ export class RevenueDashboard {
     this.averageOrderValue = data.averageOrderValue;
     this.totalTransactions = data.totalTransactions;
     this.byCurrency = data.byCurrency.map(d => new DistributionItem(d));
+    this.exchangeRatesUpdatedAt = new Date(data.exchangeRatesUpdatedAt);
     this.generatedAt = new Date(data.generatedAt);
   }
 
   get formattedTotalLifetimeRevenue(): string {
-    return formatCurrency(this.totalLifetimeRevenue);
+    return `${this.displayCurrencySymbol}${this.totalLifetimeRevenue.toLocaleString()}`;
   }
 
   get formattedAverageOrderValue(): string {
-    return formatCurrency(this.averageOrderValue);
+    return `${this.displayCurrencySymbol}${this.averageOrderValue.toLocaleString()}`;
   }
 
   get isHealthy(): boolean {
     return this.metrics.isMrrGrowing && !this.projections.hasRisk;
+  }
+  
+  get ratesAgeInMinutes(): number {
+    return Math.floor((new Date().getTime() - this.exchangeRatesUpdatedAt.getTime()) / 60000);
+  }
+  
+  get isRatesStale(): boolean {
+    return this.ratesAgeInMinutes > 120; // More than 2 hours old
+  }
+}
+
+// Currency Rate classes
+export class CurrencyRateItem {
+  public readonly code: string;
+  public readonly name: string;
+  public readonly symbol: string;
+  public readonly rate: number;
+  
+  constructor(data: CurrencyRateItemData) {
+    this.code = data.code;
+    this.name = data.name;
+    this.symbol = data.symbol;
+    this.rate = data.rate;
+  }
+  
+  get formattedRate(): string {
+    return this.rate.toFixed(4);
+  }
+}
+
+export class CurrencyRates {
+  public readonly baseCurrency: string;
+  public readonly rates: CurrencyRateItem[];
+  public readonly lastUpdated: Date;
+  public readonly source: string;
+  
+  constructor(data: CurrencyRatesData) {
+    this.baseCurrency = data.baseCurrency;
+    this.rates = data.rates.map(r => new CurrencyRateItem(r));
+    this.lastUpdated = new Date(data.lastUpdated);
+    this.source = data.source;
+  }
+  
+  getRate(currencyCode: string): number {
+    const rate = this.rates.find(r => r.code === currencyCode);
+    return rate?.rate ?? 1;
+  }
+  
+  get formattedLastUpdated(): string {
+    return this.lastUpdated.toLocaleString();
   }
 }

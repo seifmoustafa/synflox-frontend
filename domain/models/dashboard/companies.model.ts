@@ -73,6 +73,10 @@ export interface CompanyAlertData {
 }
 
 export interface CompaniesDashboardData {
+  // Currency info
+  displayCurrency: string;
+  displayCurrencySymbol: string;
+  // Stats
   totalCompanies: number;
   newThisMonth: number;
   newThisWeek: number;
@@ -277,6 +281,8 @@ export class CompanyAlert {
 }
 
 export class CompaniesDashboard {
+  public readonly displayCurrency: string;
+  public readonly displayCurrencySymbol: string;
   public readonly totalCompanies: number;
   public readonly newThisMonth: number;
   public readonly newThisWeek: number;
@@ -296,6 +302,8 @@ export class CompaniesDashboard {
   public readonly generatedAt: Date;
 
   constructor(data: CompaniesDashboardData) {
+    this.displayCurrency = data.displayCurrency;
+    this.displayCurrencySymbol = data.displayCurrencySymbol;
     this.totalCompanies = data.totalCompanies;
     this.newThisMonth = data.newThisMonth;
     this.newThisWeek = data.newThisWeek;

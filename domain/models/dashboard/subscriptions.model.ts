@@ -105,6 +105,10 @@ export interface SubscriptionGrowthSummaryData {
 }
 
 export interface SubscriptionsDashboardData {
+  // Currency info
+  displayCurrency: string;
+  displayCurrencySymbol: string;
+  // Stats
   totalSubscriptions: number;
   activeSubscriptions: number;
   trialSubscriptions: number;
@@ -424,6 +428,8 @@ export class SubscriptionGrowthSummary {
 }
 
 export class SubscriptionsDashboard {
+  public readonly displayCurrency: string;
+  public readonly displayCurrencySymbol: string;
   public readonly totalSubscriptions: number;
   public readonly activeSubscriptions: number;
   public readonly trialSubscriptions: number;
@@ -437,6 +443,8 @@ export class SubscriptionsDashboard {
   public readonly generatedAt: Date;
 
   constructor(data: SubscriptionsDashboardData) {
+    this.displayCurrency = data.displayCurrency;
+    this.displayCurrencySymbol = data.displayCurrencySymbol;
     this.totalSubscriptions = data.totalSubscriptions;
     this.activeSubscriptions = data.activeSubscriptions;
     this.trialSubscriptions = data.trialSubscriptions;
@@ -451,7 +459,8 @@ export class SubscriptionsDashboard {
   }
 
   get formattedTotalMonthlyRevenue(): string {
-    return formatCurrency(this.totalMonthlyRevenue);
+    const symbol = this.displayCurrencySymbol || '$';
+    return `${symbol}${new Intl.NumberFormat('en-US').format(this.totalMonthlyRevenue)}`;
   }
 
   get activeRate(): number {

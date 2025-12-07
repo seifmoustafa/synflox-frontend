@@ -612,6 +612,10 @@ export const en = {
       totalRevenue: "Total Revenue",
       projectionConfidence: "Projection Confidence",
       confidenceNote: "Based on historical renewal rates",
+      superAdminOnly: "SuperAdmin Only",
+      ratesFrom: "Exchange rates from",
+      displayingIn: "Displaying in",
+      exchangeRatesUpdated: "Exchange rates updated",
     },
     
     // Activity Dashboard
@@ -4259,6 +4263,18 @@ export const en = {
     error: "An error occurred",
     success: "Success",
     retry: "Try Again",
+    
+    // Currency Selector
+    currencySelector: {
+      applyMode: "Apply Mode",
+      global: "Global",
+      temporary: "One-Time",
+      selectCurrency: "Select Currency",
+      globalDescription: "Currency will be saved and apply to ALL pages",
+      temporaryDescription: "For current view only, resets on refresh",
+      resetToGlobal: "Reset to Global",
+      temp: "TEMP",
+    },
     unknown: "Unknown",
     user: "User",
     // Confirmation Dialogs

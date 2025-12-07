@@ -3,6 +3,7 @@
 import React from "react";
 import { useRevenueViewModel } from "@/viewmodels/dashboard/revenue-viewmodel";
 import { useI18n } from "@/providers/i18n-provider";
+import { CurrencySelector } from "@/components/dashboard/currency-selector";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +32,8 @@ import {
   Layers,
   Award,
   Crown,
+  Coins,
+  Clock,
 } from "lucide-react";
 
 // ============================================================================
@@ -40,13 +43,13 @@ import {
 function RevenueKpiCards({ dashboard }: { dashboard: any }) {
   const { t } = useI18n();
   
+  const currencySymbol = dashboard?.displayCurrencySymbol || '$';
+  
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'EGP',
+    return `${currencySymbol}${new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    }).format(value);
+    }).format(value)}`;
   };
 
   const kpis = [
@@ -134,7 +137,7 @@ function RevenueKpiCards({ dashboard }: { dashboard: any }) {
 // Revenue by Plan - Horizontal Bar Chart
 // ============================================================================
 
-function RevenueByPlanChart({ byPlan }: { byPlan: any }) {
+function RevenueByPlanChart({ byPlan, currencySymbol = '$' }: { byPlan: any; currencySymbol?: string }) {
   const { t } = useI18n();
 
   const plans = byPlan?.plans || [];
@@ -195,7 +198,7 @@ function RevenueByPlanChart({ byPlan }: { byPlan: any }) {
                 <span className="text-sm font-medium truncate">{plan.planName || plan.name}</span>
               </div>
               <p className="text-lg font-bold text-green-500">
-                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 0 }).format(plan.monthlyRevenue || plan.revenue || plan.amount || 0)}
+                {currencySymbol}{new Intl.NumberFormat('en-US', { minimumFractionDigits: 0 }).format(plan.monthlyRevenue || plan.revenue || plan.amount || 0)}
               </p>
               <p className="text-xs text-muted-foreground">
                 {plan.subscriptionCount || plan.count || 0} {t('dashboard.revenueDashboard.subscriptions')}
@@ -288,15 +291,13 @@ function RevenueTrendChart({ trend }: { trend: any[] }) {
 // Revenue Projections
 // ============================================================================
 
-function RevenueProjectionsSection({ projections }: { projections: any }) {
+function RevenueProjectionsSection({ projections, currencySymbol = '$' }: { projections: any; currencySymbol?: string }) {
   const { t } = useI18n();
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'EGP',
+    return `${currencySymbol}${new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
-    }).format(value || 0);
+    }).format(value || 0)}`;
   };
 
   return (
@@ -379,7 +380,7 @@ function RevenueProjectionsSection({ projections }: { projections: any }) {
 // Revenue Breakdown - Pie Chart
 // ============================================================================
 
-function RevenueBreakdownChart({ breakdown }: { breakdown: any }) {
+function RevenueBreakdownChart({ breakdown, currencySymbol = '$' }: { breakdown: any; currencySymbol?: string }) {
   const { t } = useI18n();
 
   // Get the latest trend data point for breakdown
@@ -440,7 +441,7 @@ function RevenueBreakdownChart({ breakdown }: { breakdown: any }) {
                       <span className="text-sm font-medium">{cat.name || cat.category}</span>
                     </div>
                     <span className="font-bold">
-                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 0 }).format(value)}
+                      {currencySymbol}{new Intl.NumberFormat('en-US', { minimumFractionDigits: 0 }).format(value)}
                     </span>
                   </div>
                   <Progress value={percentage} className="h-1.5" />
@@ -452,7 +453,7 @@ function RevenueBreakdownChart({ breakdown }: { breakdown: any }) {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">{t('dashboard.revenueDashboard.totalRevenue')}</span>
                 <span className="text-xl font-bold text-green-500">
-                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EGP', minimumFractionDigits: 0 }).format(total)}
+                  {currencySymbol}{new Intl.NumberFormat('en-US', { minimumFractionDigits: 0 }).format(total)}
                 </span>
               </div>
             </div>
@@ -498,8 +499,16 @@ function RevenueSkeleton() {
 // ============================================================================
 
 export function RevenueView() {
-  const { dashboard, isLoading, error, refresh, formattedLastUpdate } = useRevenueViewModel();
+  const { 
+    dashboard, 
+    isLoading, 
+    error, 
+    refresh, 
+    formattedLastUpdate,
+    formattedRatesUpdate,
+  } = useRevenueViewModel();
   const { t } = useI18n();
+
 
   if (error) {
     return (
@@ -528,10 +537,13 @@ export function RevenueView() {
           <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.revenueDashboard.title')}</h1>
           <p className="text-muted-foreground mt-1">{t('dashboard.revenueDashboard.subtitle')}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Currency Selector */}
+          <CurrencySelector />
+          
           <Badge variant="outline" className="text-xs">
             <Award className="h-3 w-3 mr-1" />
-            SuperAdmin Only
+            {t('dashboard.revenueDashboard.superAdminOnly')}
           </Badge>
           <span className="text-xs text-muted-foreground">
             {t('dashboard.lastUpdated')}: {formattedLastUpdate}
@@ -542,21 +554,32 @@ export function RevenueView() {
           </Button>
         </div>
       </div>
+      
+      {/* Exchange Rate Info Banner */}
+      <div className="flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-lg text-sm">
+        <Clock className="h-4 w-4 text-muted-foreground" />
+        <span className="text-muted-foreground">
+          {t('dashboard.revenueDashboard.ratesFrom')}: {formattedRatesUpdate}
+        </span>
+        <Badge variant="secondary" className="ml-auto text-xs">
+          {t('dashboard.revenueDashboard.displayingIn')} {dashboard.displayCurrency} ({dashboard.displayCurrencySymbol})
+        </Badge>
+      </div>
 
       {/* KPI Cards */}
       <RevenueKpiCards dashboard={dashboard} />
 
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RevenueByPlanChart byPlan={dashboard.byPlan} />
+        <RevenueByPlanChart byPlan={dashboard.byPlan} currencySymbol={dashboard.displayCurrencySymbol} />
         <RevenueTrendChart trend={dashboard.trend?.dataPoints} />
       </div>
 
       {/* Projections */}
-      <RevenueProjectionsSection projections={dashboard.projections} />
+      <RevenueProjectionsSection projections={dashboard.projections} currencySymbol={dashboard.displayCurrencySymbol} />
 
       {/* Revenue Breakdown */}
-      <RevenueBreakdownChart breakdown={dashboard} />
+      <RevenueBreakdownChart breakdown={dashboard} currencySymbol={dashboard.displayCurrencySymbol} />
     </div>
   );
 }

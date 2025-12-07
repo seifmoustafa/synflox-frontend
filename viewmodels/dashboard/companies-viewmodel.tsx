@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
+import { useCurrency } from "@/providers/currency-provider";
 import type { CompaniesDashboard } from "@/domain";
 
 export interface UseCompaniesViewModelReturn {
@@ -23,6 +24,7 @@ export interface UseCompaniesViewModelReturn {
 export function useCompaniesViewModel(): UseCompaniesViewModelReturn {
   const { dashboardService } = useServices();
   const { t } = useI18n();
+  const { activeCurrency, version } = useCurrency();
   
   const [dashboard, setDashboard] = useState<CompaniesDashboard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +34,7 @@ export function useCompaniesViewModel(): UseCompaniesViewModelReturn {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await dashboardService.getCompanies();
+      const data = await dashboardService.getCompanies(activeCurrency);
       setDashboard(data);
     } catch (err) {
       console.error('Failed to fetch companies dashboard:', err);
@@ -40,7 +42,7 @@ export function useCompaniesViewModel(): UseCompaniesViewModelReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [dashboardService, t]);
+  }, [dashboardService, t, activeCurrency, version]);
 
   useEffect(() => {
     fetchDashboard();

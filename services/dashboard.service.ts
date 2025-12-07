@@ -14,21 +14,28 @@ import {
   RevenueDashboard,
   ActivityDashboard,
   AlertsDashboard,
+  CurrencyRates,
   DashboardMapper,
 } from "@/domain";
 import { API_ENDPOINTS } from "@/config/api-endpoints";
+
+// Supported currencies for display
+export type DisplayCurrency = 'USD' | 'EUR' | 'EGP' | 'SAR' | 'AED' | 'GBP' | 'JPY' | 'CNY';
 
 /**
  * Dashboard Service Interface
  */
 export interface IDashboardService {
-  // Dashboard data fetching
-  getOverview(): Promise<OverviewDashboard>;
-  getCompanies(): Promise<CompaniesDashboard>;
-  getSubscriptions(): Promise<SubscriptionsDashboard>;
-  getRevenue(): Promise<RevenueDashboard>;
+  // Dashboard data fetching (all support currency parameter)
+  getOverview(currency?: DisplayCurrency): Promise<OverviewDashboard>;
+  getCompanies(currency?: DisplayCurrency): Promise<CompaniesDashboard>;
+  getSubscriptions(currency?: DisplayCurrency): Promise<SubscriptionsDashboard>;
+  getRevenue(currency?: DisplayCurrency): Promise<RevenueDashboard>;
   getActivity(): Promise<ActivityDashboard>;
   getAlerts(): Promise<AlertsDashboard>;
+  
+  // Currency exchange rates
+  getExchangeRates(baseCurrency?: DisplayCurrency): Promise<CurrencyRates>;
   
   // Alert actions
   dismissAlert(alertId: string): Promise<void>;
@@ -51,10 +58,10 @@ export class DashboardService implements IDashboardService {
   /**
    * Get overview dashboard data (home page)
    */
-  async getOverview(): Promise<OverviewDashboard> {
+  async getOverview(currency: DisplayCurrency = 'USD'): Promise<OverviewDashboard> {
     try {
       const response = await this.apiService.get<any>(
-        API_ENDPOINTS.DASHBOARD.OVERVIEW
+        `${API_ENDPOINTS.DASHBOARD.OVERVIEW}?currency=${currency}`
       );
       return DashboardMapper.handleOverviewResponse(response);
     } catch (error) {
@@ -66,10 +73,10 @@ export class DashboardService implements IDashboardService {
   /**
    * Get companies dashboard data
    */
-  async getCompanies(): Promise<CompaniesDashboard> {
+  async getCompanies(currency: DisplayCurrency = 'USD'): Promise<CompaniesDashboard> {
     try {
       const response = await this.apiService.get<any>(
-        API_ENDPOINTS.DASHBOARD.COMPANIES
+        `${API_ENDPOINTS.DASHBOARD.COMPANIES}?currency=${currency}`
       );
       return DashboardMapper.handleCompaniesResponse(response);
     } catch (error) {
@@ -81,10 +88,10 @@ export class DashboardService implements IDashboardService {
   /**
    * Get subscriptions dashboard data
    */
-  async getSubscriptions(): Promise<SubscriptionsDashboard> {
+  async getSubscriptions(currency: DisplayCurrency = 'USD'): Promise<SubscriptionsDashboard> {
     try {
       const response = await this.apiService.get<any>(
-        API_ENDPOINTS.DASHBOARD.SUBSCRIPTIONS
+        `${API_ENDPOINTS.DASHBOARD.SUBSCRIPTIONS}?currency=${currency}`
       );
       return DashboardMapper.handleSubscriptionsResponse(response);
     } catch (error) {
@@ -95,15 +102,32 @@ export class DashboardService implements IDashboardService {
 
   /**
    * Get revenue dashboard data (SuperAdmin only)
+   * @param currency Display currency for all monetary values (real-time conversion)
    */
-  async getRevenue(): Promise<RevenueDashboard> {
+  async getRevenue(currency: DisplayCurrency = 'USD'): Promise<RevenueDashboard> {
     try {
       const response = await this.apiService.get<any>(
-        API_ENDPOINTS.DASHBOARD.REVENUE
+        `${API_ENDPOINTS.DASHBOARD.REVENUE}?currency=${currency}`
       );
       return DashboardMapper.handleRevenueResponse(response);
     } catch (error) {
       console.error('Failed to fetch revenue dashboard:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Get current exchange rates for all supported currencies
+   * @param baseCurrency Base currency for rates
+   */
+  async getExchangeRates(baseCurrency: DisplayCurrency = 'USD'): Promise<CurrencyRates> {
+    try {
+      const response = await this.apiService.get<any>(
+        `${API_ENDPOINTS.DASHBOARD.EXCHANGE_RATES}?baseCurrency=${baseCurrency}`
+      );
+      return DashboardMapper.handleExchangeRatesResponse(response);
+    } catch (error) {
+      console.error('Failed to fetch exchange rates:', error);
       throw error;
     }
   }

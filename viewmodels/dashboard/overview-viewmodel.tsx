@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useServices } from "@/providers/service-provider";
 import { useI18n } from "@/providers/i18n-provider";
+import { useCurrency } from "@/providers/currency-provider";
 import type { OverviewDashboard } from "@/domain";
 
 export interface UseOverviewViewModelReturn {
@@ -23,6 +24,7 @@ export interface UseOverviewViewModelReturn {
 export function useOverviewViewModel(): UseOverviewViewModelReturn {
   const { dashboardService } = useServices();
   const { t } = useI18n();
+  const { activeCurrency, version } = useCurrency();
   
   const [dashboard, setDashboard] = useState<OverviewDashboard | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +34,7 @@ export function useOverviewViewModel(): UseOverviewViewModelReturn {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await dashboardService.getOverview();
+      const data = await dashboardService.getOverview(activeCurrency);
       setDashboard(data);
     } catch (err) {
       console.error('Failed to fetch dashboard:', err);
@@ -40,7 +42,7 @@ export function useOverviewViewModel(): UseOverviewViewModelReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [dashboardService, t]);
+  }, [dashboardService, t, activeCurrency, version]);
 
   useEffect(() => {
     fetchDashboard();

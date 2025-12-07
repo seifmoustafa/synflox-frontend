@@ -151,6 +151,7 @@ export const API_ENDPOINTS = {
     COMPANIES: "/dashboard/companies",
     SUBSCRIPTIONS: "/dashboard/subscriptions",
     REVENUE: "/dashboard/revenue",
+    EXCHANGE_RATES: "/dashboard/exchange-rates",
     ACTIVITY: "/dashboard/activity",
     ALERTS: "/dashboard/alerts",
     DISMISS_ALERT: "/dashboard/alerts/{id}/dismiss",
