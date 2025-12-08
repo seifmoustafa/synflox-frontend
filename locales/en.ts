@@ -1500,6 +1500,7 @@ export const en = {
       features: "Features",
       entitlements: "Entitlements",
       license: "License",
+      online: "Online Tokens",
       history: "History",
     },
     
@@ -5157,12 +5158,20 @@ export const en = {
     notes: "Notes",
     notesPlaceholder: "Internal notes about this token...",
     
-    // Permissions
+    // Offline Permissions
     permissions: "Permissions",
+    offlinePermissions: "Offline Device Permissions",
     canBindDevices: "Can Bind Devices",
     canUnbindDevices: "Can Unbind Devices",
     canViewDevices: "Can View Devices",
     canApproveReplacements: "Can Approve Replacements",
+    
+    // Online Permissions
+    onlinePermissions: "Online Device Permissions",
+    canViewOnlineTokens: "Can View Online Tokens",
+    canManageOnlineTokens: "Can Manage Online Tokens",
+    canViewOnlineDevices: "Can View Online Devices",
+    canUnbindOnlineDevices: "Can Unbind Online Devices",
     
     // Status
     active: "Active",
@@ -5193,5 +5202,105 @@ export const en = {
     copyFailed: "Failed to copy token",
     generateSuccess: "Token generated successfully",
     revokeSuccess: "Token revoked successfully",
+  },
+
+  // Online Client Tokens (Thin JWT)
+  onlineTokens: {
+    // Summary Cards
+    activeTokens: "Active Tokens",
+    registeredDevices: "Registered Devices",
+    pendingChanges: "Pending Changes",
+    nextChange: "Next change",
+    total: "total",
+
+    // Tabs
+    tokens: "Tokens",
+    devices: "Devices",
+    changes: "Changes",
+
+    // Token Table
+    name: "Name",
+    status: "Status",
+    expiry: "Expires",
+    lastUsed: "Last Used",
+    showRevoked: "Show revoked tokens",
+    noTokens: "No tokens found. Generate one to get started.",
+    noDevices: "No devices registered yet.",
+    noChanges: "No pending changes scheduled.",
+
+    // Device Table
+    device: "Device",
+    os: "OS",
+    apiCalls: "API Calls",
+    lastSeen: "Last Seen",
+
+    // Changes Table
+    changeType: "Type",
+    description: "Description",
+    effectiveDate: "Effective Date",
+    changesDescription: "Changes scheduled for next billing cycle.",
+
+    // Generate Dialog
+    generateToken: "Generate Token",
+    generateDescription: "Create a thin JWT token for online client applications. The token contains only identity information - entitlements are fetched dynamically.",
+    tokenName: "Token Name",
+    tokenNamePlaceholder: "e.g., Production Server, Mobile App",
+    expiryDays: "Expiry Days",
+    autoRefresh: "Auto-refresh before expiry",
+    maxDevices: "Max Devices",
+    unlimited: "Unlimited (use plan default)",
+    notes: "Notes",
+    notesPlaceholder: "Optional notes about this token...",
+    generate: "Generate Token",
+
+    // Token Display
+    tokenGenerated: "Token Generated Successfully",
+    tokenGeneratedDescription: "Your online token has been created. Copy it now - it won't be shown again!",
+    tokenSecurityWarning: "This token will only be shown once. Make sure to copy and store it securely!",
+    copyToken: "Copy Token",
+    copyWarning: "This token cannot be retrieved later. Copy it now!",
+
+    // Device validation
+    allocatedDevices: "Allocated to tokens",
+    remainingSlots: "Remaining slots",
+    maxAvailable: "Max available",
+    unlimitedDevices: "Unlimited devices (plan has no limit)",
+    allocatedToTokens: "Allocated to tokens",
+    noDeviceSlotsAvailable: "All device slots are allocated to existing tokens. Revoke or reduce device limits on other tokens first.",
+    
+    // Device Tab
+    connectedDevices: "Connected Devices",
+    devicesRegistered: "devices registered",
+    deviceName: "Device Name",
+    deviceType: "Device Type",
+    
+    // Changes Tab
+    pendingChangesTitle: "Pending Changes",
+    pendingChangesDescription: "Changes scheduled to take effect on the next billing cycle.",
+
+    // Revoke Dialog
+    revokeToken: "Revoke Token",
+    revokeDescription: "This will immediately invalidate the token. All devices using this token will lose access. This action cannot be undone.",
+    revokeReason: "Revocation Reason",
+    revokeReasonPlaceholder: "Enter the reason for revoking this token...",
+    revoke: "Revoke Token",
+    
+    // Device Actions
+    unbindDevice: "Unbind Device",
+    confirmUnbind: "Are you sure you want to unbind this device? It will need to re-register to access the system.",
+  },
+
+  // Company Online Tokens (Aggregate View)
+  companyOnlineTokens: {
+    title: "Online Tokens",
+    totalDevices: "Total Online Devices",
+    acrossSubscriptions: "Across all subscriptions",
+    expiringSoon: "Expiring Soon",
+    within7Days: "Within 7 days",
+    noTokens: "No Online Tokens",
+    noTokensDescription: "This company has no online tokens yet. Generate tokens from each subscription's Online Tokens tab.",
+    manageTokens: "Manage Tokens",
+    infoTitle: "Online Tokens vs Offline Tokens",
+    infoDescription: "Online tokens are lightweight JWTs for real-time access. Each subscription has its own tokens. For offline device management, use the Client Admin Tokens tab.",
   },
 };

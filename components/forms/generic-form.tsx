@@ -229,9 +229,27 @@ export function GenericForm({
     initializeFormData(fields, initialValues)
   );
   const [loading, setLoading] = useState(false);
+  
+  // Track previous field names to detect actual changes
+  const prevFieldNamesRef = React.useRef<string>("");
+  const isInitializedRef = React.useRef(false);
 
   // Re-initialize form data when fields change (for dynamic forms)
+  // Use field names as stable comparison key to prevent infinite loops
   React.useEffect(() => {
+    const currentFieldNames = fields.map(f => f.name).join(",");
+    
+    // Skip if fields haven't actually changed (same field names)
+    if (prevFieldNamesRef.current === currentFieldNames && isInitializedRef.current) {
+      return;
+    }
+    
+    prevFieldNamesRef.current = currentFieldNames;
+    isInitializedRef.current = true;
+    
+    // Only update if we have fields to process
+    if (fields.length === 0) return;
+    
     setFormData((prevData) => {
       const newData = initializeFormData(fields, initialValues);
       // Preserve existing form values that are not being overridden

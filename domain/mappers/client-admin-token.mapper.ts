@@ -35,10 +35,17 @@ export class ClientAdminTokenMapper {
       data.lastUsedAtUtc ? new Date(data.lastUsedAtUtc) : null,
       data.usageCount,
       data.lastUsedFromIp,
+      // Offline permissions
       data.canBindDevices,
       data.canUnbindDevices,
       data.canViewDevices,
       data.canApproveReplacements,
+      // Online permissions
+      data.canViewOnlineTokens ?? true,
+      data.canManageOnlineTokens ?? true,
+      data.canViewOnlineDevices ?? true,
+      data.canUnbindOnlineDevices ?? true,
+      // Limits
       data.dailyApiLimit,
       data.todayApiCalls,
       data.notes
@@ -63,10 +70,17 @@ export class ClientAdminTokenMapper {
       lastUsedAtUtc: token.lastUsedAtUtc?.toISOString() ?? null,
       usageCount: token.usageCount,
       lastUsedFromIp: token.lastUsedFromIp,
+      // Offline permissions
       canBindDevices: token.canBindDevices,
       canUnbindDevices: token.canUnbindDevices,
       canViewDevices: token.canViewDevices,
       canApproveReplacements: token.canApproveReplacements,
+      // Online permissions
+      canViewOnlineTokens: token.canViewOnlineTokens,
+      canManageOnlineTokens: token.canManageOnlineTokens,
+      canViewOnlineDevices: token.canViewOnlineDevices,
+      canUnbindOnlineDevices: token.canUnbindOnlineDevices,
+      // Limits
       dailyApiLimit: token.dailyApiLimit,
       todayApiCalls: token.todayApiCalls,
       notes: token.notes,

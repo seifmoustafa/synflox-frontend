@@ -20,11 +20,16 @@ export interface AdminTokenData {
   lastUsedAtUtc: string | null;
   usageCount: number;
   lastUsedFromIp: string | null;
-  // Permissions
+  // Offline Permissions
   canBindDevices: boolean;
   canUnbindDevices: boolean;
   canViewDevices: boolean;
   canApproveReplacements: boolean;
+  // Online Permissions
+  canViewOnlineTokens: boolean;
+  canManageOnlineTokens: boolean;
+  canViewOnlineDevices: boolean;
+  canUnbindOnlineDevices: boolean;
   // Limits
   dailyApiLimit: number;
   todayApiCalls: number;
@@ -49,11 +54,16 @@ export class AdminToken {
     public readonly lastUsedAtUtc: Date | null,
     public readonly usageCount: number,
     public readonly lastUsedFromIp: string | null,
-    // Permissions
+    // Offline Permissions
     public readonly canBindDevices: boolean,
     public readonly canUnbindDevices: boolean,
     public readonly canViewDevices: boolean,
     public readonly canApproveReplacements: boolean,
+    // Online Permissions
+    public readonly canViewOnlineTokens: boolean,
+    public readonly canManageOnlineTokens: boolean,
+    public readonly canViewOnlineDevices: boolean,
+    public readonly canUnbindOnlineDevices: boolean,
     // Limits
     public readonly dailyApiLimit: number,
     public readonly todayApiCalls: number,
@@ -112,15 +122,34 @@ export class AdminToken {
   }
 
   /**
-   * Get permissions summary
+   * Get offline permissions summary
    */
-  get permissionsSummary(): string[] {
+  get offlinePermissionsSummary(): string[] {
     const perms: string[] = [];
     if (this.canBindDevices) perms.push('Bind');
     if (this.canUnbindDevices) perms.push('Unbind');
     if (this.canViewDevices) perms.push('View');
     if (this.canApproveReplacements) perms.push('Approve');
     return perms;
+  }
+
+  /**
+   * Get online permissions summary
+   */
+  get onlinePermissionsSummary(): string[] {
+    const perms: string[] = [];
+    if (this.canViewOnlineTokens) perms.push('View Tokens');
+    if (this.canManageOnlineTokens) perms.push('Manage Tokens');
+    if (this.canViewOnlineDevices) perms.push('View Devices');
+    if (this.canUnbindOnlineDevices) perms.push('Unbind Devices');
+    return perms;
+  }
+
+  /**
+   * Get all permissions summary (backward compatible)
+   */
+  get permissionsSummary(): string[] {
+    return [...this.offlinePermissionsSummary, ...this.onlinePermissionsSummary];
   }
 }
 
@@ -131,10 +160,17 @@ export interface GenerateAdminTokenRequestData {
   companyId: string;
   name: string;
   expiryDays?: number;
+  // Offline permissions
   canBindDevices?: boolean;
   canUnbindDevices?: boolean;
   canViewDevices?: boolean;
   canApproveReplacements?: boolean;
+  // Online permissions
+  canViewOnlineTokens?: boolean;
+  canManageOnlineTokens?: boolean;
+  canViewOnlineDevices?: boolean;
+  canUnbindOnlineDevices?: boolean;
+  // Limits
   dailyApiLimit?: number;
   notes?: string | null;
 }
@@ -143,10 +179,17 @@ export class GenerateAdminTokenRequest {
   public readonly companyId: string;
   public readonly name: string;
   public readonly expiryDays: number;
+  // Offline permissions
   public readonly canBindDevices: boolean;
   public readonly canUnbindDevices: boolean;
   public readonly canViewDevices: boolean;
   public readonly canApproveReplacements: boolean;
+  // Online permissions
+  public readonly canViewOnlineTokens: boolean;
+  public readonly canManageOnlineTokens: boolean;
+  public readonly canViewOnlineDevices: boolean;
+  public readonly canUnbindOnlineDevices: boolean;
+  // Limits
   public readonly dailyApiLimit: number;
   public readonly notes: string | null;
 
@@ -154,10 +197,17 @@ export class GenerateAdminTokenRequest {
     this.companyId = data.companyId;
     this.name = data.name;
     this.expiryDays = data.expiryDays ?? 365;
+    // Offline permissions
     this.canBindDevices = data.canBindDevices ?? true;
     this.canUnbindDevices = data.canUnbindDevices ?? true;
     this.canViewDevices = data.canViewDevices ?? true;
     this.canApproveReplacements = data.canApproveReplacements ?? true;
+    // Online permissions
+    this.canViewOnlineTokens = data.canViewOnlineTokens ?? true;
+    this.canManageOnlineTokens = data.canManageOnlineTokens ?? true;
+    this.canViewOnlineDevices = data.canViewOnlineDevices ?? true;
+    this.canUnbindOnlineDevices = data.canUnbindOnlineDevices ?? true;
+    // Limits
     this.dailyApiLimit = data.dailyApiLimit ?? 0;
     this.notes = data.notes ?? null;
   }
@@ -176,10 +226,17 @@ export class GenerateAdminTokenRequest {
       companyId: this.companyId,
       name: this.name.trim(),
       expiryDays: this.expiryDays,
+      // Offline permissions
       canBindDevices: this.canBindDevices,
       canUnbindDevices: this.canUnbindDevices,
       canViewDevices: this.canViewDevices,
       canApproveReplacements: this.canApproveReplacements,
+      // Online permissions
+      canViewOnlineTokens: this.canViewOnlineTokens,
+      canManageOnlineTokens: this.canManageOnlineTokens,
+      canViewOnlineDevices: this.canViewOnlineDevices,
+      canUnbindOnlineDevices: this.canUnbindOnlineDevices,
+      // Limits
       dailyApiLimit: this.dailyApiLimit,
       notes: this.notes?.trim() || null,
     };

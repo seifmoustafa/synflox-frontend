@@ -3,7 +3,7 @@
  * Represents customer instances of subscription plans with lifecycle management
  */
 
-import { Currency } from "./subscription-plan.model";
+import { Currency, DeviceAdmissionMode } from "./subscription-plan.model";
 
 // ============================================================================
 // ENUMS - Access Mode
@@ -117,6 +117,16 @@ export interface SubscriptionData {
   entitlementCount?: number;
   gracePeriodDays?: number;
   exportGraceDays?: number;
+  // Device Management Overrides (new fields)
+  maxDevicesOverride?: number | null;
+  deviceAdmissionModeOverride?: DeviceAdmissionMode | null;
+  maxAutoAdmitDevicesOverride?: number | null;
+  effectiveMaxDevices?: number;
+  effectiveDeviceAdmissionMode?: DeviceAdmissionMode;
+  effectiveMaxAutoAdmitDevices?: number;
+  planMaxDevices?: number;
+  planDeviceAdmissionMode?: DeviceAdmissionMode;
+  requiresAdminApprovalForDevices?: boolean;
 }
 
 /**
@@ -203,6 +213,17 @@ export class Subscription {
   readonly gracePeriodDays: number;
   readonly exportGraceDays: number;
   
+  // Device Management Overrides (new fields)
+  readonly maxDevicesOverride: number | null;
+  readonly deviceAdmissionModeOverride: DeviceAdmissionMode | null;
+  readonly maxAutoAdmitDevicesOverride: number | null;
+  readonly effectiveMaxDevices: number;
+  readonly effectiveDeviceAdmissionMode: DeviceAdmissionMode;
+  readonly effectiveMaxAutoAdmitDevices: number;
+  readonly planMaxDevices: number;
+  readonly planDeviceAdmissionMode: DeviceAdmissionMode;
+  readonly requiresAdminApprovalForDevices: boolean;
+  
   // Backend computed properties
   private _status?: string;
   private _daysRemaining?: number;
@@ -272,6 +293,17 @@ export class Subscription {
     this.entitlementCount = data.entitlementCount ?? 0;
     this.gracePeriodDays = data.gracePeriodDays ?? 0;
     this.exportGraceDays = data.exportGraceDays ?? 30;
+    
+    // Set device management override fields
+    this.maxDevicesOverride = data.maxDevicesOverride ?? null;
+    this.deviceAdmissionModeOverride = data.deviceAdmissionModeOverride ?? null;
+    this.maxAutoAdmitDevicesOverride = data.maxAutoAdmitDevicesOverride ?? null;
+    this.effectiveMaxDevices = data.effectiveMaxDevices ?? 0;
+    this.effectiveDeviceAdmissionMode = data.effectiveDeviceAdmissionMode ?? DeviceAdmissionMode.Open;
+    this.effectiveMaxAutoAdmitDevices = data.effectiveMaxAutoAdmitDevices ?? 0;
+    this.planMaxDevices = data.planMaxDevices ?? 0;
+    this.planDeviceAdmissionMode = data.planDeviceAdmissionMode ?? DeviceAdmissionMode.Open;
+    this.requiresAdminApprovalForDevices = data.requiresAdminApprovalForDevices ?? false;
     
     // Set backend computed properties
     this._status = data.status;
@@ -613,6 +645,16 @@ export class Subscription {
       entitlementCount: this.entitlementCount,
       gracePeriodDays: this.gracePeriodDays,
       exportGraceDays: this.exportGraceDays,
+      // Device management override fields
+      maxDevicesOverride: this.maxDevicesOverride,
+      deviceAdmissionModeOverride: this.deviceAdmissionModeOverride,
+      maxAutoAdmitDevicesOverride: this.maxAutoAdmitDevicesOverride,
+      effectiveMaxDevices: this.effectiveMaxDevices,
+      effectiveDeviceAdmissionMode: this.effectiveDeviceAdmissionMode,
+      effectiveMaxAutoAdmitDevices: this.effectiveMaxAutoAdmitDevices,
+      planMaxDevices: this.planMaxDevices,
+      planDeviceAdmissionMode: this.planDeviceAdmissionMode,
+      requiresAdminApprovalForDevices: this.requiresAdminApprovalForDevices,
     };
   }
 }

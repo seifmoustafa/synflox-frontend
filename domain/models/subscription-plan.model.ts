@@ -41,6 +41,20 @@ export enum DeviceReplacementPolicy {
 }
 
 /**
+ * Device admission mode - controls how devices are registered
+ */
+export enum DeviceAdmissionMode {
+  /** Any device can register freely up to limit */
+  Open = 0,
+  /** Company admin must explicitly bind each device */
+  AdminOnly = 1,
+  /** Auto-register up to limit, then queue for admin approval */
+  AutoWithQueue = 2,
+  /** First N auto-register, rest require admin */
+  HybridAutoAdmin = 3,
+}
+
+/**
  * Supported currencies
  */
 export enum Currency {
@@ -110,6 +124,9 @@ export interface SubscriptionPlanData {
   allowConcurrentUsage?: boolean;
   concurrentUsageTimeoutMinutes?: number;
   hardwareChangeTolerance?: number;
+  // Device Admission Mode (new fields)
+  deviceAdmissionMode?: DeviceAdmissionMode;
+  maxAutoAdmitDevices?: number;
 }
 
 /**
@@ -159,7 +176,10 @@ export class SubscriptionPlan {
     public readonly deviceReplacementPolicy: DeviceReplacementPolicy = DeviceReplacementPolicy.AdminApproval,
     public readonly allowConcurrentUsage: boolean = false,
     public readonly concurrentUsageTimeoutMinutes: number = 30,
-    public readonly hardwareChangeTolerance: number = 2
+    public readonly hardwareChangeTolerance: number = 2,
+    // Device Admission Mode (new fields)
+    public readonly deviceAdmissionMode: DeviceAdmissionMode = DeviceAdmissionMode.Open,
+    public readonly maxAutoAdmitDevices: number = 0
   ) {}
 
   /**
@@ -315,7 +335,10 @@ export class SubscriptionPlan {
       updates.deviceReplacementPolicy ?? this.deviceReplacementPolicy,
       updates.allowConcurrentUsage ?? this.allowConcurrentUsage,
       updates.concurrentUsageTimeoutMinutes ?? this.concurrentUsageTimeoutMinutes,
-      updates.hardwareChangeTolerance ?? this.hardwareChangeTolerance
+      updates.hardwareChangeTolerance ?? this.hardwareChangeTolerance,
+      // Device admission mode fields
+      updates.deviceAdmissionMode ?? this.deviceAdmissionMode,
+      updates.maxAutoAdmitDevices ?? this.maxAutoAdmitDevices
     );
   }
 
@@ -390,6 +413,9 @@ export interface CreatePlanRequestData {
   allowConcurrentUsage?: boolean;
   concurrentUsageTimeoutMinutes?: number;
   hardwareChangeTolerance?: number;
+  // Device Admission Mode
+  deviceAdmissionMode?: DeviceAdmissionMode;
+  maxAutoAdmitDevices?: number;
 }
 
 export class CreatePlanRequest {
@@ -422,6 +448,9 @@ export class CreatePlanRequest {
   public readonly allowConcurrentUsage: boolean;
   public readonly concurrentUsageTimeoutMinutes: number;
   public readonly hardwareChangeTolerance: number;
+  // Device Admission Mode
+  public readonly deviceAdmissionMode: DeviceAdmissionMode;
+  public readonly maxAutoAdmitDevices: number;
 
   constructor(data: CreatePlanRequestData) {
     this.name = data.name;
@@ -453,6 +482,9 @@ export class CreatePlanRequest {
     this.allowConcurrentUsage = data.allowConcurrentUsage ?? false;
     this.concurrentUsageTimeoutMinutes = data.concurrentUsageTimeoutMinutes ?? 30;
     this.hardwareChangeTolerance = data.hardwareChangeTolerance ?? 2;
+    // Device Admission Mode fields
+    this.deviceAdmissionMode = data.deviceAdmissionMode ?? DeviceAdmissionMode.Open;
+    this.maxAutoAdmitDevices = data.maxAutoAdmitDevices ?? 0;
   }
 
   /**
@@ -508,6 +540,9 @@ export class CreatePlanRequest {
       allowConcurrentUsage: this.allowConcurrentUsage,
       concurrentUsageTimeoutMinutes: this.concurrentUsageTimeoutMinutes,
       hardwareChangeTolerance: this.hardwareChangeTolerance,
+      // Device Admission Mode fields
+      deviceAdmissionMode: this.deviceAdmissionMode,
+      maxAutoAdmitDevices: this.maxAutoAdmitDevices,
     };
     
     // Only include prices for non-free plans
@@ -553,6 +588,9 @@ export interface UpdatePlanRequestData {
   allowConcurrentUsage?: boolean;
   concurrentUsageTimeoutMinutes?: number;
   hardwareChangeTolerance?: number;
+  // Device Admission Mode
+  deviceAdmissionMode?: DeviceAdmissionMode;
+  maxAutoAdmitDevices?: number;
 }
 
 export class UpdatePlanRequest {
@@ -586,6 +624,9 @@ export class UpdatePlanRequest {
   public readonly allowConcurrentUsage?: boolean;
   public readonly concurrentUsageTimeoutMinutes?: number;
   public readonly hardwareChangeTolerance?: number;
+  // Device Admission Mode
+  public readonly deviceAdmissionMode?: DeviceAdmissionMode;
+  public readonly maxAutoAdmitDevices?: number;
 
   constructor(data: UpdatePlanRequestData) {
     this.id = data.id;
@@ -618,6 +659,9 @@ export class UpdatePlanRequest {
     this.allowConcurrentUsage = data.allowConcurrentUsage;
     this.concurrentUsageTimeoutMinutes = data.concurrentUsageTimeoutMinutes;
     this.hardwareChangeTolerance = data.hardwareChangeTolerance;
+    // Device Admission Mode fields
+    this.deviceAdmissionMode = data.deviceAdmissionMode;
+    this.maxAutoAdmitDevices = data.maxAutoAdmitDevices;
   }
 
   /**
@@ -666,6 +710,9 @@ export class UpdatePlanRequest {
     if (this.allowConcurrentUsage !== undefined) data.allowConcurrentUsage = this.allowConcurrentUsage;
     if (this.concurrentUsageTimeoutMinutes !== undefined) data.concurrentUsageTimeoutMinutes = this.concurrentUsageTimeoutMinutes;
     if (this.hardwareChangeTolerance !== undefined) data.hardwareChangeTolerance = this.hardwareChangeTolerance;
+    // Device Admission Mode fields
+    if (this.deviceAdmissionMode !== undefined) data.deviceAdmissionMode = this.deviceAdmissionMode;
+    if (this.maxAutoAdmitDevices !== undefined) data.maxAutoAdmitDevices = this.maxAutoAdmitDevices;
     return data;
   }
 }

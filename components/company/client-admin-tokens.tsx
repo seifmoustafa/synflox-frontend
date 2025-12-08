@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { GenericModal } from "@/components/ui/generic-modal";
 import { GenericForm, FieldConfig } from "@/components/forms/generic-form";
+import { GenericTable } from "@/components/ui/generic-table";
 import {
   Dialog,
   DialogContent,
@@ -20,14 +21,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Key,
   Plus,
   Trash2,
@@ -35,7 +28,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock,
-  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -134,6 +126,77 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
   }), []);
 
   // ============================================================================
+  // Table Columns
+  // ============================================================================
+  const columns = useMemo(() => [
+    {
+      key: "name" as keyof AdminToken,
+      label: t("clientAdminToken.name"),
+      render: (_: any, token: AdminToken) => (
+        <div className="flex items-center gap-2 font-medium">
+          <Key className="h-4 w-4 text-muted-foreground" />
+          {token.name}
+        </div>
+      ),
+    },
+    {
+      key: "isValid" as keyof AdminToken,
+      label: t("clientAdminToken.status"),
+      render: (_: any, token: AdminToken) => {
+        if (!token.isValid || token.isExpired) {
+          return <Badge variant="destructive">{t("clientAdminToken.expired")}</Badge>;
+        }
+        if (token.isExpiringSoon) {
+          return <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600">{t("clientAdminToken.expiringSoon")}</Badge>;
+        }
+        return <Badge variant="default" className="bg-green-500/10 text-green-600">{t("clientAdminToken.active")}</Badge>;
+      },
+    },
+    {
+      key: "canBindDevices" as keyof AdminToken,
+      label: t("clientAdminToken.permissions"),
+      render: (_: any, token: AdminToken) => (
+        <div className="flex gap-1 flex-wrap">
+          {token.canBindDevices && (
+            <Badge variant="outline" className="text-xs">{t("clientAdminToken.canBindDevices")}</Badge>
+          )}
+          {token.canViewDevices && (
+            <Badge variant="outline" className="text-xs">{t("clientAdminToken.canViewDevices")}</Badge>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "expiresAtUtc" as keyof AdminToken,
+      label: t("clientAdminToken.expiresAt"),
+      render: (_: any, token: AdminToken) => (
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 text-muted-foreground" />
+          {token.formattedExpiryDate}
+        </div>
+      ),
+    },
+    {
+      key: "usageCount" as keyof AdminToken,
+      label: t("clientAdminToken.usageCount"),
+    },
+  ], [t]);
+
+  // Table actions
+  const actions = useMemo(() => [
+    {
+      label: t("clientAdminToken.revoke"),
+      icon: Trash2,
+      onClick: (token: AdminToken) => {
+        setTokenToRevoke(token);
+        setShowRevokeDialog(true);
+      },
+      variant: "destructive" as const,
+      show: (token: AdminToken) => token.isValid,
+    },
+  ], [t]);
+
+  // ============================================================================
   // Data Loading
   // ============================================================================
 
@@ -206,16 +269,6 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
     }
   };
 
-  const getStatusBadge = (token: AdminToken) => {
-    if (!token.isValid || token.isExpired) {
-      return <Badge variant="destructive">{t("clientAdminToken.expired")}</Badge>;
-    }
-    if (token.isExpiringSoon) {
-      return <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600">{t("clientAdminToken.expiringSoon")}</Badge>;
-    }
-    return <Badge variant="default" className="bg-green-500/10 text-green-600">{t("clientAdminToken.active")}</Badge>;
-  };
-
   // ============================================================================
   // Render
   // ============================================================================
@@ -270,59 +323,12 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
               </Button>
             </div>
           ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className={isRTL ? "text-right" : ""}>{t("clientAdminToken.name")}</TableHead>
-                    <TableHead className={isRTL ? "text-right" : ""}>{t("clientAdminToken.status")}</TableHead>
-                    <TableHead className={isRTL ? "text-right" : ""}>{t("clientAdminToken.permissions")}</TableHead>
-                    <TableHead className={isRTL ? "text-right" : ""}>{t("clientAdminToken.expiresAt")}</TableHead>
-                    <TableHead className={isRTL ? "text-right" : ""}>{t("clientAdminToken.usageCount")}</TableHead>
-                    <TableHead className={isRTL ? "text-left" : "text-right"}>{t("common.actions")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tokens.map((token) => (
-                    <TableRow key={token.id}>
-                      <TableCell className="font-medium">{token.name}</TableCell>
-                      <TableCell>{getStatusBadge(token)}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1 flex-wrap">
-                          {token.canBindDevices && (
-                            <Badge variant="outline" className="text-xs">{t("clientAdminToken.canBindDevices")}</Badge>
-                          )}
-                          {token.canViewDevices && (
-                            <Badge variant="outline" className="text-xs">{t("clientAdminToken.canViewDevices")}</Badge>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className={cn("flex items-center gap-2", isRTL && " justify-end")}>
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          {token.formattedExpiryDate}
-                        </div>
-                      </TableCell>
-                      <TableCell>{token.usageCount}</TableCell>
-                      <TableCell className={isRTL ? "text-left" : "text-right"}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => {
-                            setTokenToRevoke(token);
-                            setShowRevokeDialog(true);
-                          }}
-                          disabled={!token.isValid}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <GenericTable<AdminToken>
+              data={tokens}
+              columns={columns}
+              actions={actions}
+              emptyMessage={t("clientAdminToken.noTokens")}
+            />
           )}
         </CardContent>
       </Card>
@@ -344,7 +350,7 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
         />
       </GenericModal>
 
-      {/* Generated Token Success Dialog - Keep as Dialog (just displays token) */}
+      {/* Generated Token Success Dialog */}
       <Dialog open={showGeneratedTokenDialog} onOpenChange={setShowGeneratedTokenDialog}>
         <DialogContent className="sm:max-w-[600px]" dir={isRTL ? "rtl" : "ltr"}>
           <DialogHeader>
@@ -401,7 +407,7 @@ export function ClientAdminTokens({ companyId }: ClientAdminTokensProps) {
         </DialogContent>
       </Dialog>
 
-      {/* Revoke Confirmation Dialog - Already using ConfirmationDialog (appropriate) */}
+      {/* Revoke Confirmation Dialog */}
       <ConfirmationDialog
         open={showRevokeDialog}
         onOpenChange={setShowRevokeDialog}

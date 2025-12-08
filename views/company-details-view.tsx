@@ -23,6 +23,7 @@ import { ExportHistoryButton } from "@/components/subscription/export-history-bu
 import { CompanyAnalytics } from "@/components/company/company-analytics";
 import { ClientAdminTokens } from "@/components/company/client-admin-tokens";
 import { CompanyAdminSection } from "@/components/company/company-admin-section";
+import { CompanyOnlineTokens } from "@/components/company/company-online-tokens";
 import { formatDate, cn } from "@/lib/utils";
 import {
   Building2,
@@ -48,6 +49,7 @@ import {
   Play,
   Key,
   UserCog,
+  Wifi,
 } from "lucide-react";
 
 interface CompanyDetailsViewProps {
@@ -233,12 +235,16 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
 
       {/* Tabs Section */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
-        <TabsList className={cn("grid w-full grid-cols-4 lg:w-[800px]", isRTL && "lg:mr-0 lg:ml-auto")}>
+        <TabsList className={cn("grid w-full grid-cols-5 lg:w-[1000px]", isRTL && "lg:mr-0 lg:ml-auto")}>
           {isRTL ? (
             <>
               <TabsTrigger value="tokens" className="gap-2 ">
                 <Key className="h-4 w-4" />
                 {t("clientAdminToken.items")}
+              </TabsTrigger>
+              <TabsTrigger value="online" className="gap-2 ">
+                <Wifi className="h-4 w-4" />
+                {t("companyOnlineTokens.title")}
               </TabsTrigger>
               <TabsTrigger value="admin" className="gap-2 ">
                 <UserCog className="h-4 w-4" />
@@ -270,6 +276,10 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
               <TabsTrigger value="tokens" className="gap-2">
                 <Key className="h-4 w-4" />
                 {t("clientAdminToken.items")}
+              </TabsTrigger>
+              <TabsTrigger value="online" className="gap-2">
+                <Wifi className="h-4 w-4" />
+                {t("companyOnlineTokens.title")}
               </TabsTrigger>
             </>
           )}
@@ -518,9 +528,14 @@ export function CompanyDetailsView({ companyId }: CompanyDetailsViewProps) {
           <CompanyAdminSection companyId={companyId} companyName={company.name} />
         </TabsContent>
 
-        {/* Tokens Tab */}
+        {/* Tokens Tab (Offline) */}
         <TabsContent value="tokens" className="space-y-6">
           <ClientAdminTokens companyId={companyId} />
+        </TabsContent>
+
+        {/* Online Tokens Tab */}
+        <TabsContent value="online" className="space-y-6">
+          <CompanyOnlineTokens companyId={companyId} />
         </TabsContent>
       </Tabs>
     </div>

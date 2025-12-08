@@ -28,6 +28,7 @@ import { EntitlementsTree } from "@/components/ui/entitlements-tree";
 import { PlanEntitlement } from "@/domain";
 import { ActivationSummary } from "@/domain/models/license.model";
 import { LicenseView } from "@/views/license-view";
+import { OnlineTokensPanel } from "@/components/features/subscriptions/online-tokens-panel";
 
 interface SubscriptionDetailsViewProps {
   subscriptionId: string;
@@ -364,6 +365,7 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
               <TabsTrigger value="devices">{t("subscription.devices.title")}</TabsTrigger>
               <TabsTrigger value="license">{t("subscription.tabs.license")}</TabsTrigger>
+              <TabsTrigger value="online">{t("subscription.tabs.online")}</TabsTrigger>
               <TabsTrigger value="entitlements">{t("subscription.tabs.entitlements")}</TabsTrigger>
               <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
               <TabsTrigger value="billing">{t("subscription.tabs.billing")}</TabsTrigger>
@@ -376,6 +378,7 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               <TabsTrigger value="features">{t("subscription.tabs.features")}</TabsTrigger>
               <TabsTrigger value="entitlements">{t("subscription.tabs.entitlements")}</TabsTrigger>
               <TabsTrigger value="license">{t("subscription.tabs.license")}</TabsTrigger>
+              <TabsTrigger value="online">{t("subscription.tabs.online")}</TabsTrigger>
               <TabsTrigger value="devices">{t("subscription.devices.title")}</TabsTrigger>
               <TabsTrigger value="history">{t("subscription.tabs.history")}</TabsTrigger>
             </>
@@ -954,6 +957,11 @@ export function SubscriptionDetailsView({ subscriptionId }: SubscriptionDetailsV
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Online Tokens Tab */}
+        <TabsContent value="online" className="space-y-4">
+          <OnlineTokensPanel subscriptionId={subscriptionId} />
         </TabsContent>
       </Tabs>
 

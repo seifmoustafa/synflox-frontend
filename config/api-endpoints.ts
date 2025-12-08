@@ -223,4 +223,17 @@ export const API_ENDPOINTS = {
     SESSIONS: (id: string) => `/admin/company-admins/${id}/sessions`,
     ACTIVE_SESSIONS: (id: string) => `/admin/company-admins/${id}/active-sessions`,
   },
+
+  // Online Client Tokens (Thin JWT for online systems)
+  ONLINE_TOKENS: {
+    GENERATE: "/admin/online-tokens/generate",
+    BY_COMPANY: (companyId: string) => `/admin/online-tokens/company/${companyId}`,
+    BY_SUBSCRIPTION: (subscriptionId: string) => `/admin/online-tokens/subscription/${subscriptionId}`,
+    REVOKE: (tokenId: string) => `/admin/online-tokens/${tokenId}/revoke`,
+    REGENERATE: (tokenId: string) => `/admin/online-tokens/${tokenId}/regenerate`,
+    DEVICES: (subscriptionId: string) => `/admin/online-tokens/subscription/${subscriptionId}/devices`,
+    DEVICE_LIMIT: (subscriptionId: string) => `/admin/online-tokens/subscription/${subscriptionId}/device-limit`,
+    PENDING_CHANGES: (subscriptionId: string) => `/admin/online-tokens/subscription/${subscriptionId}/pending-changes`,
+    UNBIND_DEVICE: (deviceId: string) => `/admin/online-tokens/devices/${deviceId}`,
+  },
 };

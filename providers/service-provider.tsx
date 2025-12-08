@@ -20,6 +20,7 @@ import { PlanEntitlementService } from "@/services/plan-entitlement.service";
 import { LicenseService } from "@/services/license.service";
 import { ClientAdminTokenService } from "@/services/client-admin-token.service";
 import { CompanyAdminService } from "@/services/company-admin.service";
+import { OnlineTokenService } from "@/services/online-token.service";
 
 interface Services {
   apiService: ApiService;
@@ -40,6 +41,7 @@ interface Services {
   licenseService: LicenseService;
   clientAdminTokenService: ClientAdminTokenService;
   companyAdminService: CompanyAdminService;
+  onlineTokenService: OnlineTokenService;
 }
 
 const ServiceContext = createContext<Services | null>(null);
@@ -64,6 +66,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
     const licenseService = new LicenseService(apiService, notificationService);
     const clientAdminTokenService = new ClientAdminTokenService(apiService, notificationService);
     const companyAdminService = new CompanyAdminService(apiService, notificationService);
+    const onlineTokenService = new OnlineTokenService(apiService, notificationService);
 
     return {
       apiService,
@@ -84,6 +87,7 @@ export function ServiceProvider({ children }: { children: React.ReactNode }) {
       licenseService,
       clientAdminTokenService,
       companyAdminService,
+      onlineTokenService,
     };
   }, []);
 

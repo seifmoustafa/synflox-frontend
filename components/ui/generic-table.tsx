@@ -138,6 +138,8 @@ interface GenericTableProps<T> {
   stickyActions?: boolean;
   /** Custom render function for actions column - completely overrides default actions */
   renderActions?: (row: T) => React.ReactNode;
+  /** Hide actions column completely (default: false) */
+  hideActions?: boolean;
 }
 
 /**
@@ -181,6 +183,7 @@ export function GenericTable<T extends Record<string, any>>({
   overrideTableStyle,
   stickyActions = true,
   renderActions,
+  hideActions = false,
 }: GenericTableProps<T>) {
   const { t, direction } = useI18n();
   const settings = useSettings();
@@ -966,7 +969,7 @@ export function GenericTable<T extends Record<string, any>>({
                     </span>
                   </div>
                 ))}
-                {((actions && actions.length > 0) || renderActions) && (
+                {!hideActions && ((actions && actions.length > 0) || renderActions) && (
                   <div className="flex justify-end pt-2 border-t border-border/50">
                     {renderActions ? (
                       renderActions(row)
@@ -1151,7 +1154,7 @@ export function GenericTable<T extends Record<string, any>>({
                     )}
                   </TableHead>
                 ))}
-                {((actions && actions.length > 0) || renderActions) && (
+                {!hideActions && ((actions && actions.length > 0) || renderActions) && (
                   <TableHead
                     ref={actionsColumnRef}
                     className={cn(
@@ -1198,7 +1201,7 @@ export function GenericTable<T extends Record<string, any>>({
                   <TableCell
                     colSpan={
                       columns.length +
-                      ((actions && actions.length > 0) || renderActions
+                      (!hideActions && ((actions && actions.length > 0) || renderActions)
                         ? 1
                         : 0) +
                       (selectable ? 1 : 0)
@@ -1288,7 +1291,7 @@ export function GenericTable<T extends Record<string, any>>({
                             : String(row[column.key])}
                         </TableCell>
                       ))}
-                      {((actions && actions.length > 0) || renderActions) && (
+                      {!hideActions && ((actions && actions.length > 0) || renderActions) && (
                         <TableCell
                           className={cn(
                             getCellPadding(),

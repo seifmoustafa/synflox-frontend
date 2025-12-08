@@ -1499,6 +1499,7 @@ export const ar = {
       features: "الميزات",
       entitlements: "الصلاحيات",
       license: "الترخيص",
+      online: "الرموز الإلكترونية",
       history: "التاريخ",
     },
     
@@ -4308,6 +4309,7 @@ export const ar = {
 
   // Common
   common: {
+    never:"أبدا",
     days:"أيام",
     contact:"تواصل",
     none:"لا شيء",
@@ -4970,12 +4972,20 @@ export const ar = {
     notes: "ملاحظات",
     notesPlaceholder: "ملاحظات داخلية حول هذا الرمز...",
     
-    // Permissions
+    // Offline Permissions
     permissions: "الصلاحيات",
+    offlinePermissions: "صلاحيات الأجهزة غير المتصلة",
     canBindDevices: "يمكن ربط الأجهزة",
     canUnbindDevices: "يمكن إلغاء ربط الأجهزة",
     canViewDevices: "يمكن عرض الأجهزة",
     canApproveReplacements: "يمكن الموافقة على الاستبدال",
+    
+    // Online Permissions
+    onlinePermissions: "صلاحيات الأجهزة المتصلة",
+    canViewOnlineTokens: "يمكن عرض الرموز المتصلة",
+    canManageOnlineTokens: "يمكن إدارة الرموز المتصلة",
+    canViewOnlineDevices: "يمكن عرض الأجهزة المتصلة",
+    canUnbindOnlineDevices: "يمكن إلغاء ربط الأجهزة المتصلة",
     
     // Status
     active: "نشط",
@@ -5006,5 +5016,105 @@ export const ar = {
     copyFailed: "فشل في نسخ الرمز",
     generateSuccess: "تم إنشاء الرمز بنجاح",
     revokeSuccess: "تم إلغاء الرمز بنجاح",
+  },
+
+  // Online Client Tokens (Thin JWT)
+  onlineTokens: {
+    // Summary Cards
+    activeTokens: "الرموز النشطة",
+    registeredDevices: "الأجهزة المسجلة",
+    pendingChanges: "التغييرات المعلقة",
+    nextChange: "التغيير التالي",
+    total: "الإجمالي",
+
+    // Tabs
+    tokens: "الرموز",
+    devices: "الأجهزة",
+    changes: "التغييرات",
+
+    // Token Table
+    name: "الاسم",
+    status: "الحالة",
+    expiry: "تاريخ الانتهاء",
+    lastUsed: "آخر استخدام",
+    showRevoked: "عرض الرموز الملغاة",
+    noTokens: "لا توجد رموز. أنشئ واحداً للبدء.",
+    noDevices: "لا توجد أجهزة مسجلة بعد.",
+    noChanges: "لا توجد تغييرات معلقة.",
+
+    // Device Table
+    device: "الجهاز",
+    os: "نظام التشغيل",
+    apiCalls: "استدعاءات API",
+    lastSeen: "آخر ظهور",
+
+    // Changes Table
+    changeType: "النوع",
+    description: "الوصف",
+    effectiveDate: "تاريخ التفعيل",
+    changesDescription: "التغييرات المجدولة لدورة الفوترة التالية.",
+
+    // Generate Dialog
+    generateToken: "إنشاء رمز",
+    generateDescription: "إنشاء رمز JWT خفيف لتطبيقات العملاء عبر الإنترنت. يحتوي الرمز فقط على معلومات الهوية - يتم جلب الصلاحيات ديناميكياً.",
+    tokenName: "اسم الرمز",
+    tokenNamePlaceholder: "مثال: خادم الإنتاج، تطبيق الهاتف",
+    expiryDays: "أيام الصلاحية",
+    autoRefresh: "تجديد تلقائي قبل الانتهاء",
+    maxDevices: "الحد الأقصى للأجهزة",
+    unlimited: "غير محدود (استخدام الافتراضي للخطة)",
+    notes: "ملاحظات",
+    notesPlaceholder: "ملاحظات اختيارية حول هذا الرمز...",
+    generate: "إنشاء رمز",
+
+    // Token Display
+    tokenGenerated: "تم إنشاء الرمز بنجاح",
+    tokenGeneratedDescription: "تم إنشاء رمزك الإلكتروني. انسخه الآن - لن يتم عرضه مرة أخرى!",
+    tokenSecurityWarning: "سيتم عرض هذا الرمز مرة واحدة فقط. تأكد من نسخه وحفظه بشكل آمن!",
+    copyToken: "نسخ الرمز",
+    copyWarning: "لا يمكن استرداد هذا الرمز لاحقاً. انسخه الآن!",
+
+    // Device validation
+    allocatedDevices: "مخصص للرموز",
+    remainingSlots: "الفتحات المتبقية",
+    maxAvailable: "الحد الأقصى المتاح",
+    unlimitedDevices: "أجهزة غير محدودة (الخطة بدون حد)",
+    allocatedToTokens: "مخصص للرموز",
+    noDeviceSlotsAvailable: "جميع فتحات الأجهزة مخصصة للرموز الموجودة. قم بإلغاء أو تقليل حدود الأجهزة على الرموز الأخرى أولاً.",
+    
+    // Device Tab
+    connectedDevices: "الأجهزة المتصلة",
+    devicesRegistered: "أجهزة مسجلة",
+    deviceName: "اسم الجهاز",
+    deviceType: "نوع الجهاز",
+    
+    // Changes Tab
+    pendingChangesTitle: "التغييرات المعلقة",
+    pendingChangesDescription: "التغييرات المجدولة للدخول حيز التنفيذ في دورة الفوترة التالية.",
+
+    // Revoke Dialog
+    revokeToken: "إلغاء الرمز",
+    revokeDescription: "سيؤدي هذا إلى إبطال الرمز فوراً. ستفقد جميع الأجهزة التي تستخدم هذا الرمز الوصول. لا يمكن التراجع عن هذا الإجراء.",
+    revokeReason: "سبب الإلغاء",
+    revokeReasonPlaceholder: "أدخل سبب إلغاء هذا الرمز...",
+    revoke: "إلغاء الرمز",
+    
+    // Device Actions
+    unbindDevice: "إلغاء ربط الجهاز",
+    confirmUnbind: "هل أنت متأكد من إلغاء ربط هذا الجهاز؟ سيحتاج إلى إعادة التسجيل للوصول إلى النظام.",
+  },
+
+  // Company Online Tokens (Aggregate View)
+  companyOnlineTokens: {
+    title: "الرموز الإلكترونية",
+    totalDevices: "إجمالي الأجهزة المتصلة",
+    acrossSubscriptions: "عبر جميع الاشتراكات",
+    expiringSoon: "تنتهي قريباً",
+    within7Days: "خلال 7 أيام",
+    noTokens: "لا توجد رموز إلكترونية",
+    noTokensDescription: "لا توجد رموز إلكترونية لهذه الشركة بعد. أنشئ رموزاً من تبويب الرموز الإلكترونية في كل اشتراك.",
+    manageTokens: "إدارة الرموز",
+    infoTitle: "الرموز الإلكترونية مقابل الرموز غير المتصلة",
+    infoDescription: "الرموز الإلكترونية هي JWT خفيفة للوصول الفوري. كل اشتراك له رموزه الخاصة. لإدارة الأجهزة غير المتصلة، استخدم تبويب رموز مسؤول العميل.",
   },
 };

@@ -4,6 +4,7 @@ import {
   CreatePlanRequest,
   UpdatePlanRequest,
   DeviceReplacementPolicy,
+  DeviceAdmissionMode,
 } from "../models/subscription-plan.model";
 
 /**
@@ -71,7 +72,10 @@ export class SubscriptionPlanMapper {
       data.deviceReplacementPolicy ?? DeviceReplacementPolicy.AdminApproval,
       data.allowConcurrentUsage ?? false,
       data.concurrentUsageTimeoutMinutes ?? 30,
-      data.hardwareChangeTolerance ?? 2
+      data.hardwareChangeTolerance ?? 2,
+      // Device Admission Mode
+      data.deviceAdmissionMode ?? DeviceAdmissionMode.Open,
+      data.maxAutoAdmitDevices ?? 0
     );
   }
 
@@ -121,6 +125,9 @@ export class SubscriptionPlanMapper {
       allowConcurrentUsage: plan.allowConcurrentUsage,
       concurrentUsageTimeoutMinutes: plan.concurrentUsageTimeoutMinutes,
       hardwareChangeTolerance: plan.hardwareChangeTolerance,
+      // Device Admission Mode
+      deviceAdmissionMode: plan.deviceAdmissionMode,
+      maxAutoAdmitDevices: plan.maxAutoAdmitDevices,
     };
   }
 
