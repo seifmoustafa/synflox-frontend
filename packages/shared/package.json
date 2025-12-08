@@ -1,0 +1,17 @@
+{
+  "name": "@synflox/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    "./components/ui/*": "./components/ui/*.tsx",
+    "./lib/*": "./lib/*.ts",
+    "./locales/*": "./locales/*.ts",
+    "./lib/utils": "./lib/utils.ts"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  }
+}

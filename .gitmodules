@@ -1,0 +1,6 @@
+[submodule "apps/admin"]
+	path = apps/admin
+	url = https://github.com/seifmoustafa/synflox-admin-portal.git
+[submodule "apps/client"]
+	path = apps/client
+	url = https://github.com/seifmoustafa/synflox-client-portal.git

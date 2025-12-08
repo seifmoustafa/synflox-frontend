@@ -1,12 +1,22 @@
 {
-  "name": "synflox",
+  "name": "synflox-frontend",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
-    "build": "next build",
-    "dev": "next dev",
-    "lint": "next lint",
-    "start": "next start"
+    "dev": "npm run dev:admin",
+    "dev:admin": "npm run dev --workspace=@synflox/admin-portal",
+    "dev:client": "npm run dev --workspace=@synflox/client-portal",
+    "dev:all": "npm run dev:admin & npm run dev:client",
+    "build": "npm run build:admin && npm run build:client",
+    "build:admin": "npm run build --workspace=@synflox/admin-portal",
+    "build:client": "npm run build --workspace=@synflox/client-portal",
+    "start:admin": "npm run start --workspace=@synflox/admin-portal",
+    "start:client": "npm run start --workspace=@synflox/client-portal",
+    "lint": "npm run lint --workspaces --if-present"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
