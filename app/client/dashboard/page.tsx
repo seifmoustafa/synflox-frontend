@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
-// Get API base URL from environment
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5035/api";
 import { useRouter } from "next/navigation";
 import { useClientAuth } from "@/providers/client-auth-provider";
+import { clientApiService, CLIENT_API_ENDPOINTS } from "@/services/client-api.service";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -70,18 +68,11 @@ export default function ClientDashboardPage() {
     const fetchSummary = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}/client/devices/summary`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch summary");
-        }
-
-        const result = await response.json();
-        setSummary(result.data);
+        const data = await clientApiService.get<CompanySummary>(
+          CLIENT_API_ENDPOINTS.DEVICES.SUMMARY,
+          token
+        );
+        setSummary(data);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -97,16 +88,20 @@ export default function ClientDashboardPage() {
     router.push("/client/login");
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     if (token) {
       setLoading(true);
-      fetch(`${API_BASE_URL}/client/devices/summary`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((res) => res.json())
-        .then((result) => setSummary(result.data))
-        .catch((err) => setError(err.message))
-        .finally(() => setLoading(false));
+      try {
+        const data = await clientApiService.get<CompanySummary>(
+          CLIENT_API_ENDPOINTS.DEVICES.SUMMARY,
+          token
+        );
+        setSummary(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

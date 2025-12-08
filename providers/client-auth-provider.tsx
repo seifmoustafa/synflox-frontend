@@ -1,9 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-
-// Get API base URL from environment
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5035/api";
+import { clientApiService, CLIENT_API_ENDPOINTS } from "@/services/client-api.service";
 
 /**
  * Client Admin Context - For company admins using their ClientAdminToken
@@ -92,19 +90,10 @@ export function ClientAuthProvider({ children }: { children: React.ReactNode }) 
       setIsLoading(true);
       
       // Validate the token by calling the client API
-      const response = await fetch(`${API_BASE_URL}/client/devices/summary`, {
-        headers: {
-          Authorization: `Bearer ${newToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        console.error("Invalid client token");
-        return false;
-      }
-
-      const result = await response.json();
-      const data = result.data;
+      const data = await clientApiService.get<any>(
+        CLIENT_API_ENDPOINTS.DEVICES.SUMMARY,
+        newToken
+      );
 
       // Extract company info from the response
       // The summary endpoint returns company info

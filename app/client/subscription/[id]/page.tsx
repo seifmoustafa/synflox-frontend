@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-
-// Get API base URL from environment
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5035/api";
 import { useRouter, useParams } from "next/navigation";
 import { useClientAuth } from "@/providers/client-auth-provider";
+import { clientApiService, CLIENT_API_ENDPOINTS } from "@/services/client-api.service";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -90,23 +88,25 @@ export default function ClientSubscriptionPage() {
       setError(null);
 
       // Fetch offline devices
-      const offlineResponse = await fetch(`${API_BASE_URL}/client/devices/subscription/${subscriptionId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      if (offlineResponse.ok) {
-        const offlineResult = await offlineResponse.json();
-        setOfflineDevices(offlineResult.data || []);
+      try {
+        const offlineData = await clientApiService.get<Device[]>(
+          CLIENT_API_ENDPOINTS.DEVICES.BY_SUBSCRIPTION(subscriptionId),
+          token
+        );
+        setOfflineDevices(offlineData || []);
+      } catch {
+        // Offline devices fetch failed, continue
       }
 
       // Fetch online devices
-      const onlineResponse = await fetch(`${API_BASE_URL}/client/online/devices/subscription/${subscriptionId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      
-      if (onlineResponse.ok) {
-        const onlineResult = await onlineResponse.json();
-        setOnlineDevices(onlineResult.data || []);
+      try {
+        const onlineData = await clientApiService.get<Device[]>(
+          CLIENT_API_ENDPOINTS.ONLINE_DEVICES.BY_SUBSCRIPTION(subscriptionId),
+          token
+        );
+        setOnlineDevices(onlineData || []);
+      } catch {
+        // Online devices fetch failed, continue
       }
     } catch (err: any) {
       setError(err.message);
@@ -124,29 +124,17 @@ export default function ClientSubscriptionPage() {
 
     setUnbindLoading(true);
     try {
-      const url = deviceToUnbind.type === "offline"
-        ? `${API_BASE_URL}/client/devices/unbind`
-        : `${API_BASE_URL}/client/online/devices/${deviceToUnbind.id}`;
-
-      const options: RequestInit = {
-        method: deviceToUnbind.type === "offline" ? "POST" : "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
-
       if (deviceToUnbind.type === "offline") {
-        options.body = JSON.stringify({
-          subscriptionId,
-          activationId: deviceToUnbind.id,
-        });
-      }
-
-      const response = await fetch(url, options);
-
-      if (!response.ok) {
-        throw new Error("Failed to unbind device");
+        await clientApiService.post(
+          CLIENT_API_ENDPOINTS.DEVICES.UNBIND,
+          token,
+          { subscriptionId, activationId: deviceToUnbind.id }
+        );
+      } else {
+        await clientApiService.delete(
+          CLIENT_API_ENDPOINTS.ONLINE_DEVICES.UNBIND(deviceToUnbind.id),
+          token
+        );
       }
 
       // Refresh the list
