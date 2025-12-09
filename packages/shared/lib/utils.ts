@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import type {
   HoverEffectType,
   HoverEffectIntensity,
-} from "@/providers/settings-provider";
+} from "@shared/providers/settings-provider";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

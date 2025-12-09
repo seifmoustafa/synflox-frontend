@@ -1,17 +1,17 @@
 "use client";
 
 import React from "react";
-import { PAGE_BLUR_Z_INDEX, PAGE_BLUR_PX, PAGE_BLUR_BRIGHTNESS, MODAL_Z_INDEX, OVERLAY_Z_INDEX } from "@/components/ui/modal-tokens";
+import { PAGE_BLUR_Z_INDEX, PAGE_BLUR_PX, PAGE_BLUR_BRIGHTNESS, MODAL_Z_INDEX, OVERLAY_Z_INDEX } from "@shared/components/ui/modal-tokens";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSettings } from "@/providers/settings-provider";
-import { cn } from "@/lib/utils";
+} from "@shared/components/ui/dialog";
+import { ScrollArea } from "@shared/components/ui/scroll-area";
+import { useSettings } from "@shared/providers/settings-provider";
+import { cn } from "@shared/lib/utils";
 
 interface GenericModalProps {
   open: boolean;

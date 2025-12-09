@@ -2,17 +2,17 @@
 
 import React, { useRef, useState, useCallback } from "react";
 import { Upload, X, Image as ImageIcon, CheckCircle2, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useI18n } from "@/providers/i18n-provider";
-import { useSettings } from "@/providers/settings-provider";
+import { Button } from "@shared/components/ui/button";
+import { cn } from "@shared/lib/utils";
+import { useI18n } from "@shared/providers/i18n-provider";
+import { useSettings } from "@shared/providers/settings-provider";
 import { 
   convertFileToBase64, 
   validateImageFile, 
   type ImageConversionOptions,
   formatFileSize,
   getImageDimensions 
-} from "@/lib/image-utils";
+} from "@shared/lib/image-utils";
 
 export interface ImageUploaderProps {
   id?: string;

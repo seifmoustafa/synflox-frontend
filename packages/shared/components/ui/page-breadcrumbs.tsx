@@ -3,8 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useI18n } from "@/providers/i18n-provider";
-import { Button } from "@/components/ui/button";
+import { useI18n } from "@shared/providers/i18n-provider";
+import { Button } from "@shared/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import {
   Breadcrumb,
@@ -13,7 +13,7 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from "@shared/components/ui/breadcrumb";
 
 export interface BreadcrumbSegment {
   label: string;

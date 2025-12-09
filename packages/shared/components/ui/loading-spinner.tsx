@@ -1,7 +1,7 @@
 "use client"
-import { useI18n } from "@/providers/i18n-provider"
-import { useSettings } from "@/providers/settings-provider"
-import { cn } from "@/lib/utils"
+import { useI18n } from "@shared/providers/i18n-provider"
+import { useSettings } from "@shared/providers/settings-provider"
+import { cn } from "@shared/lib/utils"
 
 interface LoadingSpinnerProps {
   size?: "sm" | "md" | "lg" | "inline"

@@ -1,7 +1,7 @@
 import * as React from "react"
 
-import { cn } from "@/lib/utils"
-import { useSettings } from "@/providers/settings-provider"
+import { cn } from "@shared/lib/utils"
+import { useSettings } from "@shared/providers/settings-provider"
 
 const Table = React.forwardRef<
   HTMLTableElement,

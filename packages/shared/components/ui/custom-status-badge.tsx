@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { cn } from "@/lib/utils";
-import { useSettings, BadgeStyle } from "@/providers/settings-provider";
+import { cn } from "@shared/lib/utils";
+import { useSettings, BadgeStyle } from "@shared/providers/settings-provider";
 import { Check, X, AlertTriangle, Info, Clock, Zap } from "lucide-react";
 
 export type StatusType =

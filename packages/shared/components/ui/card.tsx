@@ -1,6 +1,6 @@
 import * as React from "react"
-import { useSettings } from "@/providers/settings-provider"
-import { cn, getHoverEffectClasses } from "@/lib/utils"
+import { useSettings } from "@shared/providers/settings-provider"
+import { cn, getHoverEffectClasses } from "@shared/lib/utils"
 
 const Card = React.forwardRef<
   HTMLDivElement,

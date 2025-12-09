@@ -16,28 +16,28 @@
  */
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { GenericTable } from "@/components/ui/generic-table";
-import { GenericModal } from "@/components/ui/generic-modal";
+import { Button } from "@shared/components/ui/button";
+import { Card, CardContent } from "@shared/components/ui/card";
+import { GenericTable } from "@shared/components/ui/generic-table";
+import { GenericModal } from "@shared/components/ui/generic-modal";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { GenericForm, FieldConfig } from "@/components/forms/generic-form";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { ErrorMessage } from "@/components/ui/error-message";
-import { ConfirmationDialog, useConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { useEnhancedDelete } from "@/hooks/use-enhanced-delete";
-import { useEnhancedToast } from "@/hooks/use-enhanced-toast";
-import { useSettings } from "@/providers/settings-provider";
-import { cn, getHoverEffectClasses } from "@/lib/utils";
-import type { PaginationInfo } from "@/lib/pagination";
-import { useI18n } from "@/providers/i18n-provider";
+} from "@shared/components/ui/dialog";
+import { GenericForm, FieldConfig } from "@shared/components/forms/generic-form";
+import { LoadingSpinner } from "@shared/components/ui/loading-spinner";
+import { ErrorMessage } from "@shared/components/ui/error-message";
+import { ConfirmationDialog, useConfirmationDialog } from "@shared/components/ui/confirmation-dialog";
+import { useEnhancedDelete } from "@shared/hooks/use-enhanced-delete";
+import { useEnhancedToast } from "@shared/hooks/use-enhanced-toast";
+import { useSettings } from "@shared/providers/settings-provider";
+import { cn, getHoverEffectClasses } from "@shared/lib/utils";
+import type { PaginationInfo } from "@shared/lib/pagination";
+import { useI18n } from "@shared/providers/i18n-provider";
 import { useCallback, useMemo } from "react";
-import { appLogger } from "@/lib/logger";
+import { appLogger } from "@shared/lib/logger";
 
 /* ========================================
  * TYPE DEFINITIONS & INTERFACES

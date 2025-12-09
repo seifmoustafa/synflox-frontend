@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import * as SwitchPrimitives from "@radix-ui/react-switch";
-import { cn } from "@/lib/utils";
-import { useSettings } from "@/providers/settings-provider";
-import { useI18n } from "@/providers/i18n-provider";
+import { cn } from "@shared/lib/utils";
+import { useSettings } from "@shared/providers/settings-provider";
+import { useI18n } from "@shared/providers/i18n-provider";
 
 interface SwitchProps
   extends React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> {

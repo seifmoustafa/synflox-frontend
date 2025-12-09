@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { ChevronLeft, ChevronRight, Calendar, Clock } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useSettings } from "@/providers/settings-provider";
-import { useI18n } from "@/providers/i18n-provider";
+import { cn } from "@shared/lib/utils";
+import { useSettings } from "@shared/providers/settings-provider";
+import { useI18n } from "@shared/providers/i18n-provider";
 
 interface CustomCalendarProps {
   value?: string;

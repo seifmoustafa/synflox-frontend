@@ -1,9 +1,9 @@
 "use client"
 
 import { AlertCircle, RefreshCw } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useI18n } from "@/providers/i18n-provider"
+import { Button } from "@shared/components/ui/button"
+import { Alert, AlertDescription } from "@shared/components/ui/alert"
+import { useI18n } from "@shared/providers/i18n-provider"
 
 interface ErrorMessageProps {
   message: string

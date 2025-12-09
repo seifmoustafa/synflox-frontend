@@ -9,14 +9,14 @@ import React, {
 } from "react";
 import { createPortal } from "react-dom";
 import { CalendarDays, Clock } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useSettings } from "@/providers/settings-provider";
-import { useI18n } from "@/providers/i18n-provider";
+import { cn } from "@shared/lib/utils";
+import { useSettings } from "@shared/providers/settings-provider";
+import { useI18n } from "@shared/providers/i18n-provider";
 import { CustomCalendar } from "./custom-calendar";
 import {
   scrollIntoViewIfNeeded,
   type DropdownPosition,
-} from "@/lib/dropdown-positioning";
+} from "@shared/lib/dropdown-positioning";
 
 interface DatePickerProps {
   id?: string;

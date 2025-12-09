@@ -2,15 +2,15 @@
 
 import type React from "react";
 import { useEffect, useMemo, useState } from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { cn } from "@shared/lib/utils";
+import { Button } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@shared/components/ui/dropdown-menu";
 import {
   ChevronRight,
   ChevronDown,
@@ -20,9 +20,9 @@ import {
   Circle,
   GitBranch,
 } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useI18n } from "@/providers/i18n-provider";
-import { useSettings } from "@/providers/settings-provider";
+import { Checkbox } from "@shared/components/ui/checkbox";
+import { useI18n } from "@shared/providers/i18n-provider";
+import { useSettings } from "@shared/providers/settings-provider";
 
 export type TreeVariant = "lines" | "cards" | "minimal" | "bubble" | "modern" | "glass" | "elegant" | "professional" | "gradient" | "neon" | "organic" | "corporate";
 

@@ -4,7 +4,7 @@ import * as React from "react"
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 import { Circle, Square, Diamond, Star, Heart, Zap, Sparkles, Hexagon } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@shared/lib/utils"
 
 export type RadioDesign = 
   | "default"

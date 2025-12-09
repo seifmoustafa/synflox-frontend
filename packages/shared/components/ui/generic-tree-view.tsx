@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { TreeView } from "@/components/ui/tree-view";
-import { Button } from "@/components/ui/button";
-import { GenericForm } from "@/components/forms/generic-form";
-import { GenericModal } from "@/components/ui/generic-modal";
-import GenericSelect from "@/components/ui/generic-select";
+import { TreeView } from "@shared/components/ui/tree-view";
+import { Button } from "@shared/components/ui/button";
+import { GenericForm } from "@shared/components/forms/generic-form";
+import { GenericModal } from "@shared/components/ui/generic-modal";
+import GenericSelect from "@shared/components/ui/generic-select";
 import {
   Pagination as Pager,
   PaginationContent,
@@ -13,13 +13,13 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
+} from "@shared/components/ui/pagination";
 import { Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
-import { useI18n } from "@/providers/i18n-provider";
-import type { TreeViewModel, TreeNode } from "@/hooks/use-tree-view-model";
-import { appLogger } from "@/lib/logger";
+import { cn } from "@shared/lib/utils";
+import { ConfirmationDialog } from "@shared/components/ui/confirmation-dialog";
+import { useI18n } from "@shared/providers/i18n-provider";
+import type { TreeViewModel, TreeNode } from "@shared/hooks/use-tree-view-model";
+import { appLogger } from "@shared/lib/logger";
 
 export interface GenericTreeViewProps<T extends TreeNode, TCreate, TUpdate> {
   viewModel: TreeViewModel<T, TCreate, TUpdate>;

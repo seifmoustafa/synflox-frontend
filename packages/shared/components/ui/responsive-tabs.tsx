@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from "@shared/lib/utils";
+import { Button } from "@shared/components/ui/button";
 
 interface ResponsiveTabsProps {
   tabs: Array<{

@@ -4,13 +4,13 @@ import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@shared/lib/utils";
 import {
   MODAL_Z_INDEX,
   OVERLAY_Z_INDEX,
   OVERLAY_BACKDROP_BLUR_PX,
   OVERLAY_BACKDROP_BRIGHTNESS,
-} from "@/components/ui/modal-tokens";
+} from "@shared/components/ui/modal-tokens";
 
 const Dialog = DialogPrimitive.Root;
 

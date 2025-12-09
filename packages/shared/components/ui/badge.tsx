@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { useSettings } from "@/providers/settings-provider";
-import { cn } from "@/lib/utils";
+import { useSettings } from "@shared/providers/settings-provider";
+import { cn } from "@shared/lib/utils";
 
 const badgeVariants = cva(
   "inline-flex items-center font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 px-2.5 py-0.5 text-xs",

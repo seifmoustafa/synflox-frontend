@@ -10,11 +10,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+} from "@shared/components/ui/alert-dialog"
+import { Button } from "@shared/components/ui/button"
 import { Trash2, AlertTriangle, Info, CheckCircle } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { appLogger } from "@/lib/logger"
+import { cn } from "@shared/lib/utils"
+import { appLogger } from "@shared/lib/logger"
 
 export interface ConfirmationDialogProps {
   open: boolean

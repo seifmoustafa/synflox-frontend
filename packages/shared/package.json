@@ -5,13 +5,48 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "exports": {
+    ".": "./index.ts",
+    "./components/ui": "./components/ui/index.ts",
     "./components/ui/*": "./components/ui/*.tsx",
+    "./components/forms": "./components/forms/index.ts",
+    "./components/forms/*": "./components/forms/*.tsx",
+    "./components/layout": "./components/layout/index.ts",
+    "./components/layout/common": "./components/layout/common/index.ts",
+    "./components/layout/common/*": "./components/layout/common/*.tsx",
+    "./components/layout/*": "./components/layout/*.tsx",
+    "./components/auth": "./components/auth/index.ts",
+    "./components/auth/*": "./components/auth/*.tsx",
+    "./components/charts": "./components/charts/index.ts",
+    "./components/charts/*": "./components/charts/*.tsx",
+    "./components/dashboard": "./components/dashboard/index.ts",
+    "./components/dashboard/*": "./components/dashboard/*.tsx",
+    "./components/settings": "./components/settings/index.ts",
+    "./components/settings/*": "./components/settings/*.tsx",
+    "./lib": "./lib/index.ts",
     "./lib/*": "./lib/*.ts",
-    "./locales/*": "./locales/*.ts",
-    "./lib/utils": "./lib/utils.ts"
+    "./hooks": "./hooks/index.ts",
+    "./hooks/*": "./hooks/*.ts",
+    "./providers": "./providers/index.ts",
+    "./providers/*": "./providers/*.tsx",
+    "./services": "./services/index.ts",
+    "./services/*": "./services/*.ts",
+    "./domain": "./domain/index.ts",
+    "./domain/*": "./domain/*.ts",
+    "./domain/enums": "./domain/enums/index.ts",
+    "./config": "./config/index.ts",
+    "./config/*": "./config/*.ts",
+    "./styles/*": "./styles/*",
+    "./tailwind.config.base": "./tailwind.config.base.js",
+    "./next.config.base": "./next.config.base.mjs",
+    "./postcss.config": "./postcss.config.mjs",
+    "./tsconfig.base": "./tsconfig.base.json"
   },
   "peerDependencies": {
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "next": ">=14"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
   }
 }

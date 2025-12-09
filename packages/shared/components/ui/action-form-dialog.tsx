@@ -8,17 +8,17 @@ import {
   DialogTitle,
   DialogFooter,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { GenericSelect, type GenericSelectOption } from "@/components/ui/generic-select";
-import { cn } from "@/lib/utils";
-import { appLogger } from "@/lib/logger";
+} from "@shared/components/ui/dialog";
+import { Button } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
+import { Textarea } from "@shared/components/ui/textarea";
+import { Label } from "@shared/components/ui/label";
+import { Switch } from "@shared/components/ui/switch";
+import { GenericSelect, type GenericSelectOption } from "@shared/components/ui/generic-select";
+import { cn } from "@shared/lib/utils";
+import { appLogger } from "@shared/lib/logger";
 import { AlertTriangle, CheckCircle, XCircle, Info, Loader2 } from "lucide-react";
-import { useI18n } from "@/providers/i18n-provider";
+import { useI18n } from "@shared/providers/i18n-provider";
 
 /* ========================================
  * TYPE DEFINITIONS

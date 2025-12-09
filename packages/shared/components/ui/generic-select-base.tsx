@@ -3,12 +3,12 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { Check, ChevronDown, Search, X, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@shared/lib/utils";
 import {
   calculateDropdownPosition,
   scrollIntoViewIfNeeded,
   type DropdownPosition,
-} from "@/lib/dropdown-positioning";
+} from "@shared/lib/dropdown-positioning";
 
 // Re-export for use in other components
 export {
@@ -16,9 +16,9 @@ export {
   scrollIntoViewIfNeeded,
   type DropdownPosition,
 };
-import { useSettings } from "@/providers/settings-provider";
-import { useI18n } from "@/providers/i18n-provider";
-import type { SelectStyle } from "@/providers/settings-provider";
+import { useSettings } from "@shared/providers/settings-provider";
+import { useI18n } from "@shared/providers/i18n-provider";
+import type { SelectStyle } from "@shared/providers/settings-provider";
 
 // Enhanced generic styling system with more attractive designs
 export function getGenericSelectStyles(

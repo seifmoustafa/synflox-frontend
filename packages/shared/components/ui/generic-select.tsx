@@ -10,15 +10,15 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { createPortal } from "react-dom";
-import { cn } from "@/lib/utils";
-import { useSettings } from "@/providers/settings-provider";
-import { useI18n } from "@/providers/i18n-provider";
+import { cn } from "@shared/lib/utils";
+import { useSettings } from "@shared/providers/settings-provider";
+import { useI18n } from "@shared/providers/i18n-provider";
 import {
   getGenericSelectStyles as getGenericSelectStyles,
   ResponsiveChip,
 } from "./generic-select-base";
-import type { SelectStyle } from "@/providers/settings-provider";
-import { appLogger } from "@/lib/logger";
+import type { SelectStyle } from "@shared/providers/settings-provider";
+import { appLogger } from "@shared/lib/logger";
 
 export interface GenericSelectOption {
   value: string;

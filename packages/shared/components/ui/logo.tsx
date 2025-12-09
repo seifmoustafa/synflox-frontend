@@ -3,8 +3,8 @@
 import React from 'react'
 import Link from 'next/link'
 import { Sparkles, Shield } from 'lucide-react'
-import { useSettings } from '@/providers/settings-provider'
-import { cn } from '@/lib/utils'
+import { useSettings } from '@shared/providers/settings-provider'
+import { cn } from '@shared/lib/utils'
 import Image from 'next/image'
 
 interface LogoProps {

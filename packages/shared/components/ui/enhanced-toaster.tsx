@@ -6,8 +6,8 @@ import {
   ToastContent,
   ToastProvider,
   ToastViewport,
-} from "@/components/ui/enhanced-toast"
-import { useEnhancedToast } from "@/hooks/use-enhanced-toast"
+} from "@shared/components/ui/enhanced-toast"
+import { useEnhancedToast } from "@shared/hooks/use-enhanced-toast"
 
 export function EnhancedToaster() {
   const { toasts } = useEnhancedToast()

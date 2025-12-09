@@ -89,7 +89,7 @@ class Logger {
 export const logger = new Logger({
   level: process.env.NODE_ENV === 'development' ? LogLevel.DEBUG : LogLevel.WARN,
   enableInProduction: false,
-  prefix: '[Next-Frontend-Template]',
+  prefix: '[SYNFLOX]',
 });
 
 // Convenience exports

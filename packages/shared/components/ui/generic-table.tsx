@@ -48,21 +48,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+} from "@shared/components/ui/table";
+import { Button } from "@shared/components/ui/button";
+import { Input } from "@shared/components/ui/input";
+import { Checkbox } from "@shared/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@shared/components/ui/dropdown-menu";
 import { MoreHorizontal, ArrowUpDown, Search } from "lucide-react";
-import GenericSelect from "@/components/ui/generic-select";
-import { useI18n } from "@/providers/i18n-provider";
-import { useSettings } from "@/providers/settings-provider";
-import { cn, getHoverEffectClasses, getTableHoverEffectClasses } from "@/lib/utils";
+import GenericSelect from "@shared/components/ui/generic-select";
+import { useI18n } from "@shared/providers/i18n-provider";
+import { useSettings } from "@shared/providers/settings-provider";
+import { cn, getHoverEffectClasses, getTableHoverEffectClasses } from "@shared/lib/utils";
 
 /**
  * Column configuration for the table

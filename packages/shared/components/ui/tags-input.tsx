@@ -2,10 +2,10 @@
 
 import React, { useState, KeyboardEvent } from "react";
 import { X } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Input } from "@shared/components/ui/input";
+import { Badge } from "@shared/components/ui/badge";
+import { Button } from "@shared/components/ui/button";
+import { cn } from "@shared/lib/utils";
 
 export interface TagsInputProps {
   value?: string[];

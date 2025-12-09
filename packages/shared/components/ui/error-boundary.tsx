@@ -1,13 +1,13 @@
 "use client";
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from './button';
+import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useI18n } from '@/providers/i18n-provider';
-import { handleError } from '@/lib/error-handler';
-import { appLogger } from '@/lib/logger';
+import { useI18n } from '@shared/providers/i18n-provider';
+import { handleError } from '@shared/lib/error-handler';
+import { appLogger } from '@shared/lib/logger';
 
 interface Props {
   children: ReactNode;
