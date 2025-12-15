@@ -40,6 +40,7 @@ export * from './separator';
 export * from './sheet';
 export * from './sidebar';
 export * from './skeleton';
+export * from './select';
 export * from './slider';
 export * from './sonner';
 export * from './switch';
@@ -57,6 +58,7 @@ export * from './custom-calendar';
 export * from './custom-status-badge';
 export * from './date-picker';
 export * from './enhanced-toaster';
+export * from './entitlements-tree';
 export * from './error-boundary';
 export * from './error-message';
 export * from './generic-chart';
@@ -75,7 +77,7 @@ export * from './rich-text-editor';
 export * from './tags-input';
 export * from './tree-view';
 export * from './modal-tokens';
-// user-profile-dropdown - App-specific (imports auth-provider), keep in apps
+export * from './user-profile-dropdown';
 
 // Hooks that live with UI
 export * from './use-mobile';

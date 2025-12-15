@@ -13,6 +13,22 @@ import {
   Legend,
 } from "recharts"
 
+// Standard chart color palette
+export const GENERIC_COLORS = {
+  primary: "hsl(var(--primary))",
+  secondary: "hsl(var(--secondary))",
+  success: "#22c55e",
+  warning: "#f59e0b",
+  danger: "#ef4444",
+  info: "#3b82f6",
+  muted: "hsl(var(--muted-foreground))",
+  chart1: "#8884d8",
+  chart2: "#82ca9d",
+  chart3: "#ffc658",
+  chart4: "#ff7300",
+  chart5: "#00C49F",
+};
+
 interface ChartProps {
   data: any[]
   type: "line" | "bar"

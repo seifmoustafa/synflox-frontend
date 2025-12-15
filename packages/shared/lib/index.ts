@@ -12,3 +12,4 @@ export * from './image-utils';
 export * from './dropdown-positioning';
 export * from './secure-token-service';
 export * from './refresh-guard';
+export * from './fonts';

@@ -1,7 +1,7 @@
 /* ========================================
-   IMPORTS & TAILWIND DIRECTIVES
+   TAILWIND DIRECTIVES
+   Note: Fonts are loaded via next/font/local in @shared/lib/fonts
    ======================================== */
-@import "./fonts.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,8 +10,7 @@
    BASE CSS VARIABLES & THEMES
    ======================================== */
 :root {
-  --font-inter: "Inter", sans-serif;
-  --font-cairo: "Cairo", sans-serif;
+  /* Font variables are set by next/font/local via CSS custom properties */
   --font-size-base: 16px;
   --spacing-unit: 1rem;
   
