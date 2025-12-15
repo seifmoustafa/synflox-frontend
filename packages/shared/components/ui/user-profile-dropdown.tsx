@@ -1,130 +1,211 @@
 "use client";
 
-import * as React from "react";
-import { User, Settings, LogOut, Shield, Bell } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, Settings, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Button } from "./button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
+import { cn } from "@shared/lib/utils";
+
+export interface UserProfileDropdownUser {
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  email?: string;
+  avatar?: string;
+  role?: string;
+}
 
 export interface UserProfileDropdownProps {
-  user?: {
-    name?: string;
-    email?: string;
-    avatar?: string;
-    role?: string;
-  };
+  user?: UserProfileDropdownUser | null;
   variant?: "default" | "compact" | "minimal" | "elegant" | "floating" | "modern" | "navigation" | "classic";
   showName?: boolean;
-  showEmail?: boolean;
-  showRole?: boolean;
+  showAvatar?: boolean;
   className?: string;
   onProfileClick?: () => void;
   onSettingsClick?: () => void;
-  onSecurityClick?: () => void;
-  onNotificationsClick?: () => void;
   onLogout?: () => void;
   translations?: {
     profile?: string;
     settings?: string;
-    security?: string;
-    notifications?: string;
     logout?: string;
+    user?: string;
   };
 }
 
 export function UserProfileDropdown({
   user,
+  variant = "default",
+  showName = true,
+  showAvatar = true,
+  className,
   onProfileClick,
   onSettingsClick,
-  onSecurityClick,
-  onNotificationsClick,
   onLogout,
   translations = {},
 }: UserProfileDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
   const {
     profile = "Profile",
     settings = "Settings",
-    security = "Security",
-    notifications = "Notifications",
     logout = "Logout",
+    user: userLabel = "User",
   } = translations;
 
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+  if (!user || !showAvatar) return null;
+
+  const getInitials = () => {
+    const firstName = user.firstName || "";
+    const lastName = user.lastName || "";
+    const firstInitial = firstName.charAt(0)?.toUpperCase() || "";
+    const lastInitial = lastName.charAt(0)?.toUpperCase() || "";
+    return `${firstInitial}${lastInitial}` || user.username?.charAt(0)?.toUpperCase() || "U";
+  };
+
+  const getDisplayName = () => {
+    const firstName = user.firstName || "";
+    const lastName = user.lastName || "";
+    return `${firstName} ${lastName}`.trim() || user.username || "User";
+  };
+
+  const handleProfileClick = () => {
+    onProfileClick?.();
+    setIsOpen(false);
+  };
+
+  const handleSettingsClick = () => {
+    onSettingsClick?.();
+    setIsOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await onLogout?.();
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  const getAvatarSize = () => {
+    switch (variant) {
+      case "compact":
+        return "h-8 w-8";
+      case "minimal":
+        return "h-7 w-7";
+      case "floating":
+        return "h-9 w-9";
+      case "navigation":
+        return "h-8 w-8";
+      default:
+        return "h-9 w-9";
+    }
+  };
+
+  const getTextSize = () => {
+    switch (variant) {
+      case "compact":
+      case "minimal":
+        return "text-xs";
+      default:
+        return "text-sm";
+    }
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-          <Avatar className="h-9 w-9">
-            <AvatarImage src={user?.avatar} alt={user?.name || "User"} />
-            <AvatarFallback className="bg-primary/10 text-primary">
-              {getInitials(user?.name)}
+        <Button
+          variant="ghost"
+          className={cn(
+            "flex items-center gap-2 p-2 hover:bg-accent/50 transition-colors h-10",
+            variant === "navigation" && "h-9",
+            variant === "floating" && "rounded-full",
+            className
+          )}
+        >
+          <Avatar className={cn(getAvatarSize(), "border-2 border-primary/20")}>
+            {user.avatar && <AvatarImage src={user.avatar} alt={getDisplayName()} />}
+            <AvatarFallback className="bg-gradient-to-br from-blue-400 to-blue-600 text-white font-semibold text-sm">
+              {getInitials()}
             </AvatarFallback>
           </Avatar>
+
+          {showName && (
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="text-right rtl:text-left min-w-0">
+                <p className={cn("font-medium truncate max-w-[120px]", getTextSize())}>
+                  {getDisplayName()}
+                </p>
+                <p className="text-muted-foreground truncate max-w-[120px] text-xs">
+                  {user.role || userLabel}
+                </p>
+              </div>
+              <ChevronDown
+                className={cn(
+                  "transition-transform duration-200 flex-shrink-0",
+                  isOpen && "rotate-180",
+                  variant === "compact" ? "h-3 w-3" : "h-4 w-4"
+                )}
+              />
+            </div>
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user?.email || ""}
+
+      <DropdownMenuContent align="end" className="w-56 p-2" side="bottom">
+        <div className="flex items-center gap-3 p-2 mb-2">
+          <Avatar className="h-10 w-10 border-2 border-primary/20">
+            {user.avatar && <AvatarImage src={user.avatar} alt={getDisplayName()} />}
+            <AvatarFallback className="bg-gradient-to-br from-blue-400 to-blue-600 text-white font-semibold">
+              {getInitials()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="text-right rtl:text-left min-w-0">
+            <p className="font-medium text-sm truncate">{getDisplayName()}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {user.role || userLabel}
             </p>
-            {user?.role && (
-              <p className="text-xs leading-none text-muted-foreground mt-1">
-                {user.role}
-              </p>
-            )}
           </div>
-        </DropdownMenuLabel>
+        </div>
+
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          {onProfileClick && (
-            <DropdownMenuItem onClick={onProfileClick}>
-              <User className="mr-2 h-4 w-4" />
-              <span>{profile}</span>
-            </DropdownMenuItem>
-          )}
-          {onSettingsClick && (
-            <DropdownMenuItem onClick={onSettingsClick}>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>{settings}</span>
-            </DropdownMenuItem>
-          )}
-          {onSecurityClick && (
-            <DropdownMenuItem onClick={onSecurityClick}>
-              <Shield className="mr-2 h-4 w-4" />
-              <span>{security}</span>
-            </DropdownMenuItem>
-          )}
-          {onNotificationsClick && (
-            <DropdownMenuItem onClick={onNotificationsClick}>
-              <Bell className="mr-2 h-4 w-4" />
-              <span>{notifications}</span>
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuGroup>
+
+        {onProfileClick && (
+          <DropdownMenuItem
+            onClick={handleProfileClick}
+            className="flex items-center gap-3 p-3 cursor-pointer hover:bg-accent/50 rounded-md"
+          >
+            <User className="h-4 w-4" />
+            <span>{profile}</span>
+          </DropdownMenuItem>
+        )}
+
+        {onSettingsClick && (
+          <DropdownMenuItem
+            onClick={handleSettingsClick}
+            className="flex items-center gap-3 p-3 cursor-pointer hover:bg-accent/50 rounded-md"
+          >
+            <Settings className="h-4 w-4" />
+            <span>{settings}</span>
+          </DropdownMenuItem>
+        )}
+
         {onLogout && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onLogout} className="text-destructive focus:text-destructive">
-              <LogOut className="mr-2 h-4 w-4" />
+            <DropdownMenuItem
+              onClick={handleSignOut}
+              className="flex items-center gap-3 p-3 cursor-pointer hover:bg-destructive/10 text-destructive rounded-md"
+            >
+              <LogOut className="h-4 w-4" />
               <span>{logout}</span>
             </DropdownMenuItem>
           </>
