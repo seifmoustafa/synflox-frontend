@@ -15,8 +15,11 @@ interface LogoProps {
   clickable?: boolean
 }
 
-export function Logo({ className, showText = true, size = 'md', animation = 'none', clickable = true }: LogoProps) {
+export function Logo({ className, showText = true, size = 'md', animation, clickable = true }: LogoProps) {
   const settings = useSettings()
+
+  // Use settings.logoAnimation if no animation prop is provided
+  const effectiveAnimation: 'none' | 'spin' | 'pulse' | 'bounce' | 'fancy' = animation ?? settings.logoAnimation ?? 'none'
 
   if (!settings.showLogo) {
     return null
@@ -59,7 +62,7 @@ export function Logo({ className, showText = true, size = 'md', animation = 'non
   const renderIcon = () => {
     const iconClass = cn(
       sizeClasses[size],
-      animationClasses[animation],
+      animationClasses[effectiveAnimation],
       'transition-all duration-200'
     )
 
@@ -75,7 +78,7 @@ export function Logo({ className, showText = true, size = 'md', animation = 'non
               src={'/app-logo.png'}
               alt="Logo"
               fill
-              className={cn('object-cover', animationClasses[animation])}
+              className={cn('object-cover', animationClasses[effectiveAnimation])}
               onError={(e) => {
                 // Fallback to sparkles icon if image fails to load
                 e.currentTarget.style.display = 'none'
