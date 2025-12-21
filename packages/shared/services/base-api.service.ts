@@ -155,7 +155,7 @@ export abstract class BaseApiService implements IApiService {
 
     const language = this.getLanguage();
     const authHeaders = await this.getAuthHeaders(endpoint);
-    
+
     const headers: Record<string, string> = {
       ...this.defaultHeaders,
       "Accept-Language": language,
@@ -206,6 +206,22 @@ export abstract class BaseApiService implements IApiService {
         // 401 Unauthorized - let subclass handle it
         if (response.status === 401) {
           return this.handle401Error(endpoint, options, signal);
+        }
+
+        // 403 with PASSWORD_CHANGE_REQUIRED - redirect to change password page
+        if (response.status === 403 && errorData?.errors?.includes("PASSWORD_CHANGE_REQUIRED")) {
+          if (typeof window !== "undefined") {
+            // Only redirect if not already on change-password page
+            if (!window.location.pathname.includes("/change-password")) {
+              window.location.href = "/change-password";
+            }
+          }
+          // Still throw so the caller knows something happened
+          const error = new Error(errorMessage) as ApiError;
+          error.statusCode = 403;
+          error.response = { status: 403, data: errorData };
+          (error as any).isPasswordChangeRequired = true;
+          throw error;
         }
 
         // Create error with status code
